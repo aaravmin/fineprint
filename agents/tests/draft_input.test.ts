@@ -10,6 +10,7 @@ const taskRow = {
   kind: "emissions_fine_analysis",
   lawId: "ll97",
   fineEstimateUsd: 1_102_986,
+  deadline: { toDate: () => new Date("2027-05-01T00:00:00Z") },
 };
 
 const ingestedBuilding = {
@@ -45,6 +46,18 @@ describe("draftInputFrom", () => {
     expect(input.ll97Covered).toBe(true);
     expect(input.provenance).toHaveLength(1);
     expect(input.provenance[0].source).toBe("LL84 benchmarking disclosure");
+  });
+
+  test("the task deadline converts to a date the policies can render", () => {
+    const input = draftInputFrom(taskRow, ingestedBuilding);
+
+    expect(input.deadline?.toISOString()).toBe("2027-05-01T00:00:00.000Z");
+  });
+
+  test("a task without a deadline leaves the field undefined", () => {
+    const input = draftInputFrom({ ...taskRow, deadline: undefined }, ingestedBuilding);
+
+    expect(input.deadline).toBeUndefined();
   });
 
   test("a seed building without real-data columns degrades to empty fields", () => {

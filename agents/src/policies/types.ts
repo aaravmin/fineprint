@@ -12,6 +12,7 @@ export interface DraftInput {
   sqft: number;
   isAffordable: boolean;
   fineEstimateUsd: number | undefined;
+  deadline: Date | undefined;
   // Real-data fields from ingest. Seed buildings leave them empty — every
   // policy must render something sensible either way.
   bbl: string | undefined;

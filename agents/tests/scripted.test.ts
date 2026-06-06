@@ -12,6 +12,7 @@ function draftInput(overrides: Partial<DraftInput> = {}): DraftInput {
     sqft: 2_852_257,
     isAffordable: false,
     fineEstimateUsd: 1_102_986,
+    deadline: undefined,
     bbl: "1008350041",
     annualEmissionsTco2e: 12_096.78,
     uses: [
@@ -100,6 +101,37 @@ describe("draftScripted", () => {
     const draft = draftScripted(draftInput());
 
     expect(draft).toMatch(/12,096\.78 tCO2e/);
+  });
+
+  test("drafts state the filing deadline when the task has one", () => {
+    const draft = draftScripted(
+      draftInput({ deadline: new Date("2027-05-01T00:00:00Z") }),
+    );
+
+    expect(draft).toMatch(/Deadline: May 1, 2027/);
+  });
+
+  test("no deadline, no deadline line", () => {
+    const draft = draftScripted(draftInput({ deadline: undefined }));
+
+    expect(draft).not.toMatch(/Deadline:/);
+  });
+
+  test("the Article 321 draft states the building's 2030 target from the engine", () => {
+    const draft = draftScripted(
+      draftInput({
+        kind: "prescriptive_measures_plan",
+        lawId: "art321",
+        isAffordable: true,
+        uses: [{ group: "Multifamily Housing", sqft: 80_000 }],
+        sqft: 80_000,
+        annualEmissionsTco2e: 600,
+      }),
+    );
+
+    // 0.00334664 x 80,000 sqft = 267.73 tCO2e — the engine's 2030 target.
+    expect(draft).toMatch(/267\.73 tCO2e/);
+    expect(draft).toMatch(/2030/);
   });
 
   test("the LL97 draft shows the engine's cliff table when uses are known", () => {

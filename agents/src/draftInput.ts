@@ -9,6 +9,7 @@ interface TaskLike {
   kind: string;
   lawId: string;
   fineEstimateUsd: number | undefined;
+  deadline?: { toDate(): Date };
 }
 
 interface BuildingLike {
@@ -34,6 +35,7 @@ export function draftInputFrom(
     sqft: building?.sqft ?? 0,
     isAffordable: building?.isAffordable ?? false,
     fineEstimateUsd: task.fineEstimateUsd,
+    deadline: task.deadline?.toDate(),
     bbl: building?.bbl,
     annualEmissionsTco2e: building?.annualEmissionsTco2E,
     uses:

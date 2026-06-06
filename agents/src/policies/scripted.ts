@@ -28,6 +28,7 @@ const TEMPLATES: Record<string, (i: DraftInput) => string> = {
       ``,
       `Building qualifies for the affordable-housing pathway: implement the prescriptive`,
       `measures list instead of meeting the emissions cap.`,
+      ...art321TargetLines(input),
       `  1. Confirm eligibility documentation with HPD records.`,
       `  2. Schedule the 13 prescriptive measures survey (controls, insulation, low-flow).`,
       `  3. File certification of completed measures before the deadline.`,
@@ -104,8 +105,33 @@ export function draftScripted(input: DraftInput): string {
         `Draft prepared by scripted policy. Human review required.`,
       ].join("\n");
 
-  const footnote = sourcesFootnote(input);
-  return footnote ? `${body}\n\n${footnote}` : body;
+  return [body, deadlineLine(input), sourcesFootnote(input)].filter(Boolean).join("\n\n");
+}
+
+function deadlineLine(input: DraftInput): string {
+  if (!input.deadline) return "";
+
+  const date = input.deadline.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+  return `Deadline: ${date}`;
+}
+
+// The engine's 2030 limit is the Article 321 performance target
+// (Admin Code 28-321.2.1); state it when the building data allows.
+function art321TargetLines(input: DraftInput): string[] {
+  const projections = projectFines(input);
+  if (!projections || projections[0].pathway !== "article321") return [];
+
+  const target = projections[0].emissionsLimitTco2e.toLocaleString("en-US");
+  const current =
+    input.annualEmissionsTco2e !== undefined
+      ? ` (currently ${input.annualEmissionsTco2e.toLocaleString("en-US")} tCO2e)`
+      : "";
+  return [``, `2030 emissions target: ${target} tCO2e${current}.`];
 }
 
 // The honesty footnote: where every fact in the draft came from, straight

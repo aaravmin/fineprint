@@ -15,6 +15,7 @@ function esbInput(overrides: Partial<DraftInput> = {}): DraftInput {
     sqft: 2_852_257,
     isAffordable: false,
     fineEstimateUsd: 0,
+    deadline: undefined,
     bbl: "1008350041",
     annualEmissionsTco2e: 12_096.78,
     uses: [
