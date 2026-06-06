@@ -11,6 +11,12 @@ const USE_LLM = process.env.USE_LLM === "true";
 const NAME = process.env.WORKER_NAME ?? `agent-${process.pid}`;
 const WORK_MS = 6_000; // simulated drafting time so the demo is watchable
 
+// Optional filter: "emissions_fine_analysis,benchmarking_filing" means this
+// worker only picks up tasks of those kinds. Unset = accept everything.
+const KINDS: Set<string> | null = process.env.WORKER_KINDS
+  ? new Set(process.env.WORKER_KINDS.split(",").map(s => s.trim()))
+  : null;
+
 let myIdentityHex = "";
 let busy = false;
 
@@ -62,6 +68,7 @@ async function tick() {
   if (self.status === "idle") {
     const nextOpenTask = [...conn.db.task.iter()]
       .filter(task => task.status === "open")
+      .filter(task => KINDS === null || KINDS.has(task.kind))
       .sort((a, b) => (a.id < b.id ? -1 : 1))[0];
     if (!nextOpenTask) return;
 
@@ -90,6 +97,9 @@ async function workOn(taskId: bigint) {
     sqft: building?.sqft ?? 0,
     isAffordable: building?.isAffordable ?? false,
     fineEstimateUsd: task.fineEstimateUsd,
+    annualEmissionsTco2e: building?.annualEmissionsTco2E ?? undefined,
+    usesJson: building?.usesJson ?? undefined,
+    provenanceJson: building?.provenanceJson ?? undefined,
   };
   const body = USE_LLM ? await draftLlm(input) : draftScripted(input);
 

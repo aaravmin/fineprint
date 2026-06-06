@@ -16,6 +16,7 @@
     "generate": "spacetime generate --lang typescript --out-dir client/src/module_bindings --module-path spacetimedb && spacetime generate --lang typescript --out-dir agents/src/module_bindings --module-path spacetimedb",
     "seed": "tsx scripts/seed.ts",
     "worker": "npm run worker --workspace agents",
+    "reviewer": "npm run reviewer --workspace agents",
     "dashboard": "npm run dev --workspace client"
   },
   "devDependencies": {
