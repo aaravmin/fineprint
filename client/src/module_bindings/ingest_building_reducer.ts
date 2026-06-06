@@ -19,4 +19,5 @@ export default {
   usesJson: __t.string(),
   coveredLawIdsJson: __t.string(),
   provenanceJson: __t.string(),
+  ll97AnnualFineUsd: __t.option(__t.u32()),
 };

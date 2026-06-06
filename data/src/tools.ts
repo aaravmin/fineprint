@@ -4,6 +4,7 @@
 // data pipeline and the engine, never from the model.
 
 import { computeAllPeriods, type FineResult } from "../../engine/src/index.ts";
+import { toEngineInput } from "./engineBridge.ts";
 import { lookupBuilding as realLookupBuilding } from "./lookup.ts";
 import type { BuildingFacts } from "./types.ts";
 
@@ -77,29 +78,22 @@ interface Assessment {
 }
 
 function assessBuilding(facts: BuildingFacts): Assessment {
-  const canCompute =
-    facts.grossFloorAreaSqft !== null &&
-    facts.annualEmissionsTco2e !== null &&
-    facts.occupancyGroups.length > 0;
+  const { input, missing } = toEngineInput(facts);
 
-  if (!canCompute) {
+  if (!input) {
     return {
       facts,
       projections: null,
       note:
-        "Fine projections unavailable: the building has no LL84 filing, so " +
-        "emissions and use splits are unknown. The facts above are still sourced.",
+        `Fine projections unavailable: the city has no ${missing.join(", ")} ` +
+        "for this building (usually a missing LL84 filing — emissions and " +
+        "use splits are unknown). The facts above are still sourced.",
     };
   }
 
   return {
     facts,
-    projections: computeAllPeriods({
-      grossFloorAreaSqft: facts.grossFloorAreaSqft!,
-      occupancyGroups: facts.occupancyGroups,
-      annualEmissionsTco2e: facts.annualEmissionsTco2e!,
-      isArticle321: facts.isArticle321 ?? false,
-    }),
+    projections: computeAllPeriods(input),
     note: null,
   };
 }

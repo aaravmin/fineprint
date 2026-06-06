@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
-import { parseBblResponse } from "../src/geosearch.ts";
+import { parseBblCandidates, parseBblResponse } from "../src/geosearch.ts";
 
 // Fixtures are real GeoSearch responses recorded 2026-06-06:
 // https://geosearch.planninglabs.nyc/v2/search?text=350 5th Avenue, Manhattan
@@ -35,5 +35,17 @@ describe("parseBblResponse", () => {
     }
 
     expect(() => parseBblResponse(stripped, "350 5th Avenue, Manhattan")).toThrow(/BBL/);
+  });
+
+  test("candidates keep GeoSearch's ranking, skip BBL-less features, dedupe", () => {
+    const candidates = parseBblCandidates(match, "350 5th Avenue, Manhattan");
+
+    // The recorded response holds Manhattan's 350 5th Ave first and
+    // Brooklyn's further down — both must survive, in order.
+    expect(candidates[0].bbl).toBe("1008350041");
+    expect(candidates.some(candidate => candidate.borough === "Brooklyn")).toBe(true);
+
+    const bbls = candidates.map(candidate => candidate.bbl);
+    expect(new Set(bbls).size).toBe(bbls.length);
   });
 });

@@ -109,6 +109,31 @@ describe("parseLl84Rows", () => {
     expect(facts!.unmappedUses).toEqual([{ group: "Other", sqft: 10_000 }]);
   });
 
+  // ESPM's "location-based GHG" uses national eGRID factors; DOB prices fuels
+  // with the statute's own coefficients (Admin Code 28-320.3.1.1, echoed in
+  // 1 RCNY 103-14(d)(3)). The parser recomputes emissions the DOB way from
+  // the filing's fuel columns. For the ESB fixture: natural gas 5,469,879.2
+  // kBtu x 0.00005311 + district steam 64,363,489.2 kBtu x 0.00004493 +
+  // grid electricity 30,849,800.6 kWh x 0.000288962 = 12,096.78 tCO2e —
+  // a 27% lower figure than the 16,678.22 location-based number.
+  test("recomputes emissions with the statute's fuel coefficients", () => {
+    const facts = parseLl84Rows(esbRows, "1008350041");
+
+    expect(facts!.recomputedEmissionsTco2e).toBeCloseTo(12_096.78, 1);
+    expect(facts!.annualEmissionsTco2e).toBe(16_678.22);
+    expect(facts!.unpriceableFuels).toEqual([]);
+  });
+
+  test("a fuel with no verified coefficient blocks the recompute, visibly", () => {
+    const rows = structuredClone(esbRows);
+    rows[0].fuel_oil_5_6_use_kbtu = "100000";
+
+    const facts = parseLl84Rows(rows, "1008350041");
+
+    expect(facts!.recomputedEmissionsTco2e).toBeNull();
+    expect(facts!.unpriceableFuels).toEqual(["fuel_oil_5_6_use_kbtu"]);
+  });
+
   test("a campus year with parent and child rows keeps the largest filing", () => {
     const rows = structuredClone(esbRows);
     const childRow = structuredClone(esbRows[0]);

@@ -100,6 +100,10 @@ export const ingest_building = spacetimedb.reducer(
     usesJson: t.string(),
     coveredLawIdsJson: t.string(),
     provenanceJson: t.string(),
+    // Current-period LL97 fine in whole dollars, computed by the engine in
+    // the ingest pipeline (the module cannot import the engine itself).
+    // Absent means the engine had no data; the law's stub estimate applies.
+    ll97AnnualFineUsd: t.option(t.u32()),
   },
   (ctx, args) => {
     if (args.address.trim() === "") throw new Error("address cannot be empty");
@@ -120,6 +124,20 @@ export const ingest_building = spacetimedb.reducer(
         ll97Covered: deriveLl97Covered(args.coveredLawIdsJson),
         provenanceJson: args.provenanceJson,
       });
+
+      // Fresher data means a fresher fine: keep the LL97 task's estimate in
+      // step with the engine instead of letting a stale stub survive.
+      if (args.ll97AnnualFineUsd !== undefined) {
+        for (const task of ctx.db.task.iter()) {
+          const isLl97Task = task.lawId === "ll97" || task.lawId === "art321";
+          if (task.buildingId === existingBuilding.id && isLl97Task) {
+            ctx.db.task.id.update({
+              ...task,
+              fineEstimateUsd: args.ll97AnnualFineUsd,
+            });
+          }
+        }
+      }
 
       logEvent(
         ctx,
@@ -149,7 +167,10 @@ export const ingest_building = spacetimedb.reducer(
         : applicableLaws(args.sqft, args.isArticle321);
 
     for (const law of laws) {
-      const fine = law.fineEstimateUsd(args.sqft, args.isArticle321);
+      const isLl97Law = law.id === "ll97" || law.id === "art321";
+      const engineFine = isLl97Law ? args.ll97AnnualFineUsd : undefined;
+      const stubFine = law.fineEstimateUsd(args.sqft, args.isArticle321);
+
       ctx.db.task.insert({
         id: 0n,
         buildingId: newBuilding.id,
@@ -159,7 +180,7 @@ export const ingest_building = spacetimedb.reducer(
         status: "open",
         deadline: addMs(ctx.timestamp, law.deadlineDays * 86_400_000),
         slaBreached: false,
-        fineEstimateUsd: fine === null ? undefined : fine,
+        fineEstimateUsd: engineFine ?? (stubFine === null ? undefined : stubFine),
         claimedBy: undefined,
         createdAt: ctx.timestamp,
       });

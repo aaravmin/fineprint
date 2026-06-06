@@ -54,6 +54,35 @@ const LL84_USE_UNMAPPABLE = new Set([
   "Drinking Water Treatment & Distribution",
 ]);
 
+// Fuel coefficients in tCO2e per kBtu (electricity per kWh), as DOB prices
+// them for 2024-2029 penalties. Sources: Admin Code 28-320.3.1.1 (gas, oils,
+// steam, electricity; echoed in DOB's June 2024 guidance,
+// https://www.nyc.gov/assets/buildings/pdf/ll97_emissions.pdf) and
+// 1 RCNY 103-14(d)(3)(i) (diesel, kerosene, propane) — verified 2026-06-06.
+const FUEL_COEFFICIENTS_PER_KBTU: Record<string, number> = {
+  natural_gas_use_kbtu: 0.00005311,
+  fuel_oil_1_use_kbtu: 0.0000735,
+  fuel_oil_2_use_kbtu: 0.00007421,
+  fuel_oil_4_use_kbtu: 0.00007529,
+  diesel_2_use_kbtu: 0.00007421,
+  propane_use_kbtu: 0.00006425,
+  kerosene_use_kbtu: 0.00007769,
+  district_steam_use_kbtu: 0.00004493,
+};
+
+const ELECTRICITY_KWH_COLUMN = "electricity_use_grid_purchase_1";
+const ELECTRICITY_COEFFICIENT_PER_KWH = 0.000288962;
+
+// Fuels the statute prices differently or not at all (no. 5/6 oil has no
+// verified coefficient; district hot/chilled water and on-site generation
+// have their own rules). Any consumption here blocks the recompute.
+const UNPRICEABLE_FUEL_COLUMNS = [
+  "fuel_oil_5_6_use_kbtu",
+  "district_hot_water_use_kbtu",
+  "district_chilled_water_use",
+  "electricity_use_generated",
+];
+
 interface Ll84Row {
   report_year?: string;
   property_name?: string;
@@ -62,6 +91,7 @@ interface Ll84Row {
   property_gfa_self_reported?: string;
   list_of_all_property_use?: string;
   total_location_based_ghg?: string;
+  [fuelColumn: string]: string | undefined;
 }
 
 export async function fetchLl84(bbl: Bbl): Promise<Ll84Facts | null> {
@@ -95,6 +125,7 @@ export function parseLl84Rows(rows: Ll84Row[], bbl: Bbl): Ll84Facts | null {
   )[0];
 
   const { mapped, proxied, unmapped } = mapUseList(latestFiling.list_of_all_property_use);
+  const { recomputed, unpriceable } = recomputeEmissions(latestFiling);
 
   return {
     bbl,
@@ -102,10 +133,52 @@ export function parseLl84Rows(rows: Ll84Row[], bbl: Bbl): Ll84Facts | null {
     grossFloorAreaSqft: floorArea(latestFiling),
     occupancyGroups: mapped,
     annualEmissionsTco2e: parseNumber(latestFiling.total_location_based_ghg),
+    recomputedEmissionsTco2e: recomputed,
+    unpriceableFuels: unpriceable,
     reportingYear: parseNumber(latestFiling.report_year),
     proxiedUses: proxied,
     unmappedUses: unmapped,
   };
+}
+
+// ESPM's location-based GHG prices electricity with national eGRID factors;
+// DOB's penalty math uses the statute's coefficients. Recompute the
+// emissions the DOB way from the filing's fuel columns. Returns null when
+// any consumed fuel has no verified coefficient — falling back beats
+// pretending.
+function recomputeEmissions(row: Ll84Row): {
+  recomputed: number | null;
+  unpriceable: string[];
+} {
+  const unpriceable = UNPRICEABLE_FUEL_COLUMNS.filter(
+    column => (parseNumber(row[column]) ?? 0) > 0,
+  );
+  if (unpriceable.length > 0) {
+    return { recomputed: null, unpriceable };
+  }
+
+  let totalTco2e = 0;
+  let pricedAnything = false;
+
+  for (const [column, coefficient] of Object.entries(FUEL_COEFFICIENTS_PER_KBTU)) {
+    const kbtu = parseNumber(row[column]);
+    if (kbtu !== null && kbtu > 0) {
+      totalTco2e += kbtu * coefficient;
+      pricedAnything = true;
+    }
+  }
+
+  const electricityKwh = parseNumber(row[ELECTRICITY_KWH_COLUMN]);
+  if (electricityKwh !== null && electricityKwh > 0) {
+    totalTco2e += electricityKwh * ELECTRICITY_COEFFICIENT_PER_KWH;
+    pricedAnything = true;
+  }
+
+  if (!pricedAnything) {
+    return { recomputed: null, unpriceable: [] };
+  }
+
+  return { recomputed: Math.round(totalTco2e * 100) / 100, unpriceable: [] };
 }
 
 function floorArea(row: Ll84Row): number | null {

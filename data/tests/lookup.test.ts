@@ -21,9 +21,11 @@ const ll84Facts: Ll84Facts = {
     { group: "Restaurant", sqft: 50_021 },
   ],
   annualEmissionsTco2e: 16_678.22,
+  recomputedEmissionsTco2e: 12_096.78,
   reportingYear: 2024,
   proxiedUses: [],
   unmappedUses: [],
+  unpriceableFuels: [],
 };
 
 const cblEntry: CblEntry = {
@@ -39,7 +41,7 @@ const cblEntry: CblEntry = {
 
 function fakeSources(overrides: Partial<Parameters<typeof lookupBuilding>[1]> = {}) {
   return {
-    lookupBbl: async () => geoResult,
+    lookupBblCandidates: async () => [geoResult],
     fetchLl84: async () => ll84Facts,
     getCblEntry: () => cblEntry,
     ...overrides,
@@ -54,9 +56,87 @@ describe("lookupBuilding", () => {
     expect(facts.address).toBe("350 5 AVENUE, New York, NY, USA");
     expect(facts.grossFloorAreaSqft).toBe(2_852_257);
     expect(facts.occupancyGroups).toHaveLength(2);
-    expect(facts.annualEmissionsTco2e).toBe(16_678.22);
     expect(facts.isLl97Covered).toBe(true);
     expect(facts.isArticle321).toBe(false);
+  });
+
+  test("emissions use the statute-coefficient recompute when available", async () => {
+    const facts = await lookupBuilding("350 5th Avenue, Manhattan", fakeSources());
+
+    expect(facts.annualEmissionsTco2e).toBe(12_096.78);
+    const emissionsNote = facts.provenance.find(
+      note => note.field === "annualEmissionsTco2e",
+    );
+    expect(emissionsNote?.detail).toMatch(/28-320\.3\.1\.1/);
+  });
+
+  test("falls back to location-based GHG when a fuel cannot be priced", async () => {
+    const facts = await lookupBuilding(
+      "350 5th Avenue, Manhattan",
+      fakeSources({
+        fetchLl84: async () => ({
+          ...ll84Facts,
+          recomputedEmissionsTco2e: null,
+          unpriceableFuels: ["fuel_oil_5_6_use_kbtu"],
+        }),
+      }),
+    );
+
+    expect(facts.annualEmissionsTco2e).toBe(16_678.22);
+    const emissionsNote = facts.provenance.find(
+      note => note.field === "annualEmissionsTco2e",
+    );
+    expect(emissionsNote?.detail).toMatch(/location-based/i);
+    expect(emissionsNote?.detail).toMatch(/fuel_oil_5_6/);
+  });
+
+  test("prefers the GeoSearch candidate that DOF actually knows", async () => {
+    const wrongLot: BblResult = {
+      bbl: "1002830094",
+      normalizedAddress: "1 PIKE STREET, New York, NY, USA",
+      borough: "Manhattan",
+    };
+    const dofLot: BblResult = {
+      bbl: "1000020023",
+      normalizedAddress: "1 PIKE ST., New York, NY, USA",
+      borough: "Manhattan",
+    };
+
+    const facts = await lookupBuilding(
+      "1 Pike Street, Manhattan",
+      fakeSources({
+        lookupBblCandidates: async () => [wrongLot, dofLot],
+        getCblEntry: bbl => (bbl === "1000020023" ? cblEntry : null),
+      }),
+    );
+
+    expect(facts.bbl).toBe("1000020023");
+    const bblNote = facts.provenance.find(note => note.field === "bbl");
+    expect(bblNote?.detail).toMatch(/candidate/i);
+  });
+
+  test("never hops to a covered lot with a different house number", async () => {
+    const queriedLot: BblResult = {
+      bbl: "1002830094",
+      normalizedAddress: "1 PIKE STREET, New York, NY, USA",
+      borough: "Manhattan",
+    };
+    const otherBuildingDownTheStreet: BblResult = {
+      bbl: "1002550001",
+      normalizedAddress: "51 PIKE STREET, New York, NY, USA",
+      borough: "Manhattan",
+    };
+
+    const facts = await lookupBuilding(
+      "1 Pike Street, Manhattan",
+      fakeSources({
+        lookupBblCandidates: async () => [queriedLot, otherBuildingDownTheStreet],
+        getCblEntry: bbl => (bbl === "1002550001" ? cblEntry : null),
+      }),
+    );
+
+    // 51 Pike is a different building, covered or not — stay on 1 Pike.
+    expect(facts.bbl).toBe("1002830094");
   });
 
   test("every populated field names its source", async () => {
@@ -67,6 +147,13 @@ describe("lookupBuilding", () => {
     expect(fields).toContain("grossFloorAreaSqft");
     expect(fields).toContain("annualEmissionsTco2e");
     expect(fields).toContain("isLl97Covered");
+  });
+
+  test("coverage notes admit the list is an annual reference snapshot", async () => {
+    const facts = await lookupBuilding("350 5th Avenue, Manhattan", fakeSources());
+    const coverageNote = facts.provenance.find(note => note.field === "isLl97Covered");
+
+    expect(coverageNote?.detail).toMatch(/reference/i);
   });
 
   test("no LL84 filing: floor area falls back to DOF records, gaps are noted", async () => {
@@ -81,16 +168,6 @@ describe("lookupBuilding", () => {
 
     const noteText = facts.provenance.map(note => note.detail ?? "").join(" ");
     expect(noteText).toMatch(/no LL84 filing/i);
-  });
-
-  test("a building absent from the covered buildings list is not covered", async () => {
-    const facts = await lookupBuilding(
-      "350 5th Avenue, Manhattan",
-      fakeSources({ getCblEntry: () => null }),
-    );
-
-    expect(facts.isLl97Covered).toBe(false);
-    expect(facts.isArticle321).toBe(false);
   });
 
   test("proxied and unmapped uses surface in provenance", async () => {
@@ -111,9 +188,19 @@ describe("lookupBuilding", () => {
     expect(noteText).toMatch(/3,000 sqft.*excluded/);
   });
 
+  test("a building absent from the covered buildings list is not covered", async () => {
+    const facts = await lookupBuilding(
+      "350 5th Avenue, Manhattan",
+      fakeSources({ getCblEntry: () => null }),
+    );
+
+    expect(facts.isLl97Covered).toBe(false);
+    expect(facts.isArticle321).toBe(false);
+  });
+
   test("an unresolvable address propagates GeoSearch's error", async () => {
     const sources = fakeSources({
-      lookupBbl: async () => {
+      lookupBblCandidates: async () => {
         throw new Error('no NYC address found for "nowhere"');
       },
     });

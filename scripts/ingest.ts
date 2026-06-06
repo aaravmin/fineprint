@@ -6,7 +6,9 @@
 //        (server must be running and module published)
 import { DbConnection } from "../agents/src/module_bindings/index.ts";
 import { getCblEntry } from "../data/src/coveredBuildings.ts";
+import { toEngineInput } from "../data/src/engineBridge.ts";
 import { lookupBuilding } from "../data/src/lookup.ts";
+import { computeFine } from "../engine/src/index.ts";
 
 const HOST = process.env.SPACETIME_URI ?? "ws://localhost:3000";
 const DB_NAME = process.env.DB_NAME ?? "fineprint";
@@ -31,12 +33,22 @@ const coveredLawIds = cbl
     ].filter((id): id is string => id !== null)
   : [];
 
+// The current-period LL97 fine, in whole dollars, computed by the engine.
+// The module cannot import the engine, so the number rides in with the facts.
+const { input: engineInput } = toEngineInput(facts);
+const ll97AnnualFineUsd = engineInput
+  ? Math.round(computeFine(engineInput, "2024-2029").annualFineUsd)
+  : undefined;
+
 console.log(`  BBL ${facts.bbl} — ${facts.address}`);
 console.log(
   `  ${facts.grossFloorAreaSqft?.toLocaleString() ?? "unknown"} sqft, ${facts.annualEmissionsTco2e ?? "unknown"} tCO2e`,
 );
 console.log(
   `  covered: ${coveredLawIds.join(", ") || "(falling back to sqft heuristic)"}`,
+);
+console.log(
+  `  LL97 fine (2024-2029, engine): ${ll97AnnualFineUsd === undefined ? "no data" : `$${ll97AnnualFineUsd.toLocaleString()}`}`,
 );
 
 const timeout = setTimeout(() => {
@@ -64,6 +76,7 @@ DbConnection.builder()
           usesJson: JSON.stringify(facts.occupancyGroups),
           coveredLawIdsJson: JSON.stringify(coveredLawIds),
           provenanceJson: JSON.stringify(facts.provenance),
+          ll97AnnualFineUsd,
         });
 
         const buildingRow = [...ctx.db.building.iter()].find(

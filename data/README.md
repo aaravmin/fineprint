@@ -53,13 +53,26 @@ npm test --workspace data
 npx tsx scripts/ingest.ts "350 5th Avenue, Manhattan"   # live end-to-end into SpacetimeDB
 ```
 
+## Emissions: recomputed, not just quoted
+
+ESPM's "location-based GHG" prices electricity with national eGRID factors;
+DOB's penalty math uses the statute's coefficients (Admin Code 28-320.3.1.1).
+The parser recomputes emissions from the filing's fuel columns the DOB way —
+for the Empire State Building that's 12,097 tCO2e instead of 16,678, which
+halves the projected 2030 fine. When a consumed fuel has no verified
+coefficient (no. 5/6 oil, district hot/chilled water, on-site generation),
+the recompute aborts and the as-filed figure is used, with the blocking fuel
+named in provenance. DOB's own calculation also applies deductions and
+amendments this layer doesn't model — still an estimate, but the right kind.
+
 ## Known limitations
 
-- LL84 location-based GHG is the emissions figure; DOB's LL97 calculation
-  applies its own fuel coefficients and deductions, so treat it as the best
-  public estimate, not the filed number.
 - The CBL is "provided for reference only" — DOB's words — and a year stale
-  between editions. Disputes and new buildings won't show until refresh.
+  between editions. Disputes and new buildings won't show until refresh
+  (every result carries a provenance note saying so).
+- GeoSearch's top lot is cross-checked against the CBL: a same-house-number
+  candidate that DOF knows wins over an unknown top match. Different house
+  numbers never substitute.
 - One BBL can hold several buildings (BINs); facts aggregate to the lot.
 - Browser can't import `coveredBuildings.ts` (filesystem read); the
   dashboard reads building rows from SpacetimeDB instead.

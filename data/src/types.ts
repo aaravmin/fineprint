@@ -26,7 +26,15 @@ export interface Ll84Facts {
   reportedAddress: string | null;
   grossFloorAreaSqft: number | null;
   occupancyGroups: UseSplit[];
+  // As filed: ESPM's location-based GHG, which prices electricity with
+  // national eGRID factors rather than the statute's coefficients.
   annualEmissionsTco2e: number | null;
+  // Recomputed from the filing's fuel columns with the coefficients of
+  // Admin Code 28-320.3.1.1 — the figure DOB's penalty math would use.
+  // Null when any consumed fuel lacks a verified coefficient.
+  recomputedEmissionsTco2e: number | null;
+  // Fuel columns that blocked the recompute (no verified coefficient).
+  unpriceableFuels: string[];
   reportingYear: number | null;
   // Uses whose LL84 name is missing from the rule's factor table and was
   // mapped to the nearest listed bucket — an estimate worth disclosing.
