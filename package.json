@@ -8,7 +8,8 @@
     "client",
     "agents",
     "engine",
-    "data"
+    "data",
+    "advise"
   ],
   "scripts": {
     "typecheck": "npm run typecheck --workspaces --if-present",
