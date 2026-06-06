@@ -64,6 +64,17 @@ describe("computeFine edge behavior", () => {
     expect(result.compliant).toBe(true);
   });
 
+  test("a letter group in 2035-2039 falls back to its proxy ESPM type with a note", () => {
+    const result = computeFine(
+      officeBuilding({ occupancyGroups: [{ group: "R-2", sqft: 100_000 }] }),
+      "2035-2039",
+    );
+
+    // R-2 proxies to Multifamily Housing: 0.002692183 x 100,000 sf = 269.22.
+    expect(result.emissionsLimitTco2e).toBe(269.22);
+    expect(result.notes.join(" ")).toMatch(/unofficial mapping/);
+  });
+
   test("statutory occupancy-group letters work and carry an estimate note", () => {
     const result = computeFine(
       officeBuilding({ occupancyGroups: [{ group: "R-2", sqft: 100_000 }] }),
