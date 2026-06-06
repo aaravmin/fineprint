@@ -112,3 +112,12 @@ The rules:
   and bigint.
 - No new dependencies without approval.
 - Markdown: sentence-case headers, no emoji in headers.
+
+## Commits
+
+- Subject line under 90 characters, written in plain human language. Say what
+  changed and why a reader would care: "add 2030 emission limits so projections
+  cover the cliff", not "implement multi-period coefficient table integration".
+- No buzzwords, no filler ("enhance", "leverage", "robust", "comprehensive").
+  If the subject reads like a press release, rewrite it.
+- Body only when the subject can't carry the why; wrap it like prose.
