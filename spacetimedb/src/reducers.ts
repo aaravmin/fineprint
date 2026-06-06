@@ -1,7 +1,7 @@
 import { ScheduleAt, Timestamp } from "spacetimedb";
 import { t } from "spacetimedb/server";
 import spacetimedb, { reaperTick } from "./schema";
-import { applicableLaws } from "./laws";
+import { applicableLaws, LAWS } from "./laws";
 
 const HEARTBEAT_STALE_MS = 15_000; // 3 missed 5s heartbeats = dead
 const REAP_INTERVAL_MICROS = 5_000_000n; // 5s
@@ -53,6 +53,10 @@ export const add_building = spacetimedb.reducer(
       bbl: undefined,
       sqft,
       isAffordable,
+      annualEmissionsTco2e: undefined,
+      usesJson: undefined,
+      ll97Covered: undefined,
+      provenanceJson: undefined,
       createdAt: ctx.timestamp,
     });
 
@@ -81,6 +85,102 @@ export const add_building = spacetimedb.reducer(
     );
   },
 );
+
+// Real-data intake: scripts/ingest.ts resolves an address through the data
+// package (GeoSearch -> LL84 -> covered buildings list) and calls this with
+// the assembled facts. Obligations spawn from DOB's covered-list flags when
+// provided; the sqft heuristic is only the fallback for unknown buildings.
+export const ingest_building = spacetimedb.reducer(
+  {
+    address: t.string(),
+    bbl: t.string(),
+    sqft: t.u32(),
+    isArticle321: t.bool(),
+    annualEmissionsTco2e: t.option(t.f64()),
+    usesJson: t.string(),
+    coveredLawIdsJson: t.string(),
+    provenanceJson: t.string(),
+  },
+  (ctx, args) => {
+    if (args.address.trim() === "") throw new Error("address cannot be empty");
+    if (args.bbl.trim() === "") throw new Error("bbl cannot be empty");
+
+    const existingBuilding = [...ctx.db.building.iter()].find(
+      row => row.bbl === args.bbl,
+    );
+
+    if (existingBuilding) {
+      ctx.db.building.id.update({
+        ...existingBuilding,
+        address: args.address,
+        sqft: args.sqft,
+        isAffordable: args.isArticle321,
+        annualEmissionsTco2e: args.annualEmissionsTco2e,
+        usesJson: args.usesJson,
+        ll97Covered: deriveLl97Covered(args.coveredLawIdsJson),
+        provenanceJson: args.provenanceJson,
+      });
+
+      logEvent(
+        ctx,
+        "building_updated",
+        `${args.address} (BBL ${args.bbl}) refreshed from city data`,
+      );
+      return;
+    }
+
+    const newBuilding = ctx.db.building.insert({
+      id: 0n,
+      address: args.address,
+      bbl: args.bbl,
+      sqft: args.sqft,
+      isAffordable: args.isArticle321,
+      annualEmissionsTco2e: args.annualEmissionsTco2e,
+      usesJson: args.usesJson,
+      ll97Covered: deriveLl97Covered(args.coveredLawIdsJson),
+      provenanceJson: args.provenanceJson,
+      createdAt: ctx.timestamp,
+    });
+
+    const coveredLawIds: string[] = JSON.parse(args.coveredLawIdsJson);
+    const laws =
+      coveredLawIds.length > 0
+        ? LAWS.filter(law => coveredLawIds.includes(law.id))
+        : applicableLaws(args.sqft, args.isArticle321);
+
+    for (const law of laws) {
+      const fine = law.fineEstimateUsd(args.sqft, args.isArticle321);
+      ctx.db.task.insert({
+        id: 0n,
+        buildingId: newBuilding.id,
+        lawId: law.id,
+        kind: law.kind,
+        title: `${law.name} — ${args.address}`,
+        status: "open",
+        deadline: addMs(ctx.timestamp, law.deadlineDays * 86_400_000),
+        slaBreached: false,
+        fineEstimateUsd: fine === null ? undefined : fine,
+        claimedBy: undefined,
+        createdAt: ctx.timestamp,
+      });
+    }
+
+    logEvent(
+      ctx,
+      "building_ingested",
+      `${args.address} (BBL ${args.bbl}) ingested from city data → ${laws.length} obligations spawned`,
+    );
+  },
+);
+
+function deriveLl97Covered(coveredLawIdsJson: string): boolean | undefined {
+  const coveredLawIds: string[] = JSON.parse(coveredLawIdsJson);
+  if (coveredLawIds.length === 0) {
+    return undefined;
+  }
+
+  return coveredLawIds.includes("ll97") || coveredLawIds.includes("art321");
+}
 
 export const register_worker = spacetimedb.reducer(
   { name: t.string() },

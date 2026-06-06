@@ -13,6 +13,14 @@ export const building = table(
     bbl: t.option(t.string()),
     sqft: t.u32(),
     isAffordable: t.bool(),
+    // Real-data fields, filled by ingest_building from NYC public datasets.
+    // usesJson holds the ESPM use splits ([{group, sqft}]) and provenanceJson
+    // the per-field source notes — engine/UI vocabulary, stored as JSON
+    // strings to keep the table flat.
+    annualEmissionsTco2e: t.option(t.f64()),
+    usesJson: t.option(t.string()),
+    ll97Covered: t.option(t.bool()),
+    provenanceJson: t.option(t.string()),
     createdAt: t.timestamp(),
   },
 );
