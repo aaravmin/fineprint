@@ -18,8 +18,9 @@ const connectionBuilder = DbConnection.builder()
   .withUri(HOST)
   .withDatabaseName(DB_NAME)
   .withToken(getToken())
-  .onConnect((_conn: DbConnection, _identity: Identity, token: string) => {
+  .onConnect((conn: DbConnection, _identity: Identity, token: string) => {
     if (typeof window !== "undefined") localStorage.setItem(TOKEN_KEY, token);
+    conn.subscriptionBuilder().subscribeToAllTables();
   })
   .onConnectError((_ctx: ErrorContext, err: Error) => {
     console.error("SpacetimeDB connection error:", err.message);

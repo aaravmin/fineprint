@@ -31,14 +31,29 @@ export function PortfolioClient() {
   return (
     <div className="@container/main flex flex-col gap-6">
 
-      {/* Product intro */}
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Portfolio</h1>
-        <p className="mt-1 text-sm text-muted-foreground max-w-2xl">
-          Enter a NYC building to pull its real public energy data, compute its Local Law 97
-          carbon fine for each compliance period, see the 2030 cliff, and get a cost-optimal
-          retrofit plan that drives the fine toward $0.
+      {/* Hero */}
+      <div className="space-y-1">
+        <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
+          NYC · Local Law 97
         </p>
+        <h1 className="text-2xl font-semibold tracking-tight">
+          Your building&apos;s real Local Law 97 carbon fine — and how to fix it
+        </h1>
+      </div>
+
+      {/* Three-step explainer */}
+      <div className="grid grid-cols-1 gap-3 @sm/main:grid-cols-3">
+        <Step n="1" title="Enter your address" body="Any NYC building over 25,000 sq ft" />
+        <Step
+          n="2"
+          title="See your real fine"
+          body="Carbon penalties from public LL84 data + verified LL97 limits"
+        />
+        <Step
+          n="3"
+          title="Get a funded plan"
+          body="Ranked retrofits matched to real rebates, driving the fine toward $0"
+        />
       </div>
 
       {/* Flat metric strip — no gradient */}
@@ -134,6 +149,23 @@ export function PortfolioClient() {
           )}
         </CardContent>
       </Card>
+
+      {/* Legal disclaimer */}
+      <p className="text-xs text-muted-foreground">
+        Data sourced from NYC LL84 benchmarking submissions and LL97 emission limits
+        (1 RCNY §103-14). Not legal advice — official compliance requires a registered
+        design professional.
+      </p>
+    </div>
+  );
+}
+
+function Step({ n, title, body }: { n: string; title: string; body: string }) {
+  return (
+    <div className="rounded-xl border bg-background px-5 py-4">
+      <p className="text-xs font-medium text-muted-foreground">Step {n}</p>
+      <p className="mt-1 text-sm font-semibold">{title}</p>
+      <p className="mt-0.5 text-xs text-muted-foreground">{body}</p>
     </div>
   );
 }
