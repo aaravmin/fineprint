@@ -28,6 +28,12 @@ export interface Ll84Facts {
   occupancyGroups: UseSplit[];
   annualEmissionsTco2e: number | null;
   reportingYear: number | null;
+  // Uses whose LL84 name is missing from the rule's factor table and was
+  // mapped to the nearest listed bucket — an estimate worth disclosing.
+  proxiedUses: Array<{ from: string; to: string }>;
+  // Uses with no defensible factor at all ("Other", utility plants). They
+  // are excluded from occupancyGroups so the engine never prices them.
+  unmappedUses: UseSplit[];
 }
 
 export interface ProvenanceNote {

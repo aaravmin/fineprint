@@ -22,6 +22,8 @@ const ll84Facts: Ll84Facts = {
   ],
   annualEmissionsTco2e: 16_678.22,
   reportingYear: 2024,
+  proxiedUses: [],
+  unmappedUses: [],
 };
 
 const cblEntry: CblEntry = {
@@ -89,6 +91,24 @@ describe("lookupBuilding", () => {
 
     expect(facts.isLl97Covered).toBe(false);
     expect(facts.isArticle321).toBe(false);
+  });
+
+  test("proxied and unmapped uses surface in provenance", async () => {
+    const facts = await lookupBuilding(
+      "1 Firehouse Plaza, Manhattan",
+      fakeSources({
+        fetchLl84: async () => ({
+          ...ll84Facts,
+          occupancyGroups: [{ group: "Other - Public Services", sqft: 12_000 }],
+          proxiedUses: [{ from: "Fire Station", to: "Other - Public Services" }],
+          unmappedUses: [{ group: "Other", sqft: 3_000 }],
+        }),
+      }),
+    );
+
+    const noteText = facts.provenance.map(note => note.detail ?? "").join(" | ");
+    expect(noteText).toMatch(/Fire Station.*Other - Public Services/);
+    expect(noteText).toMatch(/3,000 sqft.*excluded/);
   });
 
   test("an unresolvable address propagates GeoSearch's error", async () => {

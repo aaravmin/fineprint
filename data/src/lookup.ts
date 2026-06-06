@@ -46,6 +46,24 @@ export async function lookupBuilding(
       source: "LL84 benchmarking disclosure",
       detail: `${ll84.reportingYear ?? "unknown"} filing, location-based GHG`,
     });
+
+    for (const proxy of ll84.proxiedUses) {
+      provenance.push({
+        field: "occupancyGroups",
+        source: "LL84 benchmarking disclosure",
+        detail: `"${proxy.from}" is not in the rule's factor table; estimated as "${proxy.to}"`,
+      });
+    }
+
+    if (ll84.unmappedUses.length > 0) {
+      const excludedSqft = ll84.unmappedUses.reduce((sum, use) => sum + use.sqft, 0);
+      const names = ll84.unmappedUses.map(use => `"${use.group}"`).join(", ");
+      provenance.push({
+        field: "occupancyGroups",
+        source: "LL84 benchmarking disclosure",
+        detail: `${excludedSqft.toLocaleString("en-US")} sqft of ${names} has no defensible emissions factor and was excluded from the limit calculation`,
+      });
+    }
   } else {
     provenance.push({
       field: "annualEmissionsTco2e",

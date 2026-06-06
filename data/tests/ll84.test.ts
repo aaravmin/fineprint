@@ -66,4 +66,58 @@ describe("parseLl84Rows", () => {
     expect(facts!.annualEmissionsTco2e).toBeNull();
     expect(facts!.grossFloorAreaSqft).toBeNull();
   });
+
+  // The dataset-wide vocabulary sweep (2026-06-06, 3,000 filings) found 16
+  // use names the rule's factor table doesn't list. Renames map exactly,
+  // near-misses map to the closest bucket and are recorded, and types with
+  // no defensible factor are excluded from the engine's input — visibly.
+  test("renamed ESPM types map to the rule's name silently", () => {
+    const rows = structuredClone(esbRows);
+    rows[0].list_of_all_property_use = "Senior Living Community (80000.0)";
+
+    const facts = parseLl84Rows(rows, "1008350041");
+
+    expect(facts!.occupancyGroups).toEqual([
+      { group: "Senior Care Community", sqft: 80_000 },
+    ]);
+    expect(facts!.proxiedUses).toEqual([]);
+  });
+
+  test("types missing from the rule map to the nearest bucket and say so", () => {
+    const rows = structuredClone(esbRows);
+    rows[0].list_of_all_property_use = "Fire Station (12000.0), Bar/Nightclub (3000.0)";
+
+    const facts = parseLl84Rows(rows, "1008350041");
+
+    expect(facts!.occupancyGroups).toEqual([
+      { group: "Other - Public Services", sqft: 12_000 },
+      { group: "Other - Restaurant/Bar", sqft: 3_000 },
+    ]);
+    expect(facts!.proxiedUses).toEqual([
+      { from: "Fire Station", to: "Other - Public Services" },
+      { from: "Bar/Nightclub", to: "Other - Restaurant/Bar" },
+    ]);
+  });
+
+  test("unmappable types are excluded from engine input, not guessed", () => {
+    const rows = structuredClone(esbRows);
+    rows[0].list_of_all_property_use = "Office (90000.0), Other (10000.0)";
+
+    const facts = parseLl84Rows(rows, "1008350041");
+
+    expect(facts!.occupancyGroups).toEqual([{ group: "Office", sqft: 90_000 }]);
+    expect(facts!.unmappedUses).toEqual([{ group: "Other", sqft: 10_000 }]);
+  });
+
+  test("a campus year with parent and child rows keeps the largest filing", () => {
+    const rows = structuredClone(esbRows);
+    const childRow = structuredClone(esbRows[0]);
+    childRow.property_gfa_calculated = "150000";
+    childRow.list_of_all_property_use = "Office (150000.0)";
+    rows.unshift(childRow);
+
+    const facts = parseLl84Rows(rows, "1008350041");
+
+    expect(facts!.grossFloorAreaSqft).toBe(2_852_257);
+  });
 });
