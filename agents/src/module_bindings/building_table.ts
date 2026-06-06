@@ -16,5 +16,9 @@ export default __t.row({
   bbl: __t.option(__t.string()),
   sqft: __t.u32(),
   isAffordable: __t.bool().name("is_affordable"),
+  annualEmissionsTco2E: __t.option(__t.f64()).name("annual_emissions_tco_2_e"),
+  usesJson: __t.option(__t.string()).name("uses_json"),
+  ll97Covered: __t.option(__t.bool()).name("ll_97_covered"),
+  provenanceJson: __t.option(__t.string()).name("provenance_json"),
   createdAt: __t.timestamp().name("created_at"),
 });

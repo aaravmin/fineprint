@@ -26,6 +26,10 @@ export const Building = __t.object("Building", {
   bbl: __t.option(__t.string()),
   sqft: __t.u32(),
   isAffordable: __t.bool(),
+  annualEmissionsTco2E: __t.option(__t.f64()),
+  usesJson: __t.option(__t.string()),
+  ll97Covered: __t.option(__t.bool()),
+  provenanceJson: __t.option(__t.string()),
   createdAt: __t.timestamp(),
 });
 export type Building = __Infer<typeof Building>;

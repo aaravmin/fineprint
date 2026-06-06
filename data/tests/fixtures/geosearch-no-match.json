@@ -1,0 +1,52 @@
+{
+  "geocoding": {
+    "version": "0.2",
+    "attribution": "http://geosearch.planninglabs.nyc/attribution",
+    "query": {
+      "text": "zzzzz nowhere street xyzzy",
+      "size": 10,
+      "layers": [
+        "venue",
+        "street",
+        "country",
+        "macroregion",
+        "region",
+        "county",
+        "localadmin",
+        "locality",
+        "borough",
+        "neighbourhood",
+        "continent",
+        "empire",
+        "dependency",
+        "macrocounty",
+        "macrohood",
+        "microhood",
+        "disputed",
+        "postalcode",
+        "ocean",
+        "marinearea"
+      ],
+      "private": false,
+      "lang": {
+        "name": "English",
+        "iso6391": "en",
+        "iso6393": "eng",
+        "via": "default",
+        "defaulted": true
+      },
+      "querySize": 20,
+      "parser": "pelias",
+      "parsed_text": {
+        "subject": "zzzzz nowhere street",
+        "street": "zzzzz nowhere street",
+        "admin": "xyzzy"
+      }
+    },
+    "warnings": ["performance optimization: excluding 'address' layer"],
+    "engine": { "name": "Pelias", "author": "Mapzen", "version": "1.0" },
+    "timestamp": 1780757510486
+  },
+  "type": "FeatureCollection",
+  "features": []
+}
