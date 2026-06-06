@@ -101,4 +101,16 @@ describe("draftScripted", () => {
 
     expect(draft).toMatch(/12,096\.78 tCO2e/);
   });
+
+  test("the LL97 draft shows the engine's cliff table when uses are known", () => {
+    const draft = draftScripted(
+      draftInput({
+        uses: [{ group: "Office", sqft: 2_852_257 }],
+        annualEmissionsTco2e: 12_096.78,
+      }),
+    );
+
+    expect(draft).toMatch(/2030-2034/);
+    expect(draft).toMatch(/2035-2039/);
+  });
 });

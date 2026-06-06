@@ -1,4 +1,5 @@
 // Zero-LLM drafting policy (DEFAULT). The demo must work with no API keys.
+import { projectFines, renderCliffTable } from "../projections.ts";
 import type { DraftInput } from "./types.ts";
 
 const TEMPLATES: Record<string, (i: DraftInput) => string> = {
@@ -12,6 +13,7 @@ const TEMPLATES: Record<string, (i: DraftInput) => string> = {
           ]
         : []),
       `Estimated annual penalty: $${fmt(input.fineEstimateUsd)} ($268 per tCO2e over cap).`,
+      ...cliffTableLines(input),
       `Recommended sequence:`,
       `  1. Pull 24 months of utility data; verify against LL84 benchmarking submission.`,
       `  2. Commission energy model to size the overage before paying a dollar of fines.`,
@@ -80,6 +82,15 @@ const TEMPLATES: Record<string, (i: DraftInput) => string> = {
 
 function fmt(amount: number | undefined): string {
   return amount === undefined ? "TBD" : amount.toLocaleString();
+}
+
+// The engine's three-period projection, ready to splice into a template.
+// Empty when the building lacks emissions or use data.
+function cliffTableLines(input: DraftInput): string[] {
+  const projections = projectFines(input);
+  if (!projections) return [];
+
+  return ["", renderCliffTable(projections), ""];
 }
 
 export function draftScripted(input: DraftInput): string {
