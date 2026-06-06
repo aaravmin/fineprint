@@ -77,13 +77,9 @@ async function tick() {
 async function workOn(taskId: bigint) {
   const task = [...conn.db.task.iter()].find(row => row.id === taskId);
   if (!task) return;
-  const building = [...conn.db.building.iter()].find(row => row.id === task.buildingId);
 
-  console.log(`[${NAME}] drafting for #${taskId}…`);
-  await new Promise(resolve => setTimeout(resolve, WORK_MS));
-
-  const input = draftInputFrom(task, building);
-  const body = USE_LLM ? await draftLlm(input) : draftScripted(input);
+  const body =
+    task.kind === "building_intake" ? await intakeBuilding(task) : await draftFor(task);
 
   try {
     await conn.reducers.submitWork({ taskId, body });
@@ -91,5 +87,47 @@ async function workOn(taskId: bigint) {
   } catch (error) {
     // Task was likely reaped away from us (e.g. we were killed mid-work).
     console.warn(`[${NAME}] submit failed for #${taskId}: ${(error as Error).message}`);
+  }
+}
+
+async function draftFor(
+  task: { id: bigint; buildingId: bigint } & Parameters<typeof draftInputFrom>[0],
+) {
+  const building = [...conn.db.building.iter()].find(row => row.id === task.buildingId);
+
+  console.log(`[${NAME}] drafting for #${task.id}…`);
+  await new Promise(resolve => setTimeout(resolve, WORK_MS));
+
+  const input = draftInputFrom(task, building);
+  return USE_LLM ? await draftLlm(input) : draftScripted(input);
+}
+
+// Intake: resolve the address through the data pipeline, ingest the building
+// (which spawns its real obligations), and submit the intake report for
+// review. A failed lookup becomes an honest report, not a stuck task.
+async function intakeBuilding(task: {
+  id: bigint;
+  intakeAddress?: string;
+}): Promise<string> {
+  const address = task.intakeAddress;
+  if (!address) {
+    return "Intake task has no address — flagging for manual triage.";
+  }
+
+  console.log(`[${NAME}] intake for #${task.id}: ${address}`);
+
+  try {
+    const { prepareIntake } = await import("../../data/src/intake.ts");
+    const intake = await prepareIntake(address);
+
+    await conn.reducers.ingestBuilding(intake.ingestArgs);
+    return intake.summary;
+  } catch (error) {
+    return [
+      `BUILDING INTAKE FAILED — ${address}`,
+      ``,
+      `Reason: ${(error as Error).message}`,
+      `No building was ingested. Verify the address (include the borough) and re-request.`,
+    ].join("\n");
   }
 }

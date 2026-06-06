@@ -38,6 +38,9 @@ export const task = table(
     slaBreached: t.bool(),
     fineEstimateUsd: t.option(t.u32()),
     claimedBy: t.option(t.u64()),
+    // Intake tasks (kind "building_intake") carry the address to look up;
+    // buildingId is 0 until the worker ingests the building.
+    intakeAddress: t.option(t.string()),
     createdAt: t.timestamp(),
   },
 );
