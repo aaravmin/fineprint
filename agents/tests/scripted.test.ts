@@ -12,6 +12,20 @@ function draftInput(overrides: Partial<DraftInput> = {}): DraftInput {
     sqft: 2_852_257,
     isAffordable: false,
     fineEstimateUsd: 1_102_986,
+    bbl: "1008350041",
+    annualEmissionsTco2e: 12_096.78,
+    uses: [
+      { group: "Office", sqft: 2_692_475.1 },
+      { group: "Restaurant", sqft: 50_021 },
+    ],
+    ll97Covered: true,
+    provenance: [
+      {
+        field: "annualEmissionsTco2e",
+        source: "LL84 benchmarking disclosure",
+        detail: "2024 filing",
+      },
+    ],
     ...overrides,
   };
 }
@@ -67,5 +81,24 @@ describe("draftScripted", () => {
     const draft = draftScripted(draftInput({ kind: "mystery_obligation" }));
 
     expect(draft).toMatch(/No playbook for kind "mystery_obligation"/);
+  });
+
+  test("provenance renders as a sources footnote", () => {
+    const draft = draftScripted(draftInput());
+
+    expect(draft).toMatch(/Sources:/);
+    expect(draft).toMatch(/LL84 benchmarking disclosure \(2024 filing\)/);
+  });
+
+  test("no provenance, no footnote", () => {
+    const draft = draftScripted(draftInput({ provenance: [] }));
+
+    expect(draft).not.toMatch(/Sources:/);
+  });
+
+  test("the LL97 draft states the reported emissions when known", () => {
+    const draft = draftScripted(draftInput());
+
+    expect(draft).toMatch(/12,096\.78 tCO2e/);
   });
 });

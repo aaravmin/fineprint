@@ -1,9 +1,9 @@
 // Agent worker: subscribe → claim → work → submit. One worker per process.
 // Run several in separate terminals: npm run worker
 import { DbConnection } from "./module_bindings/index.ts";
+import { draftInputFrom } from "./draftInput.ts";
 import { draftScripted } from "./policies/scripted.ts";
 import { draftLlm } from "./policies/llm.ts";
-import type { DraftInput } from "./policies/types.ts";
 
 const HOST = process.env.SPACETIME_URI ?? "ws://localhost:3000";
 const DB_NAME = process.env.DB_NAME ?? "fineprint";
@@ -82,15 +82,7 @@ async function workOn(taskId: bigint) {
   console.log(`[${NAME}] drafting for #${taskId}…`);
   await new Promise(resolve => setTimeout(resolve, WORK_MS));
 
-  const input: DraftInput = {
-    title: task.title,
-    kind: task.kind,
-    lawId: task.lawId,
-    address: building?.address ?? "unknown",
-    sqft: building?.sqft ?? 0,
-    isAffordable: building?.isAffordable ?? false,
-    fineEstimateUsd: task.fineEstimateUsd,
-  };
+  const input = draftInputFrom(task, building);
   const body = USE_LLM ? await draftLlm(input) : draftScripted(input);
 
   try {

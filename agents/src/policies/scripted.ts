@@ -6,6 +6,11 @@ const TEMPLATES: Record<string, (i: DraftInput) => string> = {
     [
       `LL97 EXPOSURE ANALYSIS — ${input.address}`,
       ``,
+      ...(input.annualEmissionsTco2e !== undefined
+        ? [
+            `Reported annual emissions: ${input.annualEmissionsTco2e.toLocaleString()} tCO2e.`,
+          ]
+        : []),
       `Estimated annual penalty: $${fmt(input.fineEstimateUsd)} ($268 per tCO2e over cap).`,
       `Recommended sequence:`,
       `  1. Pull 24 months of utility data; verify against LL84 benchmarking submission.`,
@@ -79,11 +84,28 @@ function fmt(amount: number | undefined): string {
 
 export function draftScripted(input: DraftInput): string {
   const template = TEMPLATES[input.kind];
-  if (template) return template(input);
-  return [
-    `COMPLIANCE DRAFT — ${input.title}`,
-    ``,
-    `No playbook for kind "${input.kind}" yet. Flagging for manual triage.`,
-    `Draft prepared by scripted policy. Human review required.`,
-  ].join("\n");
+  const body = template
+    ? template(input)
+    : [
+        `COMPLIANCE DRAFT — ${input.title}`,
+        ``,
+        `No playbook for kind "${input.kind}" yet. Flagging for manual triage.`,
+        `Draft prepared by scripted policy. Human review required.`,
+      ].join("\n");
+
+  const footnote = sourcesFootnote(input);
+  return footnote ? `${body}\n\n${footnote}` : body;
+}
+
+// The honesty footnote: where every fact in the draft came from, straight
+// from the ingest pipeline's provenance notes.
+function sourcesFootnote(input: DraftInput): string {
+  if (input.provenance.length === 0) return "";
+
+  const lines = new Set<string>();
+  for (const note of input.provenance) {
+    lines.add(note.detail ? `${note.source} (${note.detail})` : note.source);
+  }
+
+  return ["Sources:", ...[...lines].map(line => `  - ${line}`)].join("\n");
 }
