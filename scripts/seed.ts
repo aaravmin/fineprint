@@ -9,37 +9,36 @@ const HOST = process.env.SPACETIME_URI ?? "ws://localhost:3000";
 const DB_NAME = process.env.DB_NAME ?? "fineprint";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const buildings: { address: string; sqft: number; isAffordable: boolean }[] =
-  JSON.parse(readFileSync(join(here, "../data/seed-buildings.json"), "utf8"));
+const buildings: { address: string; sqft: number; isAffordable: boolean }[] = JSON.parse(
+  readFileSync(join(here, "../data/seed-buildings.json"), "utf8"),
+);
 
 const timeout = setTimeout(() => {
-  console.error(
-    `Could not reach ${HOST} within 10s. Is \`spacetime start\` running?`,
-  );
+  console.error(`Could not reach ${HOST} within 10s. Is \`spacetime start\` running?`);
   process.exit(1);
 }, 10_000);
 
 const conn = DbConnection.builder()
   .withUri(HOST)
   .withDatabaseName(DB_NAME)
-  .onConnect((conn, identity) => {
+  .onConnect((connection, identity) => {
     clearTimeout(timeout);
     console.log(`Connected as ${identity.toHexString().slice(0, 8)}…`);
 
-    conn
+    connection
       .subscriptionBuilder()
-      .onApplied(async (ctx) => {
-        const existing = [...ctx.db.building.iter()];
-        if (existing.length > 0) {
+      .onApplied(async ctx => {
+        const existingBuildings = [...ctx.db.building.iter()];
+        if (existingBuildings.length > 0) {
           console.log(
-            `Database already has ${existing.length} buildings — nothing to do.`,
+            `Database already has ${existingBuildings.length} buildings — nothing to do.`,
           );
           process.exit(0);
         }
 
-        for (const b of buildings) {
-          await conn.reducers.addBuilding(b);
-          console.log(`  + ${b.address} (${b.sqft.toLocaleString()} sqft)`);
+        for (const building of buildings) {
+          await connection.reducers.addBuilding(building);
+          console.log(`  + ${building.address} (${building.sqft.toLocaleString()} sqft)`);
         }
 
         const tasks = [...ctx.db.task.iter()];
@@ -50,8 +49,8 @@ const conn = DbConnection.builder()
       })
       .subscribeToAllTables();
   })
-  .onConnectError((_ctx, err) => {
-    console.error("Connection failed:", err.message);
+  .onConnectError((_ctx, error) => {
+    console.error("Connection failed:", error.message);
     process.exit(1);
   })
   .build();

@@ -6,13 +6,11 @@ import type { DraftInput } from "./types.ts";
 export async function draftLlm(input: DraftInput): Promise<string> {
   try {
     if (process.env.ANTHROPIC_API_KEY) return await draftClaude(input);
-    console.warn(
-      "[llm] USE_LLM=true but no ANTHROPIC_API_KEY; using scripted policy",
-    );
+    console.warn("[llm] USE_LLM=true but no ANTHROPIC_API_KEY; using scripted policy");
     return draftScripted(input);
-  } catch (err) {
+  } catch (error) {
     console.warn(
-      `[llm] drafting failed (${(err as Error).message}); using scripted policy`,
+      `[llm] drafting failed (${(error as Error).message}); using scripted policy`,
     );
     return draftScripted(input);
   }
@@ -21,7 +19,7 @@ export async function draftLlm(input: DraftInput): Promise<string> {
 async function draftClaude(input: DraftInput): Promise<string> {
   const { default: Anthropic } = await import("@anthropic-ai/sdk");
   const client = new Anthropic();
-  const msg = await client.messages.create({
+  const completion = await client.messages.create({
     model: "claude-haiku-4-5-20251001",
     max_tokens: 600,
     messages: [
@@ -43,9 +41,9 @@ async function draftClaude(input: DraftInput): Promise<string> {
       },
     ],
   });
-  const text = msg.content
-    .filter((block) => block.type === "text")
-    .map((block) => block.text)
+  const text = completion.content
+    .filter(block => block.type === "text")
+    .map(block => block.text)
     .join("\n");
   if (!text.trim()) throw new Error("empty completion");
   return text;

@@ -5,8 +5,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function fmtUsd(n: number | undefined): string {
-  return n === undefined ? "—" : `$${n.toLocaleString()}`;
+export function fmtUsd(amount: number | undefined): string {
+  return amount === undefined ? "—" : `$${amount.toLocaleString()}`;
 }
 
 export function daysLeft(deadline: { toDate(): Date }): number {

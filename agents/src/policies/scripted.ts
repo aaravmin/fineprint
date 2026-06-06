@@ -2,11 +2,11 @@
 import type { DraftInput } from "./types.ts";
 
 const TEMPLATES: Record<string, (i: DraftInput) => string> = {
-  emissions_fine_analysis: (i) =>
+  emissions_fine_analysis: input =>
     [
-      `LL97 EXPOSURE ANALYSIS — ${i.address}`,
+      `LL97 EXPOSURE ANALYSIS — ${input.address}`,
       ``,
-      `Estimated annual penalty: $${fmt(i.fineEstimateUsd)} ($268 per tCO2e over cap).`,
+      `Estimated annual penalty: $${fmt(input.fineEstimateUsd)} ($268 per tCO2e over cap).`,
       `Recommended sequence:`,
       `  1. Pull 24 months of utility data; verify against LL84 benchmarking submission.`,
       `  2. Commission energy model to size the overage before paying a dollar of fines.`,
@@ -15,9 +15,9 @@ const TEMPLATES: Record<string, (i: DraftInput) => string> = {
       ``,
       `Draft prepared by scripted policy. Human review required before any filing.`,
     ].join("\n"),
-  prescriptive_measures_plan: (i) =>
+  prescriptive_measures_plan: input =>
     [
-      `ARTICLE 321 COMPLIANCE PLAN — ${i.address}`,
+      `ARTICLE 321 COMPLIANCE PLAN — ${input.address}`,
       ``,
       `Building qualifies for the affordable-housing pathway: implement the prescriptive`,
       `measures list instead of meeting the emissions cap.`,
@@ -27,42 +27,42 @@ const TEMPLATES: Record<string, (i: DraftInput) => string> = {
       ``,
       `Draft prepared by scripted policy. Human review required before any filing.`,
     ].join("\n"),
-  benchmarking_filing: (i) =>
+  benchmarking_filing: input =>
     [
-      `LL84 BENCHMARKING FILING — ${i.address}`,
+      `LL84 BENCHMARKING FILING — ${input.address}`,
       ``,
-      `Annual energy and water benchmarking due. Exposure if missed: $${fmt(i.fineEstimateUsd)}/yr.`,
-      `  1. Confirm ESPM property profile is current (sqft: ${i.sqft.toLocaleString()}).`,
+      `Annual energy and water benchmarking due. Exposure if missed: $${fmt(input.fineEstimateUsd)}/yr.`,
+      `  1. Confirm ESPM property profile is current (sqft: ${input.sqft.toLocaleString()}).`,
       `  2. Request whole-building aggregate data from utilities.`,
       `  3. Submit through the NYC portal; archive the confirmation number.`,
       ``,
       `Draft prepared by scripted policy. Human review required before any filing.`,
     ].join("\n"),
-  audit_filing: (i) =>
+  audit_filing: input =>
     [
-      `LL87 AUDIT & RETRO-COMMISSIONING — ${i.address}`,
+      `LL87 AUDIT & RETRO-COMMISSIONING — ${input.address}`,
       ``,
-      `Energy audit + RCx filing cycle is due. Exposure if missed: $${fmt(i.fineEstimateUsd)}.`,
+      `Energy audit + RCx filing cycle is due. Exposure if missed: $${fmt(input.fineEstimateUsd)}.`,
       `  1. Engage a registered energy auditor (ASHRAE Level II).`,
       `  2. Complete retro-commissioning checklist on base building systems.`,
       `  3. File EER through DOB NOW before the deadline.`,
       ``,
       `Draft prepared by scripted policy. Human review required before any filing.`,
     ].join("\n"),
-  facade_inspection: (i) =>
+  facade_inspection: input =>
     [
-      `LL11 / FISP FACADE CYCLE — ${i.address}`,
+      `LL11 / FISP FACADE CYCLE — ${input.address}`,
       ``,
-      `Facade inspection filing window is open. Failure-to-file exposure: $${fmt(i.fineEstimateUsd)}/yr.`,
+      `Facade inspection filing window is open. Failure-to-file exposure: $${fmt(input.fineEstimateUsd)}/yr.`,
       `  1. Retain a QEWI (Qualified Exterior Wall Inspector).`,
       `  2. Schedule close-up inspection; budget sidewalk shed only if unsafe conditions found.`,
       `  3. File SWARMP or Safe report in DOB NOW: Safety.`,
       ``,
       `Draft prepared by scripted policy. Human review required before any filing.`,
     ].join("\n"),
-  lighting_submetering_plan: (i) =>
+  lighting_submetering_plan: input =>
     [
-      `LL88 LIGHTING & SUBMETERING — ${i.address}`,
+      `LL88 LIGHTING & SUBMETERING — ${input.address}`,
       ``,
       `Lighting code upgrade + tenant submetering required by deadline.`,
       `  1. Survey non-compliant fixtures against NYCECC lighting standards.`,
@@ -73,8 +73,8 @@ const TEMPLATES: Record<string, (i: DraftInput) => string> = {
     ].join("\n"),
 };
 
-function fmt(n: number | undefined): string {
-  return n === undefined ? "TBD" : n.toLocaleString();
+function fmt(amount: number | undefined): string {
+  return amount === undefined ? "TBD" : amount.toLocaleString();
 }
 
 export function draftScripted(input: DraftInput): string {

@@ -20,7 +20,7 @@ export const LAWS: Law[] = [
     deadlineDays: 120,
     appliesTo: (sqft, isAffordable) => sqft >= 25_000 && !isAffordable,
     // $268 per tCO2e over cap; stub: assume office-like intensity overage of ~0.5 kgCO2e/sqft.
-    fineEstimateUsd: (sqft) => Math.round(sqft * 0.0005 * 268),
+    fineEstimateUsd: sqft => Math.round(sqft * 0.0005 * 268),
   },
   {
     id: "art321",
@@ -35,7 +35,7 @@ export const LAWS: Law[] = [
     name: "LL84 — Energy & Water Benchmarking",
     kind: "benchmarking_filing",
     deadlineDays: 45,
-    appliesTo: (sqft) => sqft >= 25_000,
+    appliesTo: sqft => sqft >= 25_000,
     fineEstimateUsd: () => 2_500, // quarterly $500 violations, annualized stub
   },
   {
@@ -43,7 +43,7 @@ export const LAWS: Law[] = [
     name: "LL87 — Energy Audit & Retro-commissioning",
     kind: "audit_filing",
     deadlineDays: 240,
-    appliesTo: (sqft) => sqft >= 50_000,
+    appliesTo: sqft => sqft >= 50_000,
     fineEstimateUsd: () => 3_000,
   },
   {
@@ -52,7 +52,7 @@ export const LAWS: Law[] = [
     kind: "facade_inspection",
     deadlineDays: 90,
     // Stories not tracked yet; sqft is a stand-in for "over six stories" (P1: real DOB data).
-    appliesTo: (sqft) => sqft >= 60_000,
+    appliesTo: sqft => sqft >= 60_000,
     fineEstimateUsd: () => 5_000, // failure-to-file civil penalties, annualized stub
   },
   {
@@ -60,11 +60,11 @@ export const LAWS: Law[] = [
     name: "LL88 — Lighting Upgrades & Submetering",
     kind: "lighting_submetering_plan",
     deadlineDays: 300,
-    appliesTo: (sqft) => sqft >= 25_000,
+    appliesTo: sqft => sqft >= 25_000,
     fineEstimateUsd: () => 1_500,
   },
 ];
 
 export function applicableLaws(sqft: number, isAffordable: boolean): Law[] {
-  return LAWS.filter((law) => law.appliesTo(sqft, isAffordable));
+  return LAWS.filter(law => law.appliesTo(sqft, isAffordable));
 }

@@ -32,7 +32,7 @@ function workerBySender(ctx: any) {
   return ctx.db.worker.identity.find(ctx.sender);
 }
 
-export const init = spacetimedb.init((ctx) => {
+export const init = spacetimedb.init(ctx => {
   // Initial publish only: arm the reaper tick.
   ctx.db.reaperTick.insert({
     id: 0n,
@@ -47,7 +47,7 @@ export const add_building = spacetimedb.reducer(
     if (address.trim() === "") throw new Error("address cannot be empty");
     if (sqft === 0) throw new Error("sqft must be positive");
 
-    const b = ctx.db.building.insert({
+    const newBuilding = ctx.db.building.insert({
       id: 0n,
       address,
       bbl: undefined,
@@ -61,7 +61,7 @@ export const add_building = spacetimedb.reducer(
       const fine = law.fineEstimateUsd(sqft, isAffordable);
       ctx.db.task.insert({
         id: 0n,
-        buildingId: b.id,
+        buildingId: newBuilding.id,
         lawId: law.id,
         kind: law.kind,
         title: `${law.name} — ${address}`,
@@ -97,17 +97,11 @@ export const register_worker = spacetimedb.reducer(
         lastHeartbeat: ctx.timestamp,
         currentTaskId: undefined,
       });
-      logEvent(
-        ctx,
-        "worker_registered",
-        `${name} re-registered`,
-        undefined,
-        existing.id,
-      );
+      logEvent(ctx, "worker_registered", `${name} re-registered`, undefined, existing.id);
       return;
     }
 
-    const w = ctx.db.worker.insert({
+    const newWorker = ctx.db.worker.insert({
       id: 0n,
       identity: ctx.sender,
       name,
@@ -120,83 +114,101 @@ export const register_worker = spacetimedb.reducer(
       "worker_registered",
       `${name} joined the fleet`,
       undefined,
-      w.id,
+      newWorker.id,
     );
   },
 );
 
-export const heartbeat = spacetimedb.reducer((ctx) => {
-  const w = workerBySender(ctx);
-  if (!w) throw new Error("heartbeat from unregistered worker");
-  if (w.status === "dead") return; // killed workers stay dead; process should exit
-  ctx.db.worker.id.update({ ...w, lastHeartbeat: ctx.timestamp });
-  logEvent(ctx, "heartbeat", w.name, undefined, w.id);
+export const heartbeat = spacetimedb.reducer(ctx => {
+  const reportingWorker = workerBySender(ctx);
+  if (!reportingWorker) throw new Error("heartbeat came from an unregistered worker");
+  if (reportingWorker.status === "dead") return; // killed workers stay dead; process should exit
+
+  ctx.db.worker.id.update({ ...reportingWorker, lastHeartbeat: ctx.timestamp });
+  logEvent(ctx, "heartbeat", reportingWorker.name, undefined, reportingWorker.id);
 });
 
 // THE critical reducer: exactly one owner per task.
 // Reducer transactionality makes the check-then-set atomic — two workers
 // racing on the same task means one commits, the other's transaction fails.
-export const claim_task = spacetimedb.reducer(
-  { taskId: t.u64() },
-  (ctx, { taskId }) => {
-    const w = workerBySender(ctx);
-    if (!w) throw new Error("claim from unregistered worker");
-    if (w.status !== "idle") throw new Error(`worker ${w.name} is not idle`);
+export const claim_task = spacetimedb.reducer({ taskId: t.u64() }, (ctx, { taskId }) => {
+  const claimingWorker = workerBySender(ctx);
+  const requestedTask = ctx.db.task.id.find(taskId);
 
-    const task = ctx.db.task.id.find(taskId);
-    if (!task) throw new Error(`task ${taskId} not found`);
-    if (task.status !== "open") throw new Error(`task ${taskId} is not open`);
+  if (!claimingWorker) {
+    throw new Error("claim came from an unregistered worker");
+  }
+  if (claimingWorker.status !== "idle") {
+    throw new Error(`${claimingWorker.name} is already working on something`);
+  }
 
-    ctx.db.task.id.update({ ...task, status: "claimed", claimedBy: w.id });
-    ctx.db.worker.id.update({
-      ...w,
-      status: "working",
-      currentTaskId: taskId,
-      lastHeartbeat: ctx.timestamp,
-    });
-    logEvent(
-      ctx,
-      "task_claimed",
-      `${w.name} claimed "${task.title}"`,
-      taskId,
-      w.id,
-    );
-  },
-);
+  if (!requestedTask) {
+    throw new Error(`no task with id ${taskId}`);
+  }
+  if (requestedTask.status !== "open") {
+    throw new Error(`task ${taskId} was already claimed`);
+  }
+
+  ctx.db.task.id.update({
+    ...requestedTask,
+    status: "claimed",
+    claimedBy: claimingWorker.id,
+  });
+
+  ctx.db.worker.id.update({
+    ...claimingWorker,
+    status: "working",
+    currentTaskId: taskId,
+    lastHeartbeat: ctx.timestamp,
+  });
+
+  logEvent(
+    ctx,
+    "task_claimed",
+    `${claimingWorker.name} claimed "${requestedTask.title}"`,
+    taskId,
+    claimingWorker.id,
+  );
+});
 
 export const submit_work = spacetimedb.reducer(
   { taskId: t.u64(), body: t.string() },
   (ctx, { taskId, body }) => {
-    const w = workerBySender(ctx);
-    if (!w) throw new Error("submission from unregistered worker");
+    const submittingWorker = workerBySender(ctx);
+    if (!submittingWorker) {
+      throw new Error("submission came from an unregistered worker");
+    }
 
     const task = ctx.db.task.id.find(taskId);
-    if (!task) throw new Error(`task ${taskId} not found`);
-    if (task.status !== "claimed" || task.claimedBy !== w.id) {
-      throw new Error(`task ${taskId} is not claimed by ${w.name}`);
+    if (!task) {
+      throw new Error(`no task with id ${taskId}`);
+    }
+    if (task.status !== "claimed" || task.claimedBy !== submittingWorker.id) {
+      throw new Error(`task ${taskId} is not claimed by ${submittingWorker.name}`);
     }
     if (body.trim() === "") throw new Error("submission body cannot be empty");
 
     ctx.db.submission.insert({
       id: 0n,
       taskId,
-      workerId: w.id,
+      workerId: submittingWorker.id,
       body,
       submittedAt: ctx.timestamp,
     });
     ctx.db.task.id.update({ ...task, status: "in_review" });
     ctx.db.worker.id.update({
-      ...w,
+      ...submittingWorker,
       status: "idle",
       currentTaskId: undefined,
       lastHeartbeat: ctx.timestamp,
     });
+
     logEvent(
       ctx,
       "work_submitted",
-      `${w.name} submitted draft for review`,
+      `${submittingWorker.name} submitted a draft for review`,
       taskId,
-      w.id,
+      submittingWorker.id,
     );
   },
 );
@@ -206,8 +218,7 @@ export const approve = spacetimedb.reducer(
   (ctx, { taskId, note }) => {
     const task = ctx.db.task.id.find(taskId);
     if (!task) throw new Error(`task ${taskId} not found`);
-    if (task.status !== "in_review")
-      throw new Error(`task ${taskId} is not in review`);
+    if (task.status !== "in_review") throw new Error(`task ${taskId} is not in review`);
 
     ctx.db.approval.insert({
       id: 0n,
@@ -231,8 +242,7 @@ export const reject = spacetimedb.reducer(
   (ctx, { taskId, note }) => {
     const task = ctx.db.task.id.find(taskId);
     if (!task) throw new Error(`task ${taskId} not found`);
-    if (task.status !== "in_review")
-      throw new Error(`task ${taskId} is not in review`);
+    if (task.status !== "in_review") throw new Error(`task ${taskId} is not in review`);
 
     ctx.db.approval.insert({
       id: 0n,
@@ -244,12 +254,7 @@ export const reject = spacetimedb.reducer(
     });
     // Back to the queue for another worker.
     ctx.db.task.id.update({ ...task, status: "open", claimedBy: undefined });
-    logEvent(
-      ctx,
-      "task_rejected",
-      note || "rejected — returned to queue",
-      taskId,
-    );
+    logEvent(ctx, "task_rejected", note || "rejected — returned to queue", taskId);
   },
 );
 
@@ -257,71 +262,72 @@ export const reject = spacetimedb.reducer(
 export const kill_worker = spacetimedb.reducer(
   { workerId: t.u64() },
   (ctx, { workerId }) => {
-    const w = ctx.db.worker.id.find(workerId);
-    if (!w) throw new Error(`worker ${workerId} not found`);
-    if (w.status === "dead") return;
+    const targetWorker = ctx.db.worker.id.find(workerId);
+    if (!targetWorker) {
+      throw new Error(`no worker with id ${workerId}`);
+    }
+    if (targetWorker.status === "dead") return;
 
-    releaseWorker(ctx, w, "killed");
+    releaseWorker(ctx, targetWorker, "killed");
     logEvent(
       ctx,
       "worker_killed",
-      `${w.name} was killed`,
-      w.currentTaskId,
-      w.id,
+      `${targetWorker.name} was killed`,
+      targetWorker.currentTaskId,
+      targetWorker.id,
     );
   },
 );
 
-function releaseWorker(ctx: any, w: any, reason: string) {
-  if (w.currentTaskId !== undefined) {
-    const task = ctx.db.task.id.find(w.currentTaskId);
-    if (task && task.status === "claimed" && task.claimedBy === w.id) {
-      ctx.db.task.id.update({ ...task, status: "open", claimedBy: undefined });
+function releaseWorker(ctx: any, worker: any, reason: string) {
+  if (worker.currentTaskId !== undefined) {
+    const abandonedTask = ctx.db.task.id.find(worker.currentTaskId);
+
+    if (
+      abandonedTask &&
+      abandonedTask.status === "claimed" &&
+      abandonedTask.claimedBy === worker.id
+    ) {
+      ctx.db.task.id.update({ ...abandonedTask, status: "open", claimedBy: undefined });
       logEvent(
         ctx,
         "task_released",
-        `"${task.title}" returned to open (${reason})`,
-        task.id,
-        w.id,
+        `"${abandonedTask.title}" returned to open (${reason})`,
+        abandonedTask.id,
+        worker.id,
       );
     }
   }
-  ctx.db.worker.id.update({ ...w, status: "dead", currentTaskId: undefined });
+
+  ctx.db.worker.id.update({ ...worker, status: "dead", currentTaskId: undefined });
 }
 
 // Scheduled every 5s: crash recovery + SLA breach flagging.
-export const reap = spacetimedb.reducer(
-  { arg: reaperTick.rowType },
-  (ctx, _args) => {
-    const nowMs = ctx.timestamp.toDate().getTime();
+export const reap = spacetimedb.reducer({ arg: reaperTick.rowType }, (ctx, _args) => {
+  const nowMs = ctx.timestamp.toDate().getTime();
 
-    for (const w of ctx.db.worker.iter()) {
-      if (w.status === "dead") continue;
-      const ageMs = nowMs - w.lastHeartbeat.toDate().getTime();
-      if (ageMs > HEARTBEAT_STALE_MS) {
-        releaseWorker(ctx, w, "heartbeat stale — presumed crashed");
-        logEvent(
-          ctx,
-          "worker_reaped",
-          `${w.name} reaped after ${Math.round(ageMs / 1000)}s silence`,
-          undefined,
-          w.id,
-        );
-      }
-    }
+  for (const worker of ctx.db.worker.iter()) {
+    if (worker.status === "dead") continue;
 
-    for (const task of ctx.db.task.iter()) {
-      if (task.slaBreached) continue;
-      if (task.status === "approved" || task.status === "done") continue;
-      if (task.deadline.toDate().getTime() < nowMs) {
-        ctx.db.task.id.update({ ...task, slaBreached: true });
-        logEvent(
-          ctx,
-          "sla_breached",
-          `deadline passed: "${task.title}"`,
-          task.id,
-        );
-      }
+    const silenceMs = nowMs - worker.lastHeartbeat.toDate().getTime();
+    if (silenceMs > HEARTBEAT_STALE_MS) {
+      releaseWorker(ctx, worker, "heartbeat stale — presumed crashed");
+      logEvent(
+        ctx,
+        "worker_reaped",
+        `${worker.name} reaped after ${Math.round(silenceMs / 1000)}s of silence`,
+        undefined,
+        worker.id,
+      );
     }
-  },
-);
+  }
+
+  for (const task of ctx.db.task.iter()) {
+    if (task.slaBreached) continue;
+    if (task.status === "approved" || task.status === "done") continue;
+    if (task.deadline.toDate().getTime() < nowMs) {
+      ctx.db.task.id.update({ ...task, slaBreached: true });
+      logEvent(ctx, "sla_breached", `deadline passed: "${task.title}"`, task.id);
+    }
+  }
+});

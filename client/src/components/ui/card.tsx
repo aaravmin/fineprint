@@ -1,14 +1,8 @@
 import { cn } from "../../lib/utils.ts";
 
-export function Card({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div
-      className={cn("rounded-lg border border-edge bg-panel", className)}
-      {...props}
-    />
+    <div className={cn("rounded-lg border border-edge bg-panel", className)} {...props} />
   );
 }
 
@@ -27,9 +21,6 @@ export function CardHeader({
   );
 }
 
-export function CardBody({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+export function CardBody({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return <div className={cn("p-4", className)} {...props} />;
 }

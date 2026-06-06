@@ -56,41 +56,38 @@ Optimize for readability above all: clear variable names, logical paragraph
 spacing, code that reads as a sentence.
 
 ```typescript
-export const claim_task = spacetimedb.reducer(
-  { taskId: t.u64() },
-  (ctx, { taskId }) => {
-    const claimingWorker = workerBySender(ctx);
-    const requestedTask = ctx.db.task.id.find(taskId);
+export const claim_task = spacetimedb.reducer({ taskId: t.u64() }, (ctx, { taskId }) => {
+  const claimingWorker = workerBySender(ctx);
+  const requestedTask = ctx.db.task.id.find(taskId);
 
-    if (!claimingWorker) {
-      throw new Error("claim came from an unregistered worker");
-    }
-    if (claimingWorker.status !== "idle") {
-      throw new Error(`${claimingWorker.name} is already working on something`);
-    }
+  if (!claimingWorker) {
+    throw new Error("claim came from an unregistered worker");
+  }
+  if (claimingWorker.status !== "idle") {
+    throw new Error(`${claimingWorker.name} is already working on something`);
+  }
 
-    if (!requestedTask) {
-      throw new Error(`no task with id ${taskId}`);
-    }
-    if (requestedTask.status !== "open") {
-      throw new Error(`task ${taskId} was already claimed`);
-    }
+  if (!requestedTask) {
+    throw new Error(`no task with id ${taskId}`);
+  }
+  if (requestedTask.status !== "open") {
+    throw new Error(`task ${taskId} was already claimed`);
+  }
 
-    ctx.db.task.id.update({
-      ...requestedTask,
-      status: "claimed",
-      claimedBy: claimingWorker.id,
-    });
+  ctx.db.task.id.update({
+    ...requestedTask,
+    status: "claimed",
+    claimedBy: claimingWorker.id,
+  });
 
-    logEvent(
-      ctx,
-      "task_claimed",
-      `${claimingWorker.name} claimed "${requestedTask.title}"`,
-      taskId,
-      claimingWorker.id,
-    );
-  },
-);
+  logEvent(
+    ctx,
+    "task_claimed",
+    `${claimingWorker.name} claimed "${requestedTask.title}"`,
+    taskId,
+    claimingWorker.id,
+  );
+});
 ```
 
 The rules:

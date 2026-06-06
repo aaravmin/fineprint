@@ -31,15 +31,15 @@ const conn = DbConnection.builder()
       })
       .subscribeToAllTables();
   })
-  .onConnectError((_ctx, err) => {
-    console.error(`[${NAME}] connection failed:`, err.message);
+  .onConnectError((_ctx, error) => {
+    console.error(`[${NAME}] connection failed:`, error.message);
     process.exit(1);
   })
   .build();
 
 function me() {
   return [...conn.db.worker.iter()].find(
-    (w) => w.identity.toHexString() === myIdentityHex,
+    worker => worker.identity.toHexString() === myIdentityHex,
   );
 }
 
@@ -60,13 +60,14 @@ async function tick() {
   }
 
   if (self.status === "idle") {
-    const open = [...conn.db.task.iter()]
-      .filter((t) => t.status === "open")
+    const nextOpenTask = [...conn.db.task.iter()]
+      .filter(task => task.status === "open")
       .sort((a, b) => (a.id < b.id ? -1 : 1))[0];
-    if (!open) return;
+    if (!nextOpenTask) return;
+
     try {
-      await conn.reducers.claimTask({ taskId: open.id });
-      console.log(`[${NAME}] claimed #${open.id}: ${open.title}`);
+      await conn.reducers.claimTask({ taskId: nextOpenTask.id });
+      console.log(`[${NAME}] claimed #${nextOpenTask.id}: ${nextOpenTask.title}`);
     } catch {
       // Another worker won the race — the reducer rejected us. That's the point.
     }
@@ -74,14 +75,12 @@ async function tick() {
 }
 
 async function workOn(taskId: bigint) {
-  const task = [...conn.db.task.iter()].find((t) => t.id === taskId);
+  const task = [...conn.db.task.iter()].find(row => row.id === taskId);
   if (!task) return;
-  const building = [...conn.db.building.iter()].find(
-    (b) => b.id === task.buildingId,
-  );
+  const building = [...conn.db.building.iter()].find(row => row.id === task.buildingId);
 
   console.log(`[${NAME}] drafting for #${taskId}…`);
-  await new Promise((r) => setTimeout(r, WORK_MS));
+  await new Promise(resolve => setTimeout(resolve, WORK_MS));
 
   const input: DraftInput = {
     title: task.title,
@@ -97,10 +96,8 @@ async function workOn(taskId: bigint) {
   try {
     await conn.reducers.submitWork({ taskId, body });
     console.log(`[${NAME}] submitted #${taskId} for review`);
-  } catch (err) {
+  } catch (error) {
     // Task was likely reaped away from us (e.g. we were killed mid-work).
-    console.warn(
-      `[${NAME}] submit failed for #${taskId}: ${(err as Error).message}`,
-    );
+    console.warn(`[${NAME}] submit failed for #${taskId}: ${(error as Error).message}`);
   }
 }

@@ -1,8 +1,27 @@
+# deps
 node_modules/
+
+# build output
 dist/
-*.local
-.env
-.DS_Store
-*.log
-.vite/
+build/
 *.tsbuildinfo
+.vite/
+
+# env + secrets
+.env
+.env.*
+!.env.example
+
+# spacetime local state
+spacetime.local.json
+.spacetime/
+
+# logs
+*.log
+npm-debug.log*
+
+# os / editor
+.DS_Store
+Thumbs.db
+.idea/
+*.swp

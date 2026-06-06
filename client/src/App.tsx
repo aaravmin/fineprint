@@ -13,8 +13,7 @@ export default function App() {
     <main className="mx-auto max-w-3xl p-8">
       <h1 className="text-2xl font-semibold tracking-tight">Fineprint</h1>
       <p className="mt-1 text-sm text-muted">
-        NYC compliance ops room — template shell. Dashboard components land in
-        M4.
+        NYC compliance ops room — template shell. Dashboard components land in M4.
       </p>
 
       <div className="mt-6 rounded-lg border border-edge bg-panel p-4 font-mono text-sm">
@@ -25,8 +24,7 @@ export default function App() {
           </span>
         </div>
         <div className="mt-2 text-muted">
-          buildings {buildings.length} · tasks {tasks.length} · workers{" "}
-          {workers.length}
+          buildings {buildings.length} · tasks {tasks.length} · workers {workers.length}
         </div>
       </div>
     </main>
