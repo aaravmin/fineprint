@@ -1,0 +1,22 @@
+{
+  "name": "fineprint",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "workspaces": [
+    "spacetimedb",
+    "client",
+    "agents"
+  ],
+  "scripts": {
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "publish:local": "spacetime publish --module-path spacetimedb --server local fineprint",
+    "generate": "spacetime generate --lang typescript --out-dir client/src/module_bindings --module-path spacetimedb && spacetime generate --lang typescript --out-dir agents/src/module_bindings --module-path spacetimedb",
+    "seed": "tsx scripts/seed.ts",
+    "worker": "npm run worker --workspace agents",
+    "dashboard": "npm run dev --workspace client"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2"
+  }
+}
