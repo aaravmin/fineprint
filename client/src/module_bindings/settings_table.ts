@@ -11,6 +11,6 @@ import {
 } from "spacetimedb";
 
 export default __t.row({
-  id: __t.u64().primaryKey(),
+  owner: __t.identity().primaryKey(),
   reviewMode: __t.string().name("review_mode"),
 });

@@ -12,6 +12,8 @@ import {
 
 export default __t.row({
   id: __t.u64().primaryKey(),
+  owner: __t.identity(),
+  fleetScope: __t.u32().name("fleet_scope"),
   address: __t.string(),
   bbl: __t.option(__t.string()),
   sqft: __t.u32(),

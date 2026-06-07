@@ -12,6 +12,8 @@ import {
 
 export const Approval = __t.object("Approval", {
   id: __t.u64(),
+  owner: __t.identity(),
+  fleetScope: __t.u32(),
   taskId: __t.u64(),
   approvedBy: __t.identity(),
   verdict: __t.string(),
@@ -22,6 +24,8 @@ export type Approval = __Infer<typeof Approval>;
 
 export const Building = __t.object("Building", {
   id: __t.u64(),
+  owner: __t.identity(),
+  fleetScope: __t.u32(),
   address: __t.string(),
   bbl: __t.option(__t.string()),
   sqft: __t.u32(),
@@ -37,6 +41,7 @@ export type Building = __Infer<typeof Building>;
 
 export const Event = __t.object("Event", {
   id: __t.u64(),
+  owner: __t.identity(),
   kind: __t.string(),
   taskId: __t.option(__t.u64()),
   workerId: __t.option(__t.u64()),
@@ -52,13 +57,15 @@ export const ReaperTick = __t.object("ReaperTick", {
 export type ReaperTick = __Infer<typeof ReaperTick>;
 
 export const Settings = __t.object("Settings", {
-  id: __t.u64(),
+  owner: __t.identity(),
   reviewMode: __t.string(),
 });
 export type Settings = __Infer<typeof Settings>;
 
 export const Submission = __t.object("Submission", {
   id: __t.u64(),
+  owner: __t.identity(),
+  fleetScope: __t.u32(),
   taskId: __t.u64(),
   workerId: __t.u64(),
   body: __t.string(),
@@ -69,6 +76,8 @@ export type Submission = __Infer<typeof Submission>;
 
 export const Task = __t.object("Task", {
   id: __t.u64(),
+  owner: __t.identity(),
+  fleetScope: __t.u32(),
   buildingId: __t.u64(),
   lawId: __t.string(),
   kind: __t.string(),
@@ -86,6 +95,7 @@ export type Task = __Infer<typeof Task>;
 export const Worker = __t.object("Worker", {
   id: __t.u64(),
   identity: __t.identity(),
+  fleetScope: __t.u32(),
   name: __t.string(),
   status: __t.string(),
   lastHeartbeat: __t.timestamp(),

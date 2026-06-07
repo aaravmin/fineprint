@@ -13,6 +13,7 @@ import {
 export default __t.row({
   id: __t.u64().primaryKey(),
   identity: __t.identity(),
+  fleetScope: __t.u32().name("fleet_scope"),
   name: __t.string(),
   status: __t.string(),
   lastHeartbeat: __t.timestamp().name("last_heartbeat"),

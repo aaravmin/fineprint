@@ -56,19 +56,18 @@ function connectObserver() {
         `[dispatcher] watching the queue as ${identity.toHexString().slice(0, 8)}…`,
       );
 
-      conn
-        .subscriptionBuilder()
-        .onApplied(async () => {
-          // Register and heartbeat so the dashboard knows agents are on call
-          // even while the queue is empty — otherwise the "no agents online"
-          // banner shows between tasks.
-          await conn.reducers.registerWorker({ name: DISPATCHER_NAME });
-          observerTimers.push(
-            setInterval(() => conn.reducers.heartbeat({}).catch(() => {}), 5_000),
-          );
-          observerTimers.push(setInterval(() => dispatch(), 2_000));
-        })
-        .subscribeToAllTables();
+      // Register first so the row-level security worker rules apply to this
+      // connection, and so the dashboard knows agents are on call even while
+      // the queue is empty — otherwise the "no agents online" banner shows
+      // between tasks.
+      void conn.reducers.registerWorker({ name: DISPATCHER_NAME }).then(() => {
+        observerTimers.push(
+          setInterval(() => conn.reducers.heartbeat({}).catch(() => {}), 5_000),
+        );
+
+        refreshQueueSnapshot(conn);
+        observerTimers.push(setInterval(() => refreshQueueSnapshot(conn), 2_000));
+      });
     })
     .onConnectError((_ctx, error) => {
       if (!everConnected) {
@@ -96,6 +95,25 @@ function scheduleReconnect() {
 
 connectObserver();
 
+// Task updates do not propagate through the join-based worker visibility
+// rule (SpacetimeDB re-evaluates the rule on inserts but not on updates), so
+// a long-lived subscription would show every task frozen in the status it
+// had when first seen. Re-subscribing each sweep makes every snapshot fresh:
+// claimed and finished tasks drop out before dispatch runs.
+let queueSubscription: { unsubscribe(): void } | null = null;
+
+function refreshQueueSnapshot(conn: DbConnection) {
+  const previousSnapshot = queueSubscription;
+
+  queueSubscription = conn
+    .subscriptionBuilder()
+    .onApplied(() => {
+      previousSnapshot?.unsubscribe();
+      dispatch();
+    })
+    .subscribe(["SELECT * FROM task", "SELECT * FROM worker"]);
+}
+
 function dispatch() {
   if (inFlight.size >= MAX_CONCURRENT) return;
 
@@ -121,15 +139,20 @@ async function spawnAgentFor(taskId: bigint, kind: string) {
       .withUri(HOST)
       .withDatabaseName(DB_NAME)
       .onConnect((agentConn, _identity) => {
-        agentConn
-          .subscriptionBuilder()
-          .onApplied(() => {
-            void runTask(agentConn, name, taskId).finally(() => {
-              agentConn.disconnect();
-              resolve();
-            });
-          })
-          .subscribeToAllTables();
+        // Register before subscribing: the row-level security worker rules
+        // only show tasks to identities that exist in the worker table, so a
+        // subscription opened earlier would come back empty.
+        void agentConn.reducers.registerWorker({ name }).then(() => {
+          agentConn
+            .subscriptionBuilder()
+            .onApplied(() => {
+              void runTask(agentConn, name, taskId).finally(() => {
+                agentConn.disconnect();
+                resolve();
+              });
+            })
+            .subscribeToAllTables();
+        });
       })
       .onConnectError(() => {
         console.error(`[${name}] could not connect; will retry on a later sweep`);
@@ -142,7 +165,6 @@ async function spawnAgentFor(taskId: bigint, kind: string) {
 
 async function runTask(conn: DbConnection, name: string, taskId: bigint) {
   try {
-    await conn.reducers.registerWorker({ name });
     await conn.reducers.claimTask({ taskId });
   } catch {
     // Another agent won the race — the reducer rejected us. That's the point.

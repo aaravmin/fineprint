@@ -12,6 +12,7 @@ import {
 
 export default __t.row({
   id: __t.u64().primaryKey(),
+  owner: __t.identity(),
   kind: __t.string(),
   taskId: __t.option(__t.u64()).name("task_id"),
   workerId: __t.option(__t.u64()).name("worker_id"),

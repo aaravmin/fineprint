@@ -1,4 +1,4 @@
-import { ScheduleAt, Timestamp } from "spacetimedb";
+import { Identity, ScheduleAt, Timestamp } from "spacetimedb";
 import { t } from "spacetimedb/server";
 import spacetimedb, { reaperTick } from "./schema";
 import { reaperRef } from "./reaper-ref";
@@ -7,16 +7,21 @@ import { applicableLaws, LAWS } from "./laws";
 const HEARTBEAT_STALE_MS = 15_000; // 3 missed 5s heartbeats = dead
 const REAP_INTERVAL_MICROS = 5_000_000n; // 5s
 
-// Every reducer writes one event row — no silent mutations.
+// Every reducer writes one event row — no silent mutations. owner is the
+// account whose activity feed the event belongs to; it defaults to the
+// caller, but task-scoped events should pass the task's owner so the event
+// follows the data, not whoever touched it.
 function logEvent(
   ctx: any,
   kind: string,
   payload: string,
   taskId?: bigint,
   workerId?: bigint,
+  owner?: Identity,
 ) {
   ctx.db.event.insert({
     id: 0n,
+    owner: owner ?? ctx.sender,
     kind,
     taskId,
     workerId,
@@ -33,9 +38,10 @@ function workerBySender(ctx: any) {
   return ctx.db.worker.identity.find(ctx.sender);
 }
 
-// Missing row means a database that predates the settings table: manual.
-function currentReviewMode(ctx: any): string {
-  return ctx.db.settings.id.find(1n)?.reviewMode ?? "manual";
+// Settings live one row per account. A missing row means the account never
+// flipped the switch: manual.
+function currentReviewMode(ctx: any, owner: Identity): string {
+  return ctx.db.settings.owner.find(owner)?.reviewMode ?? "manual";
 }
 
 export const init = spacetimedb.init(ctx => {
@@ -44,7 +50,6 @@ export const init = spacetimedb.init(ctx => {
     id: 0n,
     scheduledAt: ScheduleAt.interval(REAP_INTERVAL_MICROS),
   });
-  ctx.db.settings.insert({ id: 1n, reviewMode: "manual" });
   logEvent(ctx, "system", "module initialized; reaper armed (5s)");
 });
 
@@ -58,11 +63,11 @@ export const set_review_mode = spacetimedb.reducer(
       throw new Error(`review mode must be "manual" or "auto", got "${mode}"`);
     }
 
-    const existingSettings = ctx.db.settings.id.find(1n);
+    const existingSettings = ctx.db.settings.owner.find(ctx.sender);
     if (existingSettings) {
-      ctx.db.settings.id.update({ ...existingSettings, reviewMode: mode });
+      ctx.db.settings.owner.update({ ...existingSettings, reviewMode: mode });
     } else {
-      ctx.db.settings.insert({ id: 1n, reviewMode: mode });
+      ctx.db.settings.insert({ owner: ctx.sender, reviewMode: mode });
     }
 
     logEvent(
@@ -83,6 +88,8 @@ export const add_building = spacetimedb.reducer(
 
     const newBuilding = ctx.db.building.insert({
       id: 0n,
+      owner: ctx.sender,
+      fleetScope: 0,
       address,
       bbl: undefined,
       sqft,
@@ -100,6 +107,8 @@ export const add_building = spacetimedb.reducer(
       const fine = law.fineEstimateUsd(sqft, isAffordable);
       ctx.db.task.insert({
         id: 0n,
+        owner: ctx.sender,
+        fleetScope: 0,
         buildingId: newBuilding.id,
         lawId: law.id,
         kind: law.kind,
@@ -134,6 +143,7 @@ export const request_building = spacetimedb.reducer(
     const alreadyQueued = [...ctx.db.task.iter()].some(
       task =>
         task.kind === "building_intake" &&
+        task.owner.isEqual(ctx.sender) &&
         task.intakeAddress === address &&
         (task.status === "open" ||
           task.status === "claimed" ||
@@ -145,6 +155,8 @@ export const request_building = spacetimedb.reducer(
 
     ctx.db.task.insert({
       id: 0n,
+      owner: ctx.sender,
+      fleetScope: 0,
       buildingId: 0n,
       lawId: "intake",
       kind: "building_intake",
@@ -184,7 +196,8 @@ export const ingest_building = spacetimedb.reducer(
     compliancePlanJson: t.option(t.string()),
   },
   (ctx, args) => {
-    ingestFromArgs(ctx, args);
+    // Direct calls (scripts, CLI) ingest under the caller's own account.
+    ingestFromArgs(ctx, args, ctx.sender);
   },
 );
 
@@ -203,12 +216,14 @@ interface IngestArgs {
 
 // The one place a building comes to exist: called by the ingest_building
 // reducer (scripts) and by approve when an intake draft is signed off.
-function ingestFromArgs(ctx: any, args: IngestArgs) {
+// owner is the account the building belongs to — for approvals that is the
+// intake task's owner, not the approving caller.
+function ingestFromArgs(ctx: any, args: IngestArgs, owner: Identity) {
   if (args.address.trim() === "") throw new Error("address cannot be empty");
   if (args.bbl.trim() === "") throw new Error("bbl cannot be empty");
 
   const existingBuilding = [...ctx.db.building.iter()].find(
-    (row: any) => row.bbl === args.bbl,
+    (row: any) => row.bbl === args.bbl && row.owner.isEqual(owner),
   );
 
   if (existingBuilding) {
@@ -242,12 +257,17 @@ function ingestFromArgs(ctx: any, args: IngestArgs) {
       ctx,
       "building_updated",
       `${args.address} (BBL ${args.bbl}) refreshed from city data`,
+      undefined,
+      undefined,
+      owner,
     );
     return;
   }
 
   const newBuilding = ctx.db.building.insert({
     id: 0n,
+    owner,
+    fleetScope: 0,
     address: args.address,
     bbl: args.bbl,
     sqft: args.sqft,
@@ -273,6 +293,8 @@ function ingestFromArgs(ctx: any, args: IngestArgs) {
 
     ctx.db.task.insert({
       id: 0n,
+      owner,
+      fleetScope: 0,
       buildingId: newBuilding.id,
       lawId: law.id,
       kind: law.kind,
@@ -291,6 +313,9 @@ function ingestFromArgs(ctx: any, args: IngestArgs) {
     ctx,
     "building_ingested",
     `${args.address} (BBL ${args.bbl}) ingested from city data → ${laws.length} obligations spawned`,
+    undefined,
+    undefined,
+    owner,
   );
 }
 
@@ -325,6 +350,7 @@ export const register_worker = spacetimedb.reducer(
     const newWorker = ctx.db.worker.insert({
       id: 0n,
       identity: ctx.sender,
+      fleetScope: 0,
       name,
       status: "idle",
       lastHeartbeat: ctx.timestamp,
@@ -389,6 +415,7 @@ export const claim_task = spacetimedb.reducer({ taskId: t.u64() }, (ctx, { taskI
     `${claimingWorker.name} claimed "${requestedTask.title}"`,
     taskId,
     claimingWorker.id,
+    requestedTask.owner,
   );
 });
 
@@ -411,6 +438,8 @@ export const submit_work = spacetimedb.reducer(
 
     ctx.db.submission.insert({
       id: 0n,
+      owner: task.owner,
+      fleetScope: 0,
       taskId,
       workerId: submittingWorker.id,
       body,
@@ -430,12 +459,14 @@ export const submit_work = spacetimedb.reducer(
       `${submittingWorker.name} submitted a draft for review`,
       taskId,
       submittingWorker.id,
+      task.owner,
     );
 
     // Auto mode signs off obligation drafts on the spot. Intakes are exempt:
     // creating a building always takes a human, whatever the mode says.
+    // The mode is the task owner's setting, not the submitting worker's.
     const autoApprove =
-      currentReviewMode(ctx) === "auto" && task.kind !== "building_intake";
+      currentReviewMode(ctx, task.owner) === "auto" && task.kind !== "building_intake";
 
     if (!autoApprove) {
       ctx.db.task.id.update({ ...task, status: "in_review" });
@@ -444,6 +475,8 @@ export const submit_work = spacetimedb.reducer(
 
     ctx.db.approval.insert({
       id: 0n,
+      owner: task.owner,
+      fleetScope: 0,
       taskId,
       approvedBy: ctx.sender,
       verdict: "approved",
@@ -451,7 +484,14 @@ export const submit_work = spacetimedb.reducer(
       at: ctx.timestamp,
     });
     ctx.db.task.id.update({ ...task, status: "approved", claimedBy: undefined });
-    logEvent(ctx, "task_approved", "auto-approved — review mode is auto", taskId);
+    logEvent(
+      ctx,
+      "task_approved",
+      "auto-approved — review mode is auto",
+      taskId,
+      undefined,
+      task.owner,
+    );
   },
 );
 
@@ -480,6 +520,8 @@ export const fail_intake = spacetimedb.reducer(
 
     ctx.db.submission.insert({
       id: 0n,
+      owner: task.owner,
+      fleetScope: 0,
       taskId,
       workerId: failingWorker.id,
       body: reason,
@@ -494,7 +536,7 @@ export const fail_intake = spacetimedb.reducer(
       lastHeartbeat: ctx.timestamp,
     });
 
-    logEvent(ctx, "intake_failed", reason, taskId, failingWorker.id);
+    logEvent(ctx, "intake_failed", reason, taskId, failingWorker.id, task.owner);
   },
 );
 
@@ -507,6 +549,9 @@ export const approve = spacetimedb.reducer(
 
     const task = ctx.db.task.id.find(taskId);
     if (!task) throw new Error(`task ${taskId} not found`);
+    if (!task.owner.isEqual(ctx.sender)) {
+      throw new Error(`task ${taskId} belongs to another account`);
+    }
     if (task.status !== "in_review") throw new Error(`task ${taskId} is not in review`);
 
     // Approving an intake is what creates the building: replay the resolved
@@ -522,11 +567,13 @@ export const approve = spacetimedb.reducer(
         );
       }
 
-      ingestFromArgs(ctx, JSON.parse(latestSubmission.payloadJson));
+      ingestFromArgs(ctx, JSON.parse(latestSubmission.payloadJson), task.owner);
     }
 
     ctx.db.approval.insert({
       id: 0n,
+      owner: task.owner,
+      fleetScope: 0,
       taskId,
       approvedBy: ctx.sender,
       verdict: "approved",
@@ -538,7 +585,7 @@ export const approve = spacetimedb.reducer(
       status: "approved",
       claimedBy: undefined,
     });
-    logEvent(ctx, "task_approved", note || "approved", taskId);
+    logEvent(ctx, "task_approved", note || "approved", taskId, undefined, task.owner);
   },
 );
 
@@ -551,10 +598,15 @@ export const reject = spacetimedb.reducer(
 
     const task = ctx.db.task.id.find(taskId);
     if (!task) throw new Error(`task ${taskId} not found`);
+    if (!task.owner.isEqual(ctx.sender)) {
+      throw new Error(`task ${taskId} belongs to another account`);
+    }
     if (task.status !== "in_review") throw new Error(`task ${taskId} is not in review`);
 
     ctx.db.approval.insert({
       id: 0n,
+      owner: task.owner,
+      fleetScope: 0,
       taskId,
       approvedBy: ctx.sender,
       verdict: "rejected",
@@ -567,13 +619,27 @@ export const reject = spacetimedb.reducer(
       // lookup would reproduce the same answer. Terminal; re-request with a
       // corrected address instead.
       ctx.db.task.id.update({ ...task, status: "rejected", claimedBy: undefined });
-      logEvent(ctx, "task_rejected", note || "intake rejected", taskId);
+      logEvent(
+        ctx,
+        "task_rejected",
+        note || "intake rejected",
+        taskId,
+        undefined,
+        task.owner,
+      );
       return;
     }
 
     // Back to the queue for another worker.
     ctx.db.task.id.update({ ...task, status: "open", claimedBy: undefined });
-    logEvent(ctx, "task_rejected", note || "rejected — returned to queue", taskId);
+    logEvent(
+      ctx,
+      "task_rejected",
+      note || "rejected — returned to queue",
+      taskId,
+      undefined,
+      task.owner,
+    );
   },
 );
 
@@ -606,12 +672,15 @@ export const mark_done = spacetimedb.reducer(
 
     const task = ctx.db.task.id.find(taskId);
     if (!task) throw new Error(`task ${taskId} not found`);
+    if (!task.owner.isEqual(ctx.sender)) {
+      throw new Error(`task ${taskId} belongs to another account`);
+    }
     if (task.status !== "approved") {
       throw new Error(`task ${taskId} is not approved — only approved work can be filed`);
     }
 
     ctx.db.task.id.update({ ...task, status: "done" });
-    logEvent(ctx, "task_done", note || "filing confirmed", taskId);
+    logEvent(ctx, "task_done", note || "filing confirmed", taskId, undefined, task.owner);
   },
 );
 
@@ -652,6 +721,7 @@ function releaseWorker(ctx: any, worker: any, reason: string) {
         `"${abandonedTask.title}" returned to open (${reason})`,
         abandonedTask.id,
         worker.id,
+        abandonedTask.owner,
       );
     }
   }
@@ -684,7 +754,14 @@ export const reap = spacetimedb.reducer({ arg: reaperTick.rowType }, (ctx, _args
     if (task.status === "approved" || task.status === "done") continue;
     if (task.deadline.toDate().getTime() < nowMs) {
       ctx.db.task.id.update({ ...task, slaBreached: true });
-      logEvent(ctx, "sla_breached", `deadline passed: "${task.title}"`, task.id);
+      logEvent(
+        ctx,
+        "sla_breached",
+        `deadline passed: "${task.title}"`,
+        task.id,
+        undefined,
+        task.owner,
+      );
     }
   }
 });

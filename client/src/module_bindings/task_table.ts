@@ -12,6 +12,8 @@ import {
 
 export default __t.row({
   id: __t.u64().primaryKey(),
+  owner: __t.identity(),
+  fleetScope: __t.u32().name("fleet_scope"),
   buildingId: __t.u64().name("building_id"),
   lawId: __t.string().name("law_id"),
   kind: __t.string(),

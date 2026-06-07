@@ -67,8 +67,14 @@ const tablesSchema = __schema({
   approval: __table({
     name: 'approval',
     indexes: [
+      { accessor: 'fleetScope', name: 'approval_fleet_scope_idx_btree', algorithm: 'btree', columns: [
+        'fleetScope',
+      ] },
       { accessor: 'id', name: 'approval_id_idx_btree', algorithm: 'btree', columns: [
         'id',
+      ] },
+      { accessor: 'owner', name: 'approval_owner_idx_btree', algorithm: 'btree', columns: [
+        'owner',
       ] },
       { accessor: 'taskId', name: 'approval_task_id_idx_btree', algorithm: 'btree', columns: [
         'taskId',
@@ -81,8 +87,14 @@ const tablesSchema = __schema({
   building: __table({
     name: 'building',
     indexes: [
+      { accessor: 'fleetScope', name: 'building_fleet_scope_idx_btree', algorithm: 'btree', columns: [
+        'fleetScope',
+      ] },
       { accessor: 'id', name: 'building_id_idx_btree', algorithm: 'btree', columns: [
         'id',
+      ] },
+      { accessor: 'owner', name: 'building_owner_idx_btree', algorithm: 'btree', columns: [
+        'owner',
       ] },
     ],
     constraints: [
@@ -95,6 +107,9 @@ const tablesSchema = __schema({
       { accessor: 'id', name: 'event_id_idx_btree', algorithm: 'btree', columns: [
         'id',
       ] },
+      { accessor: 'owner', name: 'event_owner_idx_btree', algorithm: 'btree', columns: [
+        'owner',
+      ] },
     ],
     constraints: [
       { name: 'event_id_key', constraint: 'unique', columns: ['id'] },
@@ -103,19 +118,25 @@ const tablesSchema = __schema({
   settings: __table({
     name: 'settings',
     indexes: [
-      { accessor: 'id', name: 'settings_id_idx_btree', algorithm: 'btree', columns: [
-        'id',
+      { accessor: 'owner', name: 'settings_owner_idx_btree', algorithm: 'btree', columns: [
+        'owner',
       ] },
     ],
     constraints: [
-      { name: 'settings_id_key', constraint: 'unique', columns: ['id'] },
+      { name: 'settings_owner_key', constraint: 'unique', columns: ['owner'] },
     ],
   }, SettingsRow),
   submission: __table({
     name: 'submission',
     indexes: [
+      { accessor: 'fleetScope', name: 'submission_fleet_scope_idx_btree', algorithm: 'btree', columns: [
+        'fleetScope',
+      ] },
       { accessor: 'id', name: 'submission_id_idx_btree', algorithm: 'btree', columns: [
         'id',
+      ] },
+      { accessor: 'owner', name: 'submission_owner_idx_btree', algorithm: 'btree', columns: [
+        'owner',
       ] },
       { accessor: 'taskId', name: 'submission_task_id_idx_btree', algorithm: 'btree', columns: [
         'taskId',
@@ -131,8 +152,14 @@ const tablesSchema = __schema({
       { accessor: 'buildingId', name: 'task_building_id_idx_btree', algorithm: 'btree', columns: [
         'buildingId',
       ] },
+      { accessor: 'fleetScope', name: 'task_fleet_scope_idx_btree', algorithm: 'btree', columns: [
+        'fleetScope',
+      ] },
       { accessor: 'id', name: 'task_id_idx_btree', algorithm: 'btree', columns: [
         'id',
+      ] },
+      { accessor: 'owner', name: 'task_owner_idx_btree', algorithm: 'btree', columns: [
+        'owner',
       ] },
       { accessor: 'status', name: 'task_status_idx_btree', algorithm: 'btree', columns: [
         'status',
@@ -145,6 +172,9 @@ const tablesSchema = __schema({
   worker: __table({
     name: 'worker',
     indexes: [
+      { accessor: 'fleetScope', name: 'worker_fleet_scope_idx_btree', algorithm: 'btree', columns: [
+        'fleetScope',
+      ] },
       { accessor: 'id', name: 'worker_id_idx_btree', algorithm: 'btree', columns: [
         'id',
       ] },
