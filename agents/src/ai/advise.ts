@@ -54,6 +54,10 @@ const ADVISE_SYSTEM = [
   "never compute, total, or extrapolate. Structure: current exposure in dollars,",
   "the cheapest path the optimizer found (name its measures and note the figures",
   "are assumptions, not quotes), then the first three concrete actions.",
+  "Ground the advice in this building's own equipment: quote the retrofitFindings",
+  "(its heating fuel, boilers, efficiency tier) and, when the optimizer excluded a",
+  "measure because the record shows it is already done, say so by name. Cover the",
+  "procedural obligations too — name each filing that is due and its deadline.",
   "Where the data lacks a number, say so plainly.",
   'End with: "Prepared by AI from engine-computed figures. Human review required."',
 ].join(" ");
