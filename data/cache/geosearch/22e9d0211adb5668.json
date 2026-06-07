@@ -1,12 +1,12 @@
 {
-  "key": "https://geosearch.planninglabs.nyc/v2/search?text=30-30%20Thomson%20Avenue%2C%20Queens",
-  "recordedAt": "2026-06-07T11:58:04.187Z",
+  "key": "https://geosearch.planninglabs.nyc/v2/search?text=10%20EIGHTH%20AVENUE%2C%20Brooklyn%2C%20NY%2C%20USA",
+  "recordedAt": "2026-06-07T11:43:02.693Z",
   "value": {
     "geocoding": {
       "version": "0.2",
       "attribution": "http://geosearch.planninglabs.nyc/attribution",
       "query": {
-        "text": "30-30 Thomson Avenue, Queens",
+        "text": "10 EIGHTH AVENUE, Brooklyn, NY, USA",
         "size": 10,
         "private": false,
         "lang": {
@@ -19,11 +19,13 @@
         "querySize": 20,
         "parser": "pelias",
         "parsed_text": {
-          "subject": "30-30 Thomson Avenue",
-          "housenumber": "30-30",
-          "street": "Thomson Avenue",
-          "locality": "Queens",
-          "admin": "Queens"
+          "subject": "10 EIGHTH AVENUE",
+          "housenumber": "10",
+          "street": "EIGHTH AVENUE",
+          "locality": "Brooklyn",
+          "region": "NY",
+          "country": "USA",
+          "admin": "Brooklyn, NY, USA"
         }
       },
       "warnings": [
@@ -34,7 +36,7 @@
         "author": "Mapzen",
         "version": "1.0"
       },
-      "timestamp": 1780833484165
+      "timestamp": 1780832582754
     },
     "type": "FeatureCollection",
     "features": [
@@ -43,21 +45,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.93608,
-            40.744072
+            -73.972006,
+            40.675416
           ]
         },
         "properties": {
-          "id": "1805466",
-          "gid": "nycpad:venue:1805466",
+          "id": "799218",
+          "gid": "nycpad:venue:799218",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1805466",
+          "source_id": "799218",
           "country_code": "US",
-          "name": "30-30 THOMSON AVENUE",
-          "housenumber": "30-30",
-          "street": "THOMSON AVENUE",
-          "postalcode": "11101",
+          "name": "10 EIGHTH AVENUE",
+          "housenumber": "10",
+          "street": "EIGHTH AVENUE",
+          "postalcode": "11217",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -67,20 +69,21 @@
           "region": "New York",
           "region_gid": "whosonfirst:region:85688543",
           "region_a": "NY",
-          "county": "Queens County",
-          "county_gid": "whosonfirst:county:102082377",
+          "county": "Kings County",
+          "county_gid": "whosonfirst:county:102082361",
+          "county_a": "BK",
           "locality": "New York",
           "locality_gid": "whosonfirst:locality:85977539",
           "locality_a": "NYC",
-          "borough": "Queens",
-          "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "Long Island City",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
-          "label": "30-30 THOMSON AVENUE, Long Island City, NY, USA",
+          "borough": "Brooklyn",
+          "borough_gid": "whosonfirst:borough:421205765",
+          "neighbourhood": "Park Slope",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85840609",
+          "label": "10 EIGHTH AVENUE, Brooklyn, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "4002770001",
-              "bin": "4003533",
+              "bbl": "3010590040",
+              "bin": "3024454",
               "version": "26a"
             }
           }
@@ -91,21 +94,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.934304,
-            40.743866
+            -73.914014,
+            40.558806
           ]
         },
         "properties": {
-          "id": "1805693",
-          "gid": "nycpad:venue:1805693",
+          "id": "4263192",
+          "gid": "nycpad:venue:4263192",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1805693",
+          "source_id": "4263192",
           "country_code": "US",
-          "name": "31-30 THOMSON AVENUE",
-          "housenumber": "31-30",
-          "street": "THOMSON AVENUE",
-          "postalcode": "11101",
+          "name": "10 EIGHTH AVENUE",
+          "housenumber": "10",
+          "street": "EIGHTH AVENUE",
+          "postalcode": "11697",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -122,13 +125,13 @@
           "locality_a": "NYC",
           "borough": "Queens",
           "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "Long Island City",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
-          "label": "31-30 THOMSON AVENUE, Long Island City, NY, USA",
+          "neighbourhood": "Rockaway Point",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85807191",
+          "label": "10 EIGHTH AVENUE, Rockaway Point, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "4002790001",
-              "bin": "4003535",
+              "bbl": "4163500400",
+              "bin": "4466608",
               "version": "26a"
             }
           }
@@ -139,21 +142,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.93692,
-            40.744583
+            -74.00492,
+            40.737168
           ]
         },
         "properties": {
-          "id": "1804869",
-          "gid": "nycpad:venue:1804869",
+          "id": "63930",
+          "gid": "nycpad:venue:63930",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1804869",
+          "source_id": "63930",
           "country_code": "US",
-          "name": "30-14 THOMSON AVENUE",
-          "housenumber": "30-14",
-          "street": "THOMSON AVENUE",
-          "postalcode": "11101",
+          "name": "10 EIGHTH AVENUE",
+          "housenumber": "10",
+          "street": "EIGHTH AVENUE",
+          "postalcode": "10014",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -163,20 +166,20 @@
           "region": "New York",
           "region_gid": "whosonfirst:region:85688543",
           "region_a": "NY",
-          "county": "Queens County",
-          "county_gid": "whosonfirst:county:102082377",
+          "county": "New York County",
+          "county_gid": "whosonfirst:county:102081863",
           "locality": "New York",
           "locality_gid": "whosonfirst:locality:85977539",
           "locality_a": "NYC",
-          "borough": "Queens",
-          "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "Long Island City",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
-          "label": "30-14 THOMSON AVENUE, Long Island City, NY, USA",
+          "borough": "Manhattan",
+          "borough_gid": "whosonfirst:borough:421205771",
+          "neighbourhood": "West Village",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85856577",
+          "label": "10 EIGHTH AVENUE, New York, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "4002740001",
-              "bin": "4003517",
+              "bbl": "1006240031",
+              "bin": "1011379",
               "version": "26a"
             }
           }
@@ -187,21 +190,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.93692,
-            40.744583
+            -73.815314,
+            40.793839
           ]
         },
         "properties": {
-          "id": "1804871",
-          "gid": "nycpad:venue:1804871",
+          "id": "2597931",
+          "gid": "nycpad:venue:2597931",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1804871",
+          "source_id": "2597931",
           "country_code": "US",
-          "name": "30-16 THOMSON AVENUE",
-          "housenumber": "30-16",
-          "street": "THOMSON AVENUE",
-          "postalcode": "11101",
+          "name": "150-10 EIGHTH AVENUE",
+          "housenumber": "150-10",
+          "street": "EIGHTH AVENUE",
+          "postalcode": "11357",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -218,13 +221,13 @@
           "locality_a": "NYC",
           "borough": "Queens",
           "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "Long Island City",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
-          "label": "30-16 THOMSON AVENUE, Long Island City, NY, USA",
+          "neighbourhood": "Whitestone",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85857567",
+          "label": "150-10 EIGHTH AVENUE, Whitestone, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "4002740001",
-              "bin": "4003517",
+              "bbl": "4045130012",
+              "bin": "4102577",
               "version": "26a"
             }
           }
@@ -235,21 +238,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.9358,
-            40.745426
+            -73.914014,
+            40.558806
           ]
         },
         "properties": {
-          "id": "1804980",
-          "gid": "nycpad:venue:1804980",
+          "id": "4263194",
+          "gid": "nycpad:venue:4263194",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1804980",
+          "source_id": "4263194",
           "country_code": "US",
-          "name": "30-25 THOMSON AVENUE",
-          "housenumber": "30-25",
-          "street": "THOMSON AVENUE",
-          "postalcode": "11101",
+          "name": "204-10 EIGHTH AVENUE",
+          "housenumber": "204-10",
+          "street": "EIGHTH AVENUE",
+          "postalcode": "11697",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -266,13 +269,13 @@
           "locality_a": "NYC",
           "borough": "Queens",
           "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "Long Island City",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
-          "label": "30-25 THOMSON AVENUE, Long Island City, NY, USA",
+          "neighbourhood": "Rockaway Point",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85807191",
+          "label": "204-10 EIGHTH AVENUE, Rockaway Point, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "4002750023",
-              "bin": "4003523",
+              "bbl": "4163500400",
+              "bin": "4466608",
               "version": "26a"
             }
           }
@@ -283,21 +286,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.9358,
-            40.745426
+            -73.819353,
+            40.792743
           ]
         },
         "properties": {
-          "id": "1804982",
-          "gid": "nycpad:venue:1804982",
+          "id": "2593456",
+          "gid": "nycpad:venue:2593456",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1804982",
+          "source_id": "2593456",
           "country_code": "US",
-          "name": "30-27 THOMSON AVENUE",
-          "housenumber": "30-27",
-          "street": "THOMSON AVENUE",
-          "postalcode": "11101",
+          "name": "147-10 GAR EIGHTH AVENUE",
+          "housenumber": "147-10 GAR",
+          "street": "EIGHTH AVENUE",
+          "postalcode": "11357",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -314,13 +317,13 @@
           "locality_a": "NYC",
           "borough": "Queens",
           "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "Long Island City",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
-          "label": "30-27 THOMSON AVENUE, Long Island City, NY, USA",
+          "neighbourhood": "Whitestone",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85857567",
+          "label": "147-10 GAR EIGHTH AVENUE, Whitestone, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "4002750023",
-              "bin": "4003523",
+              "bbl": "4044760015",
+              "bin": "4551392",
               "version": "26a"
             }
           }
@@ -331,21 +334,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.9358,
-            40.745426
+            -73.960286,
+            40.582542
           ]
         },
         "properties": {
-          "id": "1805004",
-          "gid": "nycpad:venue:1805004",
+          "id": "1585685",
+          "gid": "nycpad:venue:1585685",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1805004",
+          "source_id": "1585685",
           "country_code": "US",
-          "name": "30-49 THOMSON AVENUE",
-          "housenumber": "30-49",
-          "street": "THOMSON AVENUE",
-          "postalcode": "11101",
+          "name": "10 BRIGHTON EIGHTH COURT",
+          "housenumber": "10",
+          "street": "BRIGHTON EIGHTH COURT",
+          "postalcode": "11235",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -355,20 +358,21 @@
           "region": "New York",
           "region_gid": "whosonfirst:region:85688543",
           "region_a": "NY",
-          "county": "Queens County",
-          "county_gid": "whosonfirst:county:102082377",
+          "county": "Kings County",
+          "county_gid": "whosonfirst:county:102082361",
+          "county_a": "BK",
           "locality": "New York",
           "locality_gid": "whosonfirst:locality:85977539",
           "locality_a": "NYC",
-          "borough": "Queens",
-          "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "Long Island City",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
-          "label": "30-49 THOMSON AVENUE, Long Island City, NY, USA",
+          "borough": "Brooklyn",
+          "borough_gid": "whosonfirst:borough:421205765",
+          "neighbourhood": "Brighton Beach",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85807547",
+          "label": "10 BRIGHTON EIGHTH COURT, Brooklyn, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "4002750023",
-              "bin": "4003523",
+              "bbl": "3072640067",
+              "bin": "3196547",
               "version": "26a"
             }
           }
@@ -379,21 +383,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.9358,
-            40.745426
+            -73.96239,
+            40.72121
           ]
         },
         "properties": {
-          "id": "1805022",
-          "gid": "nycpad:venue:1805022",
+          "id": "1015577",
+          "gid": "nycpad:venue:1015577",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1805022",
+          "source_id": "1015577",
           "country_code": "US",
-          "name": "30-67 THOMSON AVENUE",
-          "housenumber": "30-67",
-          "street": "THOMSON AVENUE",
-          "postalcode": "11101",
+          "name": "10 NORTH EIGHTH STREET",
+          "housenumber": "10",
+          "street": "NORTH EIGHTH STREET",
+          "postalcode": "11249",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -403,20 +407,21 @@
           "region": "New York",
           "region_gid": "whosonfirst:region:85688543",
           "region_a": "NY",
-          "county": "Queens County",
-          "county_gid": "whosonfirst:county:102082377",
+          "county": "Kings County",
+          "county_gid": "whosonfirst:county:102082361",
+          "county_a": "BK",
           "locality": "New York",
           "locality_gid": "whosonfirst:locality:85977539",
           "locality_a": "NYC",
-          "borough": "Queens",
-          "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "Long Island City",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
-          "label": "30-67 THOMSON AVENUE, Long Island City, NY, USA",
+          "borough": "Brooklyn",
+          "borough_gid": "whosonfirst:borough:421205765",
+          "neighbourhood": "Williamsburg",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85857853",
+          "label": "10 NORTH EIGHTH STREET, Brooklyn, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "4002750023",
-              "bin": "4003523",
+              "bbl": "3023160001",
+              "bin": "3061863",
               "version": "26a"
             }
           }
@@ -427,21 +432,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.9358,
-            40.745426
+            -74.010567,
+            40.611745
           ]
         },
         "properties": {
-          "id": "1805032",
-          "gid": "nycpad:venue:1805032",
+          "id": "1457256",
+          "gid": "nycpad:venue:1457256",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1805032",
+          "source_id": "1457256",
           "country_code": "US",
-          "name": "30-77 THOMSON AVENUE",
-          "housenumber": "30-77",
-          "street": "THOMSON AVENUE",
-          "postalcode": "11101",
+          "name": "10 BAY EIGHTH STREET",
+          "housenumber": "10",
+          "street": "BAY EIGHTH STREET",
+          "postalcode": "11228",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -451,20 +456,21 @@
           "region": "New York",
           "region_gid": "whosonfirst:region:85688543",
           "region_a": "NY",
-          "county": "Queens County",
-          "county_gid": "whosonfirst:county:102082377",
+          "county": "Kings County",
+          "county_gid": "whosonfirst:county:102082361",
+          "county_a": "BK",
           "locality": "New York",
           "locality_gid": "whosonfirst:locality:85977539",
           "locality_a": "NYC",
-          "borough": "Queens",
-          "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "Long Island City",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
-          "label": "30-77 THOMSON AVENUE, Long Island City, NY, USA",
+          "borough": "Brooklyn",
+          "borough_gid": "whosonfirst:borough:421205765",
+          "neighbourhood": "Bath Beach",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85804733",
+          "label": "10 BAY EIGHTH STREET, Brooklyn, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "4002750023",
-              "bin": "4003523",
+              "bbl": "3063580036",
+              "bin": "3166048",
               "version": "26a"
             }
           }
@@ -475,21 +481,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.9358,
-            40.745426
+            -73.997236,
+            40.732385
           ]
         },
         "properties": {
-          "id": "1805038",
-          "gid": "nycpad:venue:1805038",
+          "id": "52392",
+          "gid": "nycpad:venue:52392",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1805038",
+          "source_id": "52392",
           "country_code": "US",
-          "name": "30-83 THOMSON AVENUE",
-          "housenumber": "30-83",
-          "street": "THOMSON AVENUE",
-          "postalcode": "11101",
+          "name": "10 WEST EIGHTH STREET",
+          "housenumber": "10",
+          "street": "WEST EIGHTH STREET",
+          "postalcode": "10011",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -499,20 +505,20 @@
           "region": "New York",
           "region_gid": "whosonfirst:region:85688543",
           "region_a": "NY",
-          "county": "Queens County",
-          "county_gid": "whosonfirst:county:102082377",
+          "county": "New York County",
+          "county_gid": "whosonfirst:county:102081863",
           "locality": "New York",
           "locality_gid": "whosonfirst:locality:85977539",
           "locality_a": "NYC",
-          "borough": "Queens",
-          "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "Long Island City",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
-          "label": "30-83 THOMSON AVENUE, Long Island City, NY, USA",
+          "borough": "Manhattan",
+          "borough_gid": "whosonfirst:borough:421205771",
+          "neighbourhood": "Greenwich Village",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:420529189",
+          "label": "10 WEST EIGHTH STREET, New York, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "4002750023",
-              "bin": "4003523",
+              "bbl": "1005510028",
+              "bin": "1008861",
               "version": "26a"
             }
           }
@@ -520,10 +526,10 @@
       }
     ],
     "bbox": [
-      -73.93692,
-      40.743866,
-      -73.934304,
-      40.745426
+      -74.010567,
+      40.558806,
+      -73.815314,
+      40.793839
     ]
   }
 }

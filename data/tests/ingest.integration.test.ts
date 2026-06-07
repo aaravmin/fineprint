@@ -35,6 +35,33 @@ describe.runIf(integrationEnabled)("ingest.ts against a live server", () => {
 
     expect(obligationCount(secondRun)).toBe(obligationCount(firstRun));
   });
+
+  // The reported bug: a small building resolved to zero floor area (PLUTO was
+  // ignored) and collapsed to LL152 alone, while large buildings silently
+  // dropped LL11. These two real-data buildings pin both ends of the fix.
+  test("a sub-25k building's only sustainability obligation is LL152", () => {
+    const output = runIngest("32 West 32 Street, Manhattan");
+
+    expect(output).toMatch(/with 1 obligations/);
+    expect(output).toMatch(/LL152 — Gas Piping Inspection & Certification/);
+    expect(output).not.toMatch(/LL97 — Building Emissions Cap/);
+    expect(output).not.toMatch(/LL84 — Energy & Water Benchmarking/);
+  });
+
+  test("a large building gets the full size-based law set, LL11 included", () => {
+    const output = runIngest("350 5th Avenue, Manhattan");
+
+    for (const title of [
+      /LL97 — Building Emissions Cap/,
+      /LL84 — Energy & Water Benchmarking/,
+      /LL87 — Energy Audit & Retro-commissioning/,
+      /LL11 \/ FISP — Facade Inspection/,
+      /LL88 — Lighting Upgrades & Submetering/,
+      /LL152 — Gas Piping Inspection & Certification/,
+    ]) {
+      expect(output).toMatch(title);
+    }
+  });
 });
 
 describe.runIf(!integrationEnabled)("ingest.ts integration (skipped)", () => {

@@ -1,12 +1,12 @@
 {
-  "key": "https://geosearch.planninglabs.nyc/v2/search?text=30-30%20Thomson%20Avenue%2C%20Queens",
-  "recordedAt": "2026-06-07T11:58:04.187Z",
+  "key": "https://geosearch.planninglabs.nyc/v2/search?text=18%20WEST%2018%20ROAD%2C%20Broad%20Channel",
+  "recordedAt": "2026-06-07T11:49:13.024Z",
   "value": {
     "geocoding": {
       "version": "0.2",
       "attribution": "http://geosearch.planninglabs.nyc/attribution",
       "query": {
-        "text": "30-30 Thomson Avenue, Queens",
+        "text": "18 WEST 18 ROAD, Broad Channel",
         "size": 10,
         "private": false,
         "lang": {
@@ -19,11 +19,8 @@
         "querySize": 20,
         "parser": "pelias",
         "parsed_text": {
-          "subject": "30-30 Thomson Avenue",
-          "housenumber": "30-30",
-          "street": "Thomson Avenue",
-          "locality": "Queens",
-          "admin": "Queens"
+          "subject": "18 WEST 18 ROAD",
+          "admin": "Broad Channel"
         }
       },
       "warnings": [
@@ -34,7 +31,7 @@
         "author": "Mapzen",
         "version": "1.0"
       },
-      "timestamp": 1780833484165
+      "timestamp": 1780832953014
     },
     "type": "FeatureCollection",
     "features": [
@@ -43,23 +40,23 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.93608,
-            40.744072
+            -73.821474,
+            40.600225
           ]
         },
         "properties": {
-          "id": "1805466",
-          "gid": "nycpad:venue:1805466",
+          "id": "4171691",
+          "gid": "nycpad:venue:4171691",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1805466",
+          "source_id": "4171691",
           "country_code": "US",
-          "name": "30-30 THOMSON AVENUE",
-          "housenumber": "30-30",
-          "street": "THOMSON AVENUE",
-          "postalcode": "11101",
-          "confidence": 0.8,
-          "match_type": "fallback",
+          "name": "18 WEST 18 ROAD",
+          "housenumber": "18",
+          "street": "WEST 18 ROAD",
+          "postalcode": "11693",
+          "confidence": 1,
+          "match_type": "exact",
           "accuracy": "point",
           "country": "United States",
           "country_gid": "whosonfirst:country:85633793",
@@ -74,13 +71,13 @@
           "locality_a": "NYC",
           "borough": "Queens",
           "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "Long Island City",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
-          "label": "30-30 THOMSON AVENUE, Long Island City, NY, USA",
+          "neighbourhood": "Broad Channel",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85807661",
+          "label": "18 WEST 18 ROAD, Broad Channel, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "4002770001",
-              "bin": "4003533",
+              "bbl": "4153230041",
+              "bin": "4297224",
               "version": "26a"
             }
           }
@@ -91,23 +88,23 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.934304,
-            40.743866
+            -73.820488,
+            40.606854
           ]
         },
         "properties": {
-          "id": "1805693",
-          "gid": "nycpad:venue:1805693",
+          "id": "4170165",
+          "gid": "nycpad:venue:4170165",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1805693",
+          "source_id": "4170165",
           "country_code": "US",
-          "name": "31-30 THOMSON AVENUE",
-          "housenumber": "31-30",
-          "street": "THOMSON AVENUE",
-          "postalcode": "11101",
-          "confidence": 0.8,
-          "match_type": "fallback",
+          "name": "18 WEST NINTH ROAD",
+          "housenumber": "18",
+          "street": "WEST NINTH ROAD",
+          "postalcode": "11693",
+          "confidence": 1,
+          "match_type": "exact",
           "accuracy": "point",
           "country": "United States",
           "country_gid": "whosonfirst:country:85633793",
@@ -122,13 +119,13 @@
           "locality_a": "NYC",
           "borough": "Queens",
           "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "Long Island City",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
-          "label": "31-30 THOMSON AVENUE, Long Island City, NY, USA",
+          "neighbourhood": "Broad Channel",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85807661",
+          "label": "18 WEST NINTH ROAD, Broad Channel, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "4002790001",
-              "bin": "4003535",
+              "bbl": "4153130006",
+              "bin": "4296866",
               "version": "26a"
             }
           }
@@ -139,23 +136,23 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.93692,
-            40.744583
+            -73.823938,
+            40.600694
           ]
         },
         "properties": {
-          "id": "1804869",
-          "gid": "nycpad:venue:1804869",
+          "id": "4171604",
+          "gid": "nycpad:venue:4171604",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1804869",
+          "source_id": "4171604",
           "country_code": "US",
-          "name": "30-14 THOMSON AVENUE",
-          "housenumber": "30-14",
-          "street": "THOMSON AVENUE",
-          "postalcode": "11101",
-          "confidence": 0.8,
-          "match_type": "fallback",
+          "name": "73 WEST 18 ROAD",
+          "housenumber": "73",
+          "street": "WEST 18 ROAD",
+          "postalcode": "11693",
+          "confidence": 1,
+          "match_type": "exact",
           "accuracy": "point",
           "country": "United States",
           "country_gid": "whosonfirst:country:85633793",
@@ -170,13 +167,13 @@
           "locality_a": "NYC",
           "borough": "Queens",
           "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "Long Island City",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
-          "label": "30-14 THOMSON AVENUE, Long Island City, NY, USA",
+          "neighbourhood": "Broad Channel",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85807661",
+          "label": "73 WEST 18 ROAD, Broad Channel, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "4002740001",
-              "bin": "4003517",
+              "bbl": "4153220091",
+              "bin": "4297202",
               "version": "26a"
             }
           }
@@ -187,23 +184,23 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.93692,
-            40.744583
+            -73.824107,
+            40.600717
           ]
         },
         "properties": {
-          "id": "1804871",
-          "gid": "nycpad:venue:1804871",
+          "id": "4171607",
+          "gid": "nycpad:venue:4171607",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1804871",
+          "source_id": "4171607",
           "country_code": "US",
-          "name": "30-16 THOMSON AVENUE",
-          "housenumber": "30-16",
-          "street": "THOMSON AVENUE",
-          "postalcode": "11101",
-          "confidence": 0.8,
-          "match_type": "fallback",
+          "name": "77 WEST 18 ROAD",
+          "housenumber": "77",
+          "street": "WEST 18 ROAD",
+          "postalcode": "11693",
+          "confidence": 1,
+          "match_type": "exact",
           "accuracy": "point",
           "country": "United States",
           "country_gid": "whosonfirst:country:85633793",
@@ -218,13 +215,13 @@
           "locality_a": "NYC",
           "borough": "Queens",
           "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "Long Island City",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
-          "label": "30-16 THOMSON AVENUE, Long Island City, NY, USA",
+          "neighbourhood": "Broad Channel",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85807661",
+          "label": "77 WEST 18 ROAD, Broad Channel, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "4002740001",
-              "bin": "4003517",
+              "bbl": "4153220092",
+              "bin": "4297203",
               "version": "26a"
             }
           }
@@ -235,23 +232,23 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.9358,
-            40.745426
+            -73.824222,
+            40.600721
           ]
         },
         "properties": {
-          "id": "1804980",
-          "gid": "nycpad:venue:1804980",
+          "id": "4171610",
+          "gid": "nycpad:venue:4171610",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1804980",
+          "source_id": "4171610",
           "country_code": "US",
-          "name": "30-25 THOMSON AVENUE",
-          "housenumber": "30-25",
-          "street": "THOMSON AVENUE",
-          "postalcode": "11101",
-          "confidence": 0.8,
-          "match_type": "fallback",
+          "name": "79 WEST 18 ROAD",
+          "housenumber": "79",
+          "street": "WEST 18 ROAD",
+          "postalcode": "11693",
+          "confidence": 1,
+          "match_type": "exact",
           "accuracy": "point",
           "country": "United States",
           "country_gid": "whosonfirst:country:85633793",
@@ -266,13 +263,13 @@
           "locality_a": "NYC",
           "borough": "Queens",
           "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "Long Island City",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
-          "label": "30-25 THOMSON AVENUE, Long Island City, NY, USA",
+          "neighbourhood": "Broad Channel",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85807661",
+          "label": "79 WEST 18 ROAD, Broad Channel, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "4002750023",
-              "bin": "4003523",
+              "bbl": "4153220095",
+              "bin": "4297204",
               "version": "26a"
             }
           }
@@ -283,23 +280,23 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.9358,
-            40.745426
+            -73.824327,
+            40.600481
           ]
         },
         "properties": {
-          "id": "1804982",
-          "gid": "nycpad:venue:1804982",
+          "id": "4171613",
+          "gid": "nycpad:venue:4171613",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1804982",
+          "source_id": "4171613",
           "country_code": "US",
-          "name": "30-27 THOMSON AVENUE",
-          "housenumber": "30-27",
-          "street": "THOMSON AVENUE",
-          "postalcode": "11101",
-          "confidence": 0.8,
-          "match_type": "fallback",
+          "name": "82 WEST 18 ROAD",
+          "housenumber": "82",
+          "street": "WEST 18 ROAD",
+          "postalcode": "11693",
+          "confidence": 1,
+          "match_type": "exact",
           "accuracy": "point",
           "country": "United States",
           "country_gid": "whosonfirst:country:85633793",
@@ -314,13 +311,13 @@
           "locality_a": "NYC",
           "borough": "Queens",
           "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "Long Island City",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
-          "label": "30-27 THOMSON AVENUE, Long Island City, NY, USA",
+          "neighbourhood": "Broad Channel",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85807661",
+          "label": "82 WEST 18 ROAD, Broad Channel, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "4002750023",
-              "bin": "4003523",
+              "bbl": "4153230001",
+              "bin": "4297205",
               "version": "26a"
             }
           }
@@ -331,23 +328,23 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.9358,
-            40.745426
+            -73.824072,
+            40.600419
           ]
         },
         "properties": {
-          "id": "1805004",
-          "gid": "nycpad:venue:1805004",
+          "id": "4171619",
+          "gid": "nycpad:venue:4171619",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1805004",
+          "source_id": "4171619",
           "country_code": "US",
-          "name": "30-49 THOMSON AVENUE",
-          "housenumber": "30-49",
-          "street": "THOMSON AVENUE",
-          "postalcode": "11101",
-          "confidence": 0.8,
-          "match_type": "fallback",
+          "name": "76 WEST 18 ROAD",
+          "housenumber": "76",
+          "street": "WEST 18 ROAD",
+          "postalcode": "11693",
+          "confidence": 1,
+          "match_type": "exact",
           "accuracy": "point",
           "country": "United States",
           "country_gid": "whosonfirst:country:85633793",
@@ -362,13 +359,13 @@
           "locality_a": "NYC",
           "borough": "Queens",
           "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "Long Island City",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
-          "label": "30-49 THOMSON AVENUE, Long Island City, NY, USA",
+          "neighbourhood": "Broad Channel",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85807661",
+          "label": "76 WEST 18 ROAD, Broad Channel, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "4002750023",
-              "bin": "4003523",
+              "bbl": "4153230005",
+              "bin": "4297207",
               "version": "26a"
             }
           }
@@ -379,23 +376,23 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.9358,
-            40.745426
+            -73.823893,
+            40.60041
           ]
         },
         "properties": {
-          "id": "1805022",
-          "gid": "nycpad:venue:1805022",
+          "id": "4171625",
+          "gid": "nycpad:venue:4171625",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1805022",
+          "source_id": "4171625",
           "country_code": "US",
-          "name": "30-67 THOMSON AVENUE",
-          "housenumber": "30-67",
-          "street": "THOMSON AVENUE",
-          "postalcode": "11101",
-          "confidence": 0.8,
-          "match_type": "fallback",
+          "name": "72 WEST 18 ROAD",
+          "housenumber": "72",
+          "street": "WEST 18 ROAD",
+          "postalcode": "11693",
+          "confidence": 1,
+          "match_type": "exact",
           "accuracy": "point",
           "country": "United States",
           "country_gid": "whosonfirst:country:85633793",
@@ -410,13 +407,13 @@
           "locality_a": "NYC",
           "borough": "Queens",
           "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "Long Island City",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
-          "label": "30-67 THOMSON AVENUE, Long Island City, NY, USA",
+          "neighbourhood": "Broad Channel",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85807661",
+          "label": "72 WEST 18 ROAD, Broad Channel, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "4002750023",
-              "bin": "4003523",
+              "bbl": "4153230007",
+              "bin": "4297209",
               "version": "26a"
             }
           }
@@ -427,23 +424,23 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.9358,
-            40.745426
+            -73.8238,
+            40.600415
           ]
         },
         "properties": {
-          "id": "1805032",
-          "gid": "nycpad:venue:1805032",
+          "id": "4171628",
+          "gid": "nycpad:venue:4171628",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1805032",
+          "source_id": "4171628",
           "country_code": "US",
-          "name": "30-77 THOMSON AVENUE",
-          "housenumber": "30-77",
-          "street": "THOMSON AVENUE",
-          "postalcode": "11101",
-          "confidence": 0.8,
-          "match_type": "fallback",
+          "name": "70 WEST 18 ROAD",
+          "housenumber": "70",
+          "street": "WEST 18 ROAD",
+          "postalcode": "11693",
+          "confidence": 1,
+          "match_type": "exact",
           "accuracy": "point",
           "country": "United States",
           "country_gid": "whosonfirst:country:85633793",
@@ -458,13 +455,13 @@
           "locality_a": "NYC",
           "borough": "Queens",
           "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "Long Island City",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
-          "label": "30-77 THOMSON AVENUE, Long Island City, NY, USA",
+          "neighbourhood": "Broad Channel",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85807661",
+          "label": "70 WEST 18 ROAD, Broad Channel, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "4002750023",
-              "bin": "4003523",
+              "bbl": "4153230008",
+              "bin": "4297210",
               "version": "26a"
             }
           }
@@ -475,23 +472,23 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.9358,
-            40.745426
+            -73.822909,
+            40.600349
           ]
         },
         "properties": {
-          "id": "1805038",
-          "gid": "nycpad:venue:1805038",
+          "id": "4171652",
+          "gid": "nycpad:venue:4171652",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1805038",
+          "source_id": "4171652",
           "country_code": "US",
-          "name": "30-83 THOMSON AVENUE",
-          "housenumber": "30-83",
-          "street": "THOMSON AVENUE",
-          "postalcode": "11101",
-          "confidence": 0.8,
-          "match_type": "fallback",
+          "name": "50 WEST 18 ROAD",
+          "housenumber": "50",
+          "street": "WEST 18 ROAD",
+          "postalcode": "11693",
+          "confidence": 1,
+          "match_type": "exact",
           "accuracy": "point",
           "country": "United States",
           "country_gid": "whosonfirst:country:85633793",
@@ -506,13 +503,13 @@
           "locality_a": "NYC",
           "borough": "Queens",
           "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "Long Island City",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
-          "label": "30-83 THOMSON AVENUE, Long Island City, NY, USA",
+          "neighbourhood": "Broad Channel",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85807661",
+          "label": "50 WEST 18 ROAD, Broad Channel, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "4002750023",
-              "bin": "4003523",
+              "bbl": "4153230021",
+              "bin": "4297216",
               "version": "26a"
             }
           }
@@ -520,10 +517,10 @@
       }
     ],
     "bbox": [
-      -73.93692,
-      40.743866,
-      -73.934304,
-      40.745426
+      -73.824327,
+      40.600225,
+      -73.820488,
+      40.606854
     ]
   }
 }

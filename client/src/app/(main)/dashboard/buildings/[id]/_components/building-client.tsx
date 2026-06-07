@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import { ArrowLeft, Banknote, BookOpenCheck, Flame, Leaf, Ruler } from "lucide-react";
+import { ArrowLeft, BookOpenCheck, Flame, Leaf, Ruler } from "lucide-react";
 import { useTable } from "spacetimedb/react";
 
 import { Badge } from "@/components/ui/badge";
@@ -15,17 +15,12 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  computePeriods,
-  computeRetrofit,
-  fmtTco2e,
-  fmtUsd,
-  type RetrofitAssessment,
-} from "@/lib/engine";
+import { computePeriods, fmtTco2e, fmtUsd } from "@/lib/engine";
 import { tables } from "@/module_bindings/index";
 
 import { ComplianceSection } from "./compliance-section";
 import { FineTimeline } from "./fine-timeline";
+import { InvestmentPlanner } from "./investment-planner";
 
 interface Props {
   buildingId: bigint;
@@ -136,7 +131,7 @@ export function BuildingClient({ buildingId }: Props) {
 
           <PlainEnglishCard periods={periods} address={building.address} />
 
-          <RetrofitCard assessment={computeRetrofit(building)} />
+          <InvestmentPlanner building={building} />
         </>
       ) : (
         <Card>
@@ -255,92 +250,6 @@ function PlainEnglishCard({
         </div>
       </CardContent>
     </Card>
-  );
-}
-
-// The optimizer's verdict. An honest empty state matters here: at some
-// scales doing nothing beats every retrofit combo, and saying so builds
-// more trust than inventing a pitch.
-function RetrofitCard({ assessment }: { assessment: RetrofitAssessment | null }) {
-  if (!assessment) return null;
-
-  const best = assessment.best;
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Cheapest path to compliance</CardTitle>
-        <p className="text-sm text-muted-foreground">
-          {assessment.evaluatedSubsets} measure combinations evaluated against fines
-          through 2039. Capex figures are typical-building assumptions, not quotes.
-        </p>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        {best.measureIds.length === 0 ? (
-          <p className="text-sm">
-            No retrofit package beats paying the fines as modeled — projected fines
-            through 2039 are {fmtUsd(assessment.doNothing.horizonFinesUsd)} and every
-            measure combination costs more than it avoids. Get firm quotes before ruling
-            investment out.
-          </p>
-        ) : (
-          <>
-            <div className="flex flex-wrap gap-1.5">
-              {best.measureIds.map(id => (
-                <Badge key={id} variant="secondary">
-                  {id}
-                </Badge>
-              ))}
-            </div>
-            <div className="grid grid-cols-1 gap-3 @sm/main:grid-cols-3">
-              <RetrofitStat
-                icon={<Banknote className="size-4" />}
-                label="Capex"
-                value={fmtUsd(best.capexUsd)}
-              />
-              <RetrofitStat
-                icon={<Leaf className="size-4" />}
-                label="Projected emissions"
-                value={`${fmtTco2e(best.projectedEmissionsTco2e)}/yr`}
-              />
-              <RetrofitStat
-                icon={<Banknote className="size-4" />}
-                label="Fines avoided through 2039"
-                value={fmtUsd(assessment.finesAvoidedUsd)}
-                valueClassName="text-success"
-              />
-            </div>
-          </>
-        )}
-        <p className="border-t pt-3 text-xs text-muted-foreground">
-          {assessment.notes.join(" ")}
-        </p>
-      </CardContent>
-    </Card>
-  );
-}
-
-function RetrofitStat({
-  icon,
-  label,
-  value,
-  valueClassName,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  valueClassName?: string;
-}) {
-  return (
-    <div className="rounded-xl border bg-background px-4 py-3">
-      <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-        {icon}
-        {label}
-      </p>
-      <p className={`mt-1 text-lg font-semibold tabular-nums ${valueClassName ?? ""}`}>
-        {value}
-      </p>
-    </div>
   );
 }
 

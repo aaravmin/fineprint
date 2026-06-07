@@ -1,12 +1,12 @@
 {
-  "key": "https://geosearch.planninglabs.nyc/v2/search?text=30-30%20Thomson%20Avenue%2C%20Queens",
-  "recordedAt": "2026-06-07T11:58:04.187Z",
+  "key": "https://geosearch.planninglabs.nyc/v2/search?text=171%20EAST%2029%20STREET%2C%20Brooklyn%2C%20NY%2C%20USA",
+  "recordedAt": "2026-06-07T11:43:02.636Z",
   "value": {
     "geocoding": {
       "version": "0.2",
       "attribution": "http://geosearch.planninglabs.nyc/attribution",
       "query": {
-        "text": "30-30 Thomson Avenue, Queens",
+        "text": "171 EAST 29 STREET, Brooklyn, NY, USA",
         "size": 10,
         "private": false,
         "lang": {
@@ -19,11 +19,13 @@
         "querySize": 20,
         "parser": "pelias",
         "parsed_text": {
-          "subject": "30-30 Thomson Avenue",
-          "housenumber": "30-30",
-          "street": "Thomson Avenue",
-          "locality": "Queens",
-          "admin": "Queens"
+          "subject": "171 EAST 29 STREET",
+          "housenumber": "171",
+          "street": "EAST 29 STREET",
+          "locality": "Brooklyn",
+          "region": "NY",
+          "country": "USA",
+          "admin": "Brooklyn, NY, USA"
         }
       },
       "warnings": [
@@ -34,7 +36,7 @@
         "author": "Mapzen",
         "version": "1.0"
       },
-      "timestamp": 1780833484165
+      "timestamp": 1780832582697
     },
     "type": "FeatureCollection",
     "features": [
@@ -43,21 +45,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.93608,
-            40.744072
+            -73.949598,
+            40.645265
           ]
         },
         "properties": {
-          "id": "1805466",
-          "gid": "nycpad:venue:1805466",
+          "id": "1277797",
+          "gid": "nycpad:venue:1277797",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1805466",
+          "source_id": "1277797",
           "country_code": "US",
-          "name": "30-30 THOMSON AVENUE",
-          "housenumber": "30-30",
-          "street": "THOMSON AVENUE",
-          "postalcode": "11101",
+          "name": "171 EAST 29 STREET",
+          "housenumber": "171",
+          "street": "EAST 29 STREET",
+          "postalcode": "11226",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -67,20 +69,21 @@
           "region": "New York",
           "region_gid": "whosonfirst:region:85688543",
           "region_a": "NY",
-          "county": "Queens County",
-          "county_gid": "whosonfirst:county:102082377",
+          "county": "Kings County",
+          "county_gid": "whosonfirst:county:102082361",
+          "county_a": "BK",
           "locality": "New York",
           "locality_gid": "whosonfirst:locality:85977539",
           "locality_a": "NYC",
-          "borough": "Queens",
-          "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "Long Island City",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
-          "label": "30-30 THOMSON AVENUE, Long Island City, NY, USA",
+          "borough": "Brooklyn",
+          "borough_gid": "whosonfirst:borough:421205765",
+          "neighbourhood": "East Flatbush",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85816313",
+          "label": "171 EAST 29 STREET, Brooklyn, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "4002770001",
-              "bin": "4003533",
+              "bbl": "3051400037",
+              "bin": "3118108",
               "version": "26a"
             }
           }
@@ -91,21 +94,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.934304,
-            40.743866
+            -73.999934,
+            40.658289
           ]
         },
         "properties": {
-          "id": "1805693",
-          "gid": "nycpad:venue:1805693",
+          "id": "753267",
+          "gid": "nycpad:venue:753267",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1805693",
+          "source_id": "753267",
           "country_code": "US",
-          "name": "31-30 THOMSON AVENUE",
-          "housenumber": "31-30",
-          "street": "THOMSON AVENUE",
-          "postalcode": "11101",
+          "name": "171 29 STREET",
+          "housenumber": "171",
+          "street": "29 STREET",
+          "postalcode": "11232",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -115,20 +118,21 @@
           "region": "New York",
           "region_gid": "whosonfirst:region:85688543",
           "region_a": "NY",
-          "county": "Queens County",
-          "county_gid": "whosonfirst:county:102082377",
+          "county": "Kings County",
+          "county_gid": "whosonfirst:county:102082361",
+          "county_a": "BK",
           "locality": "New York",
           "locality_gid": "whosonfirst:locality:85977539",
           "locality_a": "NYC",
-          "borough": "Queens",
-          "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "Long Island City",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
-          "label": "31-30 THOMSON AVENUE, Long Island City, NY, USA",
+          "borough": "Brooklyn",
+          "borough_gid": "whosonfirst:borough:421205765",
+          "neighbourhood": "Sunset Park",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85851575",
+          "label": "171 29 STREET, Brooklyn, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "4002790001",
-              "bin": "4003535",
+              "bbl": "3006650001",
+              "bin": "3009789",
               "version": "26a"
             }
           }
@@ -139,21 +143,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.93692,
-            40.744583
+            -73.949973,
+            40.647617
           ]
         },
         "properties": {
-          "id": "1804869",
-          "gid": "nycpad:venue:1804869",
+          "id": "1276575",
+          "gid": "nycpad:venue:1276575",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1804869",
+          "source_id": "1276575",
           "country_code": "US",
-          "name": "30-14 THOMSON AVENUE",
-          "housenumber": "30-14",
-          "street": "THOMSON AVENUE",
-          "postalcode": "11101",
+          "name": "29 EAST 29 STREET",
+          "housenumber": "29",
+          "street": "EAST 29 STREET",
+          "postalcode": "11226",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -163,20 +167,21 @@
           "region": "New York",
           "region_gid": "whosonfirst:region:85688543",
           "region_a": "NY",
-          "county": "Queens County",
-          "county_gid": "whosonfirst:county:102082377",
+          "county": "Kings County",
+          "county_gid": "whosonfirst:county:102082361",
+          "county_a": "BK",
           "locality": "New York",
           "locality_gid": "whosonfirst:locality:85977539",
           "locality_a": "NYC",
-          "borough": "Queens",
-          "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "Long Island City",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
-          "label": "30-14 THOMSON AVENUE, Long Island City, NY, USA",
+          "borough": "Brooklyn",
+          "borough_gid": "whosonfirst:borough:421205765",
+          "neighbourhood": "East Flatbush",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85816313",
+          "label": "29 EAST 29 STREET, Brooklyn, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "4002740001",
-              "bin": "4003517",
+              "bbl": "3051310001",
+              "bin": "3425389",
               "version": "26a"
             }
           }
@@ -187,21 +192,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.93692,
-            40.744583
+            -73.998121,
+            40.598793
           ]
         },
         "properties": {
-          "id": "1804871",
-          "gid": "nycpad:venue:1804871",
+          "id": "1469274",
+          "gid": "nycpad:venue:1469274",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1804871",
+          "source_id": "1469274",
           "country_code": "US",
-          "name": "30-16 THOMSON AVENUE",
-          "housenumber": "30-16",
-          "street": "THOMSON AVENUE",
-          "postalcode": "11101",
+          "name": "171 BAY 29 STREET",
+          "housenumber": "171",
+          "street": "BAY 29 STREET",
+          "postalcode": "11214",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -211,20 +216,21 @@
           "region": "New York",
           "region_gid": "whosonfirst:region:85688543",
           "region_a": "NY",
-          "county": "Queens County",
-          "county_gid": "whosonfirst:county:102082377",
+          "county": "Kings County",
+          "county_gid": "whosonfirst:county:102082361",
+          "county_a": "BK",
           "locality": "New York",
           "locality_gid": "whosonfirst:locality:85977539",
           "locality_a": "NYC",
-          "borough": "Queens",
-          "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "Long Island City",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
-          "label": "30-16 THOMSON AVENUE, Long Island City, NY, USA",
+          "borough": "Brooklyn",
+          "borough_gid": "whosonfirst:borough:421205765",
+          "neighbourhood": "Bath Beach",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85804733",
+          "label": "171 BAY 29 STREET, Brooklyn, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "4002740001",
-              "bin": "4003517",
+              "bbl": "3064470027",
+              "bin": "3168977",
               "version": "26a"
             }
           }
@@ -235,21 +241,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.9358,
-            40.745426
+            -73.984459,
+            40.744674
           ]
         },
         "properties": {
-          "id": "1804980",
-          "gid": "nycpad:venue:1804980",
+          "id": "91672",
+          "gid": "nycpad:venue:91672",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1804980",
+          "source_id": "91672",
           "country_code": "US",
-          "name": "30-25 THOMSON AVENUE",
-          "housenumber": "30-25",
-          "street": "THOMSON AVENUE",
-          "postalcode": "11101",
+          "name": "29 EAST 29 STREET",
+          "housenumber": "29",
+          "street": "EAST 29 STREET",
+          "postalcode": "10016",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -259,20 +265,20 @@
           "region": "New York",
           "region_gid": "whosonfirst:region:85688543",
           "region_a": "NY",
-          "county": "Queens County",
-          "county_gid": "whosonfirst:county:102082377",
+          "county": "New York County",
+          "county_gid": "whosonfirst:county:102081863",
           "locality": "New York",
           "locality_gid": "whosonfirst:locality:85977539",
           "locality_a": "NYC",
-          "borough": "Queens",
-          "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "Long Island City",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
-          "label": "30-25 THOMSON AVENUE, Long Island City, NY, USA",
+          "borough": "Manhattan",
+          "borough_gid": "whosonfirst:borough:421205771",
+          "neighbourhood": "Midtown East",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:907215785",
+          "label": "29 EAST 29 STREET, New York, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "4002750023",
-              "bin": "4003523",
+              "bbl": "1008590026",
+              "bin": "1080777",
               "version": "26a"
             }
           }
@@ -283,21 +289,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.9358,
-            40.745426
+            -73.950318,
+            40.646614
           ]
         },
         "properties": {
-          "id": "1804982",
-          "gid": "nycpad:venue:1804982",
+          "id": "1277520",
+          "gid": "nycpad:venue:1277520",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1804982",
+          "source_id": "1277520",
           "country_code": "US",
-          "name": "30-27 THOMSON AVENUE",
-          "housenumber": "30-27",
-          "street": "THOMSON AVENUE",
-          "postalcode": "11101",
+          "name": "106A EAST 29 STREET",
+          "housenumber": "106A",
+          "street": "EAST 29 STREET",
+          "postalcode": "11226",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -307,20 +313,21 @@
           "region": "New York",
           "region_gid": "whosonfirst:region:85688543",
           "region_a": "NY",
-          "county": "Queens County",
-          "county_gid": "whosonfirst:county:102082377",
+          "county": "Kings County",
+          "county_gid": "whosonfirst:county:102082361",
+          "county_a": "BK",
           "locality": "New York",
           "locality_gid": "whosonfirst:locality:85977539",
           "locality_a": "NYC",
-          "borough": "Queens",
-          "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "Long Island City",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
-          "label": "30-27 THOMSON AVENUE, Long Island City, NY, USA",
+          "borough": "Brooklyn",
+          "borough_gid": "whosonfirst:borough:421205765",
+          "neighbourhood": "East Flatbush",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85816313",
+          "label": "106A EAST 29 STREET, Brooklyn, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "4002750023",
-              "bin": "4003523",
+              "bbl": "3051390008",
+              "bin": "3118036",
               "version": "26a"
             }
           }
@@ -331,21 +338,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.9358,
-            40.745426
+            -73.950309,
+            40.646534
           ]
         },
         "properties": {
-          "id": "1805004",
-          "gid": "nycpad:venue:1805004",
+          "id": "1277524",
+          "gid": "nycpad:venue:1277524",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1805004",
+          "source_id": "1277524",
           "country_code": "US",
-          "name": "30-49 THOMSON AVENUE",
-          "housenumber": "30-49",
-          "street": "THOMSON AVENUE",
-          "postalcode": "11101",
+          "name": "110 EAST 29 STREET",
+          "housenumber": "110",
+          "street": "EAST 29 STREET",
+          "postalcode": "11226",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -355,20 +362,21 @@
           "region": "New York",
           "region_gid": "whosonfirst:region:85688543",
           "region_a": "NY",
-          "county": "Queens County",
-          "county_gid": "whosonfirst:county:102082377",
+          "county": "Kings County",
+          "county_gid": "whosonfirst:county:102082361",
+          "county_a": "BK",
           "locality": "New York",
           "locality_gid": "whosonfirst:locality:85977539",
           "locality_a": "NYC",
-          "borough": "Queens",
-          "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "Long Island City",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
-          "label": "30-49 THOMSON AVENUE, Long Island City, NY, USA",
+          "borough": "Brooklyn",
+          "borough_gid": "whosonfirst:borough:421205765",
+          "neighbourhood": "East Flatbush",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85816313",
+          "label": "110 EAST 29 STREET, Brooklyn, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "4002750023",
-              "bin": "4003523",
+              "bbl": "3051390010",
+              "bin": "3118038",
               "version": "26a"
             }
           }
@@ -379,21 +387,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.9358,
-            40.745426
+            -73.950249,
+            40.646063
           ]
         },
         "properties": {
-          "id": "1805022",
-          "gid": "nycpad:venue:1805022",
+          "id": "1277540",
+          "gid": "nycpad:venue:1277540",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1805022",
+          "source_id": "1277540",
           "country_code": "US",
-          "name": "30-67 THOMSON AVENUE",
-          "housenumber": "30-67",
-          "street": "THOMSON AVENUE",
-          "postalcode": "11101",
+          "name": "130A EAST 29 STREET",
+          "housenumber": "130A",
+          "street": "EAST 29 STREET",
+          "postalcode": "11226",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -403,20 +411,21 @@
           "region": "New York",
           "region_gid": "whosonfirst:region:85688543",
           "region_a": "NY",
-          "county": "Queens County",
-          "county_gid": "whosonfirst:county:102082377",
+          "county": "Kings County",
+          "county_gid": "whosonfirst:county:102082361",
+          "county_a": "BK",
           "locality": "New York",
           "locality_gid": "whosonfirst:locality:85977539",
           "locality_a": "NYC",
-          "borough": "Queens",
-          "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "Long Island City",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
-          "label": "30-67 THOMSON AVENUE, Long Island City, NY, USA",
+          "borough": "Brooklyn",
+          "borough_gid": "whosonfirst:borough:421205765",
+          "neighbourhood": "East Flatbush",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85816313",
+          "label": "130A EAST 29 STREET, Brooklyn, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "4002750023",
-              "bin": "4003523",
+              "bbl": "3051390021",
+              "bin": "3118048",
               "version": "26a"
             }
           }
@@ -427,21 +436,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.9358,
-            40.745426
+            -73.950165,
+            40.645301
           ]
         },
         "properties": {
-          "id": "1805032",
-          "gid": "nycpad:venue:1805032",
+          "id": "1277559",
+          "gid": "nycpad:venue:1277559",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1805032",
+          "source_id": "1277559",
           "country_code": "US",
-          "name": "30-77 THOMSON AVENUE",
-          "housenumber": "30-77",
-          "street": "THOMSON AVENUE",
-          "postalcode": "11101",
+          "name": "164 EAST 29 STREET",
+          "housenumber": "164",
+          "street": "EAST 29 STREET",
+          "postalcode": "11226",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -451,20 +460,21 @@
           "region": "New York",
           "region_gid": "whosonfirst:region:85688543",
           "region_a": "NY",
-          "county": "Queens County",
-          "county_gid": "whosonfirst:county:102082377",
+          "county": "Kings County",
+          "county_gid": "whosonfirst:county:102082361",
+          "county_a": "BK",
           "locality": "New York",
           "locality_gid": "whosonfirst:locality:85977539",
           "locality_a": "NYC",
-          "borough": "Queens",
-          "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "Long Island City",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
-          "label": "30-77 THOMSON AVENUE, Long Island City, NY, USA",
+          "borough": "Brooklyn",
+          "borough_gid": "whosonfirst:borough:421205765",
+          "neighbourhood": "East Flatbush",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85816313",
+          "label": "164 EAST 29 STREET, Brooklyn, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "4002750023",
-              "bin": "4003523",
+              "bbl": "3051390030",
+              "bin": "3118057",
               "version": "26a"
             }
           }
@@ -475,21 +485,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.9358,
-            40.745426
+            -73.949757,
+            40.645365
           ]
         },
         "properties": {
-          "id": "1805038",
-          "gid": "nycpad:venue:1805038",
+          "id": "1277799",
+          "gid": "nycpad:venue:1277799",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1805038",
+          "source_id": "1277799",
           "country_code": "US",
-          "name": "30-83 THOMSON AVENUE",
-          "housenumber": "30-83",
-          "street": "THOMSON AVENUE",
-          "postalcode": "11101",
+          "name": "165 EAST 29 STREET",
+          "housenumber": "165",
+          "street": "EAST 29 STREET",
+          "postalcode": "11226",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -499,20 +509,21 @@
           "region": "New York",
           "region_gid": "whosonfirst:region:85688543",
           "region_a": "NY",
-          "county": "Queens County",
-          "county_gid": "whosonfirst:county:102082377",
+          "county": "Kings County",
+          "county_gid": "whosonfirst:county:102082361",
+          "county_a": "BK",
           "locality": "New York",
           "locality_gid": "whosonfirst:locality:85977539",
           "locality_a": "NYC",
-          "borough": "Queens",
-          "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "Long Island City",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
-          "label": "30-83 THOMSON AVENUE, Long Island City, NY, USA",
+          "borough": "Brooklyn",
+          "borough_gid": "whosonfirst:borough:421205765",
+          "neighbourhood": "East Flatbush",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85816313",
+          "label": "165 EAST 29 STREET, Brooklyn, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "4002750023",
-              "bin": "4003523",
+              "bbl": "3051400040",
+              "bin": "3118110",
               "version": "26a"
             }
           }
@@ -520,10 +531,10 @@
       }
     ],
     "bbox": [
-      -73.93692,
-      40.743866,
-      -73.934304,
-      40.745426
+      -73.999934,
+      40.598793,
+      -73.949598,
+      40.744674
     ]
   }
 }

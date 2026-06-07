@@ -4,6 +4,7 @@
 // coverage mapping or the engine handoff.
 
 import { computeFine } from "../../engine/src/index.ts";
+import { applicableLaws } from "../laws.ts";
 import { buildCompliancePlan } from "./compliancePlan.ts";
 import { getCblEntry as realGetCblEntry, type CblEntry } from "./coveredBuildings.ts";
 import { toEngineInput } from "./engineBridge.ts";
@@ -44,20 +45,34 @@ export async function prepareIntake(
   const facts = await deps.lookupBuilding(address);
   const cbl = deps.getCblEntry(facts.bbl);
 
-  const coveredLawIds = cbl
+  // The size-based laws — benchmarking, audit, facade, lighting, gas, and the
+  // affordable-housing allergen law — are governed by the statutory floor-area
+  // (and affordability) thresholds, not by the Covered Buildings List. The CBL
+  // only carries LL97/LL84/LL87/LL88 flags, and they come back sparse, so
+  // keying coverage off them silently dropped every obligation but the
+  // hardcoded LL152 (and never spawned LL11 at all). Drive those laws off the
+  // registry's thresholds instead, and let the CBL stay authoritative for just
+  // the one thing it decides best: the LL97 performance pathway. With no floor
+  // area known and no CBL row, we know nothing — claim nothing.
+  const knownSqft = facts.grossFloorAreaSqft ?? 0;
+  const sizeApplicableLawIds =
+    knownSqft > 0
+      ? applicableLaws(knownSqft, facts.isArticle321 ?? false).map(law => law.id)
+      : [];
+
+  const ll97PathwayLawIds = cbl
     ? [
         cbl.ll97 && !cbl.article321 ? "ll97" : null,
         cbl.article321 ? "art321" : null,
-        cbl.ll84 ? "ll84" : null,
-        cbl.ll87 ? "ll87" : null,
-        cbl.ll88 ? "ll88" : null,
-        // Gas service assumed present until DOB data lands (registry stub).
-        "ll152",
-        // Article 321 means rent-regulated residential — the allergen law
-        // rides along (residential proxy until unit counts land).
-        cbl.article321 ? "ll55" : null,
       ].filter((id): id is string => id !== null)
-    : [];
+    : sizeApplicableLawIds.filter(id => id === "ll97" || id === "art321");
+
+  const coveredLawIds = Array.from(
+    new Set([
+      ...ll97PathwayLawIds,
+      ...sizeApplicableLawIds.filter(id => id !== "ll97" && id !== "art321"),
+    ]),
+  );
 
   // The current-period LL97 fine, computed by the engine. The module cannot
   // import the engine, so the number rides in with the facts.
