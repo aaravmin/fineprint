@@ -148,6 +148,27 @@ const FINE_BASES: FineBasis[] = [
   },
 ];
 
+const ALL_FINE_BASIS: FineBasis = {
+  id: "all",
+  lawId: "all",
+  label: "All types of fines",
+  type: "Fine types",
+  value: "All",
+  unit: "every modeled penalty",
+  detail:
+    "Every fine type across all covered laws is rolled into this portfolio-wide view.",
+};
+
+function fineBasesForScope(lawScope: LawScope): FineBasis[] {
+  if (lawScope === "all") {
+    return [ALL_FINE_BASIS];
+  }
+  if (lawScope === "ll97") {
+    return FINE_BASES.filter(basis => basis.lawId === "ll97" || basis.lawId === "art321");
+  }
+  return FINE_BASES.filter(basis => basis.lawId === lawScope);
+}
+
 const RECENT_ADDRESSES_KEY = "fineprint:recent-addresses";
 const RECENT_LIMIT = 6;
 
@@ -201,7 +222,7 @@ export function PortfolioClient() {
   const requestBuilding = useReducer(reducers.requestBuilding);
   const [address, setAddress] = useState("");
   const [lawScope, setLawScope] = useState<LawScope>("all");
-  const [fineBasisId, setFineBasisId] = useState(FINE_BASES[0].id);
+  const [fineBasisId, setFineBasisId] = useState(ALL_FINE_BASIS.id);
   const [recentAddresses, setRecentAddresses] = useState<string[]>([]);
   const [justQueued, setJustQueued] = useState(false);
   const requestedQueryAddress = useRef<string | null>(null);
@@ -212,13 +233,9 @@ export function PortfolioClient() {
   }, []);
 
   useEffect(() => {
-    const visibleBases = FINE_BASES.filter(basis => {
-      if (lawScope === "all") return true;
-      if (lawScope === "ll97") return basis.lawId === "ll97" || basis.lawId === "art321";
-      return basis.lawId === lawScope;
-    });
+    const visibleBases = fineBasesForScope(lawScope);
     if (!visibleBases.some(basis => basis.id === fineBasisId)) {
-      setFineBasisId(visibleBases[0]?.id ?? FINE_BASES[0].id);
+      setFineBasisId(visibleBases[0]?.id ?? ALL_FINE_BASIS.id);
     }
   }, [fineBasisId, lawScope]);
 
@@ -272,13 +289,10 @@ export function PortfolioClient() {
     lawScope === "ll97"
       ? buildings.reduce((sum, b) => sum + (ll97Fine(b, 1) ?? 0), 0)
       : 0;
+  const visibleFineBases = fineBasesForScope(lawScope);
   const activeFineBasis =
-    FINE_BASES.find(basis => basis.id === fineBasisId) ?? FINE_BASES[0];
-  const visibleFineBases = FINE_BASES.filter(basis => {
-    if (lawScope === "all") return true;
-    if (lawScope === "ll97") return basis.lawId === "ll97" || basis.lawId === "art321";
-    return basis.lawId === lawScope;
-  });
+    [ALL_FINE_BASIS, ...FINE_BASES].find(basis => basis.id === fineBasisId) ??
+    visibleFineBases[0];
 
   const sorted = [...buildings].sort((a, b) => {
     if (lawScope === "ll97") return (ll97Fine(b, 1) ?? 0) - (ll97Fine(a, 1) ?? 0);
