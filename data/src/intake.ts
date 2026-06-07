@@ -4,8 +4,9 @@
 // coverage mapping or the engine handoff.
 
 import { computeFine } from "../../engine/src/index.ts";
-import { applicableLaws } from "../laws.ts";
+import { applicableLaws, LAWS } from "../laws.ts";
 import { buildCompliancePlan } from "./compliancePlan.ts";
+import { assessObligations } from "./obligations.ts";
 import { getCblEntry as realGetCblEntry, type CblEntry } from "./coveredBuildings.ts";
 import { toEngineInput } from "./engineBridge.ts";
 import { lookupBuilding as realLookupBuilding } from "./lookup.ts";
@@ -45,16 +46,18 @@ export async function prepareIntake(
   const facts = await deps.lookupBuilding(address);
   const cbl = deps.getCblEntry(facts.bbl);
 
-  // The size-based laws — benchmarking, audit, facade, lighting, gas, and the
-  // affordable-housing allergen law — are governed by the statutory floor-area
-  // (and affordability) thresholds, not by the Covered Buildings List. The CBL
-  // only carries LL97/LL84/LL87/LL88 flags, and they come back sparse, so
-  // keying coverage off them silently dropped every obligation but the
-  // hardcoded LL152 (and never spawned LL11 at all). Drive those laws off the
-  // registry's thresholds instead, and let the CBL stay authoritative for just
-  // the one thing it decides best: the LL97 performance pathway. With no floor
-  // area known and no CBL row, we know nothing — claim nothing.
+  // Coverage and the compliance plan must come from the same brain — the
+  // LAW_ANALYZERS in obligations.ts — or the dashboard shows a plan with laws
+  // that never spawned tickets (the old registry path collapsed a small
+  // residential walk-up to LL152 alone while its plan listed LL55 too). The
+  // CBL stays authoritative for the one thing it decides best, the LL97
+  // performance pathway; the registry's sqft thresholds remain the pathway
+  // fallback when the building has no CBL row. With no floor area known, no
+  // PLUTO row, and no CBL row, we know nothing — claim nothing.
   const knownSqft = facts.grossFloorAreaSqft ?? 0;
+  const knowsAnything =
+    knownSqft > 0 || facts.plutoCharacteristics !== null || cbl !== null;
+
   const sizeApplicableLawIds =
     knownSqft > 0
       ? applicableLaws(knownSqft, facts.isArticle321 ?? false).map(law => law.id)
@@ -67,11 +70,18 @@ export async function prepareIntake(
       ].filter((id): id is string => id !== null)
     : sizeApplicableLawIds.filter(id => id === "ll97" || id === "art321");
 
+  const analyzerLawIds = knowsAnything
+    ? assessObligations(facts)
+        .obligations.map(obligation => obligation.lawId)
+        .filter(id => id !== "ll97" && id !== "art321")
+    : [];
+
+  const registryOrder = new Map(LAWS.map((law, index) => [law.id, index]));
   const coveredLawIds = Array.from(
-    new Set([
-      ...ll97PathwayLawIds,
-      ...sizeApplicableLawIds.filter(id => id !== "ll97" && id !== "art321"),
-    ]),
+    new Set([...ll97PathwayLawIds, ...analyzerLawIds]),
+  ).sort(
+    (a, b) =>
+      (registryOrder.get(a) ?? LAWS.length) - (registryOrder.get(b) ?? LAWS.length),
   );
 
   // The current-period LL97 fine, computed by the engine. The module cannot

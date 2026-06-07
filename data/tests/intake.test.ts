@@ -195,3 +195,78 @@ describe("prepareIntake coverage by building size", () => {
     expect(coverage.has("ll97")).toBe(false);
   });
 });
+
+// The bug this pins: tickets spawned from the crude sqft/affordable registry
+// while the compliance plan ran the fact-rich analyzers, so a small market-rate
+// walk-up showed two laws in its plan but spawned only the LL152 ticket.
+// Coverage must come from the same analyzers the plan uses.
+describe("prepareIntake coverage agrees with the compliance plan", () => {
+  const walkUpFacts: BuildingFacts = {
+    ...esbFacts,
+    bbl: "3051400037",
+    address: "171 EAST 29 STREET, Brooklyn, NY, USA",
+    grossFloorAreaSqft: 12_100,
+    occupancyGroups: [],
+    annualEmissionsTco2e: null,
+    isLl97Covered: false,
+    isArticle321: false,
+    plutoCharacteristics: {
+      bbl: "3051400037",
+      numFloors: 4,
+      buildingClass: "C1",
+      bldgAreaSqft: 12_100,
+      unitsResidential: 8,
+      unitsTotal: 8,
+      yearBuilt: 1931,
+      landUse: null,
+      ownerName: null,
+      communityDistrict: null,
+      raw: {},
+    },
+  };
+
+  function walkUpDeps() {
+    return fakeDeps({
+      lookupBuilding: async () => walkUpFacts,
+      getCblEntry: () => null,
+    });
+  }
+
+  test("a small market-rate walk-up gets the allergen law, not LL152 alone", async () => {
+    const intake = await prepareIntake(walkUpFacts.address, walkUpDeps());
+
+    const coverage = new Set(JSON.parse(intake.ingestArgs.coveredLawIdsJson));
+    expect(coverage).toEqual(new Set(["ll152", "ll55"]));
+  });
+
+  test("every law in the compliance plan spawns a ticket", async () => {
+    const intake = await prepareIntake(walkUpFacts.address, walkUpDeps());
+
+    const coverage = new Set(JSON.parse(intake.ingestArgs.coveredLawIdsJson));
+    const planLawIds = new Set(
+      JSON.parse(intake.ingestArgs.compliancePlanJson).laws.map(
+        (law: { lawId: string }) => law.lawId,
+      ),
+    );
+    expect(coverage).toEqual(planLawIds);
+  });
+
+  test("a tall building under 60k sqft still gets the facade law from its floor count", async () => {
+    const tallNarrow: BuildingFacts = {
+      ...walkUpFacts,
+      plutoCharacteristics: {
+        ...walkUpFacts.plutoCharacteristics!,
+        numFloors: 12,
+        unitsResidential: 0,
+        unitsTotal: 0,
+      },
+    };
+
+    const intake = await prepareIntake(
+      tallNarrow.address,
+      fakeDeps({ lookupBuilding: async () => tallNarrow, getCblEntry: () => null }),
+    );
+
+    expect(JSON.parse(intake.ingestArgs.coveredLawIdsJson)).toContain("ll11");
+  });
+});

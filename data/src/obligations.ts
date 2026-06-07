@@ -271,11 +271,18 @@ const ll88Analyzer = proceduralAnalyzer(
   ll88FilingStatus,
 );
 
-// FISP turns on building height, not floor area; we only assert it when PLUTO
-// confirms over six stories, never on a guess.
+// FISP turns on building height, not floor area. PLUTO's floor count is
+// authoritative when present; the 60k-sqft registry proxy only fills in when
+// the floor count is unknown, so a confirmed-short building never gets FISP.
 const ll11Analyzer = proceduralAnalyzer(
   "ll11",
-  facts => (facts.plutoCharacteristics?.numFloors ?? 0) > 6,
+  facts => {
+    const numFloors = facts.plutoCharacteristics?.numFloors;
+    if (numFloors != null) {
+      return numFloors > 6;
+    }
+    return (facts.grossFloorAreaSqft ?? 0) >= 60_000;
+  },
   ll11FilingStatus,
 );
 
@@ -290,8 +297,7 @@ const ll55Analyzer = proceduralAnalyzer(
   "ll55",
   facts =>
     (facts.plutoCharacteristics?.unitsResidential ?? 0) >= 3 ||
-    (facts.plutoCharacteristics?.unitsResidential == null &&
-      facts.isArticle321 === true),
+    (facts.plutoCharacteristics?.unitsResidential == null && facts.isArticle321 === true),
   ll55FilingStatus,
 );
 
