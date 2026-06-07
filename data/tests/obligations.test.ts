@@ -128,7 +128,9 @@ describe("assessObligations", () => {
       isLl97Covered: false,
     };
 
-    const lawIds = assessObligations(tiny).obligations.map(obligation => obligation.lawId);
+    const lawIds = assessObligations(tiny).obligations.map(
+      obligation => obligation.lawId,
+    );
 
     // Under 25k sqft and not LL97-covered: no LL97/LL84/LL87, but LL152 binds.
     expect(lawIds).toContain("ll152");
@@ -162,7 +164,9 @@ describe("LL88 and Article 321 analyzers", () => {
   test("an over-target Article 321 building reads at_risk and names the 2030 target", () => {
     const affordable: BuildingFacts = { ...coveredOffice, isArticle321: true };
 
-    const art321 = assessObligations(affordable).obligations.find(o => o.lawId === "art321");
+    const art321 = assessObligations(affordable).obligations.find(
+      o => o.lawId === "art321",
+    );
 
     expect(art321?.kind).toBe("performance");
     expect(art321?.status).toBe("at_risk");

@@ -41,7 +41,10 @@ describe("LL84 filing status", () => {
 
   test("no filing on record is due", () => {
     const facts = buildingWith({
-      infrastructureProfile: profileWith({ hasLl84Filing: false, ll84ReportingYear: null }),
+      infrastructureProfile: profileWith({
+        hasLl84Filing: false,
+        ll84ReportingYear: null,
+      }),
     });
 
     expect(ll84FilingStatus(facts, asOf).status).toBe("due");
@@ -96,7 +99,9 @@ describe("LL11 and LL152 surface attributes without overclaiming a deadline", ()
   });
 });
 
-function profileWith(overrides: Partial<BuildingFacts["infrastructureProfile"] & object>) {
+function profileWith(
+  overrides: Partial<BuildingFacts["infrastructureProfile"] & object>,
+) {
   return {
     hasLl84Filing: true,
     ll84ReportingYear: 2025,
@@ -115,7 +120,9 @@ function profileWith(overrides: Partial<BuildingFacts["infrastructureProfile"] &
   };
 }
 
-function plutoWith(overrides: Partial<NonNullable<BuildingFacts["plutoCharacteristics"]>>) {
+function plutoWith(
+  overrides: Partial<NonNullable<BuildingFacts["plutoCharacteristics"]>>,
+) {
   return {
     bbl: "1008350041",
     numFloors: null,

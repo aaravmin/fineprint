@@ -6,7 +6,11 @@
 // twice.
 
 import { DEFAULT_MEASURES } from "../../engine/src/retrofit.ts";
-import { assessObligations, type ComplianceStatus, type Obligation } from "./obligations.ts";
+import {
+  assessObligations,
+  type ComplianceStatus,
+  type Obligation,
+} from "./obligations.ts";
 import { planRetrofit, type RetrofitPlan } from "./retrofit.ts";
 import type { BuildingFacts } from "./types.ts";
 
@@ -133,9 +137,16 @@ function disposition(
       };
     }
     if (obligation.status === "satisfied") {
-      return { ...base, handledBy: "already_compliant", detail: "Emissions are under the cap." };
+      return {
+        ...base,
+        handledBy: "already_compliant",
+        detail: "Emissions are under the cap.",
+      };
     }
-    if (plan?.pathway === "article321" && plan.assessment.cheapestCompliantPlan === null) {
+    if (
+      plan?.pathway === "article321" &&
+      plan.assessment.cheapestCompliantPlan === null
+    ) {
       return {
         ...base,
         handledBy: "needs_attention",

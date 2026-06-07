@@ -39,8 +39,11 @@ export function ll84FilingStatus(facts: BuildingFacts, asOf: Date): FilingStatus
 
   // The May 1 deadline in year Y covers data year Y-1; once it has passed, the
   // latest required data year is this year minus one, otherwise minus two.
-  const deadlinePassedThisYear = asOf.getMonth() + 1 > 5 || (asOf.getMonth() + 1 === 5 && asOf.getDate() >= 1);
-  const requiredDataYear = deadlinePassedThisYear ? asOf.getFullYear() - 1 : asOf.getFullYear() - 2;
+  const deadlinePassedThisYear =
+    asOf.getMonth() + 1 > 5 || (asOf.getMonth() + 1 === 5 && asOf.getDate() >= 1);
+  const requiredDataYear = deadlinePassedThisYear
+    ? asOf.getFullYear() - 1
+    : asOf.getFullYear() - 2;
 
   const onRecord = reportingYear !== null;
   let status: ComplianceStatus;

@@ -119,16 +119,16 @@ now presents.
 
 ### Coverage today
 
-| Law | Kind | Status |
-| --- | --- | --- |
-| LL97 | performance | full — fine projections + building-aware optimizer |
-| Article 321 | performance | full — constrained optimizer, both pathways |
-| LL84 | procedural | full — cycle + on-record currency |
-| LL87 | procedural | cycle dated; filing record not wired |
-| LL88 | procedural | deadline + LL97 cross-credit |
-| LL11 | procedural | applicability only; sub-cycle window undated |
-| LL152 | procedural | applicability only; CD schedule undated |
-| LL55 | — | not yet analyzed (allergen hazards) |
+| Law         | Kind        | Status                                             |
+| ----------- | ----------- | -------------------------------------------------- |
+| LL97        | performance | full — fine projections + building-aware optimizer |
+| Article 321 | performance | full — constrained optimizer, both pathways        |
+| LL84        | procedural  | full — cycle + on-record currency                  |
+| LL87        | procedural  | cycle dated; filing record not wired               |
+| LL88        | procedural  | deadline + LL97 cross-credit                       |
+| LL11        | procedural  | applicability only; sub-cycle window undated       |
+| LL152       | procedural  | applicability only; CD schedule undated            |
+| LL55        | —           | not yet analyzed (allergen hazards)                |
 
 ## Forward roadmap
 

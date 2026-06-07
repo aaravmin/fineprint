@@ -188,7 +188,9 @@ function missingDataPerformance(lawId: string, missing: string[]): PerformanceOb
       `Exposure can't be computed yet: the city has no ${missing.join(", ")} ` +
         "for this building (usually a missing LL84 benchmarking filing).",
     ],
-    recommendations: ["File the LL84 benchmarking report so the emissions baseline exists."],
+    recommendations: [
+      "File the LL84 benchmarking report so the emissions baseline exists.",
+    ],
   };
 }
 

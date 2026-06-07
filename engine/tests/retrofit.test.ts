@@ -1,5 +1,9 @@
 import { describe, expect, test } from "vitest";
-import { DEFAULT_MEASURES, optimizeArticle321, optimizeRetrofit } from "../src/retrofit.ts";
+import {
+  DEFAULT_MEASURES,
+  optimizeArticle321,
+  optimizeRetrofit,
+} from "../src/retrofit.ts";
 import type { BuildingInput } from "../src/index.ts";
 
 // Big office over its 2030/2035 caps; concrete numbers come from the engine,

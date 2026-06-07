@@ -249,9 +249,16 @@ export function optimizeArticle321(
       target2030Tco2e: target,
       currentEmissionsTco2e: current,
       alreadyUnderTarget: true,
-      cheapestCompliantPlan: { measureIds: [], capexUsd: 0, projectedEmissionsTco2e: current },
+      cheapestCompliantPlan: {
+        measureIds: [],
+        capexUsd: 0,
+        projectedEmissionsTco2e: current,
+      },
       evaluatedSubsets: 1,
-      notes: [baseNote, "Current emissions already clear the 2030 target — certify the performance pathway."],
+      notes: [
+        baseNote,
+        "Current emissions already clear the 2030 target — certify the performance pathway.",
+      ],
     };
   }
 

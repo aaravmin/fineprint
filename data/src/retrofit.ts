@@ -126,8 +126,13 @@ function retrofitFindings(profile: InfrastructureProfile | null): string[] {
   const findings: string[] = [];
 
   if (profile.heatingFuel) {
-    const fuels = profile.fuelTypes.length > 0 ? ` (${profile.fuelTypes.map(humanizeFuel).join(", ")})` : "";
-    findings.push(`Primary heating fuel is ${humanizeFuel(profile.heatingFuel)}${fuels}.`);
+    const fuels =
+      profile.fuelTypes.length > 0
+        ? ` (${profile.fuelTypes.map(humanizeFuel).join(", ")})`
+        : "";
+    findings.push(
+      `Primary heating fuel is ${humanizeFuel(profile.heatingFuel)}${fuels}.`,
+    );
   }
 
   if (profile.boilerCount > 0) {
