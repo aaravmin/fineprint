@@ -16,7 +16,7 @@ interface GeoSearchResponse {
     properties: {
       label?: string;
       borough?: string;
-      addendum?: { pad?: { bbl?: string } };
+      addendum?: { pad?: { bbl?: string; bin?: string } };
     };
   }>;
 }
@@ -58,6 +58,7 @@ export function parseBblCandidates(
     seenBbls.add(bbl);
     candidates.push({
       bbl,
+      bin: feature.properties.addendum?.pad?.bin ?? null,
       normalizedAddress: feature.properties.label ?? queriedAddress,
       borough: feature.properties.borough ?? "unknown",
     });
@@ -88,6 +89,7 @@ export function parseBblResponse(
 
   return {
     bbl,
+    bin: topMatch.properties.addendum?.pad?.bin ?? null,
     normalizedAddress: topMatch.properties.label ?? queriedAddress,
     borough: topMatch.properties.borough ?? "unknown",
   };
