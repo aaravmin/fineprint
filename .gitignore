@@ -33,3 +33,5 @@ Thumbs.db
 .next/
 client/.agents/
 client/next-env.d.ts
+.vercel
+.env*

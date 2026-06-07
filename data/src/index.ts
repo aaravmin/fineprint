@@ -11,7 +11,14 @@ export { toEngineInput, type EngineInputResult } from "./engineBridge.ts";
 export { planRetrofit, type RetrofitPlan, type MeasureExclusion } from "./retrofit.ts";
 export {
   buildCompliancePlan,
+  explainFineData,
+  explainLookupError,
   type CompliancePlan,
+  type FineDataExplanation,
+  type FineDataStatus,
+  type LawSummary,
+  type PrioritizedAction,
+  type ActionLawLink,
   type ObligationDisposition,
   type PlanMeasure,
   type Handling,

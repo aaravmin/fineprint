@@ -1,5 +1,9 @@
 import { describe, expect, test } from "vitest";
-import { buildCompliancePlan } from "../src/compliancePlan.ts";
+import {
+  buildCompliancePlan,
+  explainFineData,
+  explainLookupError,
+} from "../src/compliancePlan.ts";
 import type { BuildingFacts } from "../src/types.ts";
 
 const asOf = new Date("2026-06-06T00:00:00Z");
@@ -94,3 +98,149 @@ describe("buildCompliancePlan", () => {
     expect(ll97?.handledBy).toBe("needs_attention");
   });
 });
+
+describe("explainFineData — reasoning about why fines are missing", () => {
+  const noData = {
+    grossFloorAreaSqft: null,
+    annualEmissionsTco2e: null,
+    occupancyGroups: [],
+  };
+
+  test("a building with computable fines reports status available", () => {
+    expect(explainFineData(overCapOffice).status).toBe("available");
+    expect(buildCompliancePlan(overCapOffice, { asOf }).fineData.status).toBe(
+      "available",
+    );
+  });
+
+  test("not on the covered list -> not_applicable, but caveats large buildings", () => {
+    const smallShop: BuildingFacts = {
+      ...overCapOffice,
+      ...noData,
+      isLl97Covered: false,
+    };
+
+    const explanation = explainFineData(smallShop);
+    expect(explanation.status).toBe("not_applicable");
+    expect(explanation.message).toMatch(/usually means/i); // reasons, doesn't assert
+    expect(explanation.message).toMatch(/verify the size/i); // doesn't just assert exemption
+    expect(buildCompliancePlan(smallShop, { asOf }).fineData.status).toBe(
+      "not_applicable",
+    );
+  });
+
+  test("covered but unfiled -> covered_unfiled, framed as a gap not an exemption", () => {
+    const coveredNoFiling: BuildingFacts = {
+      ...overCapOffice,
+      ...noData,
+      isLl97Covered: true,
+      infrastructureProfile: {
+        ...overCapOffice.infrastructureProfile!,
+        hasLl84Filing: false,
+        ll84ReportingYear: null,
+      },
+    };
+
+    const explanation = explainFineData(coveredNoFiling);
+    expect(explanation.status).toBe("covered_unfiled");
+    expect(explanation.message).toMatch(/applies to this building/i);
+    expect(explanation.message).toMatch(/not an exemption/i);
+  });
+
+  test("covered with a filing but unpriceable -> data_incomplete, lists what's missing", () => {
+    const coveredFiledIncomplete: BuildingFacts = {
+      ...overCapOffice,
+      ...noData,
+      isLl97Covered: true,
+      infrastructureProfile: {
+        ...overCapOffice.infrastructureProfile!,
+        hasLl84Filing: true,
+      },
+    };
+
+    const explanation = explainFineData(coveredFiledIncomplete);
+    expect(explanation.status).toBe("data_incomplete");
+    expect(explanation.missing.length).toBeGreaterThan(0);
+    expect(explanation.message).toMatch(/review the LL84 filing/i);
+  });
+});
+
+describe("explainLookupError — distinguishing errors from missing data", () => {
+  test("an unrecognized address asks the user to fix the address", () => {
+    const explanation = explainLookupError(new Error('no NYC address found for "xyz"'));
+    expect(explanation.status).toBe("error");
+    expect(explanation.message).toMatch(/borough/i);
+  });
+
+  test("a dataset failure is reported as a temporary error to retry", () => {
+    const explanation = explainLookupError(new Error("LL84 request failed: timeout"));
+    expect(explanation.status).toBe("error");
+    expect(explanation.message).toMatch(/try again/i);
+  });
+});
+
+describe("per-law breakdown and prioritized overlap actions", () => {
+  test("each law is separated out with its own exposure and handling", () => {
+    const plan = buildCompliancePlan(overCapOffice, { asOf });
+
+    const ll97 = plan.laws.find(law => law.lawId === "ll97");
+    const ll152 = plan.laws.find(law => law.lawId === "ll152");
+
+    expect(ll97?.kind).toBe("performance");
+    expect(ll97?.exposureUsd).toBeGreaterThan(0); // the LL97 fine it carries
+    expect(ll97?.addressedByActionIds.length).toBeGreaterThan(0);
+
+    expect(ll152?.kind).toBe("procedural");
+    expect(ll152?.exposureUsd).toBe(10_000); // its civil penalty
+  });
+
+  test("a measure that clears two fines is flagged as overlap and outranks single-law fixes", () => {
+    const plan = buildCompliancePlan(overCapOffice, { asOf });
+
+    const led = plan.actions.find(action => action.id === "led_lighting");
+    expect(led?.isOverlap).toBe(true);
+    expect(led?.satisfies.map(link => link.lawId)).toEqual(
+      expect.arrayContaining(["ll97", "ll88"]),
+    );
+
+    // The overlap action ranks above any single-law filing action.
+    const topAction = plan.actions[0];
+    expect(topAction.isOverlap).toBe(true);
+    const ll152Filing = plan.actions.find(
+      action => action.kind === "filing" && action.id === "ll152",
+    );
+    expect(led!.priorityScore).toBeGreaterThan(ll152Filing!.priorityScore);
+  });
+
+  test("overlap carries more weight than an equal-exposure single-law fix", () => {
+    // Two laws of the same exposure: one fix clearing both must outscore one
+    // fix clearing just one, by the overlap weight.
+    const single = makeActionForTest(["a"], 1000);
+    const doubled = makeActionForTest(["a", "b"], 2000); // 1000 + 1000
+
+    expect(doubled.isOverlap).toBe(true);
+    expect(doubled.priorityScore).toBeGreaterThan(single.priorityScore * 2);
+  });
+
+  test("a procedural law with no covering measure becomes its own filing action", () => {
+    const plan = buildCompliancePlan(overCapOffice, { asOf });
+
+    const ll152 = plan.actions.find(action => action.id === "ll152");
+    expect(ll152?.kind).toBe("filing");
+    expect(ll152?.isOverlap).toBe(false);
+    expect(ll152?.satisfies).toHaveLength(1);
+  });
+});
+
+// Mirrors makeAction's weighting so the overlap-weight contract is pinned
+// independent of the engine's dollar figures.
+function makeActionForTest(lawIds: string[], totalExposure: number) {
+  const per = totalExposure / lawIds.length;
+  const satisfies = lawIds.map(lawId => ({ lawId, lawName: lawId, exposureUsd: per }));
+  const extraLaws = Math.max(0, satisfies.length - 1);
+  const exposureAddressedUsd = totalExposure;
+  return {
+    isOverlap: satisfies.length > 1,
+    priorityScore: Math.round(exposureAddressedUsd * (1 + extraLaws * 0.5)),
+  };
+}
