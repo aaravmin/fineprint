@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import { ArrowLeft, Banknote, Flame, Leaf, Ruler } from "lucide-react";
+import { ArrowLeft, Banknote, BookOpenCheck, Flame, Leaf, Ruler } from "lucide-react";
 import { useTable } from "spacetimedb/react";
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -145,6 +145,9 @@ export function BuildingClient({ buildingId }: Props) {
         </Card>
       )}
 
+      {/* Whole-building compliance plan, computed at intake by the data layer */}
+      <CompliancePlanCard planJson={building.compliancePlanJson} />
+
       {/* Compliance tasks */}
       {buildingTasks.length > 0 && (
         <Card>
@@ -196,6 +199,8 @@ export function BuildingClient({ buildingId }: Props) {
           </CardContent>
         </Card>
       )}
+
+      <ProvenanceFootnotes provenanceJson={building.provenanceJson} />
     </div>
   );
 }
@@ -338,6 +343,198 @@ function RetrofitStat({
         {label}
       </p>
       <p className={`mt-1 text-lg font-semibold tabular-nums ${valueClassName ?? ""}`}>{value}</p>
+    </div>
+  );
+}
+
+interface PlanMeasure {
+  id: string;
+  name: string;
+  capexUsd: number;
+  alsoSatisfies: string[];
+}
+
+interface PlanDisposition {
+  lawId: string;
+  lawName: string;
+  kind: "performance" | "procedural";
+  status: string;
+  handledBy: string;
+  detail: string;
+}
+
+interface StoredCompliancePlan {
+  pathway: "standard" | "article321" | null;
+  measures: PlanMeasure[];
+  totalCapexUsd: number;
+  dispositions: PlanDisposition[];
+  crossCredits: string[];
+  notes: string[];
+}
+
+const HANDLING_LABEL: Record<string, string> = {
+  retrofit_measures: "Retrofit plan",
+  filing: "File",
+  already_compliant: "Compliant",
+  needs_attention: "Needs attention",
+};
+
+const HANDLING_VARIANT: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
+  retrofit_measures: "default",
+  filing: "outline",
+  already_compliant: "secondary",
+  needs_attention: "destructive",
+};
+
+// The data layer's whole-building plan, serialized at intake. Every obligation
+// appears exactly once; a measure that retires several laws is shown once with
+// its cross-credits.
+function CompliancePlanCard({ planJson }: { planJson: string | undefined }) {
+  if (!planJson) {
+    return null;
+  }
+
+  let plan: StoredCompliancePlan;
+  try {
+    plan = JSON.parse(planJson);
+  } catch {
+    return null;
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <CardTitle>Compliance plan</CardTitle>
+          <div className="flex items-center gap-2">
+            {plan.pathway && (
+              <Badge variant="outline">
+                {plan.pathway === "article321" ? "Article 321 pathway" : "Standard pathway"}
+              </Badge>
+            )}
+            {plan.totalCapexUsd > 0 && (
+              <Badge variant="secondary" className="tabular-nums">
+                {fmtUsd(plan.totalCapexUsd)} capex
+              </Badge>
+            )}
+          </div>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          One plan covering every law — each obligation disposed of exactly once.
+        </p>
+      </CardHeader>
+      <CardContent className="space-y-5">
+        {plan.measures.length > 0 && (
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Chosen measures
+            </p>
+            <div className="mt-2 divide-y rounded-xl border">
+              {plan.measures.map(measure => (
+                <div
+                  key={measure.id}
+                  className="flex flex-wrap items-center justify-between gap-2 px-4 py-3"
+                >
+                  <span className="text-sm font-medium">{measure.name}</span>
+                  <span className="flex items-center gap-2">
+                    {measure.alsoSatisfies.map(lawId => (
+                      <Badge key={lawId} variant="outline" className="text-xs">
+                        also clears {lawId.toUpperCase()}
+                      </Badge>
+                    ))}
+                    <span className="text-sm text-muted-foreground tabular-nums">
+                      {fmtUsd(measure.capexUsd)}
+                    </span>
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            Dispositions
+          </p>
+          <div className="mt-2 divide-y rounded-xl border">
+            {plan.dispositions.map(disposition => (
+              <div key={disposition.lawId} className="px-4 py-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-sm font-medium">{disposition.lawName}</span>
+                  <Badge
+                    variant={HANDLING_VARIANT[disposition.handledBy] ?? "secondary"}
+                    className="text-xs"
+                  >
+                    {HANDLING_LABEL[disposition.handledBy] ?? disposition.handledBy}
+                  </Badge>
+                  <span className="text-xs text-muted-foreground">
+                    {disposition.kind} / {disposition.status.replace("_", " ")}
+                  </span>
+                </div>
+                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                  {disposition.detail}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {plan.crossCredits.length > 0 && (
+          <div className="rounded-xl bg-secondary px-4 py-3">
+            {plan.crossCredits.map(credit => (
+              <p key={credit} className="flex items-start gap-2 text-xs text-foreground/80">
+                <BookOpenCheck className="mt-0.5 size-3.5 shrink-0" />
+                {credit}
+              </p>
+            ))}
+          </div>
+        )}
+
+        {plan.notes.length > 0 && (
+          <p className="border-t pt-3 text-xs leading-relaxed text-muted-foreground">
+            {plan.notes.join(" ")}
+          </p>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+interface ProvenanceNote {
+  field: string;
+  source: string;
+  detail?: string;
+}
+
+// Every fact's source, as footnotes — the honesty contract made visible.
+function ProvenanceFootnotes({ provenanceJson }: { provenanceJson: string | undefined }) {
+  if (!provenanceJson) {
+    return null;
+  }
+
+  let notes: ProvenanceNote[];
+  try {
+    notes = JSON.parse(provenanceJson);
+  } catch {
+    return null;
+  }
+  if (!Array.isArray(notes) || notes.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="px-1">
+      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        Sources
+      </p>
+      <ul className="mt-2 space-y-1">
+        {notes.map((note, index) => (
+          <li key={`${note.field}-${index}`} className="text-[11px] leading-relaxed text-muted-foreground/80">
+            <span className="font-medium text-muted-foreground">{note.field}</span> — {note.source}
+            {note.detail ? `: ${note.detail}` : ""}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

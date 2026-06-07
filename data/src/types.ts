@@ -152,6 +152,19 @@ export interface EcbViolation {
   raw: Record<string, unknown>;
 }
 
+// One FISP filing row from DOB NOW: Safety - Facades (dataset xubg-57si).
+// filingType "Auto-Generated" with filingStatus "No Report Filed" is DOB's
+// placeholder for an unfiled window — evidence of absence, not a report.
+export interface FacadeFiling {
+  tr6Number: string;
+  bin: Bin | null;
+  cycle: string | null;
+  filingType: string | null;
+  filingStatus: string | null;
+  currentStatus: string | null; // SAFE | SWARMP | UNSAFE ...
+  raw: Record<string, unknown>;
+}
+
 export interface InfrastructureProfile {
   hasLl84Filing: boolean;
   // Data year of the most recent LL84 filing on record (LL84's deadline is
@@ -188,5 +201,8 @@ export interface BuildingFacts {
   plutoCharacteristics: PlutoCharacteristics | null;
   infrastructureProfile?: InfrastructureProfile | null;
   openViolations: EcbViolation[];
+  // FISP filings, present when the facades dataset answered for this BIN;
+  // null when the dataset was not queried (no BIN) or unavailable.
+  facadeFilings?: FacadeFiling[] | null;
   provenance: ProvenanceNote[];
 }

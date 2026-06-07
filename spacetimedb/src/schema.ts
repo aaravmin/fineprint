@@ -21,6 +21,10 @@ export const building = table(
     usesJson: t.option(t.string()),
     ll97Covered: t.option(t.bool()),
     provenanceJson: t.option(t.string()),
+    // The whole-building compliance plan (data layer's buildCompliancePlan),
+    // serialized at intake time — the module can't import the data layer, so
+    // the plan rides in like the engine's fine figure does.
+    compliancePlanJson: t.option(t.string()),
     createdAt: t.timestamp(),
   },
 );

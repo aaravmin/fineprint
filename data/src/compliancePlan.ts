@@ -7,6 +7,7 @@
 
 import { DEFAULT_MEASURES } from "../../engine/src/retrofit.ts";
 import { toEngineInput } from "./engineBridge.ts";
+import type { Obligation as ObligationType } from "./obligations.ts";
 import {
   assessObligations,
   type ComplianceStatus,
@@ -131,7 +132,9 @@ export function buildCompliancePlan(
 ): CompliancePlan {
   const asOf = options.asOf ?? new Date();
   const { obligations } = assessObligations(facts, { asOf });
-  const plan = planRetrofit(facts);
+  const plan = planRetrofit(facts, {
+    proceduralPenaltySavingsByLaw: proceduralPenaltySavings(obligations),
+  });
 
   const sqft = facts.grossFloorAreaSqft ?? 0;
   const proceduralLawIds = new Set(
@@ -502,6 +505,27 @@ function planTotalCapex(plan: RetrofitPlan | null): number {
     return plan.assessment.best.capexUsd;
   }
   return plan.assessment.cheapestCompliantPlan?.capexUsd ?? 0;
+}
+
+// Avoidable penalty per procedural law a measure could retire: only laws that
+// are actually owed (due or at risk) and carry an honest dollar figure count.
+// Exported so the assess_building tool credits the same way the plan does.
+export function proceduralPenaltySavings(
+  obligations: ObligationType[],
+): Record<string, number> {
+  const measureSatisfiable = new Set(
+    DEFAULT_MEASURES.flatMap(measure => measure.satisfiesLaws ?? []),
+  );
+
+  const savings: Record<string, number> = {};
+  for (const obligation of obligations) {
+    if (obligation.kind !== "procedural") continue;
+    if (obligation.status !== "due" && obligation.status !== "at_risk") continue;
+    if (obligation.penaltyUsd === null || obligation.penaltyUsd <= 0) continue;
+    if (!measureSatisfiable.has(obligation.lawId)) continue;
+    savings[obligation.lawId] = obligation.penaltyUsd;
+  }
+  return savings;
 }
 
 function round2(value: number): number {

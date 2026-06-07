@@ -95,7 +95,7 @@ export function ll87FilingStatus(facts: BuildingFacts, asOf: Date): FilingStatus
     action:
       "Confirm whether the LL87 energy efficiency report is filed for this cycle; if not, engage an energy auditor.",
     basis:
-      "LL87 / Admin Code 28-308; due year derived as the calendar year ending in the tax-block last digit — verify against the DOB LL87 compliance calendar",
+      "LL87 / Admin Code 28-308; due year derived as the calendar year ending in the tax-block last digit — verify against the DOB LL87 compliance calendar. The city's LL87 dataset (au6c-jqvf) is a file attachment, not a queryable table, so filings cannot be confirmed programmatically",
   };
 }
 
@@ -122,49 +122,219 @@ export function ll88FilingStatus(_facts: BuildingFacts, asOf: Date): FilingStatu
   };
 }
 
+// FISP sub-cycles, set by the last digit of the tax block (1 RCNY 103-04).
+// Cycle 10 filing windows, per the DOB facade cycle service notice:
+//   A (blocks ending 4,5,6,9): Feb 21 2025 - Feb 21 2027
+//   B (blocks ending 0,7,8):   Feb 21 2026 - Feb 21 2028
+//   C (blocks ending 1,2,3):   Feb 21 2027 - Feb 21 2029
+// Each cycle runs 5 years, so later cycles add 5 to both window years.
+const FISP_SUBCYCLES: Array<{
+  label: string;
+  digits: number[];
+  cycle10OpenYear: number;
+}> = [
+  { label: "A", digits: [4, 5, 6, 9], cycle10OpenYear: 2025 },
+  { label: "B", digits: [0, 7, 8], cycle10OpenYear: 2026 },
+  { label: "C", digits: [1, 2, 3], cycle10OpenYear: 2027 },
+];
+
+interface FispWindow {
+  label: string;
+  opens: Date;
+  closes: Date;
+}
+
+// The current-or-next FISP filing window for a tax block, as of a date. The
+// window is two years long and recurs every five.
+function fispWindow(blockLastDigit: number, asOf: Date): FispWindow | null {
+  const subcycle = FISP_SUBCYCLES.find(entry => entry.digits.includes(blockLastDigit));
+  if (!subcycle) {
+    return null;
+  }
+
+  let openYear = subcycle.cycle10OpenYear;
+  // Walk cycles until the window's close date is ahead of asOf.
+  while (new Date(Date.UTC(openYear + 2, 1, 21)).getTime() < asOf.getTime()) {
+    openYear += 5;
+  }
+
+  return {
+    label: subcycle.label,
+    opens: new Date(Date.UTC(openYear, 1, 21)),
+    closes: new Date(Date.UTC(openYear + 2, 1, 21)),
+  };
+}
+
 // LL11 / FISP — periodic facade inspection for buildings over six stories, on a
-// 5-year cycle with a sub-cycle filing window set by the tax block. The
-// sub-cycle window is not yet wired, so the deadline is left undated.
-export function ll11FilingStatus(facts: BuildingFacts, _asOf: Date): FilingStatus {
+// 5-year cycle whose two-year filing window is set by the tax-block last digit.
+export function ll11FilingStatus(facts: BuildingFacts, asOf: Date): FilingStatus {
   const stories = facts.plutoCharacteristics?.numFloors ?? null;
+  const blockLastDigit = taxBlockLastDigit(facts.bbl);
+  const window = blockLastDigit === null ? null : fispWindow(blockLastDigit, asOf);
+
+  const onRecord = facadeFilingOnRecord(facts, window);
+  const windowOpen =
+    window !== null &&
+    asOf.getTime() >= window.opens.getTime() &&
+    asOf.getTime() < window.closes.getTime();
+
+  let status: ComplianceStatus;
+  if (window === null) {
+    status = "unknown";
+  } else if (onRecord === true) {
+    status = "satisfied";
+  } else if (windowOpen) {
+    status = onRecord === false ? "due" : "unknown";
+  } else {
+    status = nearOrPast(window.closes, asOf) ? "due" : "unknown";
+  }
 
   return {
     lawId: "ll11",
     title: "Facade inspection and safety report (FISP)",
-    dueDate: null,
+    dueDate: window === null ? null : toIso(window.closes),
     cycle:
-      stories === null
-        ? "5-year cycle; sub-cycle window set by tax block"
-        : `5-year cycle (${stories} stories); sub-cycle window set by tax block`,
-    onRecord: null,
-    status: "unknown",
+      window === null
+        ? "5-year cycle; sub-cycle window set by tax block (block undetermined)"
+        : `5-year cycle, sub-cycle ${window.label}${stories === null ? "" : ` (${stories} stories)`}; window ${toIso(window.opens)} to ${toIso(window.closes)}`,
+    onRecord,
+    status,
     action:
-      "Determine this building's FISP sub-cycle window (by tax block) and file the facade report with a licensed inspector.",
+      onRecord === true
+        ? null
+        : window === null
+          ? "Determine this building's FISP sub-cycle window (by tax block) and file the facade report with a licensed inspector."
+          : `File the facade report with a Qualified Exterior Wall Inspector before the sub-cycle ${window.label} window closes ${toIso(window.closes)}.`,
     basis:
-      "LL11 / Admin Code 28-302; applies to buildings over six stories. Sub-cycle window scheduling not yet wired",
+      "LL11 / Admin Code 28-302; sub-cycle windows per 1 RCNY 103-04 and the DOB Cycle 10 facade service notice (blocks 4/5/6/9 from Feb 2025, 0/7/8 from Feb 2026, 1/2/3 from Feb 2027)",
   };
 }
 
+// Whether a real FISP report is on record for the cycle the window belongs to.
+// DOB auto-generates "No Report Filed" placeholder rows for unfiled windows, so
+// those count as evidence of non-filing. Null when the dataset gave no answer.
+function facadeFilingOnRecord(
+  facts: BuildingFacts,
+  window: FispWindow | null,
+): boolean | null {
+  const filings = facts.facadeFilings ?? null;
+  if (filings === null || window === null) {
+    return null;
+  }
+
+  // The cycle number this window belongs to: cycle 10 windows open 2025-2027,
+  // and each later cycle shifts the open year by five.
+  const subcycle = FISP_SUBCYCLES.find(entry => entry.label === window.label);
+  const cycleNumber =
+    subcycle === undefined
+      ? null
+      : 10 + (window.opens.getUTCFullYear() - subcycle.cycle10OpenYear) / 5;
+  if (cycleNumber === null) {
+    return null;
+  }
+
+  const cycleFilings = filings.filter(
+    filing =>
+      filing.cycle !== null && filing.cycle.replace(/\D/g, "") === String(cycleNumber),
+  );
+  if (cycleFilings.length === 0) {
+    return null;
+  }
+
+  return cycleFilings.some(
+    filing =>
+      filing.filingType !== "Auto-Generated" &&
+      filing.filingStatus !== null &&
+      filing.filingStatus.toLowerCase() !== "no report filed",
+  );
+}
+
+// The LL152 district-to-year rotation (1 RCNY 103-10). District numbers are
+// within-borough (PLUTO's cd is borough*100 + district, so 101 -> district 1).
+// The four-year rotation, anchored at the 2024 cycle:
+//   2024: districts 1, 3, 10        2025: 2, 5, 7, 13, 18
+//   2026: 4, 6, 8, 9, 16            2027: 11, 12, 14, 15, 17
+const LL152_ROTATION: number[][] = [
+  [1, 3, 10], // years ≡ 2024 (mod 4)
+  [2, 5, 7, 13, 18], // years ≡ 2025 (mod 4)
+  [4, 6, 8, 9, 16], // years ≡ 2026 (mod 4)
+  [11, 12, 14, 15, 17], // years ≡ 2027 (mod 4)
+];
+
+// The Dec 31 deadline of the current-or-next LL152 inspection year for a
+// district number, as of a date.
+function ll152Deadline(districtNumber: number, asOf: Date): Date | null {
+  const offset = LL152_ROTATION.findIndex(group => group.includes(districtNumber));
+  if (offset === -1) {
+    return null;
+  }
+
+  let year = asOf.getUTCFullYear();
+  while ((year - 2024 - offset) % 4 !== 0) {
+    year++;
+  }
+  let deadline = new Date(Date.UTC(year, 11, 31));
+  if (deadline.getTime() < asOf.getTime()) {
+    deadline = new Date(Date.UTC(year + 4, 11, 31));
+  }
+  return deadline;
+}
+
 // LL152 — periodic gas-piping inspection and certification on a community-
-// district cycle. The CD-to-year schedule is not yet wired, so the deadline is
-// left undated; the district is surfaced so a human can look it up.
-export function ll152FilingStatus(facts: BuildingFacts, _asOf: Date): FilingStatus {
+// district cycle of four years (1 RCNY 103-10). No public dataset confirms a
+// certification is on file, so onRecord stays null.
+export function ll152FilingStatus(facts: BuildingFacts, asOf: Date): FilingStatus {
   const cd = facts.plutoCharacteristics?.communityDistrict ?? null;
+  const districtNumber = cd === null ? null : cd % 100;
+  const deadline = districtNumber === null ? null : ll152Deadline(districtNumber, asOf);
+
+  const status: ComplianceStatus = nearOrPast(deadline, asOf) ? "due" : "unknown";
 
   return {
     lawId: "ll152",
     title: "Gas piping inspection and certification",
+    dueDate: deadline === null ? null : toIso(deadline),
+    cycle:
+      districtNumber === null
+        ? "4-year certification cycle by community district (district unknown)"
+        : `4-year certification cycle; community district ${districtNumber} files in ${deadline?.getUTCFullYear() ?? "an unmapped year"}`,
+    onRecord: null,
+    status,
+    action:
+      deadline === null
+        ? "Look up this community district's LL152 filing year and have a licensed master plumber certify the gas piping."
+        : `Have a licensed master plumber inspect the gas piping and file the certification by ${toIso(deadline)}.`,
+    basis:
+      "LL152 / Admin Code 28-318; district years per 1 RCNY 103-10 (2024: CD 1/3/10; 2025: CD 2/5/7/13/18; 2026: CD 4/6/8/9/16; 2027: CD 11/12/14/15/17, repeating every 4 years). No public dataset confirms filings",
+  };
+}
+
+// LL55 — indoor allergen hazards (mold and pests). An annual duty on owners of
+// buildings with three or more residential units: inspect every unit, remediate
+// findings, and give tenants the required notice with the lease. There is no
+// DOB filing; enforcement is HPD violations, whose classes vary too widely to
+// price honestly.
+export function ll55FilingStatus(facts: BuildingFacts, _asOf: Date): FilingStatus {
+  const units = facts.plutoCharacteristics?.unitsResidential ?? null;
+
+  return {
+    lawId: "ll55",
+    title: "Annual indoor allergen inspection (mold and pests)",
     dueDate: null,
     cycle:
-      cd === null
-        ? "Periodic certification on a community-district cycle (district unknown)"
-        : `Periodic certification on the cycle for community district ${cd}`,
+      units === null
+        ? "Annual inspection of every residential unit (unit count unknown)"
+        : `Annual inspection of all ${units.toLocaleString("en-US")} residential units`,
     onRecord: null,
     status: "unknown",
     action:
-      "Look up this community district's LL152 filing year and have a licensed master plumber certify the gas piping.",
+      "Inspect every unit for mold and pest conditions annually, remediate findings " +
+      "using the safe-work practices of 24 RCNY chapter 18, and provide the allergen " +
+      "notice with each lease.",
     basis:
-      "LL152 / Admin Code 28-318; filing year set per community district. District-to-year schedule not yet wired",
+      "LL55 of 2018 / Housing Maintenance Code 27-2017 et seq.; applies to buildings " +
+      "with 3+ residential units. No filing exists, so compliance cannot be confirmed " +
+      "from city data",
   };
 }
 

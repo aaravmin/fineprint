@@ -58,6 +58,7 @@ export const add_building = spacetimedb.reducer(
       usesJson: undefined,
       ll97Covered: undefined,
       provenanceJson: undefined,
+      compliancePlanJson: undefined,
       createdAt: ctx.timestamp,
     });
 
@@ -144,6 +145,8 @@ export const ingest_building = spacetimedb.reducer(
     // the ingest pipeline (the module cannot import the engine itself).
     // Absent means the engine had no data; the law's stub estimate applies.
     ll97AnnualFineUsd: t.option(t.u32()),
+    // Serialized CompliancePlan from the data layer, same can't-import logic.
+    compliancePlanJson: t.option(t.string()),
   },
   (ctx, args) => {
     if (args.address.trim() === "") throw new Error("address cannot be empty");
@@ -163,6 +166,7 @@ export const ingest_building = spacetimedb.reducer(
         usesJson: args.usesJson,
         ll97Covered: deriveLl97Covered(args.coveredLawIdsJson),
         provenanceJson: args.provenanceJson,
+        compliancePlanJson: args.compliancePlanJson,
       });
 
       // Fresher data means a fresher fine: keep the LL97 task's estimate in
@@ -197,6 +201,7 @@ export const ingest_building = spacetimedb.reducer(
       usesJson: args.usesJson,
       ll97Covered: deriveLl97Covered(args.coveredLawIdsJson),
       provenanceJson: args.provenanceJson,
+      compliancePlanJson: args.compliancePlanJson,
       createdAt: ctx.timestamp,
     });
 

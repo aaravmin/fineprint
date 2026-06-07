@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 
+import { GlobalErrorToaster } from "@/components/global-error-toaster";
 import { SpacetimeProvider } from "@/components/spacetime-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -57,6 +58,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
             >
               <SpacetimeProvider>{children}</SpacetimeProvider>
               <Toaster />
+              <GlobalErrorToaster />
             </PreferencesStoreProvider>
           </TooltipProvider>
         </ClerkProvider>

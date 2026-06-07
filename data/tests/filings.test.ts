@@ -74,28 +74,99 @@ describe("LL87 filing status", () => {
   });
 });
 
-describe("LL11 and LL152 surface attributes without overclaiming a deadline", () => {
-  test("LL11 names the story count and leaves the sub-cycle undated", () => {
+describe("LL11 sub-cycle windows by tax-block last digit", () => {
+  test("a block ending in 5 is sub-cycle A: window Feb 2025 to Feb 2027", () => {
+    // BBL 1-00835-0041 -> tax block 00835, last digit 5 -> Cycle 10 sub-cycle A.
     const facts = buildingWith({
       plutoCharacteristics: plutoWith({ numFloors: 30 }),
     });
 
     const status = ll11FilingStatus(facts, asOf);
 
-    expect(status.dueDate).toBeNull();
+    expect(status.dueDate).toBe("2027-02-21");
+    // asOf 2026-06-06 sits inside the window; no filing data -> unknown, not due.
     expect(status.status).toBe("unknown");
+    expect(status.cycle).toMatch(/sub-cycle A/);
     expect(status.cycle).toMatch(/30 stories/);
   });
 
-  test("LL152 names the community district and leaves the cycle undated", () => {
+  test("a real filed report in the cycle reads satisfied", () => {
+    const facts = buildingWith({
+      plutoCharacteristics: plutoWith({ numFloors: 30 }),
+      facadeFilings: [
+        {
+          tr6Number: "TR6-123",
+          bin: "1015862",
+          cycle: "10",
+          filingType: "Initial",
+          filingStatus: "Filed",
+          currentStatus: "SAFE",
+          raw: {},
+        },
+      ],
+    });
+
+    const status = ll11FilingStatus(facts, asOf);
+
+    expect(status.onRecord).toBe(true);
+    expect(status.status).toBe("satisfied");
+    expect(status.action).toBeNull();
+  });
+
+  test("only an auto-generated placeholder reads due inside the window", () => {
+    const facts = buildingWith({
+      plutoCharacteristics: plutoWith({ numFloors: 30 }),
+      facadeFilings: [
+        {
+          tr6Number: "TR6-902663-10A-N1",
+          bin: "1015862",
+          cycle: "10",
+          filingType: "Auto-Generated",
+          filingStatus: "No Report Filed",
+          currentStatus: "SWARMP",
+          raw: {},
+        },
+      ],
+    });
+
+    const status = ll11FilingStatus(facts, asOf);
+
+    expect(status.onRecord).toBe(false);
+    expect(status.status).toBe("due");
+  });
+});
+
+describe("LL152 community-district cycle", () => {
+  test("district 5 files in 2025; past that, the next cycle year is 2029", () => {
+    // CD 105 -> Manhattan district 5 -> 2025 cycle; asOf mid-2026 -> next is 2029.
     const facts = buildingWith({
       plutoCharacteristics: plutoWith({ communityDistrict: 105 }),
     });
 
     const status = ll152FilingStatus(facts, asOf);
 
-    expect(status.dueDate).toBeNull();
-    expect(status.cycle).toMatch(/community district 105/);
+    expect(status.dueDate).toBe("2029-12-31");
+    expect(status.cycle).toMatch(/community district 5/);
+    expect(status.onRecord).toBeNull(); // no public dataset confirms filings
+  });
+
+  test("district 4 files in 2026 and reads due inside the actionable window", () => {
+    const facts = buildingWith({
+      plutoCharacteristics: plutoWith({ communityDistrict: 304 }),
+    });
+
+    const status = ll152FilingStatus(facts, asOf);
+
+    expect(status.dueDate).toBe("2026-12-31");
+    expect(status.status).toBe("due");
+  });
+
+  test("an unknown district stays undated", () => {
+    const facts = buildingWith({
+      plutoCharacteristics: plutoWith({ communityDistrict: null }),
+    });
+
+    expect(ll152FilingStatus(facts, asOf).dueDate).toBeNull();
   });
 });
 

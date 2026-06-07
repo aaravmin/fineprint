@@ -30,6 +30,7 @@ export const Building = __t.object("Building", {
   usesJson: __t.option(__t.string()),
   ll97Covered: __t.option(__t.bool()),
   provenanceJson: __t.option(__t.string()),
+  compliancePlanJson: __t.option(__t.string()),
   createdAt: __t.timestamp(),
 });
 export type Building = __Infer<typeof Building>;

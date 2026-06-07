@@ -4,6 +4,7 @@
 // coverage mapping or the engine handoff.
 
 import { computeFine } from "../../engine/src/index.ts";
+import { buildCompliancePlan } from "./compliancePlan.ts";
 import { getCblEntry as realGetCblEntry, type CblEntry } from "./coveredBuildings.ts";
 import { toEngineInput } from "./engineBridge.ts";
 import { lookupBuilding as realLookupBuilding } from "./lookup.ts";
@@ -31,6 +32,7 @@ export interface IntakeResult {
     coveredLawIdsJson: string;
     provenanceJson: string;
     ll97AnnualFineUsd: number | undefined;
+    compliancePlanJson: string;
   };
   summary: string;
 }
@@ -64,6 +66,8 @@ export async function prepareIntake(
     ? Math.round(computeFine(engineInput, "2024-2029").annualFineUsd)
     : undefined;
 
+  const compliancePlan = buildCompliancePlan(facts);
+
   return {
     facts,
     ingestArgs: {
@@ -76,6 +80,7 @@ export async function prepareIntake(
       coveredLawIdsJson: JSON.stringify(coveredLawIds),
       provenanceJson: JSON.stringify(facts.provenance),
       ll97AnnualFineUsd,
+      compliancePlanJson: JSON.stringify(compliancePlan),
     },
     summary: intakeSummary(facts, coveredLawIds, ll97AnnualFineUsd),
   };

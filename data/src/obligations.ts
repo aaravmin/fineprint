@@ -22,6 +22,7 @@ import {
   ll88FilingStatus,
   ll11FilingStatus,
   ll152FilingStatus,
+  ll55FilingStatus,
   type FilingStatus,
 } from "./filings.ts";
 import type { BuildingFacts } from "./types.ts";
@@ -282,6 +283,18 @@ const ll11Analyzer = proceduralAnalyzer(
 // homes are exempt, but they never reach intake).
 const ll152Analyzer = proceduralAnalyzer("ll152", () => true, ll152FilingStatus);
 
+// LL55 turns on residential unit count. PLUTO's unitsres is the honest signal;
+// the Article 321 flag is the fallback proxy (rent-regulated housing is
+// residential by definition) when PLUTO is silent.
+const ll55Analyzer = proceduralAnalyzer(
+  "ll55",
+  facts =>
+    (facts.plutoCharacteristics?.unitsResidential ?? 0) >= 3 ||
+    (facts.plutoCharacteristics?.unitsResidential == null &&
+      facts.isArticle321 === true),
+  ll55FilingStatus,
+);
+
 export const LAW_ANALYZERS: LawAnalyzer[] = [
   ll97Analyzer,
   article321Analyzer,
@@ -290,6 +303,7 @@ export const LAW_ANALYZERS: LawAnalyzer[] = [
   ll88Analyzer,
   ll11Analyzer,
   ll152Analyzer,
+  ll55Analyzer,
 ];
 
 // One address, every obligation. Resolves nothing itself — callers pass the

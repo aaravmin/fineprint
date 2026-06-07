@@ -160,3 +160,62 @@ describe("optimizeArticle321", () => {
     expect(assessment.notes.some(note => /prescribed/i.test(note))).toBe(true);
   });
 });
+
+describe("procedural penalty credit", () => {
+  test("a credit can flip selection toward the measure that retires a filing", () => {
+    // A compliant building gains nothing in fines from any measure, so the
+    // only way a measure enters the plan is the procedural credit exceeding
+    // its capex. 100,000 sqft x $0.01 = $1,000 capex vs a $1,500 credit.
+    const cheapLighting = [
+      {
+        id: "led_cheap",
+        name: "cheap lighting",
+        capexUsdPerSqft: 0.01,
+        emissionsReductionFraction: 0,
+        basis: "test",
+        satisfiesLaws: ["ll88"],
+      },
+    ];
+
+    const without = optimizeRetrofit(wellUnderCap, cheapLighting);
+    expect(without.best.measureIds).toEqual([]);
+
+    const withCredit = optimizeRetrofit(wellUnderCap, cheapLighting, {
+      proceduralPenaltySavingsByLaw: { ll88: 1_500 },
+    });
+    expect(withCredit.best.measureIds).toEqual(["led_cheap"]);
+    expect(withCredit.best.proceduralCreditUsd).toBe(1_500);
+    expect(withCredit.best.totalCostUsd).toBe(1_000 - 1_500);
+    expect(withCredit.notes.some(note => /procedural/i.test(note))).toBe(true);
+  });
+
+  test("a law is credited once even when two chosen measures both satisfy it", () => {
+    const pair = [
+      {
+        id: "a",
+        name: "a",
+        capexUsdPerSqft: 0,
+        emissionsReductionFraction: 0.3,
+        basis: "test",
+        satisfiesLaws: ["ll88"],
+      },
+      {
+        id: "b",
+        name: "b",
+        capexUsdPerSqft: 0,
+        emissionsReductionFraction: 0.3,
+        basis: "test",
+        satisfiesLaws: ["ll88"],
+      },
+    ];
+
+    const assessment = optimizeRetrofit(overCapOffice, pair, {
+      proceduralPenaltySavingsByLaw: { ll88: 1_500 },
+    });
+
+    // Both free measures get taken for their emissions cuts; the ll88 credit
+    // still lands exactly once.
+    expect(assessment.best.measureIds.sort()).toEqual(["a", "b"]);
+    expect(assessment.best.proceduralCreditUsd).toBe(1_500);
+  });
+});
