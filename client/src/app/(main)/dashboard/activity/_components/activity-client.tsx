@@ -120,7 +120,7 @@ export function ActivityClient() {
           ) : (
             <ul className="relative">
               {/* Timeline rail */}
-              <span aria-hidden="true" className="absolute inset-y-3 left-[2.95rem] w-px bg-border" />
+              <span aria-hidden="true" className="absolute inset-y-3 left-[2.375rem] w-px bg-border" />
               {sorted.map((e) => {
                 const style = KIND_STYLE[e.kind] ?? FALLBACK_STYLE;
 

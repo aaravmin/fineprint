@@ -48,7 +48,7 @@ export function AgentsClient() {
 
   return (
     <div className="@container/main flex flex-col gap-4 md:gap-6">
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-3 @sm/main:grid-cols-3 @sm/main:gap-4">
         <StatCard
           icon={<CircleDot className="size-4" />}
           iconClassName="bg-secondary text-muted-foreground"
@@ -117,7 +117,7 @@ export function AgentsClient() {
                       )}
                     </div>
 
-                    <span className="font-mono text-xs text-muted-foreground">
+                    <span className="hidden font-mono text-xs text-muted-foreground sm:inline">
                       {w.identity.toHexString().slice(0, 8)}
                     </span>
                     {w.status !== "dead" && (

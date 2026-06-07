@@ -149,10 +149,14 @@ export function TasksClient() {
                       )}
                     </div>
                     {claimedWorker && (
-                      <span className="shrink-0 text-xs text-muted-foreground">{claimedWorker.name}</span>
+                      <span className="hidden shrink-0 text-xs text-muted-foreground sm:inline">
+                        {claimedWorker.name}
+                      </span>
                     )}
                     {task.fineEstimateUsd !== undefined && (
-                      <span className="shrink-0 text-xs text-muted-foreground">{fmtUsd(task.fineEstimateUsd)}/yr</span>
+                      <span className="hidden shrink-0 text-xs text-muted-foreground tabular-nums sm:inline">
+                        {fmtUsd(task.fineEstimateUsd)}/yr
+                      </span>
                     )}
                     {task.slaBreached && (
                       <Badge variant="destructive" className="shrink-0 text-xs">

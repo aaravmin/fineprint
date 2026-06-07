@@ -28,7 +28,7 @@ function DisplayCard({
   return (
     <div
       className={cn(
-        "relative flex h-36 w-[22rem] -skew-y-[8deg] select-none flex-col justify-between rounded-xl border border-border bg-card/80 px-4 py-3 backdrop-blur-sm transition-all duration-700 after:absolute after:-right-1 after:top-[-5%] after:h-[110%] after:w-[20rem] after:bg-gradient-to-l after:from-background after:to-transparent after:content-[''] hover:border-foreground/25 hover:bg-card [&>*]:flex [&>*]:items-center [&>*]:gap-2",
+        "relative flex h-32 w-[16rem] -skew-y-[8deg] select-none flex-col justify-between overflow-hidden rounded-xl border border-border bg-card/80 px-4 py-3 backdrop-blur-sm transition-all duration-700 after:absolute after:-right-1 after:top-[-5%] after:h-[110%] after:w-[14rem] after:bg-gradient-to-l after:from-background after:to-transparent after:content-[''] hover:border-foreground/25 hover:bg-card sm:h-36 sm:w-[22rem] sm:after:w-[20rem] [&>*]:flex [&>*]:items-center [&>*]:gap-2",
         className,
       )}
     >
@@ -45,8 +45,10 @@ function DisplayCard({
           {title}
         </p>
       </div>
-      <p className="whitespace-nowrap text-base text-foreground/90">{description}</p>
-      <p className="text-sm text-muted-foreground">{date}</p>
+      <p className="whitespace-nowrap text-sm text-foreground/90 sm:text-base">
+        {description}
+      </p>
+      <p className="text-xs text-muted-foreground sm:text-sm">{date}</p>
     </div>
   );
 }
@@ -63,10 +65,10 @@ export default function DisplayCards({ cards }: DisplayCardsProps) {
     },
     {
       className:
-        "[grid-area:stack] translate-x-12 translate-y-8 hover:-translate-y-1 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:before:opacity-0 before:transition-opacity before:duration-700 hover:grayscale-0 before:left-0 before:top-0",
+        "[grid-area:stack] translate-x-8 translate-y-6 sm:translate-x-12 sm:translate-y-8 hover:-translate-y-1 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:before:opacity-0 before:transition-opacity before:duration-700 hover:grayscale-0 before:left-0 before:top-0",
     },
     {
-      className: "[grid-area:stack] translate-x-24 translate-y-16 hover:translate-y-6",
+      className: "[grid-area:stack] translate-x-16 translate-y-12 sm:translate-x-24 sm:translate-y-16 hover:translate-y-6",
     },
   ];
 

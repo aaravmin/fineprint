@@ -167,7 +167,7 @@ export function BuildingClient({ buildingId }: Props) {
                         </Badge>
                         <span className="flex-1 text-sm font-medium">{task.title}</span>
                         {task.fineEstimateUsd !== undefined && (
-                          <span className="text-xs text-muted-foreground tabular-nums">
+                          <span className="hidden text-xs text-muted-foreground tabular-nums sm:inline">
                             {fmtUsd(task.fineEstimateUsd)}/yr
                           </span>
                         )}
