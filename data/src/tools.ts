@@ -4,8 +4,10 @@
 // data pipeline and the engine, never from the model.
 
 import { computeAllPeriods, type FineResult } from "../../engine/src/index.ts";
-import { optimizeRetrofit, type RetrofitAssessment } from "../../engine/src/retrofit.ts";
+import { type RetrofitAssessment } from "../../engine/src/retrofit.ts";
 import { toEngineInput } from "./engineBridge.ts";
+import { assessObligations, type Obligation } from "./obligations.ts";
+import { planRetrofit, type MeasureExclusion } from "./retrofit.ts";
 import { retrieveLawChunks } from "./ask.ts";
 import { lookupBuilding as realLookupBuilding } from "./lookup.ts";
 import type { BuildingFacts } from "./types.ts";
@@ -113,19 +115,28 @@ function requireField(value: string | undefined, field: string): string {
 
 interface Assessment {
   facts: BuildingFacts;
+  obligations: Obligation[];
   projections: FineResult[] | null;
   retrofit: RetrofitAssessment | null;
+  // Measures dropped because the building's record shows they are already done,
+  // and the equipment findings behind the plan. Empty when no profile exists.
+  retrofitExcluded: MeasureExclusion[];
+  retrofitFindings: string[];
   note: string | null;
 }
 
 function assessBuilding(facts: BuildingFacts): Assessment {
+  const obligations = assessObligations(facts).obligations;
   const { input, missing } = toEngineInput(facts);
 
   if (!input) {
     return {
       facts,
+      obligations,
       projections: null,
       retrofit: null,
+      retrofitExcluded: [],
+      retrofitFindings: [],
       note:
         `Fine projections unavailable: the city has no ${missing.join(", ")} ` +
         "for this building (usually a missing LL84 filing — emissions and " +
@@ -133,10 +144,15 @@ function assessBuilding(facts: BuildingFacts): Assessment {
     };
   }
 
+  const plan = planRetrofit(facts);
+
   return {
     facts,
+    obligations,
     projections: computeAllPeriods(input),
-    retrofit: optimizeRetrofit(input),
+    retrofit: plan?.assessment ?? null,
+    retrofitExcluded: plan?.excluded ?? [],
+    retrofitFindings: plan?.findings ?? [],
     note: null,
   };
 }
