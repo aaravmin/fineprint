@@ -31,7 +31,7 @@ interface NavMainProps {
 }
 
 const IsComingSoon = () => (
-  <span className="ml-auto rounded-md bg-gray-200 px-2 py-1 text-xs dark:text-gray-800">Soon</span>
+  <span className="ml-auto rounded-md bg-muted px-2 py-1 text-xs text-muted-foreground">Soon</span>
 );
 
 const NavItemExpanded = ({

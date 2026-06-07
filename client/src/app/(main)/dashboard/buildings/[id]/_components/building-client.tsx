@@ -189,7 +189,7 @@ function PlainEnglishCard({
             <span className="font-medium">{address}</span> qualifies for the LL97 Article 321
             affordable housing pathway. It must implement the prescribed energy conservation
             measures (Admin Code 28-321.2.2) or meet its 2030 target of{" "}
-            <span className="font-medium text-green-600 dark:text-green-400">
+            <span className="font-medium text-success">
               {fmtTco2e(current.emissionsLimitTco2e)}
             </span>{" "}
             early. Non-compliance draws flat $10,000 penalties — not modeled here.
@@ -200,7 +200,7 @@ function PlainEnglishCard({
             periods. Its emissions of{" "}
             <span className="font-medium">{fmtTco2e(current.actualEmissionsTco2e)}</span> stay
             below the 2024–2029 cap of{" "}
-            <span className="font-medium text-green-600 dark:text-green-400">
+            <span className="font-medium text-success">
               {fmtTco2e(current.emissionsLimitTco2e)}
             </span>
             .

@@ -3,8 +3,10 @@
 import type { FineResult } from "@/lib/engine";
 import { fmtUsd } from "@/lib/engine";
 
-const PERIOD_COLORS = ["hsl(var(--chart-4))", "hsl(var(--chart-5))", "hsl(var(--destructive))"] as const;
-const COMPLIANT_COLOR = "hsl(var(--chart-2))";
+// Brand colors (match the homepage cliff chart exactly). SVG presentation
+// attributes can't resolve CSS var()/hsl(), so use literal hex.
+const DANGER = "#e5342b"; // signal red — over cap
+const COMPLIANT = "#15a34a"; // green — under cap
 
 const W = 640;
 const H = 240;
@@ -59,7 +61,7 @@ export function FineTimeline({ periods }: Props) {
           </p>
         )}
         {allCompliant && (
-          <p className="text-sm text-green-600 dark:text-green-400 font-medium">
+          <p className="text-sm text-success font-medium">
             Compliant across all periods
           </p>
         )}
@@ -84,11 +86,13 @@ export function FineTimeline({ periods }: Props) {
           const x = barX(i);
           const bh = barHeight(p.annualFineUsd);
           const by = barY(p.annualFineUsd);
-          const color = p.compliant ? COMPLIANT_COLOR : PERIOD_COLORS[i];
+          const color = p.compliant ? COMPLIANT : DANGER;
+          // Echo the homepage: the earliest (lower) period reads lighter.
+          const fillOpacity = p.compliant ? 0.85 : i === 0 ? 0.45 : 0.92;
 
           return (
             <g key={p.period}>
-              <rect x={x} y={by} width={BAR_W} height={bh} fill={color} fillOpacity="0.85" rx="4" />
+              <rect x={x} y={by} width={BAR_W} height={bh} fill={color} fillOpacity={fillOpacity} rx="4" />
               <text x={x + BAR_W / 2} y={by - 8} textAnchor="middle" fontSize="12" fontWeight="600" fill={color}>
                 {fmtUsd(p.annualFineUsd)}
               </text>
@@ -112,9 +116,9 @@ export function FineTimeline({ periods }: Props) {
               <line
                 x1={barX(0) + BAR_W / 2} y1={y1}
                 x2={barX(1) + BAR_W / 2} y2={y2}
-                stroke="hsl(var(--destructive))" strokeWidth="1" strokeDasharray="4 3" strokeOpacity="0.4"
+                stroke={DANGER} strokeWidth="1" strokeDasharray="4 3" strokeOpacity="0.4"
               />
-              <text x={midX} y={Math.min(y1, y2) - 10} textAnchor="middle" fontSize="10" fill="hsl(var(--destructive))" fillOpacity="0.7">
+              <text x={midX} y={Math.min(y1, y2) - 10} textAnchor="middle" fontSize="10" fill={DANGER} fillOpacity="0.7">
                 2030 cliff
               </text>
             </g>
