@@ -11,6 +11,7 @@ import {
 import { toEngineInput } from "./engineBridge.ts";
 import { assessObligations, type Obligation } from "./obligations.ts";
 import { buildCompliancePlan, type CompliancePlan } from "./compliancePlan.ts";
+import { categorizeBuilding } from "./category.ts";
 import { planRetrofit, type MeasureExclusion } from "./retrofit.ts";
 import { retrieveLawChunks } from "./ask.ts";
 import { lookupBuilding as realLookupBuilding } from "./lookup.ts";
@@ -55,6 +56,16 @@ export const dataToolDefinitions: DataToolDefinition[] = [
     input_schema: addressInput,
   },
   {
+    name: "categorize_building",
+    description:
+      "Classify what kind of building is at a NYC address — broad bucket " +
+      "(residential, office, commercial, civic/institutional, industrial, etc.) " +
+      "plus the specific type (courthouse, hotel, school, the named business) " +
+      "from NYC PLUTO and, when configured, Google Places. Use to describe a " +
+      "building's use or purpose.",
+    input_schema: addressInput,
+  },
+  {
     name: "ask_law",
     description:
       "Retrieve the relevant passages of LL97 statute and DOB rule text for a " +
@@ -93,6 +104,15 @@ export async function executeDataTool(
     return JSON.stringify(
       await assessBuilding(await lookup(requireField(input.address, "address"))),
     );
+  }
+
+  if (name === "categorize_building") {
+    const facts = await lookup(requireField(input.address, "address"));
+    return JSON.stringify({
+      address: facts.address,
+      bbl: facts.bbl,
+      category: await categorizeBuilding(facts),
+    });
   }
 
   if (name === "ask_law") {

@@ -41,5 +41,13 @@ export {
   type PerformanceObligation,
   type ComplianceStatus,
 } from "./obligations.ts";
+export {
+  categorizeBuilding,
+  type BuildingCategory,
+  type BroadCategory,
+  type PlaceLookup,
+  type FetchPlace,
+  type CategorizeDeps,
+} from "./category.ts";
 export { prepareIntake, type IntakeDeps, type IntakeResult } from "./intake.ts";
 export * from "../laws.ts";
