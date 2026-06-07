@@ -256,37 +256,11 @@ These serve as the fallback; there is no separate default.css file. */
 
 /* ── Landing page (/) motion + texture, shared theme ──────────────────────── */
 @layer utilities {
-  .fp-rise {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  .fp-rise.fp-in {
-    opacity: 1;
-    transform: translateY(0);
-    transition:
-      opacity 600ms cubic-bezier(0.23, 1, 0.32, 1),
-      transform 600ms cubic-bezier(0.23, 1, 0.32, 1);
-    transition-delay: calc(var(--i, 0) * 60ms);
-  }
   .fp-press {
     transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
   }
   .fp-press:active {
     transform: scale(0.97);
-  }
-  .fp-bar {
-    transform: scaleY(0.04);
-    transform-origin: bottom;
-  }
-  .fp-in .fp-bar {
-    transform: scaleY(1);
-    transition: transform 700ms cubic-bezier(0.77, 0, 0.175, 1);
-    transition-delay: calc(120ms + var(--b, 0) * 90ms);
-  }
-  .fp-hero-bg {
-    background-image:
-      radial-gradient(60% 50% at 78% -8%, rgba(229, 52, 43, 0.06), transparent 70%),
-      radial-gradient(50% 40% at 8% 4%, rgba(21, 163, 74, 0.05), transparent 70%);
   }
   .fp-grain::before {
     content: "";
@@ -299,16 +273,10 @@ These serve as the fallback; there is no separate default.css file. */
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .fp-rise,
-  .fp-rise.fp-in {
-    opacity: 1;
-    transform: none;
-    transition: opacity 200ms ease;
-  }
-  .fp-bar,
-  .fp-in .fp-bar {
-    transform: none;
+  .fp-press,
+  .fp-press:active {
     transition: none;
+    transform: none;
   }
 }
 
