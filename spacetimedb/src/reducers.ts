@@ -2,7 +2,7 @@ import { Identity, ScheduleAt, Timestamp } from "spacetimedb";
 import { t } from "spacetimedb/server";
 import spacetimedb, { reaperTick } from "./schema";
 import { reaperRef } from "./reaper-ref";
-import { applicableLaws, LAWS } from "./laws";
+import { applicableLaws, LAWS, type Law } from "./laws";
 
 const HEARTBEAT_STALE_MS = 15_000; // 3 missed 5s heartbeats = dead
 const REAP_INTERVAL_MICROS = 5_000_000n; // 5s
@@ -222,6 +222,35 @@ function ingestFromArgs(ctx: any, args: IngestArgs, owner: Identity) {
   if (args.address.trim() === "") throw new Error("address cannot be empty");
   if (args.bbl.trim() === "") throw new Error("bbl cannot be empty");
 
+  const coveredLawIds: string[] = JSON.parse(args.coveredLawIdsJson);
+  const laws =
+    coveredLawIds.length > 0
+      ? LAWS.filter(law => coveredLawIds.includes(law.id))
+      : applicableLaws(args.sqft, args.isArticle321);
+
+  const spawnTask = (law: Law, buildingId: bigint) => {
+    const isLl97Law = law.id === "ll97" || law.id === "art321";
+    const engineFine = isLl97Law ? args.ll97AnnualFineUsd : undefined;
+    const stubFine = law.fineEstimateUsd(args.sqft, args.isArticle321);
+
+    ctx.db.task.insert({
+      id: 0n,
+      owner,
+      fleetScope: 0,
+      buildingId,
+      lawId: law.id,
+      kind: law.kind,
+      title: `${law.name} — ${args.address}`,
+      status: "open",
+      deadline: addMs(ctx.timestamp, law.deadlineDays * 86_400_000),
+      slaBreached: false,
+      fineEstimateUsd: engineFine ?? (stubFine === null ? undefined : stubFine),
+      claimedBy: undefined,
+      intakeAddress: undefined,
+      createdAt: ctx.timestamp,
+    });
+  };
+
   const existingBuilding = [...ctx.db.building.iter()].find(
     (row: any) => row.bbl === args.bbl && row.owner.isEqual(owner),
   );
@@ -253,10 +282,25 @@ function ingestFromArgs(ctx: any, args: IngestArgs, owner: Identity) {
       }
     }
 
+    // Backfill any obligations the building never got. A building ingested
+    // before its full coverage was known has tasks for only some of its laws;
+    // re-ingesting now spawns the rest without duplicating what's there.
+    const existingLawIds = new Set(
+      [...ctx.db.task.iter()]
+        .filter((task: any) => task.buildingId === existingBuilding.id)
+        .map((task: any) => task.lawId),
+    );
+    const missingLaws = laws.filter(law => !existingLawIds.has(law.id));
+    for (const law of missingLaws) {
+      spawnTask(law, existingBuilding.id);
+    }
+
     logEvent(
       ctx,
       "building_updated",
-      `${args.address} (BBL ${args.bbl}) refreshed from city data`,
+      missingLaws.length > 0
+        ? `${args.address} (BBL ${args.bbl}) refreshed from city data → ${missingLaws.length} missing obligations backfilled`
+        : `${args.address} (BBL ${args.bbl}) refreshed from city data`,
       undefined,
       undefined,
       owner,
@@ -280,33 +324,8 @@ function ingestFromArgs(ctx: any, args: IngestArgs, owner: Identity) {
     createdAt: ctx.timestamp,
   });
 
-  const coveredLawIds: string[] = JSON.parse(args.coveredLawIdsJson);
-  const laws =
-    coveredLawIds.length > 0
-      ? LAWS.filter(law => coveredLawIds.includes(law.id))
-      : applicableLaws(args.sqft, args.isArticle321);
-
   for (const law of laws) {
-    const isLl97Law = law.id === "ll97" || law.id === "art321";
-    const engineFine = isLl97Law ? args.ll97AnnualFineUsd : undefined;
-    const stubFine = law.fineEstimateUsd(args.sqft, args.isArticle321);
-
-    ctx.db.task.insert({
-      id: 0n,
-      owner,
-      fleetScope: 0,
-      buildingId: newBuilding.id,
-      lawId: law.id,
-      kind: law.kind,
-      title: `${law.name} — ${args.address}`,
-      status: "open",
-      deadline: addMs(ctx.timestamp, law.deadlineDays * 86_400_000),
-      slaBreached: false,
-      fineEstimateUsd: engineFine ?? (stubFine === null ? undefined : stubFine),
-      claimedBy: undefined,
-      intakeAddress: undefined,
-      createdAt: ctx.timestamp,
-    });
+    spawnTask(law, newBuilding.id);
   }
 
   logEvent(

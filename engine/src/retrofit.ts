@@ -173,6 +173,50 @@ export function optimizeRetrofit(
   };
 }
 
+// What a fixed capex budget actually buys. The optimizer answers "what is
+// cheapest"; an owner often asks the inverse — "I can spend $X, what does that
+// get me?" Among every measure subset whose capex fits the budget, this picks
+// the one that leaves the lowest fines through 2039, breaking ties toward
+// spending less. Doing nothing (capex 0) always fits a non-negative budget, so
+// this never returns null.
+export function planForBudget(
+  building: BuildingInput,
+  budgetUsd: number,
+  measures: RetrofitMeasure[] = DEFAULT_MEASURES,
+  options: OptimizeOptions = {},
+): RetrofitPlan {
+  if (measures.length > MAX_CATALOG) {
+    throw new Error(
+      `catalog of ${measures.length} exceeds the ${MAX_CATALOG}-measure enumeration cap`,
+    );
+  }
+
+  const affordableBudget = Math.max(0, budgetUsd);
+  const subsetCount = 2 ** measures.length;
+  let best: RetrofitPlan | null = null;
+
+  for (let mask = 0; mask < subsetCount; mask++) {
+    const chosen = measures.filter((_, index) => mask & (1 << index));
+    const plan = evaluatePlan(building, chosen, options);
+
+    if (plan.capexUsd > affordableBudget) {
+      continue;
+    }
+
+    const beatsOnFines = !best || plan.horizonFinesUsd < best.horizonFinesUsd;
+    const tiesButCheaper =
+      best !== null &&
+      plan.horizonFinesUsd === best.horizonFinesUsd &&
+      plan.capexUsd < best.capexUsd;
+
+    if (beatsOnFines || tiesButCheaper) {
+      best = plan;
+    }
+  }
+
+  return best!;
+}
+
 function evaluatePlan(
   building: BuildingInput,
   chosen: RetrofitMeasure[],

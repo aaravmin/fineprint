@@ -214,6 +214,7 @@ function roundTco2e(value: number): number {
 // consumers (the dashboard's alias points at this file) get one entry point.
 export {
   optimizeRetrofit,
+  planForBudget,
   DEFAULT_MEASURES,
   type RetrofitMeasure,
   type RetrofitPlan,

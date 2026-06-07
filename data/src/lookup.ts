@@ -88,7 +88,12 @@ export async function lookupBuilding(
   const openViolations = await resolveOpenViolations(geo.bin, sources, provenance);
   const facadeFilings = await resolveFacadeFilings(geo.bin, sources, provenance);
 
-  const grossFloorAreaSqft = resolveFloorArea(ll84, cbl, provenance);
+  const grossFloorAreaSqft = resolveFloorArea(
+    ll84,
+    cbl,
+    plutoCharacteristics,
+    provenance,
+  );
   const annualEmissionsTco2e = resolveEmissions(ll84, provenance);
 
   if (ll84) {
@@ -361,6 +366,7 @@ function resolveEmissions(
 function resolveFloorArea(
   ll84: Ll84Facts | null,
   cbl: CblEntry | null,
+  pluto: PlutoCharacteristics | null,
   provenance: ProvenanceNote[],
 ): number | null {
   if (ll84?.grossFloorAreaSqft != null) {
@@ -381,10 +387,23 @@ function resolveFloorArea(
     return cbl.dofGrossSqft;
   }
 
+  // Buildings outside the covered list and without an LL84 filing — typically
+  // the under-25k-sqft ones — still have a PLUTO record. It is the floor area
+  // that decides which size-based laws apply at all, so without this fallback
+  // every such building looked like zero sqft and collapsed to LL152 alone.
+  if (pluto?.bldgAreaSqft != null) {
+    provenance.push({
+      field: "grossFloorAreaSqft",
+      source: "NYC PLUTO",
+      detail: "no LL84 filing and not on the covered list — using PLUTO building area",
+    });
+    return pluto.bldgAreaSqft;
+  }
+
   provenance.push({
     field: "grossFloorAreaSqft",
     source: "none",
-    detail: "no LL84 filing and no DOF record — floor area unknown",
+    detail: "no LL84, DOF, or PLUTO record — floor area unknown",
   });
   return null;
 }

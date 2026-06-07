@@ -3,6 +3,7 @@ import {
   DEFAULT_MEASURES,
   optimizeArticle321,
   optimizeRetrofit,
+  planForBudget,
 } from "../src/retrofit.ts";
 import type { BuildingInput } from "../src/index.ts";
 
@@ -217,5 +218,102 @@ describe("procedural penalty credit", () => {
     // still lands exactly once.
     expect(assessment.best.measureIds.sort()).toEqual(["a", "b"]);
     expect(assessment.best.proceduralCreditUsd).toBe(1_500);
+  });
+});
+
+describe("planForBudget", () => {
+  test("a zero budget funds nothing and leaves emissions untouched", () => {
+    const plan = planForBudget(overCapOffice, 0);
+
+    expect(plan.measureIds).toEqual([]);
+    expect(plan.capexUsd).toBe(0);
+    expect(plan.projectedEmissionsTco2e).toBe(overCapOffice.annualEmissionsTco2e);
+  });
+
+  test("a budget below the cheapest measure still funds nothing", () => {
+    const cheapestCapex = Math.min(
+      ...DEFAULT_MEASURES.map(m => m.capexUsdPerSqft * overCapOffice.grossFloorAreaSqft),
+    );
+    const plan = planForBudget(overCapOffice, cheapestCapex - 1);
+
+    expect(plan.measureIds).toEqual([]);
+    expect(plan.capexUsd).toBe(0);
+  });
+
+  test("a negative budget is clamped to do-nothing rather than throwing", () => {
+    const plan = planForBudget(overCapOffice, -50_000);
+
+    expect(plan.capexUsd).toBe(0);
+    expect(plan.measureIds).toEqual([]);
+  });
+
+  test("the chosen plan never spends more than the budget", () => {
+    for (const budget of [0, 100_000, 350_000, 900_000, 2_000_000, 10_000_000]) {
+      expect(planForBudget(overCapOffice, budget).capexUsd).toBeLessThanOrEqual(budget);
+    }
+  });
+
+  test("more budget never leaves higher fines (monotonic in spend)", () => {
+    const budgets = [0, 100_000, 300_000, 700_000, 1_500_000, 4_250_000];
+    const fines = budgets.map(b => planForBudget(overCapOffice, b).horizonFinesUsd);
+
+    for (let i = 1; i < fines.length; i++) {
+      expect(fines[i]).toBeLessThanOrEqual(fines[i - 1]);
+    }
+  });
+
+  test("an unbounded budget reaches at least the cost-optimal fine outcome", () => {
+    const generous = planForBudget(overCapOffice, 1_000_000_000);
+    const costOptimal = optimizeRetrofit(overCapOffice).best;
+
+    // Minimizing fines with money to burn can only match or beat the plan that
+    // also has to justify its capex.
+    expect(generous.horizonFinesUsd).toBeLessThanOrEqual(costOptimal.horizonFinesUsd);
+  });
+
+  test("with money to burn it buys the cheapest subset that clears the fines", () => {
+    // Two measures each cut emissions far below the cap on their own, so both
+    // reach zero fines; the planner must prefer the cheaper one rather than
+    // stacking spend that buys no further fine reduction.
+    const measures = [
+      {
+        id: "cheap",
+        name: "cheap deep cut",
+        capexUsdPerSqft: 1,
+        emissionsReductionFraction: 0.99,
+        basis: "test",
+      },
+      {
+        id: "expensive",
+        name: "expensive deep cut",
+        capexUsdPerSqft: 10,
+        emissionsReductionFraction: 0.99,
+        basis: "test",
+      },
+    ];
+
+    const plan = planForBudget(overCapOffice, 1_000_000_000, measures);
+
+    expect(plan.horizonFinesUsd).toBe(0);
+    expect(plan.measureIds).toEqual(["cheap"]);
+  });
+
+  test("a compliant building invests nothing no matter how large the budget", () => {
+    const plan = planForBudget(wellUnderCap, 5_000_000);
+
+    expect(plan.measureIds).toEqual([]);
+    expect(plan.capexUsd).toBe(0);
+  });
+
+  test("an Article 321 building has no modeled fine to spend against", () => {
+    const plan = planForBudget(
+      { ...overCapOffice, isArticle321: true },
+      5_000_000,
+    );
+
+    // Article 321 faces flat penalties, not the $268/tCO2e fine the engine
+    // models, so there is no fine for capex to chase — the plan stays empty.
+    expect(plan.horizonFinesUsd).toBe(0);
+    expect(plan.measureIds).toEqual([]);
   });
 });

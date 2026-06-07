@@ -5,10 +5,7 @@
 // Usage: npx tsx scripts/ingest.ts "350 5th Avenue, Manhattan"
 //        (server must be running and module published)
 import { DbConnection } from "../agents/src/module_bindings/index.ts";
-import { getCblEntry } from "../data/src/coveredBuildings.ts";
-import { toEngineInput } from "../data/src/engineBridge.ts";
-import { lookupBuilding } from "../data/src/lookup.ts";
-import { computeFine } from "../engine/src/index.ts";
+import { prepareIntake } from "../data/src/intake.ts";
 
 const HOST = process.env.SPACETIME_URI ?? "ws://localhost:3011";
 const DB_NAME = process.env.DB_NAME ?? "fineprint";
@@ -20,35 +17,19 @@ if (!address) {
 }
 
 console.log(`Looking up "${address}" across NYC datasets…`);
-const facts = await lookupBuilding(address);
 
-const cbl = getCblEntry(facts.bbl);
-const coveredLawIds = cbl
-  ? [
-      cbl.ll97 && !cbl.article321 ? "ll97" : null,
-      cbl.article321 ? "art321" : null,
-      cbl.ll84 ? "ll84" : null,
-      cbl.ll87 ? "ll87" : null,
-      cbl.ll88 ? "ll88" : null,
-    ].filter((id): id is string => id !== null)
-  : [];
-
-// The current-period LL97 fine, in whole dollars, computed by the engine.
-// The module cannot import the engine, so the number rides in with the facts.
-const { input: engineInput } = toEngineInput(facts);
-const ll97AnnualFineUsd = engineInput
-  ? Math.round(computeFine(engineInput, "2024-2029").annualFineUsd)
-  : undefined;
+// Same shared intake the agent workers use, so the script can never drift from
+// the live coverage mapping or the compliance plan again.
+const { facts, ingestArgs } = await prepareIntake(address);
+const coveredLawIds: string[] = JSON.parse(ingestArgs.coveredLawIdsJson);
 
 console.log(`  BBL ${facts.bbl} — ${facts.address}`);
 console.log(
   `  ${facts.grossFloorAreaSqft?.toLocaleString() ?? "unknown"} sqft, ${facts.annualEmissionsTco2e ?? "unknown"} tCO2e`,
 );
+console.log(`  covered: ${coveredLawIds.join(", ") || "(none on the DOB list)"}`);
 console.log(
-  `  covered: ${coveredLawIds.join(", ") || "(falling back to sqft heuristic)"}`,
-);
-console.log(
-  `  LL97 fine (2024-2029, engine): ${ll97AnnualFineUsd === undefined ? "no data" : `$${ll97AnnualFineUsd.toLocaleString()}`}`,
+  `  LL97 fine (2024-2029, engine): ${ingestArgs.ll97AnnualFineUsd === undefined ? "no data" : `$${ingestArgs.ll97AnnualFineUsd.toLocaleString()}`}`,
 );
 
 const timeout = setTimeout(() => {
@@ -66,18 +47,7 @@ DbConnection.builder()
     connection
       .subscriptionBuilder()
       .onApplied(async ctx => {
-        await connection.reducers.ingestBuilding({
-          address: facts.address,
-          bbl: facts.bbl,
-          sqft: facts.grossFloorAreaSqft ?? 0,
-          isArticle321: facts.isArticle321 ?? false,
-          // The codegen renders the column's trailing "e" uppercase.
-          annualEmissionsTco2E: facts.annualEmissionsTco2e ?? undefined,
-          usesJson: JSON.stringify(facts.occupancyGroups),
-          coveredLawIdsJson: JSON.stringify(coveredLawIds),
-          provenanceJson: JSON.stringify(facts.provenance),
-          ll97AnnualFineUsd,
-        });
+        await connection.reducers.ingestBuilding(ingestArgs);
 
         const buildingRow = [...ctx.db.building.iter()].find(
           row => row.bbl === facts.bbl,

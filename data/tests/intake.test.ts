@@ -50,6 +50,7 @@ describe("prepareIntake", () => {
       "ll97",
       "ll84",
       "ll87",
+      "ll11",
       "ll88",
       "ll152",
     ]);
@@ -84,7 +85,7 @@ describe("prepareIntake", () => {
 
     expect(intake.summary).toMatch(/1008350041/);
     expect(intake.summary).toMatch(/2,852,257/);
-    expect(intake.summary).toMatch(/ll97, ll84, ll87, ll88, ll152/);
+    expect(intake.summary).toMatch(/ll97, ll84, ll87, ll11, ll88, ll152/);
     expect(intake.summary).toMatch(/NYC GeoSearch/);
   });
 
@@ -118,5 +119,79 @@ describe("prepareIntake", () => {
     });
 
     await expect(prepareIntake("nowhere", deps)).rejects.toThrow(/no NYC address found/);
+  });
+});
+
+// Coverage is what the reported bug was about: small buildings were collapsing
+// to LL152 alone and LL11 never appeared. These pin the size-threshold logic
+// (the registry's floor-area cutoffs) against the CBL's narrower authority.
+describe("prepareIntake coverage by building size", () => {
+  function buildingOf(sqft: number, isArticle321 = false): BuildingFacts {
+    return {
+      ...esbFacts,
+      grossFloorAreaSqft: sqft,
+      occupancyGroups: [{ group: "Office", sqft }],
+      isArticle321,
+    };
+  }
+
+  async function coverageFor(
+    facts: BuildingFacts,
+    getCblEntry: () => CblEntry | null = () => null,
+  ): Promise<Set<string>> {
+    const intake = await prepareIntake(
+      facts.address,
+      fakeDeps({ lookupBuilding: async () => facts, getCblEntry }),
+    );
+    return new Set<string>(JSON.parse(intake.ingestArgs.coveredLawIdsJson));
+  }
+
+  test("an under-25k building is covered by LL152 alone", async () => {
+    expect(await coverageFor(buildingOf(13_194))).toEqual(new Set(["ll152"]));
+  });
+
+  test("the 25k threshold is inclusive: LL84, LL88, LL97, LL152 switch on", async () => {
+    expect(await coverageFor(buildingOf(25_000))).toEqual(
+      new Set(["ll97", "ll84", "ll88", "ll152"]),
+    );
+    // One square foot short stays LL152-only — the boundary is exact.
+    expect(await coverageFor(buildingOf(24_999))).toEqual(new Set(["ll152"]));
+  });
+
+  test("crossing 50k adds the LL87 audit obligation", async () => {
+    expect(await coverageFor(buildingOf(50_000))).toEqual(
+      new Set(["ll97", "ll84", "ll87", "ll88", "ll152"]),
+    );
+  });
+
+  test("crossing 60k adds the LL11 facade obligation that used to never spawn", async () => {
+    expect(await coverageFor(buildingOf(60_000))).toContain("ll11");
+  });
+
+  test("the CBL is authoritative for LL97: a large building it excludes gets no LL97", async () => {
+    const notLl97Covered = (): CblEntry => ({
+      ll97: false,
+      article321: false,
+      ll84: false,
+      ll87: false,
+      ll88: false,
+      dofGrossSqft: null,
+      dofAddress: null,
+      source: "test",
+    });
+
+    const coverage = await coverageFor(buildingOf(100_000), notLl97Covered);
+
+    expect(coverage.has("ll97")).toBe(false);
+    // The size-based obligations still apply regardless of the LL97 flag.
+    expect(coverage).toEqual(new Set(["ll84", "ll87", "ll11", "ll88", "ll152"]));
+  });
+
+  test("an affordable building maps to art321 and the allergen law, never LL97", async () => {
+    const coverage = await coverageFor(buildingOf(100_000, true));
+
+    expect(coverage.has("art321")).toBe(true);
+    expect(coverage.has("ll55")).toBe(true);
+    expect(coverage.has("ll97")).toBe(false);
   });
 });

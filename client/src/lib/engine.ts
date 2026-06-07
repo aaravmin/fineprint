@@ -1,13 +1,17 @@
 import {
   computeAllPeriods,
+  DEFAULT_MEASURES,
   optimizeRetrofit,
+  planForBudget,
   type BuildingInput,
   type FineResult,
   type RetrofitAssessment,
+  type RetrofitPlan,
 } from "fineprint-engine";
 import type { Building } from "@/module_bindings/types";
 
-export type { FineResult, RetrofitAssessment };
+export { DEFAULT_MEASURES };
+export type { FineResult, RetrofitAssessment, RetrofitPlan };
 
 export function toBuildingInput(building: Building): BuildingInput | null {
   if (building.annualEmissionsTco2E === undefined || building.usesJson === undefined) {
@@ -44,6 +48,30 @@ export function computeRetrofit(building: Building): RetrofitAssessment | null {
   } catch {
     return null;
   }
+}
+
+// The best compliance path a given investment can buy, recomputed live as the
+// owner edits the figure. Same browser-side enumeration as computeRetrofit.
+export function computeBudgetPlan(
+  building: Building,
+  budgetUsd: number,
+): RetrofitPlan | null {
+  const input = toBuildingInput(building);
+  if (!input) return null;
+  try {
+    return planForBudget(input, budgetUsd);
+  } catch {
+    return null;
+  }
+}
+
+// The full-catalog capex: the most an owner could spend, used to bound the
+// investment slider.
+export function maxRetrofitCapex(building: Building): number {
+  return DEFAULT_MEASURES.reduce(
+    (sum, measure) => sum + measure.capexUsdPerSqft * building.sqft,
+    0,
+  );
 }
 
 export function fmtUsd(amount: number): string {

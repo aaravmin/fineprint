@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import type { CblEntry } from "../src/coveredBuildings.ts";
 import { lookupBuilding } from "../src/lookup.ts";
-import type { BblResult, Ll84Facts } from "../src/types.ts";
+import type { BblResult, Ll84Facts, PlutoCharacteristics } from "../src/types.ts";
 
 // The orchestrator is tested with stand-ins for the three sources so the
 // suite runs offline; each source has its own fixture-backed tests. Values
@@ -44,6 +44,23 @@ const cblEntry: CblEntry = {
   dofGrossSqft: 2_812_739,
   dofAddress: "338 5 AVENUE",
   source: "DOB Sustainability Covered Buildings List, Filing Year 2026",
+};
+
+// A small under-25k building: not on the covered list, no LL84 filing, but
+// PLUTO still knows its building area. This is the shape that used to resolve
+// to zero floor area and collapse to LL152 alone.
+const plutoSmall: PlutoCharacteristics = {
+  bbl: "1008350041",
+  numFloors: 6,
+  buildingClass: "O4",
+  bldgAreaSqft: 13_194,
+  unitsResidential: 0,
+  unitsTotal: 4,
+  yearBuilt: 1925,
+  landUse: "05",
+  ownerName: null,
+  communityDistrict: 105,
+  raw: {},
 };
 
 function fakeSources(overrides: Partial<Parameters<typeof lookupBuilding>[1]> = {}) {
@@ -187,6 +204,58 @@ describe("lookupBuilding", () => {
 
     const noteText = facts.provenance.map(note => note.detail ?? "").join(" ");
     expect(noteText).toMatch(/no LL84 filing/i);
+  });
+
+  test("no LL84 and not on the covered list: floor area comes from PLUTO", async () => {
+    const facts = await lookupBuilding(
+      "350 5th Avenue, Manhattan",
+      fakeSources({
+        fetchLl84: async () => null,
+        getCblEntry: () => null,
+        fetchPlutoByBbl: async () => plutoSmall,
+      }),
+    );
+
+    expect(facts.grossFloorAreaSqft).toBe(13_194);
+
+    const floorNote = facts.provenance.find(note => note.field === "grossFloorAreaSqft");
+    expect(floorNote?.source).toBe("NYC PLUTO");
+  });
+
+  test("LL84 floor area still wins over PLUTO when both are present", async () => {
+    const facts = await lookupBuilding(
+      "350 5th Avenue, Manhattan",
+      fakeSources({ fetchPlutoByBbl: async () => plutoSmall }),
+    );
+
+    expect(facts.grossFloorAreaSqft).toBe(2_852_257);
+  });
+
+  test("DOF/covered-list area still wins over PLUTO when LL84 is absent", async () => {
+    const facts = await lookupBuilding(
+      "350 5th Avenue, Manhattan",
+      fakeSources({
+        fetchLl84: async () => null,
+        fetchPlutoByBbl: async () => plutoSmall,
+      }),
+    );
+
+    expect(facts.grossFloorAreaSqft).toBe(2_812_739);
+  });
+
+  test("no LL84, no covered list, no PLUTO: floor area is unknown, not zero", async () => {
+    const facts = await lookupBuilding(
+      "350 5th Avenue, Manhattan",
+      fakeSources({
+        fetchLl84: async () => null,
+        getCblEntry: () => null,
+        fetchPlutoByBbl: async () => null,
+      }),
+    );
+
+    expect(facts.grossFloorAreaSqft).toBeNull();
+    const floorNote = facts.provenance.find(note => note.field === "grossFloorAreaSqft");
+    expect(floorNote?.source).toBe("none");
   });
 
   test("proxied and unmapped uses surface in provenance", async () => {
