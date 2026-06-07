@@ -16,6 +16,14 @@
 import { computeAllPeriods, type FineResult } from "../../engine/src/index.ts";
 import { LAWS } from "../laws.ts";
 import { toEngineInput } from "./engineBridge.ts";
+import {
+  ll84FilingStatus,
+  ll87FilingStatus,
+  ll88FilingStatus,
+  ll11FilingStatus,
+  ll152FilingStatus,
+  type FilingStatus,
+} from "./filings.ts";
 import type { BuildingFacts } from "./types.ts";
 
 // Where the building stands on one obligation. "at_risk" means a penalty is
@@ -57,9 +65,10 @@ export interface LawAnalyzer {
   lawId: string;
   // Whether this law binds this specific building, given everything known.
   appliesTo: (facts: BuildingFacts) => boolean;
-  // The obligation(s) this law places on the building. A single law may emit
-  // both kinds (LL88: file a lighting plan, and actually upgrade the lighting).
-  analyze: (facts: BuildingFacts) => Obligation[];
+  // The obligation(s) this law places on the building. asOf dates every cycle
+  // deadline, so the result is deterministic and testable. A single law may
+  // emit both kinds (LL88: file a lighting plan, and upgrade the lighting).
+  analyze: (facts: BuildingFacts, asOf: Date) => Obligation[];
 }
 
 export interface ObligationAssessment {
@@ -78,43 +87,28 @@ function lawName(lawId: string): string {
 // LL97 is the one performance law fully wired today. The optimizer that closes
 // the gap lives elsewhere (it spans every performance obligation at once); this
 // analyzer only describes where the building stands.
+// Standard LL97: the $268/tCO2e cap regime. Article 321 buildings are covered
+// by LL97 too but on a different pathway, so they get their own analyzer below
+// and are excluded here.
 const ll97Analyzer: LawAnalyzer = {
   lawId: "ll97",
-  appliesTo: facts => facts.isLl97Covered === true,
+  appliesTo: facts => facts.isLl97Covered === true && !facts.isArticle321,
   analyze: facts => {
     const { input, missing } = toEngineInput(facts);
 
     if (!input) {
-      return [
-        {
-          kind: "performance",
-          lawId: "ll97",
-          lawName: lawName("ll97"),
-          title: "Hold annual emissions under the building's cap",
-          status: "unknown",
-          periods: [],
-          findings: [
-            `Exposure can't be computed yet: the city has no ${missing.join(", ")} ` +
-              "for this building (usually a missing LL84 benchmarking filing).",
-          ],
-          recommendations: [
-            "File the LL84 benchmarking report so the emissions baseline exists.",
-          ],
-        },
-      ];
+      return [missingDataPerformance("ll97", missing)];
     }
 
     const periods = computeAllPeriods(input);
     const currentPeriod = periods.find(period => period.period === "2024-2029")!;
     const anyOverage = periods.some(period => !period.compliant);
 
-    const status: ComplianceStatus = input.isArticle321
-      ? "due"
-      : !currentPeriod.compliant
-        ? "at_risk"
-        : anyOverage
-          ? "due"
-          : "satisfied";
+    const status: ComplianceStatus = !currentPeriod.compliant
+      ? "at_risk"
+      : anyOverage
+        ? "due"
+        : "satisfied";
 
     return [
       {
@@ -124,22 +118,81 @@ const ll97Analyzer: LawAnalyzer = {
         title: "Hold annual emissions under the building's cap",
         status,
         periods,
-        findings: ll97Findings(periods, input.isArticle321 ?? false),
-        recommendations: ll97Recommendations(status, input.isArticle321 ?? false),
+        findings: ll97Findings(periods),
+        recommendations:
+          status === "satisfied"
+            ? []
+            : [
+                "Close the emissions gap with the cheapest measure set the retrofit " +
+                  "optimizer finds; this obligation feeds that whole-building plan.",
+              ],
       },
     ];
   },
 };
 
-function ll97Findings(periods: FineResult[], isArticle321: boolean): string[] {
-  if (isArticle321) {
-    return [
-      "Article 321 pathway: this building complies through prescribed energy " +
-        "conservation measures or by meeting its 2030 limit early, not the " +
-        "$268/tCO2e penalty. Flat $10,000 non-compliance penalties are not modeled.",
-    ];
-  }
+// Article 321: rent-regulated / affordable buildings comply by holding 2024
+// emissions under their 2030 limit, or by the prescribed measures of
+// 28-321.2.2 — no $268/tCO2e penalty, but flat $10,000 penalties if neither.
+const article321Analyzer: LawAnalyzer = {
+  lawId: "art321",
+  appliesTo: facts => facts.isArticle321 === true,
+  analyze: facts => {
+    const { input, missing } = toEngineInput(facts);
 
+    if (!input) {
+      return [missingDataPerformance("art321", missing)];
+    }
+
+    const periods = computeAllPeriods(input);
+    const target2030 = periods[0].emissionsLimitTco2e;
+    const current = input.annualEmissionsTco2e;
+    const underTarget = current <= target2030;
+
+    return [
+      {
+        kind: "performance",
+        lawId: "art321",
+        lawName: lawName("art321"),
+        title: "Comply via prescribed measures or the 2030 emissions target",
+        status: underTarget ? "due" : "at_risk",
+        periods,
+        findings: [
+          "Article 321 pathway: comply through the prescribed energy conservation " +
+            "measures (28-321.2.2) or by holding emissions under the 2030 limit " +
+            "(28-321.2.1). No $268/tCO2e penalty, but flat $10,000 non-compliance " +
+            "penalties apply (not modeled).",
+          underTarget
+            ? `Current emissions ${current.toLocaleString("en-US")} tCO2e clear the 2030 target of ${target2030.toLocaleString("en-US")} tCO2e — the performance pathway is available.`
+            : `Current emissions ${current.toLocaleString("en-US")} tCO2e exceed the 2030 target of ${target2030.toLocaleString("en-US")} tCO2e — prescribed measures or a retrofit are required.`,
+        ],
+        recommendations: [
+          underTarget
+            ? "File the Article 321 compliance report certifying emissions under the 2030 limit."
+            : "Implement the prescribed measures, or retrofit to clear the 2030 limit; the retrofit plan ranks the cheapest compliant measure set.",
+        ],
+      },
+    ];
+  },
+};
+
+function missingDataPerformance(lawId: string, missing: string[]): PerformanceObligation {
+  return {
+    kind: "performance",
+    lawId,
+    lawName: lawName(lawId),
+    title: "Hold annual emissions under the building's cap",
+    status: "unknown",
+    periods: [],
+    findings: [
+      `Exposure can't be computed yet: the city has no ${missing.join(", ")} ` +
+        "for this building (usually a missing LL84 benchmarking filing).",
+    ],
+    recommendations: ["File the LL84 benchmarking report so the emissions baseline exists."],
+  };
+}
+
+function ll97Findings(periods: FineResult[]): string[] {
   return periods.map(period => {
     if (period.compliant) {
       return `${period.period}: ${period.actualEmissionsTco2e.toLocaleString("en-US")} tCO2e against a cap of ${period.emissionsLimitTco2e.toLocaleString("en-US")} — compliant.`;
@@ -148,66 +201,107 @@ function ll97Findings(periods: FineResult[], isArticle321: boolean): string[] {
   });
 }
 
-function ll97Recommendations(status: ComplianceStatus, isArticle321: boolean): string[] {
-  if (isArticle321) {
-    return [
-      "Confirm the Article 321 prescriptive measures are filed; the retrofit " +
-        "optimizer can rank them against the 2030 target.",
-    ];
-  }
-  if (status === "satisfied") {
-    return [];
-  }
-  return [
-    "Close the emissions gap with the cheapest measure set the retrofit " +
-      "optimizer finds; this obligation feeds that whole-building plan.",
-  ];
+// Procedural laws all reduce to the same shape: a filing cycle plus, where a
+// dataset exists, whether the filing is on record. Each analyzer pairs an
+// applicability test with the filing-status function for its law.
+function proceduralAnalyzer(
+  lawId: string,
+  appliesTo: (facts: BuildingFacts) => boolean,
+  filingStatus: (facts: BuildingFacts, asOf: Date) => FilingStatus,
+): LawAnalyzer {
+  return {
+    lawId,
+    appliesTo,
+    analyze: (facts, asOf) => [proceduralObligation(filingStatus(facts, asOf), facts)],
+  };
 }
 
-// LL84 is the first procedural law. Today it only checks whether any
-// benchmarking filing is on record; confirming the filing is current for this
-// cycle year is deferred to the filing-status capability (Task B).
-const ll84Analyzer: LawAnalyzer = {
-  lawId: "ll84",
-  appliesTo: facts => (facts.grossFloorAreaSqft ?? 0) >= 25_000,
-  analyze: facts => {
-    const hasFiling = facts.infrastructureProfile?.hasLl84Filing ?? false;
+function proceduralObligation(
+  filing: FilingStatus,
+  facts: BuildingFacts,
+): ProceduralObligation {
+  const law = LAWS.find(entry => entry.id === filing.lawId);
+  const penaltyUsd = law
+    ? law.fineEstimateUsd(facts.grossFloorAreaSqft ?? 0, facts.isArticle321 ?? false)
+    : null;
 
-    return [
-      {
-        kind: "procedural",
-        lawId: "ll84",
-        lawName: lawName("ll84"),
-        title: "File annual energy and water benchmarking by May 1",
-        status: hasFiling ? "satisfied" : "due",
-        penaltyUsd: 2_500,
-        findings: [
-          hasFiling
-            ? "A benchmarking filing is on record in the LL84 dataset (cycle-year " +
-              "currency not yet verified)."
-            : "No benchmarking filing found for this building in the LL84 dataset.",
-        ],
-        recommendations: hasFiling
-          ? []
-          : [
-              "Submit the LL84 benchmarking report through ENERGY STAR Portfolio " +
-                "Manager before the May 1 deadline.",
-            ],
-      },
-    ];
-  },
-};
+  const findings = [
+    filing.cycle + ".",
+    filing.dueDate
+      ? `Next deadline: ${filing.dueDate}.`
+      : "Next deadline can't be dated from the data on record.",
+    filing.onRecord === true
+      ? "A qualifying filing is on record."
+      : filing.onRecord === false
+        ? "No qualifying filing found in city data."
+        : "City filing status is not available for this law.",
+    `Basis: ${filing.basis}.`,
+  ];
 
-export const LAW_ANALYZERS: LawAnalyzer[] = [ll97Analyzer, ll84Analyzer];
+  return {
+    kind: "procedural",
+    lawId: filing.lawId,
+    lawName: lawName(filing.lawId),
+    title: filing.title,
+    status: filing.status,
+    penaltyUsd,
+    findings,
+    recommendations: filing.action ? [filing.action] : [],
+  };
+}
+
+const ll84Analyzer = proceduralAnalyzer(
+  "ll84",
+  facts => (facts.grossFloorAreaSqft ?? 0) >= 25_000,
+  ll84FilingStatus,
+);
+
+const ll87Analyzer = proceduralAnalyzer(
+  "ll87",
+  facts => (facts.grossFloorAreaSqft ?? 0) >= 50_000,
+  ll87FilingStatus,
+);
+
+const ll88Analyzer = proceduralAnalyzer(
+  "ll88",
+  facts => (facts.grossFloorAreaSqft ?? 0) >= 25_000,
+  ll88FilingStatus,
+);
+
+// FISP turns on building height, not floor area; we only assert it when PLUTO
+// confirms over six stories, never on a guess.
+const ll11Analyzer = proceduralAnalyzer(
+  "ll11",
+  facts => (facts.plutoCharacteristics?.numFloors ?? 0) > 6,
+  ll11FilingStatus,
+);
+
+// Gas service is assumed present until a DOB gas dataset lands (1-2 family
+// homes are exempt, but they never reach intake).
+const ll152Analyzer = proceduralAnalyzer("ll152", () => true, ll152FilingStatus);
+
+export const LAW_ANALYZERS: LawAnalyzer[] = [
+  ll97Analyzer,
+  article321Analyzer,
+  ll84Analyzer,
+  ll87Analyzer,
+  ll88Analyzer,
+  ll11Analyzer,
+  ll152Analyzer,
+];
 
 // One address, every obligation. Resolves nothing itself — callers pass the
 // already-assembled facts so the address is looked up exactly once upstream.
+// asOf dates the filing cycles; it defaults to now but is injectable for tests.
 export function assessObligations(
   facts: BuildingFacts,
-  analyzers: LawAnalyzer[] = LAW_ANALYZERS,
+  options: { asOf?: Date; analyzers?: LawAnalyzer[] } = {},
 ): ObligationAssessment {
+  const asOf = options.asOf ?? new Date();
+  const analyzers = options.analyzers ?? LAW_ANALYZERS;
+
   const applicable = analyzers.filter(analyzer => analyzer.appliesTo(facts));
-  const obligations = applicable.flatMap(analyzer => analyzer.analyze(facts));
+  const obligations = applicable.flatMap(analyzer => analyzer.analyze(facts, asOf));
 
   const notes: string[] = [];
   if (obligations.length === 0) {

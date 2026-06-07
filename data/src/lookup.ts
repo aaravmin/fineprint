@@ -159,6 +159,7 @@ async function resolveInfrastructureProfile(
 
   return {
     hasLl84Filing,
+    ll84ReportingYear: ll84?.reportingYear ?? null,
     hasRecomputedEmissions,
     fuelTypes: ll84?.fuelMix ?? [],
     boilerRecords,

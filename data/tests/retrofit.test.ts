@@ -4,6 +4,7 @@ import type { BuildingFacts, InfrastructureProfile } from "../src/types.ts";
 
 const baseProfile: InfrastructureProfile = {
   hasLl84Filing: true,
+  ll84ReportingYear: 2024,
   hasRecomputedEmissions: true,
   fuelTypes: ["natural_gas"],
   boilerRecords: [],
@@ -50,6 +51,9 @@ describe("planRetrofit", () => {
     };
 
     const plan = planRetrofit(withSolar);
+
+    expect(plan!.pathway).toBe("standard");
+    if (plan!.pathway !== "standard") return;
 
     expect(plan!.excluded.map(measure => measure.id)).toContain("solar_pv");
     expect(plan!.assessment.evaluatedSubsets).toBe(64); // 6 measures left

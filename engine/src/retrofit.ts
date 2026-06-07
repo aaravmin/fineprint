@@ -18,6 +18,10 @@ export interface RetrofitMeasure {
   capexUsdPerSqft: number;
   emissionsReductionFraction: number; // of current emissions, multiplicative
   basis: string; // where the assumption comes from
+  // Procedural laws this physical measure also satisfies when implemented, so a
+  // whole-building plan can credit one action against several laws rather than
+  // double-count it. Pure metadata — the optimizer's math ignores it.
+  satisfiesLaws?: string[];
 }
 
 export const DEFAULT_MEASURES: RetrofitMeasure[] = [
@@ -34,6 +38,8 @@ export const DEFAULT_MEASURES: RetrofitMeasure[] = [
     capexUsdPerSqft: 2.5,
     emissionsReductionFraction: 0.08,
     basis: "DOE solid-state lighting retrofit studies",
+    // A code-compliant lighting upgrade is exactly what LL88 requires.
+    satisfiesLaws: ["ll88"],
   },
   {
     id: "air_sealing",
@@ -152,16 +158,7 @@ export function optimizeRetrofit(
 }
 
 function evaluatePlan(building: BuildingInput, chosen: RetrofitMeasure[]): RetrofitPlan {
-  const capexUsd = chosen.reduce(
-    (sum, measure) => sum + measure.capexUsdPerSqft * building.grossFloorAreaSqft,
-    0,
-  );
-
-  const remainingFraction = chosen.reduce(
-    (fraction, measure) => fraction * (1 - measure.emissionsReductionFraction),
-    1,
-  );
-  const projectedEmissionsTco2e = building.annualEmissionsTco2e * remainingFraction;
+  const { capexUsd, projectedEmissionsTco2e } = applyMeasures(building, chosen);
 
   const adjusted = { ...building, annualEmissionsTco2e: projectedEmissionsTco2e };
   const results = (Object.keys(PERIOD_YEARS) as Period[]).map(period =>
@@ -175,11 +172,123 @@ function evaluatePlan(building: BuildingInput, chosen: RetrofitMeasure[]): Retro
 
   return {
     measureIds: chosen.map(measure => measure.id),
-    capexUsd: round2(capexUsd),
-    projectedEmissionsTco2e: round2(projectedEmissionsTco2e),
+    capexUsd,
+    projectedEmissionsTco2e,
     horizonFinesUsd: round2(horizonFinesUsd),
     totalCostUsd: round2(capexUsd + horizonFinesUsd),
     results,
+  };
+}
+
+// The capex and resulting emissions of applying a measure set. Reductions
+// compound multiplicatively against current emissions; capex is per-sqft.
+function applyMeasures(
+  building: BuildingInput,
+  chosen: RetrofitMeasure[],
+): { capexUsd: number; projectedEmissionsTco2e: number } {
+  const capexUsd = chosen.reduce(
+    (sum, measure) => sum + measure.capexUsdPerSqft * building.grossFloorAreaSqft,
+    0,
+  );
+
+  const remainingFraction = chosen.reduce(
+    (fraction, measure) => fraction * (1 - measure.emissionsReductionFraction),
+    1,
+  );
+
+  return {
+    capexUsd: round2(capexUsd),
+    projectedEmissionsTco2e: round2(building.annualEmissionsTco2e * remainingFraction),
+  };
+}
+
+export interface Article321Plan {
+  measureIds: string[];
+  capexUsd: number;
+  projectedEmissionsTco2e: number;
+}
+
+export interface Article321Assessment {
+  // The 2030 standard limit the building must clear to use the performance
+  // pathway (Admin Code 28-321.2.1).
+  target2030Tco2e: number;
+  currentEmissionsTco2e: number;
+  alreadyUnderTarget: boolean;
+  // Cheapest measure set whose projected emissions clear the 2030 target, or
+  // null when even the full catalog can't reach it — then the prescribed
+  // measures of 28-321.2.2 are the route. Empty plan when already compliant.
+  cheapestCompliantPlan: Article321Plan | null;
+  evaluatedSubsets: number;
+  notes: string[];
+}
+
+// Article 321 buildings face no $268/tCO2e penalty, so the objective flips:
+// minimize capex subject to clearing the 2030 target, rather than trade capex
+// against fines. A building already under the target needs no measures at all.
+export function optimizeArticle321(
+  building: BuildingInput,
+  measures: RetrofitMeasure[] = DEFAULT_MEASURES,
+): Article321Assessment {
+  if (measures.length > MAX_CATALOG) {
+    throw new Error(
+      `catalog of ${measures.length} exceeds the ${MAX_CATALOG}-measure enumeration cap`,
+    );
+  }
+
+  const standard = computeFine({ ...building, isArticle321: false }, "2030-2034");
+  const target = standard.emissionsLimitTco2e;
+  const current = building.annualEmissionsTco2e;
+
+  const baseNote =
+    "Article 321 complies through the prescribed measures of Admin Code 28-321.2.2 " +
+    "or by holding emissions under the 2030 limit (28-321.2.1). Capex figures are " +
+    "typical-building assumptions, not quotes.";
+
+  if (current <= target) {
+    return {
+      target2030Tco2e: target,
+      currentEmissionsTco2e: current,
+      alreadyUnderTarget: true,
+      cheapestCompliantPlan: { measureIds: [], capexUsd: 0, projectedEmissionsTco2e: current },
+      evaluatedSubsets: 1,
+      notes: [baseNote, "Current emissions already clear the 2030 target — certify the performance pathway."],
+    };
+  }
+
+  const subsetCount = 2 ** measures.length;
+  let cheapest: Article321Plan | null = null;
+
+  for (let mask = 0; mask < subsetCount; mask++) {
+    const chosen = measures.filter((_, index) => mask & (1 << index));
+    const { capexUsd, projectedEmissionsTco2e } = applyMeasures(building, chosen);
+
+    if (projectedEmissionsTco2e > target) {
+      continue;
+    }
+    if (!cheapest || capexUsd < cheapest.capexUsd) {
+      cheapest = {
+        measureIds: chosen.map(measure => measure.id),
+        capexUsd,
+        projectedEmissionsTco2e,
+      };
+    }
+  }
+
+  const notes = [baseNote];
+  if (!cheapest) {
+    notes.push(
+      "No measure set in the catalog clears the 2030 target; the prescribed " +
+        "measures pathway (28-321.2.2) is the route to compliance.",
+    );
+  }
+
+  return {
+    target2030Tco2e: target,
+    currentEmissionsTco2e: current,
+    alreadyUnderTarget: false,
+    cheapestCompliantPlan: cheapest,
+    evaluatedSubsets: subsetCount,
+    notes,
   };
 }
 

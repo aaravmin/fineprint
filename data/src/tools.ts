@@ -4,9 +4,13 @@
 // data pipeline and the engine, never from the model.
 
 import { computeAllPeriods, type FineResult } from "../../engine/src/index.ts";
-import { type RetrofitAssessment } from "../../engine/src/retrofit.ts";
+import {
+  type Article321Assessment,
+  type RetrofitAssessment,
+} from "../../engine/src/retrofit.ts";
 import { toEngineInput } from "./engineBridge.ts";
 import { assessObligations, type Obligation } from "./obligations.ts";
+import { buildCompliancePlan, type CompliancePlan } from "./compliancePlan.ts";
 import { planRetrofit, type MeasureExclusion } from "./retrofit.ts";
 import { retrieveLawChunks } from "./ask.ts";
 import { lookupBuilding as realLookupBuilding } from "./lookup.ts";
@@ -115,9 +119,14 @@ function requireField(value: string | undefined, field: string): string {
 
 interface Assessment {
   facts: BuildingFacts;
+  // The headline: one plan covering every law, each obligation disposed of once.
+  compliancePlan: CompliancePlan;
   obligations: Obligation[];
   projections: FineResult[] | null;
-  retrofit: RetrofitAssessment | null;
+  // "standard" trades capex against fines; "article321" minimizes capex to
+  // clear the 2030 target. The shape of retrofit follows the pathway.
+  retrofitPathway: "standard" | "article321" | null;
+  retrofit: RetrofitAssessment | Article321Assessment | null;
   // Measures dropped because the building's record shows they are already done,
   // and the equipment findings behind the plan. Empty when no profile exists.
   retrofitExcluded: MeasureExclusion[];
@@ -126,14 +135,17 @@ interface Assessment {
 }
 
 function assessBuilding(facts: BuildingFacts): Assessment {
+  const compliancePlan = buildCompliancePlan(facts);
   const obligations = assessObligations(facts).obligations;
   const { input, missing } = toEngineInput(facts);
 
   if (!input) {
     return {
       facts,
+      compliancePlan,
       obligations,
       projections: null,
+      retrofitPathway: null,
       retrofit: null,
       retrofitExcluded: [],
       retrofitFindings: [],
@@ -148,8 +160,10 @@ function assessBuilding(facts: BuildingFacts): Assessment {
 
   return {
     facts,
+    compliancePlan,
     obligations,
     projections: computeAllPeriods(input),
+    retrofitPathway: plan?.pathway ?? null,
     retrofit: plan?.assessment ?? null,
     retrofitExcluded: plan?.excluded ?? [],
     retrofitFindings: plan?.findings ?? [],
