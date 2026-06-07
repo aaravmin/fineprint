@@ -111,15 +111,7 @@ export function TasksClient() {
         <CardContent className="p-0">
           {sorted.length === 0 ? (
             tasks.length === 0 ? (
-              <EmptyFolder
-                title="No tasks in the queue"
-                description={
-                  <>
-                    Run <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">npm run seed</code> to create
-                    obligations
-                  </>
-                }
-              />
+              <EmptyFolder title="No tasks in the queue" description="Tasks will appear as buildings are analyzed." />
             ) : (
               <div className="px-6 py-10 text-center text-sm text-muted-foreground">
                 No tasks match the selected statuses.

@@ -26,8 +26,6 @@ export function AgentsClient() {
   const killWorker = useReducer(reducers.killWorker);
   const [killingId, setKillingId] = useState<bigint | null>(null);
 
-  // The fault-tolerance demo: kill an agent mid-task and watch the board
-  // release its work to the next one.
   async function kill(workerId: bigint, name: string) {
     setKillingId(workerId);
     try {
@@ -77,15 +75,7 @@ export function AgentsClient() {
         </CardHeader>
         <CardContent className="p-0">
           {sorted.length === 0 ? (
-            <EmptyFolder
-              title="No workers connected"
-              description={
-                <>
-                  Run <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">npm run worker</code> to start
-                  an agent
-                </>
-              }
-            />
+            <EmptyFolder title="No agents connected" description="Connected agents will appear here in real time." />
           ) : (
             <div className="divide-y">
               {sorted.map((w) => {

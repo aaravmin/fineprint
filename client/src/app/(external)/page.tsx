@@ -312,6 +312,7 @@ export default function Home() {
                   <AddressAutocomplete
                     value={address}
                     onValueChange={setAddress}
+                    onSelect={search}
                     className="flex-1 sm:max-w-xl"
                     inputClassName="w-full rounded-full border border-border bg-card px-6 py-4 text-base text-foreground shadow-[0_1px_2px_rgba(20,20,20,0.04),0_4px_14px_-6px_rgba(20,20,20,0.08)] outline-none transition-shadow placeholder:text-muted-foreground/60 focus:border-foreground/30"
                   />
@@ -504,6 +505,7 @@ export default function Home() {
                 <AddressAutocomplete
                   value={address}
                   onValueChange={setAddress}
+                  onSelect={search}
                   className="flex-1"
                   inputClassName="w-full rounded-full border border-border bg-background px-6 py-4 text-base text-foreground outline-none transition-shadow placeholder:text-muted-foreground/60 focus:border-foreground/30"
                 />

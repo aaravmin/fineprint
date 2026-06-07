@@ -2,16 +2,10 @@
 
 import Link from "next/link";
 
-import {
-  CircleHelp,
-  ClipboardList,
-  Database,
-  File,
-  Search,
-  Settings,
-} from "lucide-react";
+import { CircleHelp, ClipboardList, Database, File, Search, Settings } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 
+import { FineprintLogo } from "@/components/fineprint-logo";
 import {
   Sidebar,
   SidebarContent,
@@ -21,7 +15,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { FineprintLogo } from "@/components/fineprint-logo";
 import { APP_CONFIG } from "@/config/app-config";
 import { sidebarItems } from "@/navigation/sidebar/sidebar-items";
 import { usePreferencesStore } from "@/stores/preferences/preferences-provider";
@@ -78,7 +71,7 @@ export function AppSidebar({
   };
 }) {
   const { sidebarVariant, sidebarCollapsible, isSynced } = usePreferencesStore(
-    useShallow(s => ({
+    useShallow((s) => ({
       sidebarVariant: s.sidebarVariant,
       sidebarCollapsible: s.sidebarCollapsible,
       isSynced: s.isSynced,
@@ -94,12 +87,9 @@ export function AppSidebar({
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <Link prefetch={false} href="/dashboard">
+              <Link prefetch={false} href="/">
                 <span className="sr-only">{APP_CONFIG.name}</span>
-                <span
-                  aria-hidden="true"
-                  className="flex items-center text-base font-semibold"
-                >
+                <span aria-hidden="true" className="flex items-center text-base font-semibold">
                   <FineprintLogo className="mr-px h-[0.95em] w-auto" />
                   ineprint
                 </span>
