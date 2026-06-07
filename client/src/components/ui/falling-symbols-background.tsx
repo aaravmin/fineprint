@@ -33,19 +33,19 @@ const FallingSymbolsBackground: React.FC<FallingSymbolsProps> = ({
   const animationFrameId = useRef<number | null>(null);
 
   const grid = useRef({ columns: 0, rows: 0, charWidth: 0, charHeight: 0 });
-  const letters = useRef<
-    Array<{ char: string; x: number; y: number; color: string }>
-  >([]);
+  const letters = useRef<Array<{ char: string; x: number; y: number; color: string }>>(
+    [],
+  );
   const lastGlitchTime = useRef(0);
 
   const getRandomChar = useCallback(
     () => symbols[Math.floor(Math.random() * symbols.length)],
-    [symbols]
+    [symbols],
   );
 
   const getRandomColor = useCallback(
     () => symbolColors[Math.floor(Math.random() * symbolColors.length)],
-    [symbolColors]
+    [symbolColors],
   );
 
   useEffect(() => {
@@ -60,8 +60,7 @@ const FallingSymbolsBackground: React.FC<FallingSymbolsProps> = ({
     let canvasHeight = 0;
 
     const setup = () => {
-      if (animationFrameId.current)
-        cancelAnimationFrame(animationFrameId.current);
+      if (animationFrameId.current) cancelAnimationFrame(animationFrameId.current);
 
       const dpr = window.devicePixelRatio || 1;
       const rect = container.getBoundingClientRect();
@@ -95,9 +94,7 @@ const FallingSymbolsBackground: React.FC<FallingSymbolsProps> = ({
         return {
           char: getRandomChar(),
           x: col * grid.current.charWidth,
-          y:
-            row * grid.current.charHeight -
-            grid.current.rows * grid.current.charHeight,
+          y: row * grid.current.charHeight - grid.current.rows * grid.current.charHeight,
           color: getRandomColor(),
         };
       });
@@ -110,9 +107,7 @@ const FallingSymbolsBackground: React.FC<FallingSymbolsProps> = ({
 
       if (timestamp - lastGlitchTime.current > glitchSpeed) {
         lastGlitchTime.current = timestamp;
-        const updateCount = Math.floor(
-          letters.current.length * glitchIntensity
-        );
+        const updateCount = Math.floor(letters.current.length * glitchIntensity);
         for (let i = 0; i < updateCount; i++) {
           const index = Math.floor(Math.random() * letters.current.length);
           if (letters.current[index]) {
@@ -123,7 +118,7 @@ const FallingSymbolsBackground: React.FC<FallingSymbolsProps> = ({
       }
 
       const totalFieldHeight = grid.current.rows * grid.current.charHeight * 2;
-      letters.current.forEach((letter) => {
+      letters.current.forEach(letter => {
         letter.y += fallSpeed;
         if (letter.y > canvasHeight) {
           letter.y -= totalFieldHeight;
@@ -136,7 +131,7 @@ const FallingSymbolsBackground: React.FC<FallingSymbolsProps> = ({
       ctx.font = `${fontSize}px monospace`;
       ctx.textBaseline = "top";
 
-      letters.current.forEach((letter) => {
+      letters.current.forEach(letter => {
         ctx.fillStyle = letter.color;
         ctx.fillText(letter.char, letter.x, letter.y);
       });
