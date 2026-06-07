@@ -3,7 +3,7 @@
 Setup before judges arrive:
 
 1. `spacetime start` running, module published (`npm run publish:local`).
-2. Fresh data: `spacetime publish --module-path spacetimedb --server local fineprint -y --delete-data=always`, then `npm run seed`.
+2. Fresh data: `spacetime publish --module-path spacetimedb --server local fineprint -y --delete-data=always`, then queue a few intakes: `spacetime call -s local fineprint request_building '"345 Park Avenue, Manhattan"'`.
 3. Three terminals: `WORKER_NAME=atlas npm run worker`, `WORKER_NAME=lexi npm run worker`, `WORKER_NAME=rook npm run worker`.
 4. Dashboard open on the laptop; judges' phones on the same URL (M4).
 

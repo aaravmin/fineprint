@@ -16,7 +16,10 @@ import MultipleSelector, { type Option } from "@/components/ui/multiselect";
 import { fmtUsd } from "@/lib/engine";
 import { reducers, tables } from "@/module_bindings/index";
 
-const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
+const STATUS_VARIANT: Record<
+  string,
+  "default" | "secondary" | "destructive" | "outline"
+> = {
   open: "secondary",
   claimed: "outline",
   in_review: "outline",
@@ -63,9 +66,12 @@ export function TasksClient() {
     }
   }
 
-  const activeStatuses = statusFilter.map((option) => option.value);
+  const activeStatuses = statusFilter.map(option => option.value);
 
-  const filtered = activeStatuses.length === 0 ? tasks : tasks.filter((task) => activeStatuses.includes(task.status));
+  const filtered =
+    activeStatuses.length === 0
+      ? tasks
+      : tasks.filter(task => activeStatuses.includes(task.status));
 
   const sorted = [...filtered].sort((a, b) => {
     const statusOrder: Record<string, number> = {
@@ -86,10 +92,14 @@ export function TasksClient() {
 
   return (
     <div className="@container/main flex flex-col gap-4 md:gap-6">
+      <h1 className="font-heading text-2xl font-bold tracking-tight">Task Queue</h1>
+
       <div className="flex flex-wrap gap-3">
         {Object.entries(counts).map(([status, count]) => (
           <Card key={status} className="flex items-center gap-2 px-4 py-3">
-            <Badge variant={STATUS_VARIANT[status] ?? "secondary"}>{status.replace("_", " ")}</Badge>
+            <Badge variant={STATUS_VARIANT[status] ?? "secondary"}>
+              {status.replace("_", " ")}
+            </Badge>
             <span className="font-semibold">{count}</span>
           </Card>
         ))}
@@ -104,14 +114,21 @@ export function TasksClient() {
             defaultOptions={STATUS_OPTIONS}
             placeholder="Filter by status…"
             hidePlaceholderWhenSelected
-            emptyIndicator={<p className="text-center text-sm text-muted-foreground">No matching status</p>}
+            emptyIndicator={
+              <p className="text-center text-sm text-muted-foreground">
+                No matching status
+              </p>
+            }
             className="max-w-md"
           />
         </CardHeader>
         <CardContent className="p-0">
           {sorted.length === 0 ? (
             tasks.length === 0 ? (
-              <EmptyFolder title="No tasks in the queue" description="Tasks will appear as buildings are analyzed." />
+              <EmptyFolder
+                title="No tasks in the queue"
+                description="Tasks will appear as buildings are analyzed."
+              />
             ) : (
               <div className="px-6 py-10 text-center text-sm text-muted-foreground">
                 No tasks match the selected statuses.
@@ -119,14 +136,22 @@ export function TasksClient() {
             )
           ) : (
             <div className="divide-y">
-              {sorted.map((task) => {
-                const building = buildings.find((b) => b.id === task.buildingId);
+              {sorted.map(task => {
+                const building = buildings.find(b => b.id === task.buildingId);
                 const claimedWorker =
-                  task.claimedBy !== undefined ? workers.find((w) => w.id === task.claimedBy) : undefined;
+                  task.claimedBy !== undefined
+                    ? workers.find(w => w.id === task.claimedBy)
+                    : undefined;
 
                 return (
-                  <div key={String(task.id)} className="flex items-center gap-3 px-6 py-4">
-                    <Badge variant={STATUS_VARIANT[task.status] ?? "secondary"} className="shrink-0">
+                  <div
+                    key={String(task.id)}
+                    className="flex items-center gap-3 px-6 py-4"
+                  >
+                    <Badge
+                      variant={STATUS_VARIANT[task.status] ?? "secondary"}
+                      className="shrink-0"
+                    >
                       {task.status.replace("_", " ")}
                     </Badge>
                     <div className="min-w-0 flex-1">

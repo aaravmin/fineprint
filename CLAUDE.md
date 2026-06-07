@@ -9,7 +9,6 @@ npm install                  # workspaces: spacetimedb, client, agents
 spacetime start --listen-addr 127.0.0.1:3011   # database; port 3000 belongs to the Next.js app
 npm run publish:local        # build + publish module to local db 'fineprint'
 npm run generate             # regenerate bindings — REQUIRED after any schema/reducer change
-npm run seed                 # 5 buildings -> ~23 tasks (idempotent, skips if data exists)
 npm run worker               # one agent process; WORKER_NAME=atlas npm run worker
 npm run dashboard            # Next.js dev server, port 3000
 npm run typecheck            # all workspaces

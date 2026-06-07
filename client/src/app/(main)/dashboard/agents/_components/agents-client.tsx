@@ -14,7 +14,10 @@ import { EmptyFolder } from "@/components/ui/empty-folder";
 import { LoadingDots } from "@/components/ui/loading-dots";
 import { reducers, tables } from "@/module_bindings/index";
 
-const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
+const STATUS_VARIANT: Record<
+  string,
+  "default" | "secondary" | "destructive" | "outline"
+> = {
   idle: "secondary",
   working: "default",
   dead: "destructive",
@@ -40,12 +43,14 @@ export function AgentsClient() {
 
   const sorted = [...workers].sort((a, b) => (a.id < b.id ? -1 : 1));
 
-  const idle = workers.filter((w) => w.status === "idle").length;
-  const working = workers.filter((w) => w.status === "working").length;
-  const dead = workers.filter((w) => w.status === "dead").length;
+  const idle = workers.filter(w => w.status === "idle").length;
+  const working = workers.filter(w => w.status === "working").length;
+  const dead = workers.filter(w => w.status === "dead").length;
 
   return (
     <div className="@container/main flex flex-col gap-4 md:gap-6">
+      <h1 className="font-heading text-2xl font-bold tracking-tight">Agents</h1>
+
       <div className="grid grid-cols-1 gap-3 @sm/main:grid-cols-3 @sm/main:gap-4">
         <StatCard
           icon={<CircleDot className="size-4" />}
@@ -75,20 +80,33 @@ export function AgentsClient() {
         </CardHeader>
         <CardContent className="p-0">
           {sorted.length === 0 ? (
-            <EmptyFolder title="No agents connected" description="Connected agents will appear here in real time." />
+            <EmptyFolder
+              title="No agents connected"
+              description="Connected agents will appear here in real time."
+            />
           ) : (
             <div className="divide-y">
-              {sorted.map((w) => {
+              {sorted.map(w => {
                 const currentTask =
-                  w.currentTaskId !== undefined ? tasks.find((t) => t.id === w.currentTaskId) : undefined;
+                  w.currentTaskId !== undefined
+                    ? tasks.find(t => t.id === w.currentTaskId)
+                    : undefined;
 
                 return (
                   <div key={String(w.id)} className="flex items-center gap-4 px-6 py-4">
                     <Avatar className="size-9">
                       <AvatarFallback
-                        className={w.status === "dead" ? "bg-destructive-subtle text-destructive" : "bg-secondary"}
+                        className={
+                          w.status === "dead"
+                            ? "bg-destructive-subtle text-destructive"
+                            : "bg-secondary"
+                        }
                       >
-                        {w.status === "dead" ? <Skull className="size-4" /> : <Bot className="size-4" />}
+                        {w.status === "dead" ? (
+                          <Skull className="size-4" />
+                        ) : (
+                          <Bot className="size-4" />
+                        )}
                       </AvatarFallback>
                     </Avatar>
 
@@ -103,7 +121,9 @@ export function AgentsClient() {
                         </Badge>
                       </div>
                       {currentTask && (
-                        <p className="mt-0.5 truncate text-xs text-muted-foreground">{currentTask.title}</p>
+                        <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                          {currentTask.title}
+                        </p>
                       )}
                     </div>
 
@@ -165,7 +185,9 @@ function StatCard({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <p className={`text-3xl font-semibold tabular-nums ${valueClassName ?? ""}`}>{value}</p>
+        <p className={`text-3xl font-semibold tabular-nums ${valueClassName ?? ""}`}>
+          {value}
+        </p>
       </CardContent>
     </Card>
   );

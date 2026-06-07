@@ -103,7 +103,9 @@ export function ActivityClient() {
   const sorted = [...events].sort((a, b) => (a.id > b.id ? -1 : 1)).slice(0, 100);
 
   return (
-    <div className="@container/main">
+    <div className="@container/main flex flex-col gap-4 md:gap-6">
+      <h1 className="font-heading text-2xl font-bold tracking-tight">Activity</h1>
+
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -112,16 +114,21 @@ export function ActivityClient() {
               {sorted.length} events
             </Badge>
           </div>
-          <p className="text-sm text-muted-foreground">Last 100 events, newest first.</p>
         </CardHeader>
         <CardContent className="p-0">
           {sorted.length === 0 ? (
-            <EmptyFolder title="No events yet" description="Reducer calls write the audit trail here in real time" />
+            <EmptyFolder
+              title="No events yet"
+              description="Reducer calls write the audit trail here in real time"
+            />
           ) : (
             <ul className="relative">
               {/* Timeline rail */}
-              <span aria-hidden="true" className="absolute inset-y-3 left-[2.375rem] w-px bg-border" />
-              {sorted.map((e) => {
+              <span
+                aria-hidden="true"
+                className="absolute inset-y-3 left-[2.375rem] w-px bg-border"
+              />
+              {sorted.map(e => {
                 const style = KIND_STYLE[e.kind] ?? FALLBACK_STYLE;
 
                 return (
@@ -147,7 +154,9 @@ export function ActivityClient() {
                           })}
                         </span>
                       </div>
-                      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{e.payload}</p>
+                      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                        {e.payload}
+                      </p>
                     </div>
                   </li>
                 );

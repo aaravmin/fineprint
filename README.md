@@ -23,9 +23,14 @@ curl -sSf https://install.spacetimedb.com | sh   # CLI, once
 npm install
 spacetime start                                   # terminal 1, keep open
 npm run publish:local
-npm run seed                                      # 5 buildings, ~23 tickets
 WORKER_NAME=atlas npm run worker                  # terminal 2, repeat for a fleet
-npm run dashboard                                 # terminal 3, port 5173
+npm run dashboard                                 # terminal 3, port 3000
+```
+
+Add a building from the dashboard's address bar, or from the CLI:
+
+```bash
+spacetime call -s local fineprint request_building '"345 Park Avenue, Manhattan"'
 ```
 
 `npm run generate` rebuilds the client bindings after any schema change.
@@ -40,7 +45,7 @@ spacetime logs -s local fineprint
 
 ## Where it stands
 
-Module, seed, and workers run today. The dashboard is a Vite shell with live row counts; board components come next. `scripts/demo-kill.md` has the 90-second demo script, including a CLI fallback that needs no frontend.
+Module and workers run today. The dashboard is a Vite shell with live row counts; board components come next. `scripts/demo-kill.md` has the 90-second demo script, including a CLI fallback that needs no frontend.
 
 Workers draft from canned playbooks by default. Set `USE_LLM=true` plus an `ANTHROPIC_API_KEY` to let Claude write the drafts instead; without a key everything still works.
 
