@@ -1,12 +1,12 @@
 {
-  "key": "https://geosearch.planninglabs.nyc/v2/search?text=32%20WEST%2032%20STREET%2C%20New%20York",
-  "recordedAt": "2026-06-07T13:27:24.887Z",
+  "key": "https://geosearch.planninglabs.nyc/v2/search?text=32%20WEST%20STREET%2C%20New%20York",
+  "recordedAt": "2026-06-07T13:27:28.906Z",
   "value": {
     "geocoding": {
       "version": "0.2",
       "attribution": "http://geosearch.planninglabs.nyc/attribution",
       "query": {
-        "text": "32 WEST 32 STREET, New York",
+        "text": "32 WEST STREET, New York",
         "size": 10,
         "private": false,
         "lang": {
@@ -19,9 +19,9 @@
         "querySize": 20,
         "parser": "pelias",
         "parsed_text": {
-          "subject": "32 WEST 32 STREET",
+          "subject": "32 WEST STREET",
           "housenumber": "32",
-          "street": "WEST 32 STREET",
+          "street": "WEST STREET",
           "locality": "New York",
           "admin": "New York"
         }
@@ -34,10 +34,58 @@
         "author": "Mapzen",
         "version": "1.0"
       },
-      "timestamp": 1780838844841
+      "timestamp": 1780838848948
     },
     "type": "FeatureCollection",
     "features": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.017099,
+            40.70624
+          ]
+        },
+        "properties": {
+          "id": "1839",
+          "gid": "nycpad:venue:1839",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "1839",
+          "country_code": "US",
+          "name": "32 WEST STREET",
+          "housenumber": "32",
+          "street": "WEST STREET",
+          "postalcode": "10004",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "New York County",
+          "county_gid": "whosonfirst:county:102081863",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Manhattan",
+          "borough_gid": "whosonfirst:borough:421205771",
+          "neighbourhood": "Battery Park City",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85804741",
+          "label": "32 WEST STREET, New York, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "1000167514",
+              "bin": "1087238",
+              "version": "26a"
+            }
+          }
+        }
+      },
       {
         "type": "Feature",
         "geometry": {
@@ -91,21 +139,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.987234,
-            40.747659
+            -73.958579,
+            40.727462
           ]
         },
         "properties": {
-          "id": "88397",
-          "gid": "nycpad:venue:88397",
+          "id": "1033746",
+          "gid": "nycpad:venue:1033746",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "88397",
+          "source_id": "1033746",
           "country_code": "US",
-          "name": "32A WEST 32 STREET",
-          "housenumber": "32A",
-          "street": "WEST 32 STREET",
-          "postalcode": "10001",
+          "name": "32 WEST STREET",
+          "housenumber": "32",
+          "street": "WEST STREET",
+          "postalcode": "11222",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -115,20 +163,21 @@
           "region": "New York",
           "region_gid": "whosonfirst:region:85688543",
           "region_a": "NY",
-          "county": "New York County",
-          "county_gid": "whosonfirst:county:102081863",
+          "county": "Kings County",
+          "county_gid": "whosonfirst:county:102082361",
+          "county_a": "BK",
           "locality": "New York",
           "locality_gid": "whosonfirst:locality:85977539",
           "locality_a": "NYC",
-          "borough": "Manhattan",
-          "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Midtown West",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85882233",
-          "label": "32A WEST 32 STREET, New York, NY, USA",
+          "borough": "Brooklyn",
+          "borough_gid": "whosonfirst:borough:421205765",
+          "neighbourhood": "Greenpoint",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85823059",
+          "label": "32 WEST STREET, Brooklyn, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008330062",
-              "bin": "1015831",
+              "bbl": "3025710001",
+              "bin": "3424986",
               "version": "26a"
             }
           }
@@ -139,21 +188,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.987562,
-            40.747652
+            -74.118467,
+            40.633512
           ]
         },
         "properties": {
-          "id": "88353",
-          "gid": "nycpad:venue:88353",
+          "id": "4290267",
+          "gid": "nycpad:venue:4290267",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "88353",
+          "source_id": "4290267",
           "country_code": "US",
-          "name": "40 WEST 32 STREET",
-          "housenumber": "40",
-          "street": "WEST 32 STREET",
-          "postalcode": "10001",
+          "name": "32 WEST STREET",
+          "housenumber": "32",
+          "street": "WEST STREET",
+          "postalcode": "10310",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -163,20 +212,20 @@
           "region": "New York",
           "region_gid": "whosonfirst:region:85688543",
           "region_a": "NY",
-          "county": "New York County",
-          "county_gid": "whosonfirst:county:102081863",
+          "county": "Richmond County",
+          "county_gid": "whosonfirst:county:102081779",
           "locality": "New York",
           "locality_gid": "whosonfirst:locality:85977539",
           "locality_a": "NYC",
-          "borough": "Manhattan",
-          "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Midtown West",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85882233",
-          "label": "40 WEST 32 STREET, New York, NY, USA",
+          "borough": "Staten Island",
+          "borough_gid": "whosonfirst:borough:421205775",
+          "neighbourhood": "West Brighton",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85892969",
+          "label": "32 WEST STREET, Staten Island, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008330018",
-              "bin": "1015806",
+              "bbl": "5002080065",
+              "bin": "5005569",
               "version": "26a"
             }
           }
@@ -187,21 +236,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.98618,
-            40.747216
+            -74.017099,
+            40.70624
           ]
         },
         "properties": {
-          "id": "88381",
-          "gid": "nycpad:venue:88381",
+          "id": "1847",
+          "gid": "nycpad:venue:1847",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "88381",
+          "source_id": "1847",
           "country_code": "US",
-          "name": "2 WEST 32 STREET",
-          "housenumber": "2",
-          "street": "WEST 32 STREET",
-          "postalcode": "10001",
+          "name": "32 WEST ST NORTHBOUND ROADBED",
+          "housenumber": "32",
+          "street": "WEST ST NORTHBOUND ROADBED",
+          "postalcode": "10004",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -218,13 +267,13 @@
           "locality_a": "NYC",
           "borough": "Manhattan",
           "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Midtown West",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85882233",
-          "label": "2 WEST 32 STREET, New York, NY, USA",
+          "neighbourhood": "Battery Park City",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85804741",
+          "label": "32 WEST ST NORTHBOUND ROADBED, New York, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008330047",
-              "bin": "1015823",
+              "bbl": "1000167514",
+              "bin": "1087238",
               "version": "26a"
             }
           }
@@ -235,21 +284,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.986347,
-            40.747279
+            -74.017099,
+            40.70624
           ]
         },
         "properties": {
-          "id": "88384",
-          "gid": "nycpad:venue:88384",
+          "id": "1848",
+          "gid": "nycpad:venue:1848",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "88384",
+          "source_id": "1848",
           "country_code": "US",
-          "name": "8 WEST 32 STREET",
-          "housenumber": "8",
-          "street": "WEST 32 STREET",
-          "postalcode": "10001",
+          "name": "32 WEST STREET NORTHBOUND ROADBED",
+          "housenumber": "32",
+          "street": "WEST STREET NORTHBOUND ROADBED",
+          "postalcode": "10004",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -266,13 +315,13 @@
           "locality_a": "NYC",
           "borough": "Manhattan",
           "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Midtown West",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85882233",
-          "label": "8 WEST 32 STREET, New York, NY, USA",
+          "neighbourhood": "Battery Park City",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85804741",
+          "label": "32 WEST STREET NORTHBOUND ROADBED, New York, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008330049",
-              "bin": "1015824",
+              "bbl": "1000167514",
+              "bin": "1087238",
               "version": "26a"
             }
           }
@@ -283,21 +332,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.986465,
-            40.747319
+            -73.99048,
+            40.744177
           ]
         },
         "properties": {
-          "id": "88385",
-          "gid": "nycpad:venue:88385",
+          "id": "87275",
+          "gid": "nycpad:venue:87275",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "88385",
+          "source_id": "87275",
           "country_code": "US",
-          "name": "10 WEST 32 STREET",
-          "housenumber": "10",
-          "street": "WEST 32 STREET",
-          "postalcode": "10001",
+          "name": "32 WEST 26 STREET",
+          "housenumber": "32",
+          "street": "WEST 26 STREET",
+          "postalcode": "10010",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -314,13 +363,13 @@
           "locality_a": "NYC",
           "borough": "Manhattan",
           "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Midtown West",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85882233",
-          "label": "10 WEST 32 STREET, New York, NY, USA",
+          "neighbourhood": "Flatiron District",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85869245",
+          "label": "32 WEST 26 STREET, New York, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008330051",
-              "bin": "1015825",
+              "bbl": "1008270064",
+              "bin": "1015629",
               "version": "26a"
             }
           }
@@ -331,20 +380,20 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.986931,
-            40.747534
+            -73.985763,
+            40.749321
           ]
         },
         "properties": {
-          "id": "88391",
-          "gid": "nycpad:venue:88391",
+          "id": "88709",
+          "gid": "nycpad:venue:88709",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "88391",
+          "source_id": "88709",
           "country_code": "US",
-          "name": "22 WEST 32 STREET",
-          "housenumber": "22",
-          "street": "WEST 32 STREET",
+          "name": "32 WEST 35 STREET",
+          "housenumber": "32",
+          "street": "WEST 35 STREET",
           "postalcode": "10001",
           "confidence": 0.8,
           "match_type": "fallback",
@@ -364,11 +413,11 @@
           "borough_gid": "whosonfirst:borough:421205771",
           "neighbourhood": "Midtown West",
           "neighbourhood_gid": "whosonfirst:neighbourhood:85882233",
-          "label": "22 WEST 32 STREET, New York, NY, USA",
+          "label": "32 WEST 35 STREET, New York, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008330057",
-              "bin": "1015828",
+              "bbl": "1008360020",
+              "bin": "1015873",
               "version": "26a"
             }
           }
@@ -379,21 +428,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.988476,
-            40.748259
+            -73.972171,
+            40.783726
           ]
         },
         "properties": {
-          "id": "88441",
-          "gid": "nycpad:venue:88441",
+          "id": "149530",
+          "gid": "nycpad:venue:149530",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "88441",
+          "source_id": "149530",
           "country_code": "US",
-          "name": "60 WEST 32 STREET",
-          "housenumber": "60",
-          "street": "WEST 32 STREET",
-          "postalcode": "10001",
+          "name": "32 WEST 83 STREET",
+          "housenumber": "32",
+          "street": "WEST 83 STREET",
+          "postalcode": "10024",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -410,13 +459,13 @@
           "locality_a": "NYC",
           "borough": "Manhattan",
           "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Midtown West",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85882233",
-          "label": "60 WEST 32 STREET, New York, NY, USA",
+          "neighbourhood": "Upper West Side",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85853285",
+          "label": "32 WEST 83 STREET, New York, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008330078",
-              "bin": "1015834",
+              "bbl": "1011960046",
+              "bin": "1083853",
               "version": "26a"
             }
           }
@@ -427,21 +476,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.988476,
-            40.748259
+            -73.9681,
+            40.789388
           ]
         },
         "properties": {
-          "id": "88442",
-          "gid": "nycpad:venue:88442",
+          "id": "150431",
+          "gid": "nycpad:venue:150431",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "88442",
+          "source_id": "150431",
           "country_code": "US",
-          "name": "62 WEST 32 STREET",
-          "housenumber": "62",
-          "street": "WEST 32 STREET",
-          "postalcode": "10001",
+          "name": "32 WEST 92 STREET",
+          "housenumber": "32",
+          "street": "WEST 92 STREET",
+          "postalcode": "10025",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -458,61 +507,13 @@
           "locality_a": "NYC",
           "borough": "Manhattan",
           "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Midtown West",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85882233",
-          "label": "62 WEST 32 STREET, New York, NY, USA",
+          "neighbourhood": "Upper West Side",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85853285",
+          "label": "32 WEST 92 STREET, New York, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008330078",
-              "bin": "1015834",
-              "version": "26a"
-            }
-          }
-        }
-      },
-      {
-        "type": "Feature",
-        "geometry": {
-          "type": "Point",
-          "coordinates": [
-            -73.988476,
-            40.748259
-          ]
-        },
-        "properties": {
-          "id": "88445",
-          "gid": "nycpad:venue:88445",
-          "layer": "venue",
-          "source": "nycpad",
-          "source_id": "88445",
-          "country_code": "US",
-          "name": "68 WEST 32 STREET",
-          "housenumber": "68",
-          "street": "WEST 32 STREET",
-          "postalcode": "10001",
-          "confidence": 0.8,
-          "match_type": "fallback",
-          "accuracy": "point",
-          "country": "United States",
-          "country_gid": "whosonfirst:country:85633793",
-          "country_a": "USA",
-          "region": "New York",
-          "region_gid": "whosonfirst:region:85688543",
-          "region_a": "NY",
-          "county": "New York County",
-          "county_gid": "whosonfirst:county:102081863",
-          "locality": "New York",
-          "locality_gid": "whosonfirst:locality:85977539",
-          "locality_a": "NYC",
-          "borough": "Manhattan",
-          "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Midtown West",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85882233",
-          "label": "68 WEST 32 STREET, New York, NY, USA",
-          "addendum": {
-            "pad": {
-              "bbl": "1008330078",
-              "bin": "1015834",
+              "bbl": "1012050006",
+              "bin": "1081042",
               "version": "26a"
             }
           }
@@ -520,10 +521,10 @@
       }
     ],
     "bbox": [
-      -73.988476,
-      40.747216,
-      -73.98618,
-      40.748259
+      -74.118467,
+      40.633512,
+      -73.958579,
+      40.789388
     ]
   }
 }

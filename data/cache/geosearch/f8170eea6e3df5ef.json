@@ -1,12 +1,12 @@
 {
-  "key": "https://geosearch.planninglabs.nyc/v2/search?text=32%20WEST%2032%20STREET%2C%20New%20York",
-  "recordedAt": "2026-06-07T13:27:24.887Z",
+  "key": "https://geosearch.planninglabs.nyc/v2/search?text=20%20Exchange%20Place",
+  "recordedAt": "2026-06-07T13:27:28.794Z",
   "value": {
     "geocoding": {
       "version": "0.2",
       "attribution": "http://geosearch.planninglabs.nyc/attribution",
       "query": {
-        "text": "32 WEST 32 STREET, New York",
+        "text": "20 Exchange Place",
         "size": 10,
         "private": false,
         "lang": {
@@ -19,11 +19,9 @@
         "querySize": 20,
         "parser": "pelias",
         "parsed_text": {
-          "subject": "32 WEST 32 STREET",
-          "housenumber": "32",
-          "street": "WEST 32 STREET",
-          "locality": "New York",
-          "admin": "New York"
+          "subject": "20 Exchange Place",
+          "housenumber": "20",
+          "street": "Exchange Place"
         }
       },
       "warnings": [
@@ -34,7 +32,7 @@
         "author": "Mapzen",
         "version": "1.0"
       },
-      "timestamp": 1780838844841
+      "timestamp": 1780838848835
     },
     "type": "FeatureCollection",
     "features": [
@@ -43,21 +41,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.987234,
-            40.747659
+            -74.009507,
+            40.705496
           ]
         },
         "properties": {
-          "id": "88396",
-          "gid": "nycpad:venue:88396",
+          "id": "3240",
+          "gid": "nycpad:venue:3240",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "88396",
+          "source_id": "3240",
           "country_code": "US",
-          "name": "32 WEST 32 STREET",
-          "housenumber": "32",
-          "street": "WEST 32 STREET",
-          "postalcode": "10001",
+          "name": "20 EXCHANGE PLACE",
+          "housenumber": "20",
+          "street": "EXCHANGE PLACE",
+          "postalcode": "10005",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -74,13 +72,13 @@
           "locality_a": "NYC",
           "borough": "Manhattan",
           "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Midtown West",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85882233",
-          "label": "32 WEST 32 STREET, New York, NY, USA",
+          "neighbourhood": "Financial District",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85865711",
+          "label": "20 EXCHANGE PLACE, New York, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008330062",
-              "bin": "1015831",
+              "bbl": "1000277502",
+              "bin": "1000830",
               "version": "26a"
             }
           }
@@ -91,21 +89,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.987234,
-            40.747659
+            -74.011806,
+            40.707122
           ]
         },
         "properties": {
-          "id": "88397",
-          "gid": "nycpad:venue:88397",
+          "id": "2966",
+          "gid": "nycpad:venue:2966",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "88397",
+          "source_id": "2966",
           "country_code": "US",
-          "name": "32A WEST 32 STREET",
-          "housenumber": "32A",
-          "street": "WEST 32 STREET",
-          "postalcode": "10001",
+          "name": "73 EXCHANGE PLACE",
+          "housenumber": "73",
+          "street": "EXCHANGE PLACE",
+          "postalcode": "10004",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -122,13 +120,13 @@
           "locality_a": "NYC",
           "borough": "Manhattan",
           "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Midtown West",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85882233",
-          "label": "32A WEST 32 STREET, New York, NY, USA",
+          "neighbourhood": "Financial District",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85865711",
+          "label": "73 EXCHANGE PLACE, New York, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008330062",
-              "bin": "1015831",
+              "bbl": "1000237501",
+              "bin": "1000815",
               "version": "26a"
             }
           }
@@ -139,21 +137,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.987562,
-            40.747652
+            -74.010179,
+            40.705737
           ]
         },
         "properties": {
-          "id": "88353",
-          "gid": "nycpad:venue:88353",
+          "id": "3069",
+          "gid": "nycpad:venue:3069",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "88353",
+          "source_id": "3069",
           "country_code": "US",
-          "name": "40 WEST 32 STREET",
-          "housenumber": "40",
-          "street": "WEST 32 STREET",
-          "postalcode": "10001",
+          "name": "38 EXCHANGE PLACE",
+          "housenumber": "38",
+          "street": "EXCHANGE PLACE",
+          "postalcode": "10005",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -170,13 +168,13 @@
           "locality_a": "NYC",
           "borough": "Manhattan",
           "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Midtown West",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85882233",
-          "label": "40 WEST 32 STREET, New York, NY, USA",
+          "neighbourhood": "Financial District",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85865711",
+          "label": "38 EXCHANGE PLACE, New York, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008330018",
-              "bin": "1015806",
+              "bbl": "1000250027",
+              "bin": "1000825",
               "version": "26a"
             }
           }
@@ -187,21 +185,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.98618,
-            40.747216
+            -74.010763,
+            40.705929
           ]
         },
         "properties": {
-          "id": "88381",
-          "gid": "nycpad:venue:88381",
+          "id": "3088",
+          "gid": "nycpad:venue:3088",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "88381",
+          "source_id": "3088",
           "country_code": "US",
-          "name": "2 WEST 32 STREET",
-          "housenumber": "2",
-          "street": "WEST 32 STREET",
-          "postalcode": "10001",
+          "name": "50 EXCHANGE PLACE",
+          "housenumber": "50",
+          "street": "EXCHANGE PLACE",
+          "postalcode": "10005",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -218,13 +216,13 @@
           "locality_a": "NYC",
           "borough": "Manhattan",
           "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Midtown West",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85882233",
-          "label": "2 WEST 32 STREET, New York, NY, USA",
+          "neighbourhood": "Financial District",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85865711",
+          "label": "50 EXCHANGE PLACE, New York, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008330047",
-              "bin": "1015823",
+              "bbl": "1000257502",
+              "bin": "1000824",
               "version": "26a"
             }
           }
@@ -235,21 +233,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.986347,
-            40.747279
+            -74.010763,
+            40.705929
           ]
         },
         "properties": {
-          "id": "88384",
-          "gid": "nycpad:venue:88384",
+          "id": "3096",
+          "gid": "nycpad:venue:3096",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "88384",
+          "source_id": "3096",
           "country_code": "US",
-          "name": "8 WEST 32 STREET",
-          "housenumber": "8",
-          "street": "WEST 32 STREET",
-          "postalcode": "10001",
+          "name": "48 EXCHANGE PLACE",
+          "housenumber": "48",
+          "street": "EXCHANGE PLACE",
+          "postalcode": "10005",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -266,13 +264,13 @@
           "locality_a": "NYC",
           "borough": "Manhattan",
           "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Midtown West",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85882233",
-          "label": "8 WEST 32 STREET, New York, NY, USA",
+          "neighbourhood": "Financial District",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85865711",
+          "label": "48 EXCHANGE PLACE, New York, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008330049",
-              "bin": "1015824",
+              "bbl": "1000257502",
+              "bin": "1000824",
               "version": "26a"
             }
           }
@@ -283,21 +281,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.986465,
-            40.747319
+            -74.010302,
+            40.706156
           ]
         },
         "properties": {
-          "id": "88385",
-          "gid": "nycpad:venue:88385",
+          "id": "3114",
+          "gid": "nycpad:venue:3114",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "88385",
+          "source_id": "3114",
           "country_code": "US",
-          "name": "10 WEST 32 STREET",
-          "housenumber": "10",
-          "street": "WEST 32 STREET",
-          "postalcode": "10001",
+          "name": "43 EXCHANGE PLACE",
+          "housenumber": "43",
+          "street": "EXCHANGE PLACE",
+          "postalcode": "10005",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -314,13 +312,13 @@
           "locality_a": "NYC",
           "borough": "Manhattan",
           "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Midtown West",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85882233",
-          "label": "10 WEST 32 STREET, New York, NY, USA",
+          "neighbourhood": "Financial District",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85865711",
+          "label": "43 EXCHANGE PLACE, New York, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008330051",
-              "bin": "1015825",
+              "bbl": "1000260014",
+              "bin": "1078991",
               "version": "26a"
             }
           }
@@ -331,21 +329,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.986931,
-            40.747534
+            -74.009922,
+            40.706208
           ]
         },
         "properties": {
-          "id": "88391",
-          "gid": "nycpad:venue:88391",
+          "id": "3124",
+          "gid": "nycpad:venue:3124",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "88391",
+          "source_id": "3124",
           "country_code": "US",
-          "name": "22 WEST 32 STREET",
-          "housenumber": "22",
-          "street": "WEST 32 STREET",
-          "postalcode": "10001",
+          "name": "39 EXCHANGE PLACE",
+          "housenumber": "39",
+          "street": "EXCHANGE PLACE",
+          "postalcode": "10005",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -362,13 +360,13 @@
           "locality_a": "NYC",
           "borough": "Manhattan",
           "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Midtown West",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85882233",
-          "label": "22 WEST 32 STREET, New York, NY, USA",
+          "neighbourhood": "Financial District",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85865711",
+          "label": "39 EXCHANGE PLACE, New York, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008330057",
-              "bin": "1015828",
+              "bbl": "1000260021",
+              "bin": "1000826",
               "version": "26a"
             }
           }
@@ -379,21 +377,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.988476,
-            40.748259
+            -74.010561,
+            40.706523
           ]
         },
         "properties": {
-          "id": "88441",
-          "gid": "nycpad:venue:88441",
+          "id": "3158",
+          "gid": "nycpad:venue:3158",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "88441",
+          "source_id": "3158",
           "country_code": "US",
-          "name": "60 WEST 32 STREET",
-          "housenumber": "60",
-          "street": "WEST 32 STREET",
-          "postalcode": "10001",
+          "name": "53 EXCHANGE PLACE",
+          "housenumber": "53",
+          "street": "EXCHANGE PLACE",
+          "postalcode": "10005",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -410,13 +408,13 @@
           "locality_a": "NYC",
           "borough": "Manhattan",
           "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Midtown West",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85882233",
-          "label": "60 WEST 32 STREET, New York, NY, USA",
+          "neighbourhood": "Financial District",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85865711",
+          "label": "53 EXCHANGE PLACE, New York, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008330078",
-              "bin": "1015834",
+              "bbl": "1000267501",
+              "bin": "1078988",
               "version": "26a"
             }
           }
@@ -427,21 +425,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.988476,
-            40.748259
+            -74.009323,
+            40.70595
           ]
         },
         "properties": {
-          "id": "88442",
-          "gid": "nycpad:venue:88442",
+          "id": "3209",
+          "gid": "nycpad:venue:3209",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "88442",
+          "source_id": "3209",
           "country_code": "US",
-          "name": "62 WEST 32 STREET",
-          "housenumber": "62",
-          "street": "WEST 32 STREET",
-          "postalcode": "10001",
+          "name": "9 EXCHANGE PLACE",
+          "housenumber": "9",
+          "street": "EXCHANGE PLACE",
+          "postalcode": "10005",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -458,13 +456,13 @@
           "locality_a": "NYC",
           "borough": "Manhattan",
           "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Midtown West",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85882233",
-          "label": "62 WEST 32 STREET, New York, NY, USA",
+          "neighbourhood": "Financial District",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85865711",
+          "label": "9 EXCHANGE PLACE, New York, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008330078",
-              "bin": "1015834",
+              "bbl": "1000277501",
+              "bin": "1000827",
               "version": "26a"
             }
           }
@@ -475,21 +473,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.988476,
-            40.748259
+            -74.009323,
+            40.70595
           ]
         },
         "properties": {
-          "id": "88445",
-          "gid": "nycpad:venue:88445",
+          "id": "3210",
+          "gid": "nycpad:venue:3210",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "88445",
+          "source_id": "3210",
           "country_code": "US",
-          "name": "68 WEST 32 STREET",
-          "housenumber": "68",
-          "street": "WEST 32 STREET",
-          "postalcode": "10001",
+          "name": "11 EXCHANGE PLACE",
+          "housenumber": "11",
+          "street": "EXCHANGE PLACE",
+          "postalcode": "10005",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -506,13 +504,13 @@
           "locality_a": "NYC",
           "borough": "Manhattan",
           "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Midtown West",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85882233",
-          "label": "68 WEST 32 STREET, New York, NY, USA",
+          "neighbourhood": "Financial District",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85865711",
+          "label": "11 EXCHANGE PLACE, New York, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008330078",
-              "bin": "1015834",
+              "bbl": "1000277501",
+              "bin": "1000827",
               "version": "26a"
             }
           }
@@ -520,10 +518,10 @@
       }
     ],
     "bbox": [
-      -73.988476,
-      40.747216,
-      -73.98618,
-      40.748259
+      -74.011806,
+      40.705496,
+      -74.009323,
+      40.707122
     ]
   }
 }
