@@ -16,6 +16,7 @@ import {
   Raleway,
   Roboto,
   Roboto_Slab,
+  Space_Grotesk,
 } from "next/font/google";
 
 import { GeistPixelSquare } from "geist/font/pixel";
@@ -107,6 +108,14 @@ const playfairDisplay = Playfair_Display({
   variable: "--font-playfair-display",
 });
 
+// Display/heading font for the Fineprint brand (matches the homepage). Injected
+// globally via fontVars; not a selectable body font.
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  variable: "--font-space-grotesk",
+});
+
 export const fontRegistry = {
   geist: {
     label: "Geist",
@@ -184,9 +193,10 @@ export const fontRegistry = {
 
 export type FontKey = keyof typeof fontRegistry;
 
-export const fontVars = (Object.values(fontRegistry) as Array<(typeof fontRegistry)[FontKey]>)
-  .map((f) => f.font.variable)
-  .join(" ");
+export const fontVars = [
+  ...(Object.values(fontRegistry) as Array<(typeof fontRegistry)[FontKey]>).map((f) => f.font.variable),
+  spaceGrotesk.variable, // display/heading font, injected but not body-selectable
+].join(" ");
 
 export const fontOptions = (Object.entries(fontRegistry) as Array<[FontKey, (typeof fontRegistry)[FontKey]]>).map(
   ([key, f]) => ({

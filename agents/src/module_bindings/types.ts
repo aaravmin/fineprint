@@ -70,6 +70,7 @@ export const Task = __t.object("Task", {
   slaBreached: __t.bool(),
   fineEstimateUsd: __t.option(__t.u32()),
   claimedBy: __t.option(__t.u64()),
+  intakeAddress: __t.option(__t.string()),
   createdAt: __t.timestamp(),
 });
 export type Task = __Infer<typeof Task>;

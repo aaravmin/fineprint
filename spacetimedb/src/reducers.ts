@@ -74,6 +74,7 @@ export const add_building = spacetimedb.reducer(
         slaBreached: false,
         fineEstimateUsd: fine === null ? undefined : fine,
         claimedBy: undefined,
+        intakeAddress: undefined,
         createdAt: ctx.timestamp,
       });
     }
@@ -83,6 +84,44 @@ export const add_building = spacetimedb.reducer(
       "building_added",
       `${address} (${sqft} sqft${isAffordable ? ", affordable" : ""}) → ${laws.length} obligations spawned`,
     );
+  },
+);
+
+// The dashboard's magic moment: one reducer call with a bare address. A
+// worker claims the intake task, runs the data pipeline (GeoSearch -> LL84 ->
+// covered list -> engine), then calls ingest_building — which spawns the real
+// obligations. The intake summary lands in review like any other draft.
+export const request_building = spacetimedb.reducer(
+  { address: t.string() },
+  (ctx, { address }) => {
+    if (address.trim() === "") throw new Error("address cannot be empty");
+
+    const alreadyQueued = [...ctx.db.task.iter()].some(
+      task =>
+        task.kind === "building_intake" &&
+        task.intakeAddress === address &&
+        (task.status === "open" || task.status === "claimed"),
+    );
+    if (alreadyQueued) {
+      throw new Error(`an intake for "${address}" is already in the queue`);
+    }
+
+    ctx.db.task.insert({
+      id: 0n,
+      buildingId: 0n,
+      lawId: "intake",
+      kind: "building_intake",
+      title: `Building intake — ${address}`,
+      status: "open",
+      deadline: addMs(ctx.timestamp, 86_400_000),
+      slaBreached: false,
+      fineEstimateUsd: undefined,
+      claimedBy: undefined,
+      intakeAddress: address,
+      createdAt: ctx.timestamp,
+    });
+
+    logEvent(ctx, "building_requested", `intake queued for "${address}"`);
   },
 );
 
@@ -182,6 +221,7 @@ export const ingest_building = spacetimedb.reducer(
         slaBreached: false,
         fineEstimateUsd: engineFine ?? (stubFine === null ? undefined : stubFine),
         claimedBy: undefined,
+        intakeAddress: undefined,
         createdAt: ctx.timestamp,
       });
     }

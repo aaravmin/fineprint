@@ -14,6 +14,7 @@ import IngestBuildingReducer from "../ingest_building_reducer";
 import KillWorkerReducer from "../kill_worker_reducer";
 import RegisterWorkerReducer from "../register_worker_reducer";
 import RejectReducer from "../reject_reducer";
+import RequestBuildingReducer from "../request_building_reducer";
 import SubmitWorkReducer from "../submit_work_reducer";
 
 export type AddBuildingParams = __Infer<typeof AddBuildingReducer>;
@@ -24,5 +25,6 @@ export type IngestBuildingParams = __Infer<typeof IngestBuildingReducer>;
 export type KillWorkerParams = __Infer<typeof KillWorkerReducer>;
 export type RegisterWorkerParams = __Infer<typeof RegisterWorkerReducer>;
 export type RejectParams = __Infer<typeof RejectReducer>;
+export type RequestBuildingParams = __Infer<typeof RequestBuildingReducer>;
 export type SubmitWorkParams = __Infer<typeof SubmitWorkReducer>;
 

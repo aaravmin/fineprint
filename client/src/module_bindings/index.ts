@@ -42,6 +42,7 @@ import IngestBuildingReducer from "./ingest_building_reducer";
 import KillWorkerReducer from "./kill_worker_reducer";
 import RegisterWorkerReducer from "./register_worker_reducer";
 import RejectReducer from "./reject_reducer";
+import RequestBuildingReducer from "./request_building_reducer";
 import SubmitWorkReducer from "./submit_work_reducer";
 
 // Import all procedure arg schemas
@@ -152,6 +153,7 @@ const reducersSchema = __reducers(
   __reducerSchema("kill_worker", KillWorkerReducer),
   __reducerSchema("register_worker", RegisterWorkerReducer),
   __reducerSchema("reject", RejectReducer),
+  __reducerSchema("request_building", RequestBuildingReducer),
   __reducerSchema("submit_work", SubmitWorkReducer),
 );
 
