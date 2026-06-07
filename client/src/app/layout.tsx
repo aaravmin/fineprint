@@ -10,6 +10,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { APP_CONFIG } from "@/config/app-config";
 import { fontVars } from "@/lib/fonts/registry";
 import { PREFERENCE_DEFAULTS } from "@/lib/preferences/preferences-config";
+import { ClerkDebugBootScript } from "@/scripts/clerk-debug-boot";
 import { ThemeBootScript } from "@/scripts/theme-boot";
 import { PreferencesStoreProvider } from "@/stores/preferences/preferences-provider";
 
@@ -45,6 +46,8 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
       <head>
         {/* Applies theme and layout preferences on load to avoid flicker and unnecessary server rerenders. */}
         <ThemeBootScript />
+        {/* Temporary: Clerk sign-in debugging. Remove with clerk-debug-boot.tsx and api/debug-log. */}
+        <ClerkDebugBootScript />
       </head>
       <body className={`${fontVars} min-h-screen antialiased`}>
         <ClerkProvider>
