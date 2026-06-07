@@ -12,7 +12,14 @@ import { AddressAutocomplete } from "@/components/address-autocomplete";
 import { FineprintLogo } from "@/components/fineprint-logo";
 import DisplayCards from "@/components/ui/display-cards";
 import { Separator } from "@/components/ui/separator";
-import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import StickyTabs from "@/components/ui/sticky-tabs";
 import { TextRotate } from "@/components/ui/text-rotate";
 
@@ -142,7 +149,7 @@ const TICKET_CARDS = [
     iconClassName: "bg-destructive-subtle",
     title: "LL97 over-cap exposure",
     titleClassName: "text-destructive",
-    description: "$214,000/yr fine — retrofit plan in progress",
+    description: "$214,000/yr fine; retrofit plan in progress",
     date: "claimed / atlas",
     className:
       "[grid-area:stack] translate-x-16 translate-y-12 sm:translate-x-24 sm:translate-y-16 hover:translate-y-6",
@@ -166,7 +173,10 @@ export default function Home() {
           {/* ── NAV ── */}
           <header className="sticky top-0 z-50 border-b border-border/70 bg-background/80 backdrop-blur-md">
             <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5">
-              <Link href="/" className="font-heading flex items-center text-xl font-bold tracking-tight">
+              <Link
+                href="/"
+                className="font-heading flex items-center text-xl font-bold tracking-tight"
+              >
                 <span className="sr-only">Fineprint</span>
                 <span aria-hidden="true" className="flex items-center">
                   <FineprintLogo className="mr-px h-[0.95em] w-auto" />
@@ -174,8 +184,12 @@ export default function Home() {
                 </span>
               </Link>
               <div className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
-                {NAV_LINKS.map((link) => (
-                  <Link key={link.label} href={link.href} className="transition-colors hover:text-foreground">
+                {NAV_LINKS.map(link => (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    className="transition-colors hover:text-foreground"
+                  >
                     {link.label}
                   </Link>
                 ))}
@@ -205,7 +219,7 @@ export default function Home() {
                       </SheetTitle>
                     </SheetHeader>
                     <div className="grid gap-1 px-4">
-                      {NAV_LINKS.map((link) => (
+                      {NAV_LINKS.map(link => (
                         <SheetClose key={link.label} asChild>
                           <Link
                             href={link.href}
@@ -243,9 +257,14 @@ export default function Home() {
             />
 
             {/* Vertical statute stamp on the right edge. */}
-            <div aria-hidden="true" className="absolute right-0 top-1/2 z-10 hidden -translate-y-1/2 lg:flex">
+            <div
+              aria-hidden="true"
+              className="absolute right-0 top-1/2 z-10 hidden -translate-y-1/2 lg:flex"
+            >
               <div className="bg-foreground px-3 py-6 text-sm font-bold text-background">
-                <span className="rotate-180 [writing-mode:vertical-rl]">1 RCNY §103-14</span>
+                <span className="rotate-180 [writing-mode:vertical-rl]">
+                  1 RCNY §103-14
+                </span>
               </div>
             </div>
 
@@ -279,8 +298,12 @@ export default function Home() {
                   SKIP&nbsp;THE&nbsp;
                   <span className="inline-grid">
                     {/* Invisible copies reserve the widest word so rotation never reflows the page. */}
-                    {["FINE.", "CLIFF.", "PANIC."].map((word) => (
-                      <span key={word} aria-hidden="true" className="invisible [grid-area:1/1]">
+                    {["FINE.", "CLIFF.", "PANIC."].map(word => (
+                      <span
+                        key={word}
+                        aria-hidden="true"
+                        className="invisible [grid-area:1/1]"
+                      >
                         {word}
                       </span>
                     ))}
@@ -309,8 +332,12 @@ export default function Home() {
                       ANNUAL RISK
                     </span>
                     <span className="inline-grid font-heading text-2xl font-bold italic text-destructive tabular-nums md:text-3xl lg:text-4xl">
-                      {HERO_FINE_EXPOSURES.map((exposure) => (
-                        <span key={exposure} aria-hidden="true" className="invisible whitespace-nowrap [grid-area:1/1]">
+                      {HERO_FINE_EXPOSURES.map(exposure => (
+                        <span
+                          key={exposure}
+                          aria-hidden="true"
+                          className="invisible whitespace-nowrap [grid-area:1/1]"
+                        >
                           {exposure}
                         </span>
                       ))}
@@ -354,16 +381,18 @@ export default function Home() {
                 </div>
                 <div className="mt-3.5 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                   <span>Try:</span>
-                  {["1 Wall Street", "20 Exchange Place", "1870 Pelham Pkwy S"].map((ex) => (
-                    <button
-                      key={ex}
-                      type="button"
-                      onClick={() => search(ex)}
-                      className="fp-press rounded-full border border-border bg-card px-3 py-1.5 text-foreground/80 hover:border-foreground/25"
-                    >
-                      {ex}
-                    </button>
-                  ))}
+                  {["1 Wall Street", "20 Exchange Place", "1870 Pelham Pkwy S"].map(
+                    ex => (
+                      <button
+                        key={ex}
+                        type="button"
+                        onClick={() => search(ex)}
+                        className="fp-press rounded-full border border-border bg-card px-3 py-1.5 text-foreground/80 hover:border-foreground/25"
+                      >
+                        {ex}
+                      </button>
+                    ),
+                  )}
                 </div>
               </motion.form>
             </motion.div>
@@ -378,17 +407,23 @@ export default function Home() {
             >
               {[
                 { n: "8", s: "NYC building laws tracked in one dashboard", red: false },
-                { n: "$595M+", s: "modeled annual fine exposure across tracked laws", red: true },
+                {
+                  n: "$595M+",
+                  s: "modeled annual fine exposure across tracked laws",
+                  red: true,
+                },
                 { n: "~28,000", s: "NYC buildings covered", red: false },
                 { n: "40+", s: "cities passed the same standard", red: false },
-              ].map((s) => (
+              ].map(s => (
                 <motion.div variants={rise} key={s.n} className="px-5 py-8">
                   <p
                     className={`font-heading text-4xl font-bold tracking-tight ${s.red ? "text-destructive" : "text-foreground"}`}
                   >
                     {s.n}
                   </p>
-                  <p className="mt-1.5 text-sm leading-snug text-muted-foreground">{s.s}</p>
+                  <p className="mt-1.5 text-sm leading-snug text-muted-foreground">
+                    {s.s}
+                  </p>
                 </motion.div>
               ))}
             </motion.div>
@@ -398,12 +433,15 @@ export default function Home() {
           <StickyTabs>
             <StickyTabs.Item title="01 / How it works" id="how">
               <motion.div variants={stagger} {...inView} id="how">
-                <motion.p variants={rise} className="max-w-lg text-lg text-muted-foreground">
+                <motion.p
+                  variants={rise}
+                  className="max-w-lg text-lg text-muted-foreground"
+                >
                   Address to funded plan. No spreadsheet, no consultant.
                 </motion.p>
                 {/* Docket ledger — each step is a filing line, numeral inks up on hover. */}
                 <div className="mt-10 border-y border-border">
-                  {STEPS.map((step) => (
+                  {STEPS.map(step => (
                     <motion.div
                       variants={rise}
                       key={step.n}
@@ -415,7 +453,9 @@ export default function Home() {
                       >
                         {step.n}
                       </span>
-                      <h3 className="font-heading text-xl font-semibold tracking-tight md:text-2xl">{step.t}</h3>
+                      <h3 className="font-heading text-xl font-semibold tracking-tight md:text-2xl">
+                        {step.t}
+                      </h3>
                       <p className="col-span-2 col-start-2 leading-relaxed text-muted-foreground md:col-span-1 md:col-start-3 md:text-lg">
                         {step.d}
                       </p>
@@ -441,24 +481,30 @@ export default function Home() {
                     <thead>
                       <tr className="border-b border-border text-left text-xs uppercase tracking-wider text-muted-foreground/70">
                         <th className="py-3 pr-4 font-medium">Statute</th>
-                        <th className="hidden py-3 pr-4 font-medium sm:table-cell">Obligation</th>
+                        <th className="hidden py-3 pr-4 font-medium sm:table-cell">
+                          Obligation
+                        </th>
                         <th className="py-3 pr-4 font-medium">Handling</th>
                         <th className="py-3 text-right font-medium">Cost of a miss</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {LAWS.map((law) => (
+                      {LAWS.map(law => (
                         <tr
                           key={law.statute}
                           className="group border-b border-border transition-colors last:border-b-0 hover:bg-card"
                         >
                           <td className="py-4 pr-4">
-                            <span className="font-heading font-semibold tracking-tight">{law.statute}</span>
+                            <span className="font-heading font-semibold tracking-tight">
+                              {law.statute}
+                            </span>
                             <span className="mt-0.5 block text-xs text-muted-foreground sm:hidden">
                               {law.obligation}
                             </span>
                           </td>
-                          <td className="hidden py-4 pr-4 text-muted-foreground sm:table-cell">{law.obligation}</td>
+                          <td className="hidden py-4 pr-4 text-muted-foreground sm:table-cell">
+                            {law.obligation}
+                          </td>
                           <td className="py-4 pr-4">
                             <span className="inline-flex items-center gap-1.5 text-xs font-medium">
                               <span
@@ -467,31 +513,41 @@ export default function Home() {
                               {law.computed ? "Computed" : "Tracked"}
                             </span>
                           </td>
-                          <td className="py-4 text-right font-medium text-destructive tabular-nums">{law.stakes}</td>
+                          <td className="py-4 text-right font-medium text-destructive tabular-nums">
+                            {law.stakes}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </motion.div>
-                <motion.p variants={rise} className="mt-5 max-w-2xl text-sm text-muted-foreground">
-                  Computed means we publish the math against the statute. Tracked means the public DOB deadline sits on
-                  a live board with a timer.
+                <motion.p
+                  variants={rise}
+                  className="mt-5 max-w-2xl text-sm text-muted-foreground"
+                >
+                  Computed means we publish the math against the statute. Tracked means
+                  the public DOB deadline sits on a live board with a timer.
                 </motion.p>
               </motion.div>
             </StickyTabs.Item>
 
             <StickyTabs.Item title="03 / The ops room" id="ops">
-              <motion.div variants={stagger} {...inView} className="grid items-center gap-16 lg:grid-cols-[1fr_1fr]">
+              <motion.div
+                variants={stagger}
+                {...inView}
+                className="grid items-center gap-16 lg:grid-cols-[1fr_1fr]"
+              >
                 <motion.div variants={rise}>
                   <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
-                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--success)]" /> Real-time
+                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--success)]" />{" "}
+                    Real-time
                   </span>
                   <h3 className="font-heading mt-5 text-3xl font-bold tracking-tight sm:text-4xl">
                     Every obligation becomes a ticket
                   </h3>
                   <p className="mt-4 max-w-md text-lg leading-relaxed text-muted-foreground">
-                    Each one carries its statutory deadline on a timer. AI workers claim tickets, draft the remediation,
-                    and submit. You approve every one.
+                    Each one carries its statutory deadline on a timer. AI workers claim
+                    tickets, draft the remediation, and submit. You approve every one.
                   </p>
                   <Link
                     href={DASH}
@@ -500,7 +556,10 @@ export default function Home() {
                     Open the dashboard <ArrowRight className="size-4" />
                   </Link>
                 </motion.div>
-                <motion.div variants={rise} className="flex justify-center pb-12 sm:pb-16 sm:pr-8">
+                <motion.div
+                  variants={rise}
+                  className="flex justify-center pb-12 sm:pb-16 sm:pr-8"
+                >
                   <DisplayCards cards={TICKET_CARDS} />
                 </motion.div>
               </motion.div>
@@ -509,18 +568,31 @@ export default function Home() {
 
           {/* ── CTA + FOOTER ── */}
           <section className="border-t border-border bg-card">
-            <motion.div variants={stagger} {...inView} className="mx-auto max-w-6xl px-5 py-20 text-center md:py-24">
-              <motion.h2 variants={rise} className="font-heading text-4xl font-bold tracking-tight sm:text-5xl">
+            <motion.div
+              variants={stagger}
+              {...inView}
+              className="mx-auto max-w-6xl px-5 py-20 text-center md:py-24"
+            >
+              <motion.h2
+                variants={rise}
+                className="font-heading text-4xl font-bold tracking-tight sm:text-5xl"
+              >
                 <span className="sr-only">See your building&apos;s number</span>
                 <span aria-hidden="true">
                   {"See your building's number".split("").map((ch, i) => (
-                    <span key={`${ch}-${i}`} className="transition-colors duration-150 hover:text-destructive">
+                    <span
+                      key={`${ch}-${i}`}
+                      className="transition-colors duration-150 hover:text-destructive"
+                    >
                       {ch}
                     </span>
                   ))}
                 </span>
               </motion.h2>
-              <motion.p variants={rise} className="mx-auto mt-4 max-w-md text-lg text-muted-foreground">
+              <motion.p
+                variants={rise}
+                className="mx-auto mt-4 max-w-md text-lg text-muted-foreground"
+              >
                 One address. About ten seconds.
               </motion.p>
               <motion.form
@@ -557,8 +629,9 @@ export default function Home() {
                 </div>
                 {/* The footer is set, on purpose, in actual fine print. */}
                 <p className="max-w-xl text-[11px] leading-relaxed text-muted-foreground/70">
-                  Estimates from NYC LL84 benchmarking data and LL97 emission limits (1 RCNY §103-14). Not legal advice.
-                  Official compliance requires a registered design professional.
+                  Estimates from NYC LL84 benchmarking data and LL97 emission limits (1
+                  RCNY §103-14). Not legal advice. Official compliance requires a
+                  registered design professional.
                 </p>
               </div>
             </footer>

@@ -28,18 +28,29 @@ export function AgentsClient() {
   const [workers] = useTable(tables.worker);
   const [tasks] = useTable(tables.task);
   const killWorker = useReducer(reducers.killWorker);
+  const pruneDeadWorkers = useReducer(reducers.pruneDeadWorkers);
   const [killingId, setKillingId] = useState<bigint | null>(null);
+  const [showDead, setShowDead] = useState(false);
 
   function kill(workerId: bigint, name: string) {
     setKillingId(workerId);
-    toast(`${name} killed — its task returns to the queue`);
+    toast(`${name} killed. Its task returns to the queue`);
 
     withAck(killWorker({ workerId }), "The kill order")
       .catch((error: Error) => toast.error(`Kill failed: ${error.message}`))
       .finally(() => setKillingId(null));
   }
 
-  const sorted = [...workers].sort((a, b) => (a.id < b.id ? -1 : 1));
+  function clearDead() {
+    toast("Clearing dead agents");
+    withAck(pruneDeadWorkers(), "The cleanup").catch((error: Error) =>
+      toast.error(`Cleanup failed: ${error.message}`),
+    );
+  }
+
+  // Per-task agents leave one dead row each; hide them unless asked.
+  const visibleWorkers = showDead ? workers : workers.filter(w => w.status !== "dead");
+  const sorted = [...visibleWorkers].sort((a, b) => (a.id < b.id ? -1 : 1));
 
   const idle = workers.filter(w => w.status === "idle").length;
   const working = workers.filter(w => w.status === "working").length;
@@ -74,7 +85,24 @@ export function AgentsClient() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Fleet</CardTitle>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <CardTitle>Fleet</CardTitle>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowDead(previous => !previous)}
+              >
+                {showDead ? "Hide dead" : `Show dead (${dead})`}
+              </Button>
+              {dead > 0 && (
+                <Button type="button" variant="outline" size="sm" onClick={clearDead}>
+                  Clear dead
+                </Button>
+              )}
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="p-0">
           {sorted.length === 0 ? (

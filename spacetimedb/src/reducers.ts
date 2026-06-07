@@ -577,6 +577,44 @@ export const reject = spacetimedb.reducer(
   },
 );
 
+// Housekeeping: per-task agents leave one dead row each. Sweep them on
+// demand; the live fleet is untouched.
+export const prune_dead_workers = spacetimedb.reducer(ctx => {
+  if (workerBySender(ctx)) {
+    throw new Error("workers cannot prune the fleet");
+  }
+
+  let prunedCount = 0;
+  for (const worker of ctx.db.worker.iter()) {
+    if (worker.status === "dead") {
+      ctx.db.worker.id.delete(worker.id);
+      prunedCount++;
+    }
+  }
+
+  logEvent(ctx, "workers_pruned", `${prunedCount} dead agent rows cleared`);
+});
+
+// The end of the line: a human confirms the approved filing actually went
+// out the door (DOB NOW, HPD, wherever the law wants it).
+export const mark_done = spacetimedb.reducer(
+  { taskId: t.u64(), note: t.string() },
+  (ctx, { taskId, note }) => {
+    if (workerBySender(ctx)) {
+      throw new Error("workers cannot close out tasks — a human confirms the filing");
+    }
+
+    const task = ctx.db.task.id.find(taskId);
+    if (!task) throw new Error(`task ${taskId} not found`);
+    if (task.status !== "approved") {
+      throw new Error(`task ${taskId} is not approved — only approved work can be filed`);
+    }
+
+    ctx.db.task.id.update({ ...task, status: "done" });
+    logEvent(ctx, "task_done", note || "filing confirmed", taskId);
+  },
+);
+
 // Demo button: simulate a crash. The worker process exits when it sees itself dead.
 export const kill_worker = spacetimedb.reducer(
   { workerId: t.u64() },

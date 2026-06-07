@@ -40,7 +40,7 @@ const finalTurn = {
   content: [
     {
       type: "text",
-      text: "EXPOSURE: $1,185,037/yr from 2030.\nDraft prepared by AI. Human review required before any filing.",
+      text: "EXPOSURE: $1,185,037/yr from 2030.\nNext step: commission an energy model.",
     },
   ],
 };
@@ -98,7 +98,7 @@ describe("draftWithTools", () => {
     const lastMessage = JSON.stringify(secondCallMessages[secondCallMessages.length - 1]);
     expect(lastMessage).toContain("no NYC address found");
     expect(lastMessage).toContain("is_error");
-    expect(draft).toContain("Human review required");
+    expect(draft).toContain("EXPOSURE");
   });
 
   test("stops a runaway tool loop after the round cap", async () => {

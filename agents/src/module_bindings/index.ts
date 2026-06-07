@@ -41,6 +41,8 @@ import FailIntakeReducer from "./fail_intake_reducer";
 import HeartbeatReducer from "./heartbeat_reducer";
 import IngestBuildingReducer from "./ingest_building_reducer";
 import KillWorkerReducer from "./kill_worker_reducer";
+import MarkDoneReducer from "./mark_done_reducer";
+import PruneDeadWorkersReducer from "./prune_dead_workers_reducer";
 import RegisterWorkerReducer from "./register_worker_reducer";
 import RejectReducer from "./reject_reducer";
 import RequestBuildingReducer from "./request_building_reducer";
@@ -166,6 +168,8 @@ const reducersSchema = __reducers(
   __reducerSchema("heartbeat", HeartbeatReducer),
   __reducerSchema("ingest_building", IngestBuildingReducer),
   __reducerSchema("kill_worker", KillWorkerReducer),
+  __reducerSchema("mark_done", MarkDoneReducer),
+  __reducerSchema("prune_dead_workers", PruneDeadWorkersReducer),
   __reducerSchema("register_worker", RegisterWorkerReducer),
   __reducerSchema("reject", RejectReducer),
   __reducerSchema("request_building", RequestBuildingReducer),

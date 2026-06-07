@@ -193,6 +193,7 @@ export function ComplianceSection({ buildingId }: { buildingId: bigint }) {
   const [workers] = useTable(tables.worker);
   const approve = useReducer(reducers.approve);
   const reject = useReducer(reducers.reject);
+  const markDone = useReducer(reducers.markDone);
   const [pendingTaskId, setPendingTaskId] = useState<bigint | null>(null);
   const reduceMotion = useReducedMotion();
 
@@ -214,6 +215,15 @@ export function ComplianceSection({ buildingId }: { buildingId: bigint }) {
 
     withAck(call, "The review verdict")
       .catch((error: Error) => toast.error(`Review failed: ${error.message}`))
+      .finally(() => setPendingTaskId(null));
+  }
+
+  function confirmFiled(task: Task) {
+    setPendingTaskId(task.id);
+    toast.success("Filing confirmed");
+
+    withAck(markDone({ taskId: task.id, note: "filing confirmed" }), "The filing")
+      .catch((error: Error) => toast.error(`Could not close out: ${error.message}`))
       .finally(() => setPendingTaskId(null));
   }
 
@@ -322,6 +332,16 @@ export function ComplianceSection({ buildingId }: { buildingId: bigint }) {
                                   Reject
                                 </Button>
                               </div>
+                            )}
+                            {lawTask.status === "approved" && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                disabled={pendingTaskId === lawTask.id}
+                                onClick={() => confirmFiled(lawTask)}
+                              >
+                                Mark filed
+                              </Button>
                             )}
                           </div>
                         </div>

@@ -4,7 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
-import { Building2, CircleDollarSign, ListTodo, TrendingUp } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Building2, Check, CircleDollarSign, ListTodo, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { useReducer, useTable } from "spacetimedb/react";
 
@@ -202,7 +203,9 @@ export function PortfolioClient() {
   const [lawScope, setLawScope] = useState<LawScope>("all");
   const [fineBasisId, setFineBasisId] = useState(FINE_BASES[0].id);
   const [recentAddresses, setRecentAddresses] = useState<string[]>([]);
+  const [justQueued, setJustQueued] = useState(false);
   const requestedQueryAddress = useRef<string | null>(null);
+  const queuedFlashTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     setRecentAddresses(readRecentAddresses());
@@ -232,8 +235,14 @@ export function PortfolioClient() {
       setRecentAddresses(rememberAddress(trimmed));
       setAddress("");
       toast.success("Intake queued. An agent is pulling the city's records now");
+
+      setJustQueued(true);
+      if (queuedFlashTimer.current) clearTimeout(queuedFlashTimer.current);
+      queuedFlashTimer.current = setTimeout(() => setJustQueued(false), 2_200);
+
       withAck(requestBuilding({ address: trimmed }), `Intake for "${trimmed}"`).catch(
         (error: Error) => {
+          setJustQueued(false);
           toast.error(`Intake for "${trimmed}" failed: ${error.message}`);
         },
       );
@@ -343,9 +352,25 @@ export function PortfolioClient() {
           className="flex-1"
           inputClassName="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-[3px] focus:ring-ring/20 disabled:cursor-not-allowed disabled:opacity-50"
         />
-        <Button onClick={() => submitAddress()} className="h-10 shrink-0">
-          Get my number
-        </Button>
+        <span className="flex shrink-0 items-center gap-2">
+          <Button onClick={() => submitAddress()} className="h-10">
+            Get my number
+          </Button>
+          <AnimatePresence>
+            {justQueued && (
+              <motion.span
+                initial={{ scale: 0, opacity: 0, rotate: -90 }}
+                animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                exit={{ scale: 0.5, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 520, damping: 22 }}
+                className="flex size-6 items-center justify-center rounded-full bg-success text-success-foreground"
+                aria-hidden="true"
+              >
+                <Check className="size-3.5" strokeWidth={3} />
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </span>
       </div>
 
       {recentAddresses.length > 0 && (

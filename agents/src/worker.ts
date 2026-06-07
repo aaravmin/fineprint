@@ -36,32 +36,65 @@ const KIND_SHORT: Record<string, string> = {
 const inFlight = new Set<string>();
 
 const DISPATCHER_NAME = process.env.WORKER_NAME ?? "dispatcher";
+const RECONNECT_DELAY_MS = 3_000;
 
-const observer = DbConnection.builder()
-  .withUri(HOST)
-  .withDatabaseName(DB_NAME)
-  .onConnect((conn, identity) => {
-    console.log(
-      `[dispatcher] watching the queue as ${identity.toHexString().slice(0, 8)}…`,
-    );
+// A module republish or database wipe drops every connection, and the SDK
+// neither reconnects nor fails loudly. The dispatcher rebuilds its
+// connection from scratch whenever the socket dies, so a wipe costs a few
+// seconds instead of a zombie process.
+let observer: DbConnection;
+let observerTimers: ReturnType<typeof setInterval>[] = [];
+let everConnected = false;
 
-    conn
-      .subscriptionBuilder()
-      .onApplied(async () => {
-        // Register and heartbeat so the dashboard knows agents are on call
-        // even while the queue is empty — otherwise the "no agents online"
-        // banner shows between tasks.
-        await conn.reducers.registerWorker({ name: DISPATCHER_NAME });
-        setInterval(() => conn.reducers.heartbeat({}).catch(() => {}), 5_000);
-        setInterval(() => dispatch(), 2_000);
-      })
-      .subscribeToAllTables();
-  })
-  .onConnectError((_ctx, error) => {
-    console.error(`[dispatcher] connection failed:`, error.message);
-    process.exit(1);
-  })
-  .build();
+function connectObserver() {
+  observer = DbConnection.builder()
+    .withUri(HOST)
+    .withDatabaseName(DB_NAME)
+    .onConnect((conn, identity) => {
+      everConnected = true;
+      console.log(
+        `[dispatcher] watching the queue as ${identity.toHexString().slice(0, 8)}…`,
+      );
+
+      conn
+        .subscriptionBuilder()
+        .onApplied(async () => {
+          // Register and heartbeat so the dashboard knows agents are on call
+          // even while the queue is empty — otherwise the "no agents online"
+          // banner shows between tasks.
+          await conn.reducers.registerWorker({ name: DISPATCHER_NAME });
+          observerTimers.push(
+            setInterval(() => conn.reducers.heartbeat({}).catch(() => {}), 5_000),
+          );
+          observerTimers.push(setInterval(() => dispatch(), 2_000));
+        })
+        .subscribeToAllTables();
+    })
+    .onConnectError((_ctx, error) => {
+      if (!everConnected) {
+        console.error(`[dispatcher] connection failed:`, error.message);
+        process.exit(1);
+      }
+      scheduleReconnect();
+    })
+    .onDisconnect(() => {
+      console.warn(`[dispatcher] connection lost (database wiped or republished?)`);
+      scheduleReconnect();
+    })
+    .build();
+}
+
+function scheduleReconnect() {
+  for (const timer of observerTimers) {
+    clearInterval(timer);
+  }
+  observerTimers = [];
+
+  console.log(`[dispatcher] reconnecting in ${RECONNECT_DELAY_MS / 1000}s…`);
+  setTimeout(() => connectObserver(), RECONNECT_DELAY_MS);
+}
+
+connectObserver();
 
 function dispatch() {
   if (inFlight.size >= MAX_CONCURRENT) return;

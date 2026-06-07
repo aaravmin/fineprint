@@ -31,6 +31,16 @@ const STATUS_VARIANT: Record<
   done: "default",
 };
 
+// Same dot-and-word treatment as the building page's compliance ledger.
+const STATUS_DOT: Record<string, string> = {
+  open: "bg-muted-foreground/50",
+  claimed: "bg-foreground/70",
+  in_review: "bg-amber-500",
+  approved: "bg-success",
+  done: "bg-success",
+  rejected: "bg-destructive",
+};
+
 const STATUS_OPTIONS: Option[] = [
   { value: "open", label: "open" },
   { value: "claimed", label: "claimed" },
@@ -47,6 +57,7 @@ export function TasksClient() {
   const [settingsRows] = useTable(tables.settings);
   const approve = useReducer(reducers.approve);
   const reject = useReducer(reducers.reject);
+  const markDone = useReducer(reducers.markDone);
   const setReviewMode = useReducer(reducers.setReviewMode);
   const [pendingTaskId, setPendingTaskId] = useState<bigint | null>(null);
   const [statusFilter, setStatusFilter] = useState<Option[]>([]);
@@ -83,6 +94,15 @@ export function TasksClient() {
 
     withAck(call, "The review verdict")
       .catch((error: Error) => toast.error(`Review failed: ${error.message}`))
+      .finally(() => setPendingTaskId(null));
+  }
+
+  function confirmFiled(taskId: bigint) {
+    setPendingTaskId(taskId);
+    toast.success("Filing confirmed");
+
+    withAck(markDone({ taskId, note: "filing confirmed" }), "The filing")
+      .catch((error: Error) => toast.error(`Could not close out: ${error.message}`))
       .finally(() => setPendingTaskId(null));
   }
 
@@ -179,16 +199,24 @@ export function TasksClient() {
                 return (
                   <div
                     key={String(task.id)}
-                    className="flex items-center gap-3 px-6 py-4"
+                    className="grid grid-cols-[1fr_auto] items-center gap-3 px-6 py-3.5 transition-colors duration-200 hover:bg-muted/40 sm:grid-cols-[7.5rem_1fr_7rem_6.5rem_auto]"
                   >
-                    <Badge
-                      variant={STATUS_VARIANT[task.status] ?? "secondary"}
-                      className="shrink-0"
-                    >
+                    <span className="hidden items-center gap-1.5 text-xs text-muted-foreground sm:flex">
+                      <span
+                        className={`size-1.5 shrink-0 rounded-full ${STATUS_DOT[task.status] ?? "bg-muted-foreground/50"}`}
+                      />
                       {task.status.replace("_", " ")}
-                    </Badge>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium">{task.title}</p>
+                    </span>
+
+                    <div className="min-w-0">
+                      <p className="flex items-center gap-2 truncate text-sm font-medium">
+                        <span className="truncate">{task.title}</span>
+                        {task.slaBreached && (
+                          <Badge variant="destructive" className="shrink-0 text-[10px]">
+                            SLA
+                          </Badge>
+                        )}
+                      </p>
                       {building && (
                         <Link
                           href={`/dashboard/buildings/${building.id}`}
@@ -198,40 +226,48 @@ export function TasksClient() {
                         </Link>
                       )}
                     </div>
-                    {claimedWorker && (
-                      <span className="hidden shrink-0 text-xs text-muted-foreground sm:inline">
-                        {claimedWorker.name}
-                      </span>
-                    )}
-                    {task.fineEstimateUsd !== undefined && (
-                      <span className="hidden shrink-0 text-xs text-muted-foreground tabular-nums sm:inline">
-                        {fmtUsd(task.fineEstimateUsd)}/yr
-                      </span>
-                    )}
-                    {task.slaBreached && (
-                      <Badge variant="destructive" className="shrink-0 text-xs">
-                        SLA
-                      </Badge>
-                    )}
-                    {task.status === "in_review" && (
-                      <div className="flex shrink-0 gap-2">
-                        <Button
-                          size="sm"
-                          disabled={pendingTaskId === task.id}
-                          onClick={() => review(task.id, "approve")}
-                        >
-                          {pendingTaskId === task.id ? <LoadingDots /> : "Approve"}
-                        </Button>
+
+                    <span className="hidden truncate text-right text-xs text-muted-foreground sm:inline">
+                      {claimedWorker?.name ?? ""}
+                    </span>
+
+                    <span className="hidden text-right text-xs text-muted-foreground tabular-nums sm:inline">
+                      {task.fineEstimateUsd !== undefined
+                        ? `${fmtUsd(task.fineEstimateUsd)}/yr`
+                        : ""}
+                    </span>
+
+                    <div className="flex shrink-0 justify-end gap-2">
+                      {task.status === "in_review" && (
+                        <>
+                          <Button
+                            size="sm"
+                            disabled={pendingTaskId === task.id}
+                            onClick={() => review(task.id, "approve")}
+                          >
+                            {pendingTaskId === task.id ? <LoadingDots /> : "Approve"}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={pendingTaskId === task.id}
+                            onClick={() => review(task.id, "reject")}
+                          >
+                            Reject
+                          </Button>
+                        </>
+                      )}
+                      {task.status === "approved" && (
                         <Button
                           size="sm"
                           variant="outline"
                           disabled={pendingTaskId === task.id}
-                          onClick={() => review(task.id, "reject")}
+                          onClick={() => confirmFiled(task.id)}
                         >
-                          Reject
+                          Mark filed
                         </Button>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 );
               })}
