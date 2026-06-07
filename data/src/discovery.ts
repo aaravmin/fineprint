@@ -1,52 +1,36 @@
 import { fetchJson } from "./http.ts";
 
-const DISCOVERY_URL = "https://api.us.socrata.com/api/catalog/v1";
+const CATALOG_API = "https://api.us.socrata.com/api/catalog/v1";
 
-const KNOWN_DATASET_IDS: Record<string, string> = {
-  "dob now safety boiler": "52dp-yji6",
-  "dob now: safety boiler": "52dp-yji6",
-  "dob now build job filings": "w9ak-ipjd",
-  "dob now: build job filings": "w9ak-ipjd",
-  "dob job application filings": "ic3t-wcy2",
-  "dob ecb violations": "6bgk-3dad",
-};
+const cache = new Map<string, string | null>();
 
-interface CatalogResult {
-  resource: {
-    id: string;
-  };
+export async function resolveDatasetId(query: string, domain = "data.cityofnewyork.us"): Promise<string | null> {
+  const cacheKey = `${domain}::${query}`;
+  if (cache.has(cacheKey)) return cache.get(cacheKey) ?? null;
+
+  const url = `${CATALOG_API}?domains=${encodeURIComponent(domain)}&q=${encodeURIComponent(query)}&only=resource`;
+  try {
+    const resp = await fetchJson<{ results?: Array<{ resource: { id: string; name?: string } }> }>(url, {
+      service: "Socrata Catalog",
+    });
+    const first = resp.results && resp.results[0];
+    const id = first?.resource?.id ?? null;
+    cache.set(cacheKey, id);
+    return id;
+  } catch (e) {
+    cache.set(cacheKey, null);
+    return null;
+  }
 }
 
-interface CatalogResponse {
-  results: CatalogResult[];
+export function resourceUrlFor(domain: string, resourceId: string): string {
+  return `https://${domain}/resource/${resourceId}.json`;
 }
 
-export async function resolveDatasetId(
-  query: string,
-  domain = "data.cityofnewyork.us",
-): Promise<string> {
-  const normalized = query.trim().toLowerCase();
-
-  if (/^[A-Za-z0-9]{4}-[A-Za-z0-9]{4}$/.test(query)) {
-    return query;
-  }
-
-  const known = KNOWN_DATASET_IDS[normalized];
-  if (known) {
-    return known;
-  }
-
-  const url = `${DISCOVERY_URL}?domains=${encodeURIComponent(domain)}&q=${encodeURIComponent(
-    query,
-  )}&limit=10`;
-  const response = await fetchJson<CatalogResponse>(url, {
-    service: "Socrata Discovery",
-  });
-
-  const candidate = response.results[0];
-  if (!candidate) {
-    throw new Error(`no Socrata dataset found for "${query}"`);
-  }
-
-  return candidate.resource.id;
+export async function resolveResourceUrl(query: string, domain = "data.cityofnewyork.us"): Promise<string | null> {
+  const id = await resolveDatasetId(query, domain);
+  if (!id) return null;
+  return resourceUrlFor(domain, id);
 }
+
+export default { resolveDatasetId, resolveResourceUrl };

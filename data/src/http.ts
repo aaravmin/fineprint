@@ -6,6 +6,7 @@ import { cacheRead, cacheWrite } from "./cache.ts";
 export interface FetchJsonOptions {
   service: string; // human name for error messages ("GeoSearch", "LL84")
   timeoutMs?: number;
+  headers?: Record<string, string>; // e.g. Socrata's X-App-Token
 }
 
 // Live-then-cache: a good response leaves a snapshot, a dead network serves
@@ -33,11 +34,14 @@ export async function cachedFetchJson<T>(
 }
 
 export async function fetchJson<T>(url: string, options: FetchJsonOptions): Promise<T> {
-  const { service, timeoutMs = 10_000 } = options;
+  const { service, timeoutMs = 10_000, headers } = options;
 
   let response: Response;
   try {
-    response = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
+    response = await fetch(url, {
+      headers,
+      signal: AbortSignal.timeout(timeoutMs),
+    });
   } catch (cause) {
     throw new Error(`${service} request failed: ${(cause as Error).message}`, { cause });
   }
