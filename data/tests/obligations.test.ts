@@ -16,6 +16,7 @@ const coveredOffice: BuildingFacts = {
   plutoCharacteristics: null,
   infrastructureProfile: {
     hasLl84Filing: true,
+    ll84ReportingYear: 2025,
     hasRecomputedEmissions: true,
     fuelTypes: ["natural_gas"],
     boilerRecords: [],
@@ -57,8 +58,10 @@ describe("assessObligations", () => {
     expect(ll97.findings.length).toBeGreaterThan(0);
   });
 
-  test("an on-record LL84 filing reads satisfied with no recommendation", () => {
-    const ll84 = assessObligations(coveredOffice).obligations.find(
+  const asOf = new Date("2026-06-06T00:00:00Z");
+
+  test("a current LL84 filing reads satisfied with no recommendation", () => {
+    const ll84 = assessObligations(coveredOffice, { asOf }).obligations.find(
       obligation => obligation.lawId === "ll84",
     );
 
@@ -72,15 +75,32 @@ describe("assessObligations", () => {
       infrastructureProfile: {
         ...coveredOffice.infrastructureProfile!,
         hasLl84Filing: false,
+        ll84ReportingYear: null,
       },
     };
 
-    const ll84 = assessObligations(noFiling).obligations.find(
+    const ll84 = assessObligations(noFiling, { asOf }).obligations.find(
       obligation => obligation.lawId === "ll84",
     );
 
     expect(ll84?.status).toBe("due");
     expect(ll84?.recommendations[0]).toMatch(/benchmarking/i);
+  });
+
+  test("a stale LL84 filing reads at_risk", () => {
+    const stale: BuildingFacts = {
+      ...coveredOffice,
+      infrastructureProfile: {
+        ...coveredOffice.infrastructureProfile!,
+        ll84ReportingYear: 2021,
+      },
+    };
+
+    const ll84 = assessObligations(stale, { asOf }).obligations.find(
+      obligation => obligation.lawId === "ll84",
+    );
+
+    expect(ll84?.status).toBe("at_risk");
   });
 
   test("LL97 with no emissions data degrades to an unknown obligation, not a guess", () => {
@@ -101,16 +121,51 @@ describe("assessObligations", () => {
     expect(ll97.periods).toHaveLength(0);
   });
 
-  test("a building covered by nothing modeled returns an explanatory note", () => {
+  test("a small non-LL97 building still carries the universal gas-piping duty", () => {
     const tiny: BuildingFacts = {
       ...coveredOffice,
       grossFloorAreaSqft: 10_000,
       isLl97Covered: false,
     };
 
-    const assessment = assessObligations(tiny);
+    const lawIds = assessObligations(tiny).obligations.map(obligation => obligation.lawId);
 
-    expect(assessment.obligations).toHaveLength(0);
-    expect(assessment.notes[0]).toMatch(/no modeled law/i);
+    // Under 25k sqft and not LL97-covered: no LL97/LL84/LL87, but LL152 binds.
+    expect(lawIds).toContain("ll152");
+    expect(lawIds).not.toContain("ll97");
+    expect(lawIds).not.toContain("ll84");
+  });
+});
+
+describe("LL88 and Article 321 analyzers", () => {
+  const asOfLl88 = new Date("2026-06-06T00:00:00Z");
+
+  test("LL88 binds a large building with a passed deadline and an LL97 cross-reference", () => {
+    const ll88 = assessObligations(coveredOffice, { asOf: asOfLl88 }).obligations.find(
+      obligation => obligation.lawId === "ll88",
+    );
+
+    expect(ll88?.kind).toBe("procedural");
+    expect(ll88?.status).toBe("due");
+    expect(ll88?.recommendations[0]).toMatch(/LL97/);
+  });
+
+  test("an Article 321 building gets the art321 analyzer, not standard LL97", () => {
+    const affordable: BuildingFacts = { ...coveredOffice, isArticle321: true };
+
+    const lawIds = assessObligations(affordable).obligations.map(o => o.lawId);
+
+    expect(lawIds).toContain("art321");
+    expect(lawIds).not.toContain("ll97");
+  });
+
+  test("an over-target Article 321 building reads at_risk and names the 2030 target", () => {
+    const affordable: BuildingFacts = { ...coveredOffice, isArticle321: true };
+
+    const art321 = assessObligations(affordable).obligations.find(o => o.lawId === "art321");
+
+    expect(art321?.kind).toBe("performance");
+    expect(art321?.status).toBe("at_risk");
+    expect(art321?.findings.some(f => /2030 target/.test(f))).toBe(true);
   });
 });

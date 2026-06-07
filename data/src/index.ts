@@ -14,6 +14,21 @@ export {
   type MeasureExclusion,
 } from "./retrofit.ts";
 export {
+  buildCompliancePlan,
+  type CompliancePlan,
+  type ObligationDisposition,
+  type PlanMeasure,
+  type Handling,
+} from "./compliancePlan.ts";
+export {
+  ll84FilingStatus,
+  ll87FilingStatus,
+  ll88FilingStatus,
+  ll11FilingStatus,
+  ll152FilingStatus,
+  type FilingStatus,
+} from "./filings.ts";
+export {
   assessObligations,
   LAW_ANALYZERS,
   type LawAnalyzer,

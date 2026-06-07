@@ -38,6 +38,7 @@ export async function fetchPlutoByBbl(bbl: Bbl): Promise<PlutoCharacteristics | 
     yearBuilt: parseNumber(row.yearbuilt),
     landUse: row.landuse ?? null,
     ownerName: row.ownername ?? null,
+    communityDistrict: parseNumber(row.cd),
     raw: row as Record<string, unknown>,
   };
 }

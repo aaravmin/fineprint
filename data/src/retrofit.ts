@@ -8,7 +8,9 @@
 
 import {
   DEFAULT_MEASURES,
+  optimizeArticle321,
   optimizeRetrofit,
+  type Article321Assessment,
   type RetrofitAssessment,
   type RetrofitMeasure,
 } from "../../engine/src/retrofit.ts";
@@ -21,14 +23,22 @@ export interface MeasureExclusion {
   reason: string;
 }
 
-export interface RetrofitPlan {
-  // The optimizer's result over the measures that survived tailoring.
-  assessment: RetrofitAssessment;
-  // Measures removed before optimizing, each with the evidence that removed it.
-  excluded: MeasureExclusion[];
-  // Building-specific observations, phrased so narration can quote them.
-  findings: string[];
-}
+// Two pathways, two optimizers. Standard buildings trade capex against
+// $268/tCO2e fines; Article 321 buildings minimize capex to clear the 2030
+// target. Both share the same building-aware measure tailoring and findings.
+export type RetrofitPlan =
+  | {
+      pathway: "standard";
+      assessment: RetrofitAssessment;
+      excluded: MeasureExclusion[];
+      findings: string[];
+    }
+  | {
+      pathway: "article321";
+      assessment: Article321Assessment;
+      excluded: MeasureExclusion[];
+      findings: string[];
+    };
 
 // One address's retrofit plan, or null when the engine can't price the building
 // (no emissions or use splits — same gate as the fine projections).
@@ -40,11 +50,22 @@ export function planRetrofit(facts: BuildingFacts): RetrofitPlan | null {
 
   const profile = facts.infrastructureProfile ?? null;
   const { measures, excluded } = tailorMeasures(profile);
+  const findings = retrofitFindings(profile);
+
+  if (input.isArticle321) {
+    return {
+      pathway: "article321",
+      assessment: optimizeArticle321(input, measures),
+      excluded,
+      findings,
+    };
+  }
 
   return {
+    pathway: "standard",
     assessment: optimizeRetrofit(input, measures),
     excluded,
-    findings: retrofitFindings(profile),
+    findings,
   };
 }
 
