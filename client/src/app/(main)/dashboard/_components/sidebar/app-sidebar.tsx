@@ -95,8 +95,14 @@ export function AppSidebar({
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <Link prefetch={false} href="/dashboard">
-                <FineprintLogo className="size-5" />
-                <span className="font-semibold text-base">{APP_CONFIG.name}</span>
+                <span className="sr-only">{APP_CONFIG.name}</span>
+                <span
+                  aria-hidden="true"
+                  className="flex items-center text-base font-semibold"
+                >
+                  <FineprintLogo className="mr-px h-[0.95em] w-auto" />
+                  ineprint
+                </span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

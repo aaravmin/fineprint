@@ -1,17 +1,20 @@
 "use client";
 
 import { useState } from "react";
+
+import { Bot, CircleDot, Skull, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { useReducer, useTable } from "spacetimedb/react";
-import { reducers, tables } from "@/module_bindings/index";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyFolder } from "@/components/ui/empty-folder";
+import { LoadingDots } from "@/components/ui/loading-dots";
+import { reducers, tables } from "@/module_bindings/index";
 
-const STATUS_VARIANT: Record<
-  string,
-  "default" | "secondary" | "destructive" | "outline"
-> = {
+const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
   idle: "secondary",
   working: "default",
   dead: "destructive",
@@ -39,43 +42,33 @@ export function AgentsClient() {
 
   const sorted = [...workers].sort((a, b) => (a.id < b.id ? -1 : 1));
 
-  const idle = workers.filter(w => w.status === "idle").length;
-  const working = workers.filter(w => w.status === "working").length;
-  const dead = workers.filter(w => w.status === "dead").length;
+  const idle = workers.filter((w) => w.status === "idle").length;
+  const working = workers.filter((w) => w.status === "working").length;
+  const dead = workers.filter((w) => w.status === "dead").length;
 
   return (
     <div className="@container/main flex flex-col gap-4 md:gap-6">
       <div className="grid grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="pb-1">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Idle
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-semibold">{idle}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-1">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Working
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-semibold text-primary">{working}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-1">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Dead
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-semibold text-destructive">{dead}</p>
-          </CardContent>
-        </Card>
+        <StatCard
+          icon={<CircleDot className="size-4" />}
+          iconClassName="bg-secondary text-muted-foreground"
+          label="Idle"
+          value={idle}
+        />
+        <StatCard
+          icon={<Zap className="size-4" />}
+          iconClassName="bg-[var(--success)]/10 text-[var(--success)]"
+          label="Working"
+          value={working}
+          pulse={working > 0}
+        />
+        <StatCard
+          icon={<Skull className="size-4" />}
+          iconClassName="bg-destructive-subtle text-destructive"
+          label="Dead"
+          value={dead}
+          valueClassName={dead > 0 ? "text-destructive" : undefined}
+        />
       </div>
 
       <Card>
@@ -84,34 +77,48 @@ export function AgentsClient() {
         </CardHeader>
         <CardContent className="p-0">
           {sorted.length === 0 ? (
-            <div className="px-6 py-10 text-center text-sm text-muted-foreground">
-              No workers connected. Run{" "}
-              <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">
-                npm run worker
-              </code>{" "}
-              to start an agent.
-            </div>
+            <EmptyFolder
+              title="No workers connected"
+              description={
+                <>
+                  Run <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">npm run worker</code> to start
+                  an agent
+                </>
+              }
+            />
           ) : (
             <div className="divide-y">
-              {sorted.map(w => {
+              {sorted.map((w) => {
                 const currentTask =
-                  w.currentTaskId !== undefined
-                    ? tasks.find(t => t.id === w.currentTaskId)
-                    : undefined;
+                  w.currentTaskId !== undefined ? tasks.find((t) => t.id === w.currentTaskId) : undefined;
 
                 return (
                   <div key={String(w.id)} className="flex items-center gap-4 px-6 py-4">
-                    <Badge variant={STATUS_VARIANT[w.status] ?? "secondary"}>
-                      {w.status}
-                    </Badge>
-                    <span className="flex-1 font-medium text-sm">{w.name}</span>
-                    {currentTask && (
-                      <span className="text-xs text-muted-foreground truncate max-w-xs">
-                        {currentTask.title}
-                      </span>
-                    )}
-                    <span className="text-xs text-muted-foreground font-mono">
-                      {w.identity.toHexString().slice(0, 8)}…
+                    <Avatar className="size-9">
+                      <AvatarFallback
+                        className={w.status === "dead" ? "bg-destructive-subtle text-destructive" : "bg-secondary"}
+                      >
+                        {w.status === "dead" ? <Skull className="size-4" /> : <Bot className="size-4" />}
+                      </AvatarFallback>
+                    </Avatar>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">{w.name}</span>
+                        <Badge variant={STATUS_VARIANT[w.status] ?? "secondary"}>
+                          {w.status === "working" && (
+                            <span className="mr-1 inline-block size-1.5 animate-pulse rounded-full bg-[var(--success)]" />
+                          )}
+                          {w.status}
+                        </Badge>
+                      </div>
+                      {currentTask && (
+                        <p className="mt-0.5 truncate text-xs text-muted-foreground">{currentTask.title}</p>
+                      )}
+                    </div>
+
+                    <span className="font-mono text-xs text-muted-foreground">
+                      {w.identity.toHexString().slice(0, 8)}
                     </span>
                     {w.status !== "dead" && (
                       <Button
@@ -120,7 +127,13 @@ export function AgentsClient() {
                         disabled={killingId === w.id}
                         onClick={() => kill(w.id, w.name)}
                       >
-                        Kill
+                        {killingId === w.id ? (
+                          <LoadingDots />
+                        ) : (
+                          <>
+                            <Skull className="size-3.5" /> Kill
+                          </>
+                        )}
                       </Button>
                     )}
                   </div>
@@ -131,5 +144,39 @@ export function AgentsClient() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+function StatCard({
+  icon,
+  iconClassName,
+  label,
+  value,
+  valueClassName,
+  pulse,
+}: {
+  icon: React.ReactNode;
+  iconClassName: string;
+  label: string;
+  value: number;
+  valueClassName?: string;
+  pulse?: boolean;
+}) {
+  return (
+    <Card>
+      <CardHeader className="pb-1">
+        <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+          <span
+            className={`flex size-7 items-center justify-center rounded-full ${iconClassName} ${pulse ? "animate-pulse" : ""}`}
+          >
+            {icon}
+          </span>
+          {label}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className={`text-3xl font-semibold tabular-nums ${valueClassName ?? ""}`}>{value}</p>
+      </CardContent>
+    </Card>
   );
 }

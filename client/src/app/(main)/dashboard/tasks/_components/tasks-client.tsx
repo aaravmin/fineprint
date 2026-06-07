@@ -1,19 +1,22 @@
 "use client";
 
 import { useState } from "react";
+
 import Link from "next/link";
+
 import { toast } from "sonner";
 import { useReducer, useTable } from "spacetimedb/react";
-import { reducers, tables } from "@/module_bindings/index";
-import { fmtUsd } from "@/lib/engine";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyFolder } from "@/components/ui/empty-folder";
+import { LoadingDots } from "@/components/ui/loading-dots";
+import MultipleSelector, { type Option } from "@/components/ui/multiselect";
+import { fmtUsd } from "@/lib/engine";
+import { reducers, tables } from "@/module_bindings/index";
 
-const STATUS_VARIANT: Record<
-  string,
-  "default" | "secondary" | "destructive" | "outline"
-> = {
+const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
   open: "secondary",
   claimed: "outline",
   in_review: "outline",
@@ -22,6 +25,15 @@ const STATUS_VARIANT: Record<
   done: "default",
 };
 
+const STATUS_OPTIONS: Option[] = [
+  { value: "open", label: "open" },
+  { value: "claimed", label: "claimed" },
+  { value: "in_review", label: "in review" },
+  { value: "approved", label: "approved" },
+  { value: "rejected", label: "rejected" },
+  { value: "done", label: "done" },
+];
+
 export function TasksClient() {
   const [tasks] = useTable(tables.task);
   const [buildings] = useTable(tables.building);
@@ -29,6 +41,7 @@ export function TasksClient() {
   const approve = useReducer(reducers.approve);
   const reject = useReducer(reducers.reject);
   const [pendingTaskId, setPendingTaskId] = useState<bigint | null>(null);
+  const [statusFilter, setStatusFilter] = useState<Option[]>([]);
 
   async function review(taskId: bigint, verdict: "approve" | "reject") {
     setPendingTaskId(taskId);
@@ -50,7 +63,11 @@ export function TasksClient() {
     }
   }
 
-  const sorted = [...tasks].sort((a, b) => {
+  const activeStatuses = statusFilter.map((option) => option.value);
+
+  const filtered = activeStatuses.length === 0 ? tasks : tasks.filter((task) => activeStatuses.includes(task.status));
+
+  const sorted = [...filtered].sort((a, b) => {
     const statusOrder: Record<string, number> = {
       open: 0,
       claimed: 1,
@@ -71,50 +88,57 @@ export function TasksClient() {
     <div className="@container/main flex flex-col gap-4 md:gap-6">
       <div className="flex flex-wrap gap-3">
         {Object.entries(counts).map(([status, count]) => (
-          <Card key={status} className="px-4 py-3 flex items-center gap-2">
-            <Badge variant={STATUS_VARIANT[status] ?? "secondary"}>
-              {status.replace("_", " ")}
-            </Badge>
+          <Card key={status} className="flex items-center gap-2 px-4 py-3">
+            <Badge variant={STATUS_VARIANT[status] ?? "secondary"}>{status.replace("_", " ")}</Badge>
             <span className="font-semibold">{count}</span>
           </Card>
         ))}
       </div>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="gap-4">
           <CardTitle>Task queue</CardTitle>
+          <MultipleSelector
+            value={statusFilter}
+            onChange={setStatusFilter}
+            defaultOptions={STATUS_OPTIONS}
+            placeholder="Filter by status…"
+            hidePlaceholderWhenSelected
+            emptyIndicator={<p className="text-center text-sm text-muted-foreground">No matching status</p>}
+            className="max-w-md"
+          />
         </CardHeader>
         <CardContent className="p-0">
           {sorted.length === 0 ? (
-            <div className="px-6 py-10 text-center text-sm text-muted-foreground">
-              No tasks. Run{" "}
-              <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">
-                npm run seed
-              </code>{" "}
-              to create obligations.
-            </div>
+            tasks.length === 0 ? (
+              <EmptyFolder
+                title="No tasks in the queue"
+                description={
+                  <>
+                    Run <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">npm run seed</code> to create
+                    obligations
+                  </>
+                }
+              />
+            ) : (
+              <div className="px-6 py-10 text-center text-sm text-muted-foreground">
+                No tasks match the selected statuses.
+              </div>
+            )
           ) : (
             <div className="divide-y">
-              {sorted.map(task => {
-                const building = buildings.find(b => b.id === task.buildingId);
+              {sorted.map((task) => {
+                const building = buildings.find((b) => b.id === task.buildingId);
                 const claimedWorker =
-                  task.claimedBy !== undefined
-                    ? workers.find(w => w.id === task.claimedBy)
-                    : undefined;
+                  task.claimedBy !== undefined ? workers.find((w) => w.id === task.claimedBy) : undefined;
 
                 return (
-                  <div
-                    key={String(task.id)}
-                    className="flex items-center gap-3 px-6 py-4"
-                  >
-                    <Badge
-                      variant={STATUS_VARIANT[task.status] ?? "secondary"}
-                      className="shrink-0"
-                    >
+                  <div key={String(task.id)} className="flex items-center gap-3 px-6 py-4">
+                    <Badge variant={STATUS_VARIANT[task.status] ?? "secondary"} className="shrink-0">
                       {task.status.replace("_", " ")}
                     </Badge>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{task.title}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium">{task.title}</p>
                       {building && (
                         <Link
                           href={`/dashboard/buildings/${building.id}`}
@@ -125,28 +149,24 @@ export function TasksClient() {
                       )}
                     </div>
                     {claimedWorker && (
-                      <span className="text-xs text-muted-foreground shrink-0">
-                        {claimedWorker.name}
-                      </span>
+                      <span className="shrink-0 text-xs text-muted-foreground">{claimedWorker.name}</span>
                     )}
                     {task.fineEstimateUsd !== undefined && (
-                      <span className="text-xs text-muted-foreground shrink-0">
-                        {fmtUsd(task.fineEstimateUsd)}/yr
-                      </span>
+                      <span className="shrink-0 text-xs text-muted-foreground">{fmtUsd(task.fineEstimateUsd)}/yr</span>
                     )}
                     {task.slaBreached && (
-                      <Badge variant="destructive" className="text-xs shrink-0">
+                      <Badge variant="destructive" className="shrink-0 text-xs">
                         SLA
                       </Badge>
                     )}
                     {task.status === "in_review" && (
-                      <div className="flex gap-2 shrink-0">
+                      <div className="flex shrink-0 gap-2">
                         <Button
                           size="sm"
                           disabled={pendingTaskId === task.id}
                           onClick={() => review(task.id, "approve")}
                         >
-                          Approve
+                          {pendingTaskId === task.id ? <LoadingDots /> : "Approve"}
                         </Button>
                         <Button
                           size="sm"

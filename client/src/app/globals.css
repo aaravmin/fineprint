@@ -280,6 +280,24 @@ These serve as the fallback; there is no separate default.css file. */
   }
 }
 
+@keyframes ink-draw {
+  from {
+    stroke-dashoffset: 3600;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ink-stroke {
+    stroke-dashoffset: 0 !important;
+    animation: none !important;
+  }
+  .ink-nib {
+    display: none !important;
+  }
+}
+
 html {
   overscroll-behavior: none;
 }
