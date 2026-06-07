@@ -209,3 +209,14 @@ function note(notes: string[], text: string): void {
 function roundTco2e(value: number): number {
   return Math.round(value * 100) / 100;
 }
+
+// Retrofit optimizer lives in its own module; re-exported here so package
+// consumers (the dashboard's alias points at this file) get one entry point.
+export {
+  optimizeRetrofit,
+  DEFAULT_MEASURES,
+  type RetrofitMeasure,
+  type RetrofitPlan,
+  type MaccPoint,
+  type RetrofitAssessment,
+} from "./retrofit.ts";

@@ -28,13 +28,13 @@ if (!fs.existsSync(presetDir)) {
 
 const outputPath = path.resolve(__dirname, "../lib/preferences/theme.ts");
 
-const files = fs.readdirSync(presetDir).filter((file) => file.endsWith(".css"));
+const files = fs.readdirSync(presetDir).filter(file => file.endsWith(".css"));
 
 if (files.length === 0) {
   console.warn("⚠️ No preset CSS files found. Only default preset will be included.");
 }
 
-const presets = files.map((file) => {
+const presets = files.map(file => {
   const filePath = path.join(presetDir, file);
   const content = fs.readFileSync(filePath, "utf8");
 
@@ -51,8 +51,12 @@ const presets = files.map((file) => {
   const label = labelMatch?.[1]?.trim() ?? file.replace(".css", "");
   const value = valueMatch?.[1]?.trim() ?? file.replace(".css", "");
 
-  const lightPrimaryMatch = content.match(/:root\[data-theme-preset="[^"]*"\][\s\S]*?--primary:\s*([^;]+);/);
-  const darkPrimaryMatch = content.match(/\.dark:root\[data-theme-preset="[^"]*"\][\s\S]*?--primary:\s*([^;]+);/);
+  const lightPrimaryMatch = content.match(
+    /:root\[data-theme-preset="[^"]*"\][\s\S]*?--primary:\s*([^;]+);/,
+  );
+  const darkPrimaryMatch = content.match(
+    /\.dark:root\[data-theme-preset="[^"]*"\][\s\S]*?--primary:\s*([^;]+);/,
+  );
 
   const primary = {
     light: lightPrimaryMatch?.[1]?.trim() ?? "",
@@ -109,10 +113,14 @@ const updated = fileContent.replace(
 
 function main() {
   const biomeBin = require.resolve("@biomejs/biome/bin/biome");
-  const formatted = execFileSync(process.execPath, [biomeBin, "format", "--stdin-file-path", outputPath], {
-    input: updated,
-    encoding: "utf8",
-  });
+  const formatted = execFileSync(
+    process.execPath,
+    [biomeBin, "format", "--stdin-file-path", outputPath],
+    {
+      input: updated,
+      encoding: "utf8",
+    },
+  );
 
   if (formatted === fileContent) {
     console.log("ℹ️  No changes in theme.ts");

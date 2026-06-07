@@ -16,11 +16,13 @@ interface DateRangePickerProps {
 
 export function DateRangePicker({ value, onChange }: DateRangePickerProps) {
   const [open, setOpen] = React.useState(false);
-  const [internalDateRange, setInternalDateRange] = React.useState<DateRange | undefined>(() => {
-    const to = new Date();
-    const from = subDays(to, 29);
-    return { from, to };
-  });
+  const [internalDateRange, setInternalDateRange] = React.useState<DateRange | undefined>(
+    () => {
+      const to = new Date();
+      const from = subDays(to, 29);
+      return { from, to };
+    },
+  );
   const dateRange = value ?? internalDateRange;
 
   const handleDateChange = (nextValue: DateRange | undefined) => {

@@ -1,466 +1,751 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Fineprint — your building's real Local Law 97 fine, and how to fund the fix</title>
-  <meta name="description" content="Type a NYC building address and get its real Local Law 97 carbon fine — plus an AI-ranked, rebate-funded fix-it plan. Every number is a labeled estimate." />
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+      Fineprint — your building's real Local Law 97 fine, and how to fund the fix
+    </title>
+    <meta
+      name="description"
+      content="Type a NYC building address and get its real Local Law 97 carbon fine — plus an AI-ranked, rebate-funded fix-it plan. Every number is a labeled estimate."
+    />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;450;500;600&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;450;500;600&display=swap"
+      rel="stylesheet"
+    />
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            canvas: "#FAF9F6",
-            paper: "#FFFFFF",
-            ink: "#141414",
-            muted: "#565250",
-            faint: "#8A857E",
-            hairline: "#E7E3DB",
-            signal: "#E5342B",
-            signalbg: "#FCEBE8",
-            green: "#15A34A",
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              canvas: "#FAF9F6",
+              paper: "#FFFFFF",
+              ink: "#141414",
+              muted: "#565250",
+              faint: "#8A857E",
+              hairline: "#E7E3DB",
+              signal: "#E5342B",
+              signalbg: "#FCEBE8",
+              green: "#15A34A",
+            },
+            fontFamily: {
+              display: ['"Space Grotesk"', "ui-sans-serif", "system-ui", "sans-serif"],
+              sans: ['"Inter"', "ui-sans-serif", "system-ui", "sans-serif"],
+            },
+            boxShadow: {
+              card: "0 1px 2px rgba(20,20,20,0.04), 0 4px 14px -6px rgba(20,20,20,0.08)",
+              float:
+                "0 2px 4px rgba(20,20,20,0.05), 0 18px 44px -16px rgba(20,20,20,0.20)",
+            },
+            letterSpacing: { tightest: "-0.04em" },
           },
-          fontFamily: {
-            display: ['"Space Grotesk"', "ui-sans-serif", "system-ui", "sans-serif"],
-            sans: ['"Inter"', "ui-sans-serif", "system-ui", "sans-serif"],
-          },
-          boxShadow: {
-            card: "0 1px 2px rgba(20,20,20,0.04), 0 4px 14px -6px rgba(20,20,20,0.08)",
-            float: "0 2px 4px rgba(20,20,20,0.05), 0 18px 44px -16px rgba(20,20,20,0.20)",
-          },
-          letterSpacing: { tightest: "-0.04em" },
         },
-      },
-    };
-  </script>
+      };
+    </script>
 
-  <style>
-    :root {
-      --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-      --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
-    }
-    html { scroll-behavior: smooth; }
-    body {
-      background-color: #FAF9F6;
-      /* Layered radial gradients for warm depth */
-      background-image:
-        radial-gradient(60% 50% at 78% -8%, rgba(229,52,43,0.06), transparent 70%),
-        radial-gradient(50% 40% at 8% 4%, rgba(21,163,74,0.05), transparent 70%),
-        radial-gradient(80% 60% at 50% 120%, rgba(20,20,20,0.04), transparent 70%);
-    }
-    /* Fine SVG grain overlay for texture (very low opacity) */
-    .grain::before {
-      content: "";
-      position: fixed; inset: 0; z-index: 0; pointer-events: none;
-      opacity: 0.035;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    }
-    .tnum { font-variant-numeric: tabular-nums; }
+    <style>
+      :root {
+        --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+        --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background-color: #faf9f6;
+        /* Layered radial gradients for warm depth */
+        background-image:
+          radial-gradient(60% 50% at 78% -8%, rgba(229, 52, 43, 0.06), transparent 70%),
+          radial-gradient(50% 40% at 8% 4%, rgba(21, 163, 74, 0.05), transparent 70%),
+          radial-gradient(80% 60% at 50% 120%, rgba(20, 20, 20, 0.04), transparent 70%);
+      }
+      /* Fine SVG grain overlay for texture (very low opacity) */
+      .grain::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        opacity: 0.035;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      }
+      .tnum {
+        font-variant-numeric: tabular-nums;
+      }
 
-    /* Scroll reveal: transform + opacity only; staggered via --i */
-    .rise { opacity: 0; transform: translateY(14px); }
-    .rise.in {
-      opacity: 1; transform: translateY(0);
-      transition: opacity 600ms var(--ease-out), transform 600ms var(--ease-out);
-      transition-delay: calc(var(--i, 0) * 60ms);
-    }
+      /* Scroll reveal: transform + opacity only; staggered via --i */
+      .rise {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      .rise.in {
+        opacity: 1;
+        transform: translateY(0);
+        transition:
+          opacity 600ms var(--ease-out),
+          transform 600ms var(--ease-out);
+        transition-delay: calc(var(--i, 0) * 60ms);
+      }
 
-    /* Press feedback on every pressable element */
-    .press { transition: transform 160ms var(--ease-out); }
-    .press:active { transform: scale(0.97); }
+      /* Press feedback on every pressable element */
+      .press {
+        transition: transform 160ms var(--ease-out);
+      }
+      .press:active {
+        transform: scale(0.97);
+      }
 
-    /* Cliff bars grow from baseline on reveal */
-    .bar { transform: scaleY(0.04); transform-origin: bottom; }
-    .in .bar {
-      transform: scaleY(1);
-      transition: transform 700ms var(--ease-in-out);
-      transition-delay: calc(120ms + var(--b, 0) * 90ms);
-    }
+      /* Cliff bars grow from baseline on reveal */
+      .bar {
+        transform: scaleY(0.04);
+        transform-origin: bottom;
+      }
+      .in .bar {
+        transform: scaleY(1);
+        transition: transform 700ms var(--ease-in-out);
+        transition-delay: calc(120ms + var(--b, 0) * 90ms);
+      }
 
-    @media (hover: hover) and (pointer: fine) {
-      .lift { transition: transform 220ms var(--ease-out), box-shadow 220ms var(--ease-out); }
-      .lift:hover { transform: translateY(-3px); }
-    }
+      @media (hover: hover) and (pointer: fine) {
+        .lift {
+          transition:
+            transform 220ms var(--ease-out),
+            box-shadow 220ms var(--ease-out);
+        }
+        .lift:hover {
+          transform: translateY(-3px);
+        }
+      }
 
-    @media (prefers-reduced-motion: reduce) {
-      html { scroll-behavior: auto; }
-      .rise, .rise.in { opacity: 1; transform: none; transition: opacity 200ms ease; }
-      .bar, .in .bar { transform: none; transition: none; }
-      .press:active { transform: none; }
-      .lift:hover { transform: none; }
-    }
-  </style>
-</head>
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        .rise,
+        .rise.in {
+          opacity: 1;
+          transform: none;
+          transition: opacity 200ms ease;
+        }
+        .bar,
+        .in .bar {
+          transform: none;
+          transition: none;
+        }
+        .press:active {
+          transform: none;
+        }
+        .lift:hover {
+          transform: none;
+        }
+      }
+    </style>
+  </head>
 
-<body class="grain font-sans text-ink antialiased selection:bg-ink selection:text-canvas">
-  <div class="relative z-10">
+  <body
+    class="grain font-sans text-ink antialiased selection:bg-ink selection:text-canvas"
+  >
+    <div class="relative z-10">
+      <!-- ───────────────────────── NAV ───────────────────────── -->
+      <header
+        class="sticky top-0 z-50 border-b border-hairline/70 bg-canvas/80 backdrop-blur-md"
+      >
+        <nav class="mx-auto flex h-16 max-w-6xl items-center justify-between px-5">
+          <a
+            href="#top"
+            class="flex items-center gap-2 font-display text-xl font-700 tracking-tightest"
+          >
+            <span class="inline-block h-2 w-2 rounded-full bg-green"></span>
+            Fineprint
+          </a>
+          <div class="hidden items-center gap-8 text-sm text-muted md:flex">
+            <a href="#how" class="transition-colors hover:text-ink">How it works</a>
+            <a href="#laws" class="transition-colors hover:text-ink">Laws covered</a>
+            <a href="#opsroom" class="transition-colors hover:text-ink">Dashboard</a>
+          </div>
+          <a
+            href="#search"
+            class="press rounded-full bg-ink px-4 py-2 text-sm font-500 text-canvas hover:bg-ink/90"
+          >
+            Check a building
+          </a>
+        </nav>
+      </header>
 
-    <!-- ───────────────────────── NAV ───────────────────────── -->
-    <header class="sticky top-0 z-50 border-b border-hairline/70 bg-canvas/80 backdrop-blur-md">
-      <nav class="mx-auto flex h-16 max-w-6xl items-center justify-between px-5">
-        <a href="#top" class="flex items-center gap-2 font-display text-xl font-700 tracking-tightest">
-          <span class="inline-block h-2 w-2 rounded-full bg-green"></span>
-          Fineprint
-        </a>
-        <div class="hidden items-center gap-8 text-sm text-muted md:flex">
-          <a href="#how" class="transition-colors hover:text-ink">How it works</a>
-          <a href="#laws" class="transition-colors hover:text-ink">Laws covered</a>
-          <a href="#opsroom" class="transition-colors hover:text-ink">Dashboard</a>
-        </div>
-        <a href="#search" class="press rounded-full bg-ink px-4 py-2 text-sm font-500 text-canvas hover:bg-ink/90">
-          Check a building
-        </a>
-      </nav>
-    </header>
+      <main id="top" class="mx-auto max-w-6xl px-5">
+        <!-- ───────────────────────── HERO ───────────────────────── -->
+        <section
+          id="search"
+          class="grid items-center gap-12 pt-16 pb-20 md:grid-cols-[1.05fr_0.95fr] md:pt-24 md:pb-28"
+        >
+          <div>
+            <span
+              class="rise in inline-flex items-center gap-2 rounded-full border border-hairline bg-paper px-3 py-1 text-xs font-500 uppercase tracking-wide text-muted shadow-card"
+            >
+              <span class="inline-block h-1.5 w-1.5 rounded-full bg-green"></span>
+              NYC · Local Law 97
+            </span>
 
-    <main id="top" class="mx-auto max-w-6xl px-5">
+            <h1
+              class="rise in mt-5 font-display text-5xl font-700 leading-[0.98] tracking-tightest sm:text-6xl"
+              style="--i: 1"
+            >
+              Know your building's<br />carbon fine.<br />
+              <span class="text-signal">Fund the fix.</span>
+            </h1>
 
-      <!-- ───────────────────────── HERO ───────────────────────── -->
-      <section id="search" class="grid items-center gap-12 pt-16 pb-20 md:grid-cols-[1.05fr_0.95fr] md:pt-24 md:pb-28">
-        <div>
-          <span class="rise in inline-flex items-center gap-2 rounded-full border border-hairline bg-paper px-3 py-1 text-xs font-500 uppercase tracking-wide text-muted shadow-card">
-            <span class="inline-block h-1.5 w-1.5 rounded-full bg-green"></span>
-            NYC · Local Law 97
-          </span>
+            <p
+              class="rise in mt-5 max-w-md text-lg leading-relaxed text-muted"
+              style="--i: 2"
+            >
+              Type an address. Get the real Local Law 97 number from public data and the
+              verified rule — then an AI-ranked, rebate-funded plan to get under the cap.
+            </p>
 
-          <h1 class="rise in mt-5 font-display text-5xl font-700 leading-[0.98] tracking-tightest sm:text-6xl" style="--i:1">
-            Know your building's<br />carbon fine.<br />
-            <span class="text-signal">Fund the fix.</span>
-          </h1>
+            <!-- Search -->
+            <form class="rise in mt-8" style="--i: 3" onsubmit="return false;">
+              <div class="flex flex-col gap-2.5 sm:flex-row">
+                <label class="flex-1">
+                  <span class="sr-only">NYC building address</span>
+                  <input
+                    type="text"
+                    placeholder="Enter a NYC building address"
+                    class="w-full rounded-2xl border border-hairline bg-paper px-5 py-4 text-base text-ink shadow-card outline-none transition-shadow placeholder:text-faint focus:border-ink/30 focus:shadow-float"
+                  />
+                </label>
+                <button
+                  class="press rounded-2xl bg-ink px-6 py-4 text-base font-500 text-canvas hover:bg-ink/90"
+                >
+                  Check fine&nbsp;→
+                </button>
+              </div>
+              <div class="mt-3 flex flex-wrap items-center gap-2 text-sm text-faint">
+                <span>Try:</span>
+                <button
+                  class="press rounded-full border border-hairline bg-paper px-3 py-1 text-ink/80 hover:border-ink/25"
+                >
+                  1 Wall Street
+                </button>
+                <button
+                  class="press rounded-full border border-hairline bg-paper px-3 py-1 text-ink/80 hover:border-ink/25"
+                >
+                  20 Exchange Place
+                </button>
+                <button
+                  class="press rounded-full border border-hairline bg-paper px-3 py-1 text-ink/80 hover:border-ink/25"
+                >
+                  1870 Pelham Pkwy S
+                </button>
+              </div>
+            </form>
+          </div>
 
-          <p class="rise in mt-5 max-w-md text-lg leading-relaxed text-muted" style="--i:2">
-            Type an address. Get the real Local Law 97 number from public data and the
-            verified rule — then an AI-ranked, rebate-funded plan to get under the cap.
+          <!-- Floating verdict-preview card -->
+          <div
+            class="rise in lift relative rounded-3xl border border-hairline bg-paper p-6 shadow-float sm:p-7"
+            style="--i: 2"
+          >
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <p class="font-display text-lg font-600 tracking-tight">
+                  1870 Pelham Parkway South
+                </p>
+                <p class="mt-0.5 text-sm text-faint tnum">
+                  52,941 sq ft · Multifamily Housing · BBL 2042500026
+                </p>
+              </div>
+              <span
+                class="shrink-0 rounded-full bg-signalbg px-2.5 py-1 text-xs font-600 text-signal"
+                >Over cap</span
+              >
+            </div>
+
+            <div class="mt-6">
+              <div class="flex items-end gap-1">
+                <span
+                  class="font-display text-5xl font-700 tracking-tightest text-signal tnum"
+                  >$4,147</span
+                >
+                <span class="mb-1.5 text-lg text-faint">/yr</span>
+              </div>
+              <p class="mt-1 text-sm font-500 text-signal">Over your cap · 2024–2029</p>
+            </div>
+
+            <!-- Mini cliff chart -->
+            <div class="mt-7">
+              <p class="text-[11px] font-600 uppercase tracking-wide text-faint">
+                Projection · annual fine as the cap tightens
+              </p>
+              <div class="mt-3 grid grid-cols-3 gap-3">
+                <div class="flex flex-col items-center gap-2">
+                  <div class="flex h-28 w-full items-end">
+                    <div
+                      class="bar w-full rounded-t-md bg-signal/30"
+                      style="height: 14%; --b: 0"
+                    ></div>
+                  </div>
+                  <span class="text-[11px] text-faint tnum">2024–29</span>
+                </div>
+                <div class="flex flex-col items-center gap-2">
+                  <div class="flex h-28 w-full items-end">
+                    <div
+                      class="bar w-full rounded-t-md bg-signal"
+                      style="height: 92%; --b: 1"
+                    ></div>
+                  </div>
+                  <span class="text-[11px] text-faint tnum">2030–34</span>
+                </div>
+                <div class="flex flex-col items-center gap-2">
+                  <div class="flex h-28 w-full items-end">
+                    <div
+                      class="bar w-full rounded-t-md bg-signal"
+                      style="height: 100%; --b: 2"
+                    ></div>
+                  </div>
+                  <span class="text-[11px] text-faint tnum">2035–39</span>
+                </div>
+              </div>
+            </div>
+
+            <p
+              class="mt-5 border-t border-hairline pt-4 text-xs leading-relaxed text-faint"
+            >
+              Estimate from public LL84 disclosure; limits per 1 RCNY §103-14. The
+              official figure requires a registered design professional.
+            </p>
+          </div>
+        </section>
+
+        <!-- ───────────────────────── STAKES STRIP ───────────────────────── -->
+        <section
+          class="grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-hairline bg-hairline/60 text-center shadow-card md:grid-cols-4"
+        >
+          <div class="rise bg-paper px-4 py-7" style="--i: 0">
+            <p class="font-display text-3xl font-700 tracking-tight text-ink tnum">
+              $268
+            </p>
+            <p class="mt-1 text-sm text-muted">per tCO₂e over the cap</p>
+          </div>
+          <div class="rise bg-paper px-4 py-7" style="--i: 1">
+            <p class="font-display text-3xl font-700 tracking-tight text-signal tnum">
+              2030
+            </p>
+            <p class="mt-1 text-sm text-muted">the cliff — limits tighten</p>
+          </div>
+          <div class="rise bg-paper px-4 py-7" style="--i: 2">
+            <p class="font-display text-3xl font-700 tracking-tight text-ink tnum">
+              ~28,000
+            </p>
+            <p class="mt-1 text-sm text-muted">covered NYC buildings</p>
+          </div>
+          <div class="rise bg-paper px-4 py-7" style="--i: 3">
+            <p class="font-display text-3xl font-700 tracking-tight text-ink tnum">40+</p>
+            <p class="mt-1 text-sm text-muted">cities with the same law</p>
+          </div>
+        </section>
+
+        <!-- ───────────────────────── HOW IT WORKS ───────────────────────── -->
+        <section id="how" class="py-24 md:py-28">
+          <h2 class="rise font-display text-3xl font-700 tracking-tight sm:text-4xl">
+            From address to funded plan
+          </h2>
+          <p class="rise mt-3 max-w-lg text-lg text-muted" style="--i: 1">
+            Three steps. No spreadsheet, no consultant required to see where you stand.
           </p>
 
-          <!-- Search -->
-          <form class="rise in mt-8" style="--i:3" onsubmit="return false">
-            <div class="flex flex-col gap-2.5 sm:flex-row">
-              <label class="flex-1">
-                <span class="sr-only">NYC building address</span>
-                <input
-                  type="text"
-                  placeholder="Enter a NYC building address"
-                  class="w-full rounded-2xl border border-hairline bg-paper px-5 py-4 text-base text-ink shadow-card outline-none transition-shadow placeholder:text-faint focus:border-ink/30 focus:shadow-float"
-                />
-              </label>
-              <button class="press rounded-2xl bg-ink px-6 py-4 text-base font-500 text-canvas hover:bg-ink/90">
-                Check fine&nbsp;→
-              </button>
+          <div class="mt-12 grid gap-5 md:grid-cols-3">
+            <div
+              class="rise lift rounded-3xl border border-hairline bg-paper p-7 shadow-card"
+              style="--i: 0"
+            >
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-ink font-display text-sm font-600 text-canvas tnum"
+                >1</span
+              >
+              <h3 class="mt-5 font-display text-xl font-600 tracking-tight">
+                Enter your address
+              </h3>
+              <p class="mt-2 leading-relaxed text-muted">
+                Any NYC building over 25,000 sq ft. We resolve it to its tax lot and pull
+                the city's own records.
+              </p>
             </div>
-            <div class="mt-3 flex flex-wrap items-center gap-2 text-sm text-faint">
-              <span>Try:</span>
-              <button class="press rounded-full border border-hairline bg-paper px-3 py-1 text-ink/80 hover:border-ink/25">1 Wall Street</button>
-              <button class="press rounded-full border border-hairline bg-paper px-3 py-1 text-ink/80 hover:border-ink/25">20 Exchange Place</button>
-              <button class="press rounded-full border border-hairline bg-paper px-3 py-1 text-ink/80 hover:border-ink/25">1870 Pelham Pkwy S</button>
+            <div
+              class="rise lift rounded-3xl border border-hairline bg-paper p-7 shadow-card"
+              style="--i: 1"
+            >
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-ink font-display text-sm font-600 text-canvas tnum"
+                >2</span
+              >
+              <h3 class="mt-5 font-display text-xl font-600 tracking-tight">
+                See your real fine
+              </h3>
+              <p class="mt-2 leading-relaxed text-muted">
+                Computed from LL84 benchmarking data against the verified LL97 limits —
+                every number, all three periods.
+              </p>
             </div>
+            <div
+              class="rise lift rounded-3xl border border-hairline bg-paper p-7 shadow-card"
+              style="--i: 2"
+            >
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-ink font-display text-sm font-600 text-canvas tnum"
+                >3</span
+              >
+              <h3 class="mt-5 font-display text-xl font-600 tracking-tight">
+                Get a funded plan
+              </h3>
+              <p class="mt-2 leading-relaxed text-muted">
+                Ranked retrofits matched to real Con Ed / NYSERDA / IRS rebates, with
+                payback in years.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ───────────────────────── COMPUTE vs TRACK ───────────────────────── -->
+        <section id="laws" class="py-8 md:py-12">
+          <div
+            class="rise rounded-[2rem] border border-hairline bg-paper p-7 shadow-card sm:p-10"
+          >
+            <p class="font-display text-sm font-600 uppercase tracking-wide text-faint">
+              The principle
+            </p>
+            <h2
+              class="mt-2 max-w-2xl font-display text-2xl font-700 leading-snug tracking-tight sm:text-3xl"
+            >
+              Compute what's computable. Track what's trackable.
+              <span class="text-signal">Never fake a number.</span>
+            </h2>
+
+            <div
+              class="mt-9 grid gap-px overflow-hidden rounded-3xl border border-hairline bg-hairline/60 md:grid-cols-2"
+            >
+              <!-- COMPUTE -->
+              <div class="bg-paper p-7">
+                <div class="flex items-center gap-2">
+                  <span class="inline-block h-2 w-2 rounded-full bg-signal"></span>
+                  <h3 class="font-display text-lg font-600 tracking-tight">Compute</h3>
+                  <span class="text-xs text-faint"
+                    >fines that cost thousands to interpret</span
+                  >
+                </div>
+                <ul class="mt-5 space-y-3 text-[15px] text-muted">
+                  <li class="flex gap-2.5">
+                    <span class="text-ink">—</span> Local Law 97 carbon fines, verified
+                    against 1 RCNY §103-14
+                  </li>
+                  <li class="flex gap-2.5">
+                    <span class="text-ink">—</span> A rebate-funded retrofit plan with
+                    real payback math
+                  </li>
+                  <li class="flex gap-2.5">
+                    <span class="text-ink">—</span> The affordable-housing (Article 321)
+                    pathway
+                  </li>
+                  <li class="flex gap-2.5">
+                    <span class="text-ink">—</span> Expanding to the 40+ cities with the
+                    same standard
+                  </li>
+                </ul>
+              </div>
+              <!-- TRACK -->
+              <div class="bg-paper p-7">
+                <div class="flex items-center gap-2">
+                  <span class="inline-block h-2 w-2 rounded-full bg-green"></span>
+                  <h3 class="font-display text-lg font-600 tracking-tight">Track</h3>
+                  <span class="text-xs text-faint"
+                    >deadlines that cost thousands to miss</span
+                  >
+                </div>
+                <div class="mt-5 flex flex-wrap gap-2">
+                  <span
+                    class="rounded-full border border-hairline bg-canvas px-3 py-1 text-sm text-ink/80"
+                    >FISP / LL11 facade</span
+                  >
+                  <span
+                    class="rounded-full border border-hairline bg-canvas px-3 py-1 text-sm text-ink/80"
+                    >LL84 benchmarking</span
+                  >
+                  <span
+                    class="rounded-full border border-hairline bg-canvas px-3 py-1 text-sm text-ink/80"
+                    >LL33/95 grade</span
+                  >
+                  <span
+                    class="rounded-full border border-hairline bg-canvas px-3 py-1 text-sm text-ink/80"
+                    >LL152 gas</span
+                  >
+                  <span
+                    class="rounded-full border border-hairline bg-canvas px-3 py-1 text-sm text-ink/80"
+                    >Boiler</span
+                  >
+                  <span
+                    class="rounded-full border border-hairline bg-canvas px-3 py-1 text-sm text-ink/80"
+                    >Elevator</span
+                  >
+                </div>
+                <p class="mt-5 text-[15px] leading-relaxed text-muted">
+                  Public DOB deadlines and status, on one real-time board — so you never
+                  eat a late penalty.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ───────────────────────── FUNDED FIX-IT PLAN ───────────────────────── -->
+        <section class="py-24 md:py-28">
+          <div class="grid items-start gap-12 md:grid-cols-[0.9fr_1.1fr]">
+            <div>
+              <h2 class="rise font-display text-3xl font-700 tracking-tight sm:text-4xl">
+                A plan that pays for itself
+              </h2>
+              <p class="rise mt-4 text-lg leading-relaxed text-muted" style="--i: 1">
+                Code computes every dollar, ton, and year. The optimizer enumerates
+                retrofit combinations, matches each to the single best as-of-right cash
+                rebate, and ranks by payback. Claude only orders and explains — it never
+                invents a number.
+              </p>
+              <ul class="rise mt-6 space-y-2 text-[15px] text-muted" style="--i: 2">
+                <li class="flex gap-2.5">
+                  <span class="text-green">✓</span> Avoided fine bounded by your actual
+                  overage
+                </li>
+                <li class="flex gap-2.5">
+                  <span class="text-green">✓</span> One best cash rebate per measure —
+                  never double-counted
+                </li>
+                <li class="flex gap-2.5">
+                  <span class="text-green">✓</span> Income-restricted programs unlock for
+                  affordable housing
+                </li>
+              </ul>
+            </div>
+
+            <!-- Ranked fix list -->
+            <div
+              class="rise lift rounded-3xl border border-hairline bg-paper p-6 shadow-float sm:p-7"
+              style="--i: 1"
+            >
+              <div class="flex items-baseline justify-between">
+                <p
+                  class="font-display text-sm font-600 uppercase tracking-wide text-faint"
+                >
+                  Ranked fixes
+                </p>
+                <p class="text-sm text-faint">by payback</p>
+              </div>
+
+              <div class="mt-4 space-y-3">
+                <!-- row -->
+                <div
+                  class="flex items-center gap-4 rounded-2xl border border-hairline bg-canvas/60 p-4"
+                >
+                  <div class="min-w-0 flex-1">
+                    <p class="truncate font-500 text-ink">Boiler / BMS controls</p>
+                    <div class="mt-1.5 flex flex-wrap gap-1.5">
+                      <span
+                        class="rounded-md bg-green/10 px-2 py-0.5 text-xs font-500 text-green"
+                        >Con Ed · up to $2.6k/unit</span
+                      >
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <p class="font-display text-lg font-700 text-ink tnum">1.4 yr</p>
+                    <p class="text-xs text-faint">payback</p>
+                  </div>
+                </div>
+                <!-- row -->
+                <div
+                  class="flex items-center gap-4 rounded-2xl border border-hairline bg-canvas/60 p-4"
+                >
+                  <div class="min-w-0 flex-1">
+                    <p class="truncate font-500 text-ink">Weatherization package</p>
+                    <div class="mt-1.5 flex flex-wrap gap-1.5">
+                      <span
+                        class="rounded-md bg-green/10 px-2 py-0.5 text-xs font-500 text-green"
+                        >NYSERDA · up to $14k/unit</span
+                      >
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <p class="font-display text-lg font-700 text-ink tnum">3.0 yr</p>
+                    <p class="text-xs text-faint">payback</p>
+                  </div>
+                </div>
+                <!-- row -->
+                <div
+                  class="flex items-center gap-4 rounded-2xl border border-hairline bg-canvas/60 p-4"
+                >
+                  <div class="min-w-0 flex-1">
+                    <p class="truncate font-500 text-ink">Air-source heat pump</p>
+                    <div class="mt-1.5 flex flex-wrap gap-1.5">
+                      <span
+                        class="rounded-md bg-green/10 px-2 py-0.5 text-xs font-500 text-green"
+                        >Clean Heat · up to $10k/unit</span
+                      >
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <p class="font-display text-lg font-700 text-ink tnum">8.6 yr</p>
+                    <p class="text-xs text-faint">payback</p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="mt-5 flex items-center justify-between border-t border-hairline pt-4"
+              >
+                <p class="text-sm text-muted">Fines avoided through 2050</p>
+                <p class="font-display text-xl font-700 text-green tnum">$3.78M</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ───────────────────────── OPS ROOM ───────────────────────── -->
+        <section id="opsroom" class="pb-24 md:pb-28">
+          <div
+            class="rise overflow-hidden rounded-[2rem] border border-hairline bg-paper shadow-card"
+          >
+            <div class="grid gap-px bg-hairline/60 lg:grid-cols-[1.1fr_0.9fr]">
+              <div class="bg-paper p-8 sm:p-10">
+                <span
+                  class="inline-flex items-center gap-2 rounded-full border border-hairline bg-canvas px-3 py-1 text-xs font-500 text-muted"
+                >
+                  <span class="relative flex h-1.5 w-1.5"
+                    ><span
+                      class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green opacity-60"
+                    ></span
+                    ><span
+                      class="relative inline-flex h-1.5 w-1.5 rounded-full bg-green"
+                    ></span
+                  ></span>
+                  Real-time
+                </span>
+                <h2
+                  class="mt-5 font-display text-3xl font-700 tracking-tight sm:text-4xl"
+                >
+                  A live compliance ops room
+                </h2>
+                <p class="mt-4 max-w-md text-lg leading-relaxed text-muted">
+                  Every obligation becomes a ticket with its statutory deadline on a
+                  timer. AI workers claim tickets, draft the remediation, and submit. You
+                  approve every one.
+                </p>
+                <p class="mt-4 max-w-md leading-relaxed text-muted">
+                  Kill a worker mid-ticket and within seconds it's back in the queue and
+                  another agent has it. Nothing falls through.
+                </p>
+              </div>
+
+              <!-- ticket board -->
+              <div class="bg-canvas/50 p-8 sm:p-10">
+                <p class="text-[11px] font-600 uppercase tracking-wide text-faint">
+                  Open tickets
+                </p>
+                <div class="mt-4 space-y-2.5">
+                  <div
+                    class="flex items-center justify-between rounded-xl border border-hairline bg-paper px-4 py-3 shadow-card"
+                  >
+                    <div class="flex items-center gap-3">
+                      <span class="inline-block h-2 w-2 rounded-full bg-signal"></span>
+                      <span class="font-500">LL97 over-cap exposure</span>
+                    </div>
+                    <span class="text-xs text-faint">claimed · atlas</span>
+                  </div>
+                  <div
+                    class="flex items-center justify-between rounded-xl border border-hairline bg-paper px-4 py-3 shadow-card"
+                  >
+                    <div class="flex items-center gap-3">
+                      <span class="inline-block h-2 w-2 rounded-full bg-signal/60"></span>
+                      <span class="font-500">FISP cycle 9 filing</span>
+                    </div>
+                    <span class="text-xs text-faint">drafting · nyx</span>
+                  </div>
+                  <div
+                    class="flex items-center justify-between rounded-xl border border-hairline bg-paper px-4 py-3 shadow-card"
+                  >
+                    <div class="flex items-center gap-3">
+                      <span class="inline-block h-2 w-2 rounded-full bg-green"></span>
+                      <span class="font-500">LL84 benchmarking</span>
+                    </div>
+                    <span class="text-xs font-500 text-green">approved</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- ───────────────────────── CTA + FOOTER ───────────────────────── -->
+      <section class="border-t border-hairline bg-paper">
+        <div class="mx-auto max-w-6xl px-5 py-20 text-center md:py-24">
+          <h2 class="rise font-display text-4xl font-700 tracking-tightest sm:text-5xl">
+            See your building's number
+          </h2>
+          <p class="rise mx-auto mt-4 max-w-md text-lg text-muted" style="--i: 1">
+            It takes one address and about ten seconds.
+          </p>
+          <form
+            class="rise mx-auto mt-8 flex max-w-md flex-col gap-2.5 sm:flex-row"
+            style="--i: 2"
+            onsubmit="return false;"
+          >
+            <input
+              type="text"
+              placeholder="Enter a NYC building address"
+              class="flex-1 rounded-2xl border border-hairline bg-canvas px-5 py-4 text-base text-ink outline-none transition-shadow placeholder:text-faint focus:border-ink/30 focus:shadow-card"
+            />
+            <button
+              class="press rounded-2xl bg-ink px-6 py-4 text-base font-500 text-canvas hover:bg-ink/90"
+            >
+              Check fine&nbsp;→
+            </button>
           </form>
         </div>
 
-        <!-- Floating verdict-preview card -->
-        <div class="rise in lift relative rounded-3xl border border-hairline bg-paper p-6 shadow-float sm:p-7" style="--i:2">
-          <div class="flex items-start justify-between gap-4">
-            <div>
-              <p class="font-display text-lg font-600 tracking-tight">1870 Pelham Parkway South</p>
-              <p class="mt-0.5 text-sm text-faint tnum">52,941 sq ft · Multifamily Housing · BBL 2042500026</p>
+        <footer class="border-t border-hairline">
+          <div
+            class="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-8 text-sm text-faint md:flex-row md:items-center md:justify-between"
+          >
+            <div class="flex items-center gap-2 font-display text-base font-600 text-ink">
+              <span class="inline-block h-1.5 w-1.5 rounded-full bg-green"></span>
+              Fineprint
             </div>
-            <span class="shrink-0 rounded-full bg-signalbg px-2.5 py-1 text-xs font-600 text-signal">Over cap</span>
-          </div>
-
-          <div class="mt-6">
-            <div class="flex items-end gap-1">
-              <span class="font-display text-5xl font-700 tracking-tightest text-signal tnum">$4,147</span>
-              <span class="mb-1.5 text-lg text-faint">/yr</span>
-            </div>
-            <p class="mt-1 text-sm font-500 text-signal">Over your cap · 2024–2029</p>
-          </div>
-
-          <!-- Mini cliff chart -->
-          <div class="mt-7">
-            <p class="text-[11px] font-600 uppercase tracking-wide text-faint">Projection · annual fine as the cap tightens</p>
-            <div class="mt-3 grid grid-cols-3 gap-3">
-              <div class="flex flex-col items-center gap-2">
-                <div class="flex h-28 w-full items-end">
-                  <div class="bar w-full rounded-t-md bg-signal/30" style="height:14%;--b:0"></div>
-                </div>
-                <span class="text-[11px] text-faint tnum">2024–29</span>
-              </div>
-              <div class="flex flex-col items-center gap-2">
-                <div class="flex h-28 w-full items-end">
-                  <div class="bar w-full rounded-t-md bg-signal" style="height:92%;--b:1"></div>
-                </div>
-                <span class="text-[11px] text-faint tnum">2030–34</span>
-              </div>
-              <div class="flex flex-col items-center gap-2">
-                <div class="flex h-28 w-full items-end">
-                  <div class="bar w-full rounded-t-md bg-signal" style="height:100%;--b:2"></div>
-                </div>
-                <span class="text-[11px] text-faint tnum">2035–39</span>
-              </div>
-            </div>
-          </div>
-
-          <p class="mt-5 border-t border-hairline pt-4 text-xs leading-relaxed text-faint">
-            Estimate from public LL84 disclosure; limits per 1 RCNY §103-14. The official
-            figure requires a registered design professional.
-          </p>
-        </div>
-      </section>
-
-      <!-- ───────────────────────── STAKES STRIP ───────────────────────── -->
-      <section class="grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-hairline bg-hairline/60 text-center shadow-card md:grid-cols-4">
-        <div class="rise bg-paper px-4 py-7" style="--i:0">
-          <p class="font-display text-3xl font-700 tracking-tight text-ink tnum">$268</p>
-          <p class="mt-1 text-sm text-muted">per tCO₂e over the cap</p>
-        </div>
-        <div class="rise bg-paper px-4 py-7" style="--i:1">
-          <p class="font-display text-3xl font-700 tracking-tight text-signal tnum">2030</p>
-          <p class="mt-1 text-sm text-muted">the cliff — limits tighten</p>
-        </div>
-        <div class="rise bg-paper px-4 py-7" style="--i:2">
-          <p class="font-display text-3xl font-700 tracking-tight text-ink tnum">~28,000</p>
-          <p class="mt-1 text-sm text-muted">covered NYC buildings</p>
-        </div>
-        <div class="rise bg-paper px-4 py-7" style="--i:3">
-          <p class="font-display text-3xl font-700 tracking-tight text-ink tnum">40+</p>
-          <p class="mt-1 text-sm text-muted">cities with the same law</p>
-        </div>
-      </section>
-
-      <!-- ───────────────────────── HOW IT WORKS ───────────────────────── -->
-      <section id="how" class="py-24 md:py-28">
-        <h2 class="rise font-display text-3xl font-700 tracking-tight sm:text-4xl">From address to funded plan</h2>
-        <p class="rise mt-3 max-w-lg text-lg text-muted" style="--i:1">Three steps. No spreadsheet, no consultant required to see where you stand.</p>
-
-        <div class="mt-12 grid gap-5 md:grid-cols-3">
-          <div class="rise lift rounded-3xl border border-hairline bg-paper p-7 shadow-card" style="--i:0">
-            <span class="flex h-9 w-9 items-center justify-center rounded-full bg-ink font-display text-sm font-600 text-canvas tnum">1</span>
-            <h3 class="mt-5 font-display text-xl font-600 tracking-tight">Enter your address</h3>
-            <p class="mt-2 leading-relaxed text-muted">Any NYC building over 25,000 sq ft. We resolve it to its tax lot and pull the city's own records.</p>
-          </div>
-          <div class="rise lift rounded-3xl border border-hairline bg-paper p-7 shadow-card" style="--i:1">
-            <span class="flex h-9 w-9 items-center justify-center rounded-full bg-ink font-display text-sm font-600 text-canvas tnum">2</span>
-            <h3 class="mt-5 font-display text-xl font-600 tracking-tight">See your real fine</h3>
-            <p class="mt-2 leading-relaxed text-muted">Computed from LL84 benchmarking data against the verified LL97 limits — every number, all three periods.</p>
-          </div>
-          <div class="rise lift rounded-3xl border border-hairline bg-paper p-7 shadow-card" style="--i:2">
-            <span class="flex h-9 w-9 items-center justify-center rounded-full bg-ink font-display text-sm font-600 text-canvas tnum">3</span>
-            <h3 class="mt-5 font-display text-xl font-600 tracking-tight">Get a funded plan</h3>
-            <p class="mt-2 leading-relaxed text-muted">Ranked retrofits matched to real Con Ed / NYSERDA / IRS rebates, with payback in years.</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- ───────────────────────── COMPUTE vs TRACK ───────────────────────── -->
-      <section id="laws" class="py-8 md:py-12">
-        <div class="rise rounded-[2rem] border border-hairline bg-paper p-7 shadow-card sm:p-10">
-          <p class="font-display text-sm font-600 uppercase tracking-wide text-faint">The principle</p>
-          <h2 class="mt-2 max-w-2xl font-display text-2xl font-700 leading-snug tracking-tight sm:text-3xl">
-            Compute what's computable. Track what's trackable. <span class="text-signal">Never fake a number.</span>
-          </h2>
-
-          <div class="mt-9 grid gap-px overflow-hidden rounded-3xl border border-hairline bg-hairline/60 md:grid-cols-2">
-            <!-- COMPUTE -->
-            <div class="bg-paper p-7">
-              <div class="flex items-center gap-2">
-                <span class="inline-block h-2 w-2 rounded-full bg-signal"></span>
-                <h3 class="font-display text-lg font-600 tracking-tight">Compute</h3>
-                <span class="text-xs text-faint">fines that cost thousands to interpret</span>
-              </div>
-              <ul class="mt-5 space-y-3 text-[15px] text-muted">
-                <li class="flex gap-2.5"><span class="text-ink">—</span> Local Law 97 carbon fines, verified against 1 RCNY §103-14</li>
-                <li class="flex gap-2.5"><span class="text-ink">—</span> A rebate-funded retrofit plan with real payback math</li>
-                <li class="flex gap-2.5"><span class="text-ink">—</span> The affordable-housing (Article 321) pathway</li>
-                <li class="flex gap-2.5"><span class="text-ink">—</span> Expanding to the 40+ cities with the same standard</li>
-              </ul>
-            </div>
-            <!-- TRACK -->
-            <div class="bg-paper p-7">
-              <div class="flex items-center gap-2">
-                <span class="inline-block h-2 w-2 rounded-full bg-green"></span>
-                <h3 class="font-display text-lg font-600 tracking-tight">Track</h3>
-                <span class="text-xs text-faint">deadlines that cost thousands to miss</span>
-              </div>
-              <div class="mt-5 flex flex-wrap gap-2">
-                <span class="rounded-full border border-hairline bg-canvas px-3 py-1 text-sm text-ink/80">FISP / LL11 facade</span>
-                <span class="rounded-full border border-hairline bg-canvas px-3 py-1 text-sm text-ink/80">LL84 benchmarking</span>
-                <span class="rounded-full border border-hairline bg-canvas px-3 py-1 text-sm text-ink/80">LL33/95 grade</span>
-                <span class="rounded-full border border-hairline bg-canvas px-3 py-1 text-sm text-ink/80">LL152 gas</span>
-                <span class="rounded-full border border-hairline bg-canvas px-3 py-1 text-sm text-ink/80">Boiler</span>
-                <span class="rounded-full border border-hairline bg-canvas px-3 py-1 text-sm text-ink/80">Elevator</span>
-              </div>
-              <p class="mt-5 text-[15px] leading-relaxed text-muted">Public DOB deadlines and status, on one real-time board — so you never eat a late penalty.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ───────────────────────── FUNDED FIX-IT PLAN ───────────────────────── -->
-      <section class="py-24 md:py-28">
-        <div class="grid items-start gap-12 md:grid-cols-[0.9fr_1.1fr]">
-          <div>
-            <h2 class="rise font-display text-3xl font-700 tracking-tight sm:text-4xl">A plan that pays for itself</h2>
-            <p class="rise mt-4 text-lg leading-relaxed text-muted" style="--i:1">
-              Code computes every dollar, ton, and year. The optimizer enumerates retrofit
-              combinations, matches each to the single best as-of-right cash rebate, and ranks
-              by payback. Claude only orders and explains — it never invents a number.
+            <p class="max-w-xl leading-relaxed">
+              Estimates from NYC LL84 benchmarking data and LL97 emission limits (1 RCNY
+              §103-14). Not legal advice — official compliance requires a registered
+              design professional.
             </p>
-            <ul class="rise mt-6 space-y-2 text-[15px] text-muted" style="--i:2">
-              <li class="flex gap-2.5"><span class="text-green">✓</span> Avoided fine bounded by your actual overage</li>
-              <li class="flex gap-2.5"><span class="text-green">✓</span> One best cash rebate per measure — never double-counted</li>
-              <li class="flex gap-2.5"><span class="text-green">✓</span> Income-restricted programs unlock for affordable housing</li>
-            </ul>
           </div>
-
-          <!-- Ranked fix list -->
-          <div class="rise lift rounded-3xl border border-hairline bg-paper p-6 shadow-float sm:p-7" style="--i:1">
-            <div class="flex items-baseline justify-between">
-              <p class="font-display text-sm font-600 uppercase tracking-wide text-faint">Ranked fixes</p>
-              <p class="text-sm text-faint">by payback</p>
-            </div>
-
-            <div class="mt-4 space-y-3">
-              <!-- row -->
-              <div class="flex items-center gap-4 rounded-2xl border border-hairline bg-canvas/60 p-4">
-                <div class="min-w-0 flex-1">
-                  <p class="truncate font-500 text-ink">Boiler / BMS controls</p>
-                  <div class="mt-1.5 flex flex-wrap gap-1.5">
-                    <span class="rounded-md bg-green/10 px-2 py-0.5 text-xs font-500 text-green">Con Ed · up to $2.6k/unit</span>
-                  </div>
-                </div>
-                <div class="text-right">
-                  <p class="font-display text-lg font-700 text-ink tnum">1.4 yr</p>
-                  <p class="text-xs text-faint">payback</p>
-                </div>
-              </div>
-              <!-- row -->
-              <div class="flex items-center gap-4 rounded-2xl border border-hairline bg-canvas/60 p-4">
-                <div class="min-w-0 flex-1">
-                  <p class="truncate font-500 text-ink">Weatherization package</p>
-                  <div class="mt-1.5 flex flex-wrap gap-1.5">
-                    <span class="rounded-md bg-green/10 px-2 py-0.5 text-xs font-500 text-green">NYSERDA · up to $14k/unit</span>
-                  </div>
-                </div>
-                <div class="text-right">
-                  <p class="font-display text-lg font-700 text-ink tnum">3.0 yr</p>
-                  <p class="text-xs text-faint">payback</p>
-                </div>
-              </div>
-              <!-- row -->
-              <div class="flex items-center gap-4 rounded-2xl border border-hairline bg-canvas/60 p-4">
-                <div class="min-w-0 flex-1">
-                  <p class="truncate font-500 text-ink">Air-source heat pump</p>
-                  <div class="mt-1.5 flex flex-wrap gap-1.5">
-                    <span class="rounded-md bg-green/10 px-2 py-0.5 text-xs font-500 text-green">Clean Heat · up to $10k/unit</span>
-                  </div>
-                </div>
-                <div class="text-right">
-                  <p class="font-display text-lg font-700 text-ink tnum">8.6 yr</p>
-                  <p class="text-xs text-faint">payback</p>
-                </div>
-              </div>
-            </div>
-
-            <div class="mt-5 flex items-center justify-between border-t border-hairline pt-4">
-              <p class="text-sm text-muted">Fines avoided through 2050</p>
-              <p class="font-display text-xl font-700 text-green tnum">$3.78M</p>
-            </div>
-          </div>
-        </div>
+        </footer>
       </section>
+    </div>
 
-      <!-- ───────────────────────── OPS ROOM ───────────────────────── -->
-      <section id="opsroom" class="pb-24 md:pb-28">
-        <div class="rise overflow-hidden rounded-[2rem] border border-hairline bg-paper shadow-card">
-          <div class="grid gap-px bg-hairline/60 lg:grid-cols-[1.1fr_0.9fr]">
-            <div class="bg-paper p-8 sm:p-10">
-              <span class="inline-flex items-center gap-2 rounded-full border border-hairline bg-canvas px-3 py-1 text-xs font-500 text-muted">
-                <span class="relative flex h-1.5 w-1.5"><span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green opacity-60"></span><span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-green"></span></span>
-                Real-time
-              </span>
-              <h2 class="mt-5 font-display text-3xl font-700 tracking-tight sm:text-4xl">A live compliance ops room</h2>
-              <p class="mt-4 max-w-md text-lg leading-relaxed text-muted">
-                Every obligation becomes a ticket with its statutory deadline on a timer. AI
-                workers claim tickets, draft the remediation, and submit. You approve every one.
-              </p>
-              <p class="mt-4 max-w-md leading-relaxed text-muted">
-                Kill a worker mid-ticket and within seconds it's back in the queue and another
-                agent has it. Nothing falls through.
-              </p>
-            </div>
-
-            <!-- ticket board -->
-            <div class="bg-canvas/50 p-8 sm:p-10">
-              <p class="text-[11px] font-600 uppercase tracking-wide text-faint">Open tickets</p>
-              <div class="mt-4 space-y-2.5">
-                <div class="flex items-center justify-between rounded-xl border border-hairline bg-paper px-4 py-3 shadow-card">
-                  <div class="flex items-center gap-3">
-                    <span class="inline-block h-2 w-2 rounded-full bg-signal"></span>
-                    <span class="font-500">LL97 over-cap exposure</span>
-                  </div>
-                  <span class="text-xs text-faint">claimed · atlas</span>
-                </div>
-                <div class="flex items-center justify-between rounded-xl border border-hairline bg-paper px-4 py-3 shadow-card">
-                  <div class="flex items-center gap-3">
-                    <span class="inline-block h-2 w-2 rounded-full bg-signal/60"></span>
-                    <span class="font-500">FISP cycle 9 filing</span>
-                  </div>
-                  <span class="text-xs text-faint">drafting · nyx</span>
-                </div>
-                <div class="flex items-center justify-between rounded-xl border border-hairline bg-paper px-4 py-3 shadow-card">
-                  <div class="flex items-center gap-3">
-                    <span class="inline-block h-2 w-2 rounded-full bg-green"></span>
-                    <span class="font-500">LL84 benchmarking</span>
-                  </div>
-                  <span class="text-xs font-500 text-green">approved</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <!-- ───────────────────────── CTA + FOOTER ───────────────────────── -->
-    <section class="border-t border-hairline bg-paper">
-      <div class="mx-auto max-w-6xl px-5 py-20 text-center md:py-24">
-        <h2 class="rise font-display text-4xl font-700 tracking-tightest sm:text-5xl">See your building's number</h2>
-        <p class="rise mx-auto mt-4 max-w-md text-lg text-muted" style="--i:1">It takes one address and about ten seconds.</p>
-        <form class="rise mx-auto mt-8 flex max-w-md flex-col gap-2.5 sm:flex-row" style="--i:2" onsubmit="return false">
-          <input type="text" placeholder="Enter a NYC building address"
-            class="flex-1 rounded-2xl border border-hairline bg-canvas px-5 py-4 text-base text-ink outline-none transition-shadow placeholder:text-faint focus:border-ink/30 focus:shadow-card" />
-          <button class="press rounded-2xl bg-ink px-6 py-4 text-base font-500 text-canvas hover:bg-ink/90">Check fine&nbsp;→</button>
-        </form>
-      </div>
-
-      <footer class="border-t border-hairline">
-        <div class="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-8 text-sm text-faint md:flex-row md:items-center md:justify-between">
-          <div class="flex items-center gap-2 font-display text-base font-600 text-ink">
-            <span class="inline-block h-1.5 w-1.5 rounded-full bg-green"></span> Fineprint
-          </div>
-          <p class="max-w-xl leading-relaxed">
-            Estimates from NYC LL84 benchmarking data and LL97 emission limits (1 RCNY §103-14).
-            Not legal advice — official compliance requires a registered design professional.
-          </p>
-        </div>
-      </footer>
-    </section>
-  </div>
-
-  <script>
-    // Scroll reveal — adds .in once, transform/opacity transition handles the rest.
-    const io = new IntersectionObserver((entries) => {
-      for (const e of entries) {
-        if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
-      }
-    }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
-    document.querySelectorAll(".rise").forEach((el) => io.observe(el));
-  </script>
-</body>
+    <script>
+      // Scroll reveal — adds .in once, transform/opacity transition handles the rest.
+      const io = new IntersectionObserver(
+        entries => {
+          for (const e of entries) {
+            if (e.isIntersecting) {
+              e.target.classList.add("in");
+              io.unobserve(e.target);
+            }
+          }
+        },
+        { threshold: 0.12, rootMargin: "0px 0px -40px 0px" },
+      );
+      document.querySelectorAll(".rise").forEach(el => io.observe(el));
+    </script>
+  </body>
 </html>

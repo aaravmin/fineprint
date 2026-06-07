@@ -30,13 +30,16 @@ function nextN() {
 
 const browser = await chromium.launch();
 async function shoot(suffix, width, height) {
-  const ctx = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: 2 });
+  const ctx = await browser.newContext({
+    viewport: { width, height },
+    deviceScaleFactor: 2,
+  });
   const page = await ctx.newPage();
   await page.goto(TARGET, { waitUntil: "networkidle", timeout: 30000 });
   // Force every scroll-reveal element visible so the full-page capture shows all
   // sections (the IntersectionObserver only fires for content in the viewport).
   await page.evaluate(() => {
-    document.querySelectorAll(".rise").forEach((el) => el.classList.add("in"));
+    document.querySelectorAll(".rise").forEach(el => el.classList.add("in"));
   });
   await page.waitForTimeout(900); // let reveal + bar transitions settle
   const n = nextN();

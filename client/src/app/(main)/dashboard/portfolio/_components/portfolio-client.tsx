@@ -1,12 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useTable } from "spacetimedb/react";
-import { tables } from "@/module_bindings/index";
+import { toast } from "sonner";
+import { useReducer, useTable } from "spacetimedb/react";
+import { reducers, tables } from "@/module_bindings/index";
 import { computePeriods, fmtUsd } from "@/lib/engine";
 import type { Building, Task } from "@/module_bindings/types";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
 function ll97Fine(building: Building, periodIndex: number): number | null {
   const periods = computePeriods(building);
@@ -21,16 +25,39 @@ export function PortfolioClient() {
   const [buildings] = useTable(tables.building);
   const [tasks] = useTable(tables.task);
   const router = useRouter();
+  const requestBuilding = useReducer(reducers.requestBuilding);
+  const [address, setAddress] = useState("");
+  const [requesting, setRequesting] = useState(false);
+
+  async function submitAddress() {
+    const trimmed = address.trim();
+    if (!trimmed) {
+      toast.error("Enter a street address with the borough");
+      return;
+    }
+
+    setRequesting(true);
+    try {
+      await requestBuilding({ address: trimmed });
+      toast.success("Intake queued — an agent is pulling the city's records now");
+      setAddress("");
+    } catch (error) {
+      toast.error(`Request failed: ${(error as Error).message}`);
+    } finally {
+      setRequesting(false);
+    }
+  }
 
   const totalCurrent = buildings.reduce((sum, b) => sum + (ll97Fine(b, 0) ?? 0), 0);
   const total2030 = buildings.reduce((sum, b) => sum + (ll97Fine(b, 1) ?? 0), 0);
   const openTasks = tasks.filter(t => t.status === "open").length;
 
-  const sorted = [...buildings].sort((a, b) => (ll97Fine(b, 1) ?? 0) - (ll97Fine(a, 1) ?? 0));
+  const sorted = [...buildings].sort(
+    (a, b) => (ll97Fine(b, 1) ?? 0) - (ll97Fine(a, 1) ?? 0),
+  );
 
   return (
     <div className="@container/main flex flex-col gap-6">
-
       {/* Hero */}
       <div className="space-y-1">
         <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
@@ -43,7 +70,11 @@ export function PortfolioClient() {
 
       {/* Three-step explainer */}
       <div className="grid grid-cols-1 gap-3 @sm/main:grid-cols-3">
-        <Step n="1" title="Enter your address" body="Any NYC building over 25,000 sq ft" />
+        <Step
+          n="1"
+          title="Enter your address"
+          body="Any NYC building over 25,000 sq ft"
+        />
         <Step
           n="2"
           title="See your real fine"
@@ -55,6 +86,29 @@ export function PortfolioClient() {
           body="Ranked retrofits matched to real rebates, driving the fine toward $0"
         />
       </div>
+
+      {/* Address intake — the front door. The reducer dedupes; the new
+          building and its obligations stream in over the live subscription. */}
+      <Card>
+        <CardContent className="flex flex-col gap-2 py-4 @sm/main:flex-row">
+          <Input
+            value={address}
+            placeholder='Street address with borough, e.g. "350 5th Avenue, Manhattan"'
+            disabled={requesting}
+            onChange={event => setAddress(event.target.value)}
+            onKeyDown={event => {
+              if (event.key === "Enter") void submitAddress();
+            }}
+          />
+          <Button
+            onClick={() => void submitAddress()}
+            disabled={requesting}
+            className="shrink-0"
+          >
+            {requesting ? "Queueing…" : "Get my number"}
+          </Button>
+        </CardContent>
+      </Card>
 
       {/* Flat metric strip — no gradient */}
       <div className="grid grid-cols-1 gap-3 @sm/main:grid-cols-4">
@@ -91,7 +145,9 @@ export function PortfolioClient() {
               <p className="text-sm text-muted-foreground">No buildings yet.</p>
               <p className="mt-1 text-xs text-muted-foreground">
                 Run{" "}
-                <code className="rounded bg-muted px-1.5 py-0.5 font-mono">npm run seed</code>{" "}
+                <code className="rounded bg-muted px-1.5 py-0.5 font-mono">
+                  npm run seed
+                </code>{" "}
                 to load sample NYC buildings with LL97 obligations.
               </p>
             </div>
@@ -127,18 +183,21 @@ export function PortfolioClient() {
                           {b.sqft.toLocaleString()}
                         </td>
                         <td className="px-6 py-4 text-right text-muted-foreground">
-                          {b.annualEmissionsTco2E !== undefined
-                            ? `${b.annualEmissionsTco2E.toLocaleString(undefined, { maximumFractionDigits: 0 })} t`
-                            : <span className="text-xs">—</span>
-                          }
+                          {b.annualEmissionsTco2E !== undefined ? (
+                            `${b.annualEmissionsTco2E.toLocaleString(undefined, { maximumFractionDigits: 0 })} t`
+                          ) : (
+                            <span className="text-xs">—</span>
+                          )}
                         </td>
                         <FineCell fine={fine0} />
                         <FineCell fine={fine1} highlight />
                         <FineCell fine={fine2} />
                         <td className="px-6 py-4 text-right">
-                          {open > 0
-                            ? <Badge variant="secondary">{open}</Badge>
-                            : <span className="text-muted-foreground">—</span>}
+                          {open > 0 ? (
+                            <Badge variant="secondary">{open}</Badge>
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
                         </td>
                       </tr>
                     );
@@ -152,9 +211,9 @@ export function PortfolioClient() {
 
       {/* Legal disclaimer */}
       <p className="text-xs text-muted-foreground">
-        Data sourced from NYC LL84 benchmarking submissions and LL97 emission limits
-        (1 RCNY §103-14). Not legal advice — official compliance requires a registered
-        design professional.
+        Data sourced from NYC LL84 benchmarking submissions and LL97 emission limits (1
+        RCNY §103-14). Not legal advice — official compliance requires a registered design
+        professional.
       </p>
     </div>
   );
@@ -197,14 +256,12 @@ function FineCell({ fine, highlight }: { fine: number | null; highlight?: boolea
     return <td className="px-6 py-4 text-right text-muted-foreground">—</td>;
   }
   if (fine === 0) {
-    return (
-      <td className="px-6 py-4 text-right text-xs font-medium text-success">
-        $0
-      </td>
-    );
+    return <td className="px-6 py-4 text-right text-xs font-medium text-success">$0</td>;
   }
   return (
-    <td className={`px-6 py-4 text-right text-xs font-medium ${highlight ? "text-destructive" : ""}`}>
+    <td
+      className={`px-6 py-4 text-right text-xs font-medium ${highlight ? "text-destructive" : ""}`}
+    >
       {fmtUsd(fine)}
     </td>
   );

@@ -40,7 +40,12 @@ export function AccountSwitcher({
           </Avatar>
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="min-w-56 space-y-1 rounded-lg" side="bottom" align="end" sideOffset={4}>
+      <DropdownMenuContent
+        className="min-w-56 space-y-1 rounded-lg"
+        side="bottom"
+        align="end"
+        sideOffset={4}
+      >
         <DropdownMenuLabel className="p-0 font-normal">
           <div className="flex w-full items-center gap-2 px-1 py-1.5">
             <Avatar className="size-9 rounded-lg">

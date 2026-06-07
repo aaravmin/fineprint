@@ -1,13 +1,19 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { useTable } from "spacetimedb/react";
-import { tables } from "@/module_bindings/index";
+import { toast } from "sonner";
+import { useReducer, useTable } from "spacetimedb/react";
+import { reducers, tables } from "@/module_bindings/index";
 import { fmtUsd } from "@/lib/engine";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
-const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
+const STATUS_VARIANT: Record<
+  string,
+  "default" | "secondary" | "destructive" | "outline"
+> = {
   open: "secondary",
   claimed: "outline",
   in_review: "outline",
@@ -20,9 +26,39 @@ export function TasksClient() {
   const [tasks] = useTable(tables.task);
   const [buildings] = useTable(tables.building);
   const [workers] = useTable(tables.worker);
+  const approve = useReducer(reducers.approve);
+  const reject = useReducer(reducers.reject);
+  const [pendingTaskId, setPendingTaskId] = useState<bigint | null>(null);
+
+  async function review(taskId: bigint, verdict: "approve" | "reject") {
+    setPendingTaskId(taskId);
+    try {
+      if (verdict === "approve") {
+        await approve({ taskId, note: "approved from the dashboard" });
+        toast.success("Draft approved");
+      } else {
+        await reject({
+          taskId,
+          note: "rejected from the dashboard — returned to the queue",
+        });
+        toast("Draft rejected — task returned to the queue");
+      }
+    } catch (error) {
+      toast.error(`Review failed: ${(error as Error).message}`);
+    } finally {
+      setPendingTaskId(null);
+    }
+  }
 
   const sorted = [...tasks].sort((a, b) => {
-    const statusOrder: Record<string, number> = { open: 0, claimed: 1, in_review: 2, approved: 3, rejected: 4, done: 5 };
+    const statusOrder: Record<string, number> = {
+      open: 0,
+      claimed: 1,
+      in_review: 2,
+      approved: 3,
+      rejected: 4,
+      done: 5,
+    };
     return (statusOrder[a.status] ?? 9) - (statusOrder[b.status] ?? 9);
   });
 
@@ -36,7 +72,9 @@ export function TasksClient() {
       <div className="flex flex-wrap gap-3">
         {Object.entries(counts).map(([status, count]) => (
           <Card key={status} className="px-4 py-3 flex items-center gap-2">
-            <Badge variant={STATUS_VARIANT[status] ?? "secondary"}>{status.replace("_", " ")}</Badge>
+            <Badge variant={STATUS_VARIANT[status] ?? "secondary"}>
+              {status.replace("_", " ")}
+            </Badge>
             <span className="font-semibold">{count}</span>
           </Card>
         ))}
@@ -50,20 +88,29 @@ export function TasksClient() {
           {sorted.length === 0 ? (
             <div className="px-6 py-10 text-center text-sm text-muted-foreground">
               No tasks. Run{" "}
-              <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">npm run seed</code>{" "}
+              <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">
+                npm run seed
+              </code>{" "}
               to create obligations.
             </div>
           ) : (
             <div className="divide-y">
               {sorted.map(task => {
                 const building = buildings.find(b => b.id === task.buildingId);
-                const claimedWorker = task.claimedBy !== undefined
-                  ? workers.find(w => w.id === task.claimedBy)
-                  : undefined;
+                const claimedWorker =
+                  task.claimedBy !== undefined
+                    ? workers.find(w => w.id === task.claimedBy)
+                    : undefined;
 
                 return (
-                  <div key={String(task.id)} className="flex items-center gap-3 px-6 py-4">
-                    <Badge variant={STATUS_VARIANT[task.status] ?? "secondary"} className="shrink-0">
+                  <div
+                    key={String(task.id)}
+                    className="flex items-center gap-3 px-6 py-4"
+                  >
+                    <Badge
+                      variant={STATUS_VARIANT[task.status] ?? "secondary"}
+                      className="shrink-0"
+                    >
                       {task.status.replace("_", " ")}
                     </Badge>
                     <div className="flex-1 min-w-0">
@@ -78,7 +125,9 @@ export function TasksClient() {
                       )}
                     </div>
                     {claimedWorker && (
-                      <span className="text-xs text-muted-foreground shrink-0">{claimedWorker.name}</span>
+                      <span className="text-xs text-muted-foreground shrink-0">
+                        {claimedWorker.name}
+                      </span>
                     )}
                     {task.fineEstimateUsd !== undefined && (
                       <span className="text-xs text-muted-foreground shrink-0">
@@ -86,7 +135,28 @@ export function TasksClient() {
                       </span>
                     )}
                     {task.slaBreached && (
-                      <Badge variant="destructive" className="text-xs shrink-0">SLA</Badge>
+                      <Badge variant="destructive" className="text-xs shrink-0">
+                        SLA
+                      </Badge>
+                    )}
+                    {task.status === "in_review" && (
+                      <div className="flex gap-2 shrink-0">
+                        <Button
+                          size="sm"
+                          disabled={pendingTaskId === task.id}
+                          onClick={() => review(task.id, "approve")}
+                        >
+                          Approve
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={pendingTaskId === task.id}
+                          onClick={() => review(task.id, "reject")}
+                        >
+                          Reject
+                        </Button>
+                      </div>
                     )}
                   </div>
                 );

@@ -13,7 +13,7 @@ export const getInitials = (str: string): string => {
       .trim()
       .split(/\s+/)
       .filter(Boolean)
-      .map((word) => word[0])
+      .map(word => word[0])
       .join("")
       .toUpperCase() || "?"
   );
@@ -29,7 +29,13 @@ export function formatCurrency(
     noDecimals?: boolean;
   },
 ) {
-  const { currency = "USD", locale = "en-US", minimumFractionDigits, maximumFractionDigits, noDecimals } = opts ?? {};
+  const {
+    currency = "USD",
+    locale = "en-US",
+    minimumFractionDigits,
+    maximumFractionDigits,
+    noDecimals,
+  } = opts ?? {};
 
   const formatOptions: Intl.NumberFormatOptions = {
     style: "currency",

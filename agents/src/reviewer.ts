@@ -71,9 +71,10 @@ async function reviewTask(task: Task) {
 
   console.log(`[${NAME}] reviewing #${task.id}: ${task.title}`);
 
-  const { verdict, note } = USE_LLM && process.env.ANTHROPIC_API_KEY
-    ? await reviewWithLlm(task, submission, building)
-    : reviewScripted(submission);
+  const { verdict, note } =
+    USE_LLM && process.env.ANTHROPIC_API_KEY
+      ? await reviewWithLlm(task, submission, building)
+      : reviewScripted(submission);
 
   try {
     if (verdict === "approve") {
@@ -86,12 +87,17 @@ async function reviewTask(task: Task) {
       inProgress.delete(task.id);
     }
   } catch (error) {
-    console.warn(`[${NAME}] verdict call failed for #${task.id}: ${(error as Error).message}`);
+    console.warn(
+      `[${NAME}] verdict call failed for #${task.id}: ${(error as Error).message}`,
+    );
     inProgress.delete(task.id);
   }
 }
 
-function reviewScripted(submission: Submission): { verdict: "approve" | "reject"; note: string } {
+function reviewScripted(submission: Submission): {
+  verdict: "approve" | "reject";
+  note: string;
+} {
   const hasSubstance = submission.body.trim().length > 100;
   const hasNumberedSteps = /^\s*\d+\./m.test(submission.body);
 
@@ -116,7 +122,9 @@ async function reviewWithLlm(
   try {
     return await callReviewLlm(task, submission, building);
   } catch (error) {
-    console.warn(`[${NAME}] LLM review failed (${(error as Error).message}); falling back to scripted`);
+    console.warn(
+      `[${NAME}] LLM review failed (${(error as Error).message}); falling back to scripted`,
+    );
     return reviewScripted(submission);
   }
 }
@@ -129,9 +137,10 @@ async function callReviewLlm(
   const { default: Anthropic } = await import("@anthropic-ai/sdk");
   const client = new Anthropic();
 
-  const fineText = task.fineEstimateUsd !== undefined
-    ? `$${task.fineEstimateUsd.toLocaleString()}/yr`
-    : "not modeled";
+  const fineText =
+    task.fineEstimateUsd !== undefined
+      ? `$${task.fineEstimateUsd.toLocaleString()}/yr`
+      : "not modeled";
 
   const prompt = [
     `You are a senior NYC building compliance reviewer. Assess whether this draft action plan is complete and actionable enough to send to the building owner.`,
@@ -171,5 +180,8 @@ async function callReviewLlm(
 
   // Ambiguous response: forward to human rather than auto-reject.
   console.warn(`[${NAME}] ambiguous LLM response: "${text.slice(0, 80)}"`);
-  return { verdict: "approve", note: "LLM review inconclusive — forwarded for human review." };
+  return {
+    verdict: "approve",
+    note: "LLM review inconclusive — forwarded for human review.",
+  };
 }

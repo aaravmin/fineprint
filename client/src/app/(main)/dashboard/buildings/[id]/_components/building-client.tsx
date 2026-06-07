@@ -3,13 +3,22 @@
 import Link from "next/link";
 import { useTable } from "spacetimedb/react";
 import { tables } from "@/module_bindings/index";
-import { computePeriods, fmtUsd, fmtTco2e } from "@/lib/engine";
+import {
+  computePeriods,
+  computeRetrofit,
+  fmtUsd,
+  fmtTco2e,
+  type RetrofitAssessment,
+} from "@/lib/engine";
 import { FineTimeline } from "./fine-timeline";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { Task, Submission } from "@/module_bindings/types";
 
-const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
+const STATUS_VARIANT: Record<
+  string,
+  "default" | "secondary" | "destructive" | "outline"
+> = {
   open: "secondary",
   claimed: "outline",
   in_review: "outline",
@@ -32,7 +41,9 @@ export function BuildingClient({ buildingId }: Props) {
     return (
       <div className="flex items-center justify-center py-24 text-muted-foreground text-sm">
         Building not found.{" "}
-        <Link href="/dashboard/portfolio" className="ml-1 underline">Back to portfolio</Link>
+        <Link href="/dashboard/portfolio" className="ml-1 underline">
+          Back to portfolio
+        </Link>
       </div>
     );
   }
@@ -42,21 +53,27 @@ export function BuildingClient({ buildingId }: Props) {
     .filter(t => t.buildingId === buildingId)
     .sort((a, b) => (a.id < b.id ? -1 : 1));
 
-  const uses: Array<{ group: string; sqft: number }> =
-    building.usesJson ? JSON.parse(building.usesJson) : [];
+  const uses: Array<{ group: string; sqft: number }> = building.usesJson
+    ? JSON.parse(building.usesJson)
+    : [];
 
   const ll97Status =
     building.ll97Covered === true
-      ? building.isAffordable ? "Article 321" : "LL97 Covered"
+      ? building.isAffordable
+        ? "Article 321"
+        : "LL97 Covered"
       : building.ll97Covered === false
-      ? "LL97 Exempt"
-      : "LL97 Unknown";
+        ? "LL97 Exempt"
+        : "LL97 Unknown";
 
   return (
     <div className="@container/main flex flex-col gap-4 md:gap-6">
       {/* Back link */}
       <div>
-        <Link href="/dashboard/portfolio" className="text-sm text-muted-foreground hover:text-foreground">
+        <Link
+          href="/dashboard/portfolio"
+          className="text-sm text-muted-foreground hover:text-foreground"
+        >
           ← Portfolio
         </Link>
       </div>
@@ -72,7 +89,9 @@ export function BuildingClient({ buildingId }: Props) {
                 {building.sqft.toLocaleString()} sqft
                 {uses.length > 0 && (
                   <span className="ml-3">
-                    {uses.map(u => `${u.group}: ${u.sqft.toLocaleString()} sqft`).join(" · ")}
+                    {uses
+                      .map(u => `${u.group}: ${u.sqft.toLocaleString()} sqft`)
+                      .join(" · ")}
                   </span>
                 )}
               </p>
@@ -104,6 +123,8 @@ export function BuildingClient({ buildingId }: Props) {
           </Card>
 
           <PlainEnglishCard periods={periods} address={building.address} />
+
+          <RetrofitCard assessment={computeRetrofit(building)} />
         </>
       ) : (
         <Card>
@@ -130,7 +151,10 @@ export function BuildingClient({ buildingId }: Props) {
                 return (
                   <details key={String(task.id)} className="group">
                     <summary className="flex cursor-pointer list-none items-center gap-3 px-6 py-4 hover:bg-muted/50">
-                      <Badge variant={STATUS_VARIANT[task.status] ?? "secondary"} className="shrink-0">
+                      <Badge
+                        variant={STATUS_VARIANT[task.status] ?? "secondary"}
+                        className="shrink-0"
+                      >
                         {task.status.replace("_", " ")}
                       </Badge>
                       <span className="flex-1 text-sm font-medium">{task.title}</span>
@@ -140,7 +164,9 @@ export function BuildingClient({ buildingId }: Props) {
                         </span>
                       )}
                       {task.slaBreached && (
-                        <Badge variant="destructive" className="text-xs">SLA breached</Badge>
+                        <Badge variant="destructive" className="text-xs">
+                          SLA breached
+                        </Badge>
                       )}
                     </summary>
                     {latestSub && (
@@ -186,9 +212,9 @@ function PlainEnglishCard({
       <CardContent className="space-y-3 text-sm leading-relaxed">
         {isArticle321 ? (
           <p>
-            <span className="font-medium">{address}</span> qualifies for the LL97 Article 321
-            affordable housing pathway. It must implement the prescribed energy conservation
-            measures (Admin Code 28-321.2.2) or meet its 2030 target of{" "}
+            <span className="font-medium">{address}</span> qualifies for the LL97 Article
+            321 affordable housing pathway. It must implement the prescribed energy
+            conservation measures (Admin Code 28-321.2.2) or meet its 2030 target of{" "}
             <span className="font-medium text-success">
               {fmtTco2e(current.emissionsLimitTco2e)}
             </span>{" "}
@@ -196,10 +222,10 @@ function PlainEnglishCard({
           </p>
         ) : current.compliant ? (
           <p>
-            <span className="font-medium">{address}</span> is compliant across all three LL97
-            periods. Its emissions of{" "}
-            <span className="font-medium">{fmtTco2e(current.actualEmissionsTco2e)}</span> stay
-            below the 2024–2029 cap of{" "}
+            <span className="font-medium">{address}</span> is compliant across all three
+            LL97 periods. Its emissions of{" "}
+            <span className="font-medium">{fmtTco2e(current.actualEmissionsTco2e)}</span>{" "}
+            stay below the 2024–2029 cap of{" "}
             <span className="font-medium text-success">
               {fmtTco2e(current.emissionsLimitTco2e)}
             </span>
@@ -209,9 +235,12 @@ function PlainEnglishCard({
           <>
             <p>
               <span className="font-medium">{address}</span> emits{" "}
-              <span className="font-medium">{fmtTco2e(current.actualEmissionsTco2e)}</span>/year
-              against a 2024–2029 cap of{" "}
-              <span className="font-medium">{fmtTco2e(current.emissionsLimitTco2e)}</span>. The{" "}
+              <span className="font-medium">
+                {fmtTco2e(current.actualEmissionsTco2e)}
+              </span>
+              /year against a 2024–2029 cap of{" "}
+              <span className="font-medium">{fmtTco2e(current.emissionsLimitTco2e)}</span>
+              . The{" "}
               <span className="font-medium text-destructive">
                 {fmtTco2e(current.overageTco2e)} overage
               </span>{" "}
@@ -227,15 +256,20 @@ function PlainEnglishCard({
                 <span className="font-medium text-destructive">
                   {fmtUsd(p2030.annualFineUsd)}/year
                 </span>
-                {cliffRatio && Number(cliffRatio) > 1.1 ? ` — a ${cliffRatio}× increase` : ""}. By
-                2035 it reaches{" "}
-                <span className="font-medium text-destructive">{fmtUsd(p2035.annualFineUsd)}/year</span>.
+                {cliffRatio && Number(cliffRatio) > 1.1
+                  ? ` — a ${cliffRatio}× increase`
+                  : ""}
+                . By 2035 it reaches{" "}
+                <span className="font-medium text-destructive">
+                  {fmtUsd(p2035.annualFineUsd)}/year
+                </span>
+                .
               </p>
             )}
             <p>
               The fastest path to $0: close the{" "}
-              <span className="font-medium">{fmtTco2e(current.overageTco2e)}</span> gap before
-              2030.
+              <span className="font-medium">{fmtTco2e(current.overageTco2e)}</span> gap
+              before 2030.
             </p>
           </>
         )}
@@ -248,6 +282,66 @@ function PlainEnglishCard({
             ² Admin Code 28-320.3 — building emissions limits by occupancy group.
           </p>
         </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// The optimizer's verdict. An honest empty state matters here: at some
+// scales doing nothing beats every retrofit combo, and saying so builds
+// more trust than inventing a pitch.
+function RetrofitCard({ assessment }: { assessment: RetrofitAssessment | null }) {
+  if (!assessment) return null;
+
+  const best = assessment.best;
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Cheapest path to compliance</CardTitle>
+        <p className="text-sm text-muted-foreground">
+          {assessment.evaluatedSubsets} measure combinations evaluated against fines
+          through 2039. Capex figures are typical-building assumptions, not quotes.
+        </p>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {best.measureIds.length === 0 ? (
+          <p className="text-sm">
+            No retrofit package beats paying the fines as modeled — projected fines
+            through 2039 are {fmtUsd(assessment.doNothing.horizonFinesUsd)} and every
+            measure combination costs more than it avoids. Get firm quotes before ruling
+            investment out.
+          </p>
+        ) : (
+          <>
+            <p className="text-sm">
+              <span className="font-medium">{best.measureIds.join(", ")}</span>
+            </p>
+            <div className="grid grid-cols-1 gap-3 @sm/main:grid-cols-3">
+              <div>
+                <p className="text-xs text-muted-foreground">Capex</p>
+                <p className="text-lg font-semibold">{fmtUsd(best.capexUsd)}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Projected emissions</p>
+                <p className="text-lg font-semibold">
+                  {fmtTco2e(best.projectedEmissionsTco2e)}/yr
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">
+                  Fines avoided through 2039
+                </p>
+                <p className="text-lg font-semibold text-success">
+                  {fmtUsd(assessment.finesAvoidedUsd)}
+                </p>
+              </div>
+            </div>
+          </>
+        )}
+        <p className="border-t pt-3 text-xs text-muted-foreground">
+          {assessment.notes.join(" ")}
+        </p>
       </CardContent>
     </Card>
   );

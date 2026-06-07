@@ -1,11 +1,17 @@
 "use client";
 
-import { useTable } from "spacetimedb/react";
-import { tables } from "@/module_bindings/index";
+import { useState } from "react";
+import { toast } from "sonner";
+import { useReducer, useTable } from "spacetimedb/react";
+import { reducers, tables } from "@/module_bindings/index";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
-const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
+const STATUS_VARIANT: Record<
+  string,
+  "default" | "secondary" | "destructive" | "outline"
+> = {
   idle: "secondary",
   working: "default",
   dead: "destructive",
@@ -14,6 +20,22 @@ const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive" | "
 export function AgentsClient() {
   const [workers] = useTable(tables.worker);
   const [tasks] = useTable(tables.task);
+  const killWorker = useReducer(reducers.killWorker);
+  const [killingId, setKillingId] = useState<bigint | null>(null);
+
+  // The fault-tolerance demo: kill an agent mid-task and watch the board
+  // release its work to the next one.
+  async function kill(workerId: bigint, name: string) {
+    setKillingId(workerId);
+    try {
+      await killWorker({ workerId });
+      toast(`${name} killed — its task returns to the queue`);
+    } catch (error) {
+      toast.error(`Kill failed: ${(error as Error).message}`);
+    } finally {
+      setKillingId(null);
+    }
+  }
 
   const sorted = [...workers].sort((a, b) => (a.id < b.id ? -1 : 1));
 
@@ -26,7 +48,9 @@ export function AgentsClient() {
       <div className="grid grid-cols-3 gap-4">
         <Card>
           <CardHeader className="pb-1">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Idle</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Idle
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-semibold">{idle}</p>
@@ -34,7 +58,9 @@ export function AgentsClient() {
         </Card>
         <Card>
           <CardHeader className="pb-1">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Working</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Working
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-semibold text-primary">{working}</p>
@@ -42,7 +68,9 @@ export function AgentsClient() {
         </Card>
         <Card>
           <CardHeader className="pb-1">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Dead</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Dead
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-semibold text-destructive">{dead}</p>
@@ -58,15 +86,18 @@ export function AgentsClient() {
           {sorted.length === 0 ? (
             <div className="px-6 py-10 text-center text-sm text-muted-foreground">
               No workers connected. Run{" "}
-              <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">npm run worker</code>{" "}
+              <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">
+                npm run worker
+              </code>{" "}
               to start an agent.
             </div>
           ) : (
             <div className="divide-y">
               {sorted.map(w => {
-                const currentTask = w.currentTaskId !== undefined
-                  ? tasks.find(t => t.id === w.currentTaskId)
-                  : undefined;
+                const currentTask =
+                  w.currentTaskId !== undefined
+                    ? tasks.find(t => t.id === w.currentTaskId)
+                    : undefined;
 
                 return (
                   <div key={String(w.id)} className="flex items-center gap-4 px-6 py-4">
@@ -82,6 +113,16 @@ export function AgentsClient() {
                     <span className="text-xs text-muted-foreground font-mono">
                       {w.identity.toHexString().slice(0, 8)}…
                     </span>
+                    {w.status !== "dead" && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={killingId === w.id}
+                        onClick={() => kill(w.id, w.name)}
+                      >
+                        Kill
+                      </Button>
+                    )}
                   </div>
                 );
               })}

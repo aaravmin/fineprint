@@ -39,7 +39,8 @@ export function FineTimeline({ periods }: Props) {
   const gridMax = Math.ceil(maxFine / 10_000) * 10_000 || 10_000;
   const allCompliant = periods.every(p => p.compliant);
 
-  const barHeight = (fine: number) => Math.max((fine / gridMax) * PLOT_H, fine > 0 ? 4 : 0);
+  const barHeight = (fine: number) =>
+    Math.max((fine / gridMax) * PLOT_H, fine > 0 ? 4 : 0);
   const barY = (fine: number) => BOTTOM_Y - barHeight(fine);
 
   const gridLines = [0, 0.5, 1].map(frac => ({
@@ -61,9 +62,7 @@ export function FineTimeline({ periods }: Props) {
           </p>
         )}
         {allCompliant && (
-          <p className="text-sm text-success font-medium">
-            Compliant across all periods
-          </p>
+          <p className="text-sm text-success font-medium">Compliant across all periods</p>
         )}
       </div>
 
@@ -75,8 +74,23 @@ export function FineTimeline({ periods }: Props) {
       >
         {gridLines.map(({ y, label }) => (
           <g key={y}>
-            <line x1={ML} y1={y} x2={W - MR} y2={y} stroke="currentColor" strokeOpacity="0.1" strokeWidth="1" />
-            <text x={ML - 8} y={y + 4} textAnchor="end" fontSize="11" fill="currentColor" fillOpacity="0.5">
+            <line
+              x1={ML}
+              y1={y}
+              x2={W - MR}
+              y2={y}
+              stroke="currentColor"
+              strokeOpacity="0.1"
+              strokeWidth="1"
+            />
+            <text
+              x={ML - 8}
+              y={y + 4}
+              textAnchor="end"
+              fontSize="11"
+              fill="currentColor"
+              fillOpacity="0.5"
+            >
               {label}
             </text>
           </g>
@@ -92,38 +106,81 @@ export function FineTimeline({ periods }: Props) {
 
           return (
             <g key={p.period}>
-              <rect x={x} y={by} width={BAR_W} height={bh} fill={color} fillOpacity={fillOpacity} rx="4" />
-              <text x={x + BAR_W / 2} y={by - 8} textAnchor="middle" fontSize="12" fontWeight="600" fill={color}>
+              <rect
+                x={x}
+                y={by}
+                width={BAR_W}
+                height={bh}
+                fill={color}
+                fillOpacity={fillOpacity}
+                rx="4"
+              />
+              <text
+                x={x + BAR_W / 2}
+                y={by - 8}
+                textAnchor="middle"
+                fontSize="12"
+                fontWeight="600"
+                fill={color}
+              >
                 {fmtUsd(p.annualFineUsd)}
               </text>
-              <text x={x + BAR_W / 2} y={BOTTOM_Y + 18} textAnchor="middle" fontSize="12" fill="currentColor" fillOpacity="0.5">
+              <text
+                x={x + BAR_W / 2}
+                y={BOTTOM_Y + 18}
+                textAnchor="middle"
+                fontSize="12"
+                fill="currentColor"
+                fillOpacity="0.5"
+              >
                 {p.period}
               </text>
-              <text x={x + BAR_W / 2} y={BOTTOM_Y + 34} textAnchor="middle" fontSize="10" fill="currentColor" fillOpacity="0.3">
+              <text
+                x={x + BAR_W / 2}
+                y={BOTTOM_Y + 34}
+                textAnchor="middle"
+                fontSize="10"
+                fill="currentColor"
+                fillOpacity="0.3"
+              >
                 /yr
               </text>
             </g>
           );
         })}
 
-        {!allCompliant && periods[1].annualFineUsd > periods[0].annualFineUsd && (() => {
-          const midX = (barX(0) + BAR_W + barX(1)) / 2;
-          const y1 = barY(periods[0].annualFineUsd);
-          const y2 = barY(periods[1].annualFineUsd);
+        {!allCompliant &&
+          periods[1].annualFineUsd > periods[0].annualFineUsd &&
+          (() => {
+            const midX = (barX(0) + BAR_W + barX(1)) / 2;
+            const y1 = barY(periods[0].annualFineUsd);
+            const y2 = barY(periods[1].annualFineUsd);
 
-          return (
-            <g>
-              <line
-                x1={barX(0) + BAR_W / 2} y1={y1}
-                x2={barX(1) + BAR_W / 2} y2={y2}
-                stroke={DANGER} strokeWidth="1" strokeDasharray="4 3" strokeOpacity="0.4"
-              />
-              <text x={midX} y={Math.min(y1, y2) - 10} textAnchor="middle" fontSize="10" fill={DANGER} fillOpacity="0.7">
-                2030 cliff
-              </text>
-            </g>
-          );
-        })()}
+            return (
+              <g>
+                <line
+                  x1={barX(0) + BAR_W / 2}
+                  y1={y1}
+                  x2={barX(1) + BAR_W / 2}
+                  y2={y2}
+                  stroke={DANGER}
+                  strokeWidth="1"
+                  strokeDasharray="4 3"
+                  strokeOpacity="0.4"
+                />
+                <text
+                  x={midX}
+                  y={Math.min(y1, y2) - 10}
+                  textAnchor="middle"
+                  fontSize="10"
+                  fill={DANGER}
+                  fillOpacity="0.7"
+                >
+                  2030 cliff
+                </text>
+              </g>
+            );
+          })()}
       </svg>
     </div>
   );

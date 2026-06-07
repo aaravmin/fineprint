@@ -2,7 +2,14 @@
 
 import Link from "next/link";
 
-import { CircleHelp, ClipboardList, Command, Database, File, Search, Settings } from "lucide-react";
+import {
+  CircleHelp,
+  ClipboardList,
+  Database,
+  File,
+  Search,
+  Settings,
+} from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 
 import {
@@ -14,6 +21,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { FineprintLogo } from "@/components/fineprint-logo";
 import { APP_CONFIG } from "@/config/app-config";
 import { sidebarItems } from "@/navigation/sidebar/sidebar-items";
 import { usePreferencesStore } from "@/stores/preferences/preferences-provider";
@@ -70,7 +78,7 @@ export function AppSidebar({
   };
 }) {
   const { sidebarVariant, sidebarCollapsible, isSynced } = usePreferencesStore(
-    useShallow((s) => ({
+    useShallow(s => ({
       sidebarVariant: s.sidebarVariant,
       sidebarCollapsible: s.sidebarCollapsible,
       isSynced: s.isSynced,
@@ -87,7 +95,7 @@ export function AppSidebar({
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <Link prefetch={false} href="/dashboard">
-                <Command />
+                <FineprintLogo className="size-5" />
                 <span className="font-semibold text-base">{APP_CONFIG.name}</span>
               </Link>
             </SidebarMenuButton>
