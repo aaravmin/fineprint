@@ -6,11 +6,8 @@
 // twice.
 
 import { DEFAULT_MEASURES } from "../../engine/src/retrofit.ts";
-<<<<<<< HEAD
-import type { Obligation as ObligationType } from "./obligations.ts";
-=======
 import { toEngineInput } from "./engineBridge.ts";
->>>>>>> refs/remotes/origin/main
+import type { Obligation as ObligationType } from "./obligations.ts";
 import {
   assessObligations,
   type ComplianceStatus,
