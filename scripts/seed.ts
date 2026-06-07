@@ -5,7 +5,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { DbConnection } from "../agents/src/module_bindings/index.ts";
 
-const HOST = process.env.SPACETIME_URI ?? "ws://localhost:3000";
+const HOST = process.env.SPACETIME_URI ?? "ws://localhost:3011";
 const DB_NAME = process.env.DB_NAME ?? "fineprint";
 
 const here = dirname(fileURLToPath(import.meta.url));

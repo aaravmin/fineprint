@@ -5,7 +5,7 @@
 import { DbConnection } from "./module_bindings/index.ts";
 import type { Task, Submission, Building } from "./module_bindings/types.ts";
 
-const HOST = process.env.SPACETIME_URI ?? "ws://localhost:3000";
+const HOST = process.env.SPACETIME_URI ?? "ws://localhost:3011";
 const DB_NAME = process.env.DB_NAME ?? "fineprint";
 const USE_LLM = process.env.USE_LLM === "true";
 const NAME = "reviewer";

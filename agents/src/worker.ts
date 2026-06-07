@@ -5,7 +5,7 @@ import { draftInputFrom } from "./draftInput.ts";
 import { draftScripted } from "./policies/scripted.ts";
 import { draftLlm } from "./policies/llm.ts";
 
-const HOST = process.env.SPACETIME_URI ?? "ws://localhost:3000";
+const HOST = process.env.SPACETIME_URI ?? "ws://localhost:3011";
 const DB_NAME = process.env.DB_NAME ?? "fineprint";
 const USE_LLM = process.env.USE_LLM === "true";
 const NAME = process.env.WORKER_NAME ?? `agent-${process.pid}`;

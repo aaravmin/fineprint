@@ -10,7 +10,7 @@ import { toEngineInput } from "../data/src/engineBridge.ts";
 import { lookupBuilding } from "../data/src/lookup.ts";
 import { computeFine } from "../engine/src/index.ts";
 
-const HOST = process.env.SPACETIME_URI ?? "ws://localhost:3000";
+const HOST = process.env.SPACETIME_URI ?? "ws://localhost:3011";
 const DB_NAME = process.env.DB_NAME ?? "fineprint";
 
 const address = process.argv[2];

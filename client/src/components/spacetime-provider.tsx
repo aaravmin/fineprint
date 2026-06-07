@@ -5,7 +5,7 @@ import { Identity } from "spacetimedb";
 import { SpacetimeDBProvider } from "spacetimedb/react";
 import { DbConnection, type ErrorContext } from "@/module_bindings/index";
 
-const HOST = process.env.NEXT_PUBLIC_SPACETIMEDB_HOST ?? "ws://localhost:3000";
+const HOST = process.env.NEXT_PUBLIC_SPACETIMEDB_HOST ?? "ws://localhost:3011";
 const DB_NAME = process.env.NEXT_PUBLIC_SPACETIMEDB_DB_NAME ?? "fineprint";
 const TOKEN_KEY = `${HOST}/${DB_NAME}/auth_token`;
 

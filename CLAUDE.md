@@ -6,12 +6,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 npm install                  # workspaces: spacetimedb, client, agents
-spacetime start              # local server, keep running in own terminal
+spacetime start --listen-addr 127.0.0.1:3011   # database; port 3000 belongs to the Next.js app
 npm run publish:local        # build + publish module to local db 'fineprint'
 npm run generate             # regenerate bindings — REQUIRED after any schema/reducer change
 npm run seed                 # 5 buildings -> ~23 tasks (idempotent, skips if data exists)
 npm run worker               # one agent process; WORKER_NAME=atlas npm run worker
-npm run dashboard            # Vite dev server, port 5173
+npm run dashboard            # Next.js dev server, port 3000
 npm run typecheck            # all workspaces
 ```
 
@@ -27,7 +27,7 @@ spacetime publish --module-path spacetimedb --server local fineprint -y --delete
 ## Architecture
 
 SpacetimeDB is the backend. No API server exists; do not add one. The browser
-and the agent workers open WebSockets directly to the database (port 3000).
+and the agent workers open WebSockets directly to the database (port 3011).
 Reads are table subscriptions, writes are reducer calls — nothing else writes.
 
 - `spacetimedb/src/` is the module. `schema.ts` (tables) and `reducers.ts`

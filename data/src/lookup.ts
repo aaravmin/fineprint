@@ -72,7 +72,11 @@ export async function lookupBuilding(
     });
   }
 
-  const infrastructureProfile = await resolveInfrastructureProfile(geo.bin, ll84, sources);
+  const infrastructureProfile = await resolveInfrastructureProfile(
+    geo.bin,
+    ll84,
+    sources,
+  );
   const openViolations = await resolveOpenViolations(geo.bin, sources, provenance);
 
   const grossFloorAreaSqft = resolveFloorArea(ll84, cbl, provenance);

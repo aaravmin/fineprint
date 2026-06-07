@@ -96,7 +96,7 @@ guard run without the SDK or a key.
 
 | Variable                  | Default               | Meaning                                                           |
 | ------------------------- | --------------------- | ----------------------------------------------------------------- |
-| `SPACETIME_URI`           | `ws://localhost:3000` | database WebSocket                                                |
+| `SPACETIME_URI`           | `ws://localhost:3011` | database WebSocket                                                |
 | `DB_NAME`                 | `fineprint`           | module name                                                       |
 | `WORKER_NAME`             | `agent-<pid>`         | name on the board                                                 |
 | `USE_LLM`                 | unset (scripted)      | `true` enables the tool loop                                      |
