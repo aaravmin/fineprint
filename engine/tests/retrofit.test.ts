@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { DEFAULT_MEASURES, optimizeRetrofit } from "../src/retrofit.ts";
+import { DEFAULT_MEASURES, optimizeArticle321, optimizeRetrofit } from "../src/retrofit.ts";
 import type { BuildingInput } from "../src/index.ts";
 
 // Big office over its 2030/2035 caps; concrete numbers come from the engine,
@@ -121,5 +121,38 @@ describe("optimizeRetrofit", () => {
     const assessment = optimizeRetrofit({ ...overCapOffice, isArticle321: true });
 
     expect(assessment.notes.join(" ")).toMatch(/Article 321/);
+  });
+});
+
+describe("optimizeArticle321", () => {
+  test("a building already under its 2030 target needs no measures", () => {
+    const assessment = optimizeArticle321(wellUnderCap);
+
+    expect(assessment.alreadyUnderTarget).toBe(true);
+    expect(assessment.cheapestCompliantPlan?.measureIds).toEqual([]);
+    expect(assessment.cheapestCompliantPlan?.capexUsd).toBe(0);
+  });
+
+  test("an over-target building gets the cheapest measure set that clears the limit", () => {
+    // The 100k-sqft office 2030 limit is ~269 tCO2e; 400 is over but reachable.
+    const reachable: BuildingInput = { ...overCapOffice, annualEmissionsTco2e: 400 };
+    const assessment = optimizeArticle321(reachable);
+
+    expect(assessment.alreadyUnderTarget).toBe(false);
+    expect(assessment.cheapestCompliantPlan).not.toBeNull();
+    // Whatever set is chosen must actually clear the 2030 target.
+    expect(assessment.cheapestCompliantPlan!.projectedEmissionsTco2e).toBeLessThanOrEqual(
+      assessment.target2030Tco2e,
+    );
+  });
+
+  test("no per-tonne fines: a building far over target may be unreachable by measures", () => {
+    const wayOver: BuildingInput = { ...overCapOffice, annualEmissionsTco2e: 50_000 };
+    const assessment = optimizeArticle321(wayOver);
+
+    // The full catalog can't cut 50,000 tCO2e to the office 2030 limit, so the
+    // prescribed-measures pathway is the route and the plan is null.
+    expect(assessment.cheapestCompliantPlan).toBeNull();
+    expect(assessment.notes.some(note => /prescribed/i.test(note))).toBe(true);
   });
 });

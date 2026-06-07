@@ -111,6 +111,9 @@ export interface PlutoCharacteristics {
   yearBuilt: number | null;
   landUse: string | null;
   ownerName: string | null;
+  // Community district code (PLUTO "cd"), the key LL152 uses to schedule the
+  // gas-piping certification cycle. Null when PLUTO omits it.
+  communityDistrict: number | null;
   raw: Record<string, unknown>;
 }
 
@@ -151,6 +154,10 @@ export interface EcbViolation {
 
 export interface InfrastructureProfile {
   hasLl84Filing: boolean;
+  // Data year of the most recent LL84 filing on record (LL84's deadline is
+  // annual, so the year is what decides whether the filing is current). Null
+  // when no filing exists.
+  ll84ReportingYear: number | null;
   hasRecomputedEmissions: boolean;
   fuelTypes: string[]; // detected fuel types (e.g. natural_gas, fuel_oil_4)
   // Raw evidence, kept for audit.
