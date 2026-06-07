@@ -21,5 +21,6 @@ export default __t.row({
   slaBreached: __t.bool().name("sla_breached"),
   fineEstimateUsd: __t.option(__t.u32()).name("fine_estimate_usd"),
   claimedBy: __t.option(__t.u64()).name("claimed_by"),
+  intakeAddress: __t.option(__t.string()).name("intake_address"),
   createdAt: __t.timestamp().name("created_at"),
 });

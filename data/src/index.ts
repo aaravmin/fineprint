@@ -8,4 +8,5 @@ export { fetchArticle321Flag, getCblEntry, isLl97Covered } from "./coveredBuildi
 export { lookupBuilding } from "./lookup.ts";
 export { dataToolDefinitions, executeDataTool } from "./tools.ts";
 export { toEngineInput, type EngineInputResult } from "./engineBridge.ts";
+export { prepareIntake, type IntakeDeps, type IntakeResult } from "./intake.ts";
 export * from "../laws.ts";

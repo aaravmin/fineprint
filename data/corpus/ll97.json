@@ -1,0 +1,98 @@
+[
+  {
+    "id": "statute-28-320.3-limits",
+    "source": "NYC Admin Code §28-320.3 (Local Law 97 of 2019)",
+    "url": "https://www.nyc.gov/assets/buildings/local_laws/ll97of2019.pdf",
+    "text": "Building emissions limits. Except as otherwise provided in this article, or otherwise provided by rule, on and after January 1, 2024 a covered building shall not have annual building emissions higher than the annual building emissions limit for such building as determined in accordance with this section based on the occupancy group of the building."
+  },
+  {
+    "id": "statute-28-320.3.1-limits-2024",
+    "source": "NYC Admin Code §28-320.3.1 (Local Law 97 of 2019)",
+    "url": "https://www.nyc.gov/assets/buildings/local_laws/ll97of2019.pdf",
+    "text": "Annual building emissions limits 2024-2029. For calendar years 2024 through 2029 the annual building emissions limits for covered buildings shall be calculated pursuant to items 1 through 10 of this section. For a covered building with spaces classified in more than one occupancy group, the annual building emissions limit shall be the sum of the calculated values for each space. Building emissions intensity limits in tCO2e per square foot: occupancy group A 0.01074; group B (other than item 6) 0.00846; groups E and I-4 0.00758; group I-1 0.01138; group F 0.00574; group B civic administrative facility for emergency response services, B non-production laboratory, B ambulatory health care facility, H, I-2 and I-3 0.02381; group M 0.01181; group R-1 0.00987; group R-2 0.00675; groups S and U 0.00426."
+  },
+  {
+    "id": "statute-28-320.3.1.1-coefficients",
+    "source": "NYC Admin Code §28-320.3.1.1 (Local Law 97 of 2019)",
+    "url": "https://www.nyc.gov/assets/buildings/local_laws/ll97of2019.pdf",
+    "text": "Greenhouse gas coefficient of energy consumption for calendar years 2024 through 2029. Utility electricity consumed on the premises of a covered building that is delivered via the electric grid shall be calculated as generating 0.000288962 tCO2e per kilowatt hour. Natural gas combusted on the premises shall be calculated as generating 0.00005311 tCO2e per kbtu. #2 fuel oil combusted on the premises shall be calculated as generating 0.00007421 tCO2e per kbtu. #4 fuel oil combusted on the premises shall be calculated as generating 0.00007529 tCO2e per kbtu. District steam consumed on the premises shall be calculated as generating 0.00004493 tCO2e per kbtu."
+  },
+  {
+    "id": "statute-28-320.3.2-limits-2030",
+    "source": "NYC Admin Code §28-320.3.2 (Local Law 97 of 2019)",
+    "url": "https://www.nyc.gov/assets/buildings/local_laws/ll97of2019.pdf",
+    "text": "Building emissions limits for calendar years 2030 through 2034. For calendar years 2030 through 2034 the annual building emissions limits for covered buildings shall be calculated pursuant to items 1 through 10 of this section. The department may establish different limits, set forth in the rules of the department, where the department determines that different limits are feasible and in the public interest. Building emissions intensity limits in tCO2e per square foot: occupancy group A 0.00420; group B (other than item 6) 0.00453; groups E and I-4 0.00344; group I-1 0.00598; group F 0.00167; group B civic administrative facility for emergency response services, B non-production laboratory, B ambulatory health care facility, H, I-2 or I-3 0.01193; group M 0.00403; group R-1 0.00526; group R-2 0.00407; groups S and U 0.00110."
+  },
+  {
+    "id": "statute-28-320.3.4-limits-2035",
+    "source": "NYC Admin Code §28-320.3.4 (Local Law 97 of 2019)",
+    "url": "https://www.nyc.gov/assets/buildings/local_laws/ll97of2019.pdf",
+    "text": "Building emissions limits for calendar years 2035 through 2050. No later than January 1, 2023, the commissioner shall establish by rule annual building emissions limits and building emissions intensity limits applicable for calendar years 2035 through 2039 and for calendar years 2040 through 2049. Such limits shall be set to achieve an average building emissions intensity for all covered buildings of no more than 0.0014 tCO2e per square foot per year by 2050."
+  },
+  {
+    "id": "rule-103-14-d3-espm-factors",
+    "source": "1 RCNY 103-14(d)(3) (DOB rule, Annual GHG Emissions Limits)",
+    "url": "https://www.nyc.gov/assets/buildings/rules/1_RCNY_103-14.pdf",
+    "text": "The DOB rule assigns building emissions factors by Energy Star Portfolio Manager (ESPM) property type. For calendar years 2024 and 2025 only, an owner may instead utilize a building emissions intensity limit for an occupancy group set forth in section 28-320.3.1 of the Administrative Code, provided that limit is greater than the assigned ESPM factor; from 2026 on the ESPM property-type factors govern. Example factors for the Office property type: 0.00758 tCO2e per square foot for 2024-2029, 0.002690852 for 2030-2034, and 0.001652340 for 2035-2039."
+  },
+  {
+    "id": "rule-103-14-2030-coefficients",
+    "source": "1 RCNY 103-14 (DOB rule, utility GHG coefficients 2030-2034)",
+    "url": "https://www.nyc.gov/assets/buildings/rules/1_RCNY_103-14.pdf",
+    "text": "Greenhouse gas coefficients for utility energy consumption for calendar years 2030 through 2034. Utility electricity delivered via the electric grid shall be calculated as generating 0.000145 tCO2e per kWh, provided that, at the owner's option, utility electricity may be calculated based on time of use. Natural gas delivered by a utility shall be calculated as generating 0.00005311 tCO2e per kBtu. District steam delivered by a utility shall be calculated as 0.0000432 tCO2e per kBtu."
+  },
+  {
+    "id": "rule-103-14-h-penalty",
+    "source": "1 RCNY 103-14(h) (DOB rule, penalty for exceeding limits)",
+    "url": "https://www.nyc.gov/assets/buildings/rules/1_RCNY_103-14.pdf",
+    "text": "Penalty for exceeding building emissions limits: $268 per metric ton of carbon dioxide equivalent (tCO2e) over the annual limit. Rule text: An owner of a covered building shall be liable for a civil penalty for exceeding the building emissions limits established for a calendar year pursuant to Article 320 of Chapter 3 of Title 28 of the Administrative Code and rules promulgated thereunder. Such penalty shall be an amount equal to the difference between the building emissions limit established for a calendar year and the actual emissions reported for such calendar year in the building emissions report, multiplied by $268."
+  },
+  {
+    "id": "rule-103-14-i-mitigation",
+    "source": "1 RCNY 103-14(i) (DOB rule, mitigating factors 2024-2029)",
+    "url": "https://www.nyc.gov/assets/buildings/rules/1_RCNY_103-14.pdf",
+    "text": "Mitigating factors during the 2024-2029 compliance period. An owner not in compliance with the emissions limits may be eligible for a mitigated penalty based on mitigating factors filed with the building emissions report. Unexpected or unforeseeable event: an owner may demonstrate that an event outside of their control precluded compliance during a calendar year where a building was damaged as a result of a disaster, including a hurricane, severe flooding, or fire; such demonstration may result in a penalty of zero dollars for that calendar year."
+  },
+  {
+    "id": "rule-103-14-i2-good-faith",
+    "source": "1 RCNY 103-14(i)(2) (DOB rule, good faith efforts)",
+    "url": "https://www.nyc.gov/assets/buildings/rules/1_RCNY_103-14.pdf",
+    "text": "Good faith efforts. An owner may demonstrate they made good faith efforts to comply with Article 320, which may result in a mitigated penalty for the calendar year claimed. The owner must meet all of the following criteria: submit the annual building emissions report for the previous calendar year and comply with any adjustment granted under sections 28-320.7, 28-320.8 or 28-320.9; upload benchmarking information for the previous calendar year in accordance with section 28-309.4; and submit an attestation that lighting system upgrades required by Article 310 have been made and electrical sub-meters in tenant spaces have been installed as required by Article 311."
+  },
+  {
+    "id": "statute-28-320.3.6-deductions",
+    "source": "NYC Admin Code §28-320.3.6 (Local Law 97 of 2019)",
+    "url": "https://www.nyc.gov/assets/buildings/local_laws/ll97of2019.pdf",
+    "text": "Deductions from reported annual building emissions. The department may authorize a deduction from the annual building emissions where the owner demonstrates the purchase of greenhouse gas offsets or renewable energy credits, or the use of clean distributed energy resources. Renewable energy credits must come from a capacity resource located in or directly deliverable into zone J load zone, be solely owned and retired by or on behalf of the building owner, and be from the same year as the reporting year. For calendar years 2024 through 2029, a deduction for purchased greenhouse gas offsets shall be authorized for up to 10 percent of the annual building emissions limit."
+  },
+  {
+    "id": "statute-28-320.3.7-reports",
+    "source": "NYC Admin Code §28-320.3.7 (Local Law 97 of 2019)",
+    "url": "https://www.nyc.gov/assets/buildings/local_laws/ll97of2019.pdf",
+    "text": "Reports. By May 1, 2025, and by May 1 of every year thereafter, the owner of a covered building shall file with the department a report, certified by a registered design professional, prepared in a form and manner and containing such information as specified in rules of the department, that for the previous calendar year such building is either in compliance with the applicable building emissions limit established pursuant to section 28-320.3, or not in compliance."
+  },
+  {
+    "id": "statute-28-321.1-covered",
+    "source": "NYC Admin Code §28-321.1 (Local Law 97 of 2019, Article 321)",
+    "url": "https://www.nyc.gov/assets/buildings/local_laws/ll97of2019.pdf",
+    "text": "Article 321 covered building definition. A building (i) containing one or more dwelling units with a legal regulated rent pursuant to the emergency tenant protection act of 1974, the rent stabilization law of 1969 or the local emergency housing rent control act of 1962, (ii) containing one or more dwelling units required by law to be registered and regulated under those acts, (iii) buildings developed with subsidies received pursuant to section 1701q of title 12 of the United States code, (iv) buildings participating in a project-based assistance program pursuant to section 1473f of title 42 of the United States code, or (v) real estate owned by any religious corporation actually dedicated and used exclusively as a place of public worship — that exceeds 25,000 gross square feet, or two or more buildings on the same tax lot that together exceed 50,000 gross square feet, or two or more buildings governed by the same condominium board that together exceed 50,000 gross square feet."
+  },
+  {
+    "id": "statute-28-321.2-compliance",
+    "source": "NYC Admin Code §28-321.2 (Local Law 97 of 2019, Article 321)",
+    "url": "https://www.nyc.gov/assets/buildings/local_laws/ll97of2019.pdf",
+    "text": "Required energy conservation measures for certain buildings. A covered building must comply with either section 28-321.2.1 or section 28-321.2.2. Energy compliant buildings (28-321.2.1): the owner shall demonstrate that, for calendar year 2024, the annual building emissions of the covered building did not exceed what the applicable annual building emissions limit would be pursuant to section 28-320.3.2 if such building were a covered building as defined in article 320."
+  },
+  {
+    "id": "statute-28-321.2.2-measures",
+    "source": "NYC Admin Code §28-321.2.2 (Local Law 97 of 2019, Article 321)",
+    "url": "https://www.nyc.gov/assets/buildings/local_laws/ll97of2019.pdf",
+    "text": "Prescriptive energy conservation measures. By December 31, 2024, the owner of a covered building shall ensure that the following energy conservation measures have been implemented where applicable: 1. Adjusting temperature set points for heat and hot water to reflect appropriate space occupancy and facility requirements; 2. Repairing all heating system leaks; 3. Maintaining the heating system, including ensuring that system component parts are clean and in good operating condition; 4. Installing individual temperature controls or insulated radiator enclosures with temperature controls on all radiators; 5. Insulating all pipes for heating and/or hot water; 6. Insulating the steam system condensate tank or water tank; 7. Installing indoor and outdoor heating system sensors and boiler controls to allow for proper set-points; 8. Replacing or repairing all steam traps such that all are in working order; 9. Installing or upgrading steam system master venting at the ends of mains, large horizontal pipes, and tops of risers; 10. Upgrading lighting to comply with the standards for new systems set forth in section 805 of the New York city energy conservation code on or prior to December 31, 2024; 11. Weatherizing and air sealing where appropriate, including windows and ductwork, with focus on whole-building insulation; 12. Installing timers on exhaust fans; and 13. Installing radiant barriers behind all radiators."
+  },
+  {
+    "id": "statute-28-321.3-reports",
+    "source": "NYC Admin Code §28-321.3 / §28-321.4 (Local Law 97 of 2019, Article 321)",
+    "url": "https://www.nyc.gov/assets/buildings/local_laws/ll97of2019.pdf",
+    "text": "Article 321 reports and penalties. By May 1, 2025, an owner of a covered building shall submit a report to the department to demonstrate compliance, either an energy compliant buildings report certified by a registered design professional (28-321.3.1) or a prescriptive energy conservation measures report prepared and certified by a retro-commissioning agent as defined in article 308 (28-321.3.2). Penalties that may be assessed for violations of section 28-321.2 shall be determined by department rule."
+  }
+]

@@ -63,6 +63,26 @@ export const LAWS: Law[] = [
     appliesTo: sqft => sqft >= 25_000,
     fineEstimateUsd: () => 1_500,
   },
+  {
+    id: "ll152",
+    name: "LL152 — Gas Piping Inspection & Certification",
+    kind: "gas_piping_certification",
+    deadlineDays: 150, // community-district cycle stub; P1 maps the CD to its filing year
+    // Gas service assumed present until DOB data lands (1-2 family homes are
+    // exempt, but they never reach our intake in the first place).
+    appliesTo: () => true,
+    fineEstimateUsd: () => 10_000, // failure-to-certify civil penalty
+  },
+  {
+    id: "ll55",
+    name: "LL55 — Indoor Allergen Hazards (Mold & Pests)",
+    kind: "mold_pest_remediation",
+    deadlineDays: 60,
+    // Residential proxy until unit counts land (P1); our affordable flag is
+    // the only residential signal the registry has today.
+    appliesTo: (_sqft, isAffordable) => isAffordable,
+    fineEstimateUsd: () => null, // HPD violation classes vary too widely to stub honestly
+  },
 ];
 
 export function applicableLaws(sqft: number, isAffordable: boolean): Law[] {
