@@ -1,0 +1,529 @@
+{
+  "key": "https://geosearch.planninglabs.nyc/v2/search?text=30-30%20Thomson%20Avenue%2C%20Queens",
+  "recordedAt": "2026-06-07T00:42:42.545Z",
+  "value": {
+    "geocoding": {
+      "version": "0.2",
+      "attribution": "http://geosearch.planninglabs.nyc/attribution",
+      "query": {
+        "text": "30-30 Thomson Avenue, Queens",
+        "size": 10,
+        "private": false,
+        "lang": {
+          "name": "English",
+          "iso6391": "en",
+          "iso6393": "eng",
+          "via": "default",
+          "defaulted": true
+        },
+        "querySize": 20,
+        "parser": "pelias",
+        "parsed_text": {
+          "subject": "30-30 Thomson Avenue",
+          "housenumber": "30-30",
+          "street": "Thomson Avenue",
+          "locality": "Queens",
+          "admin": "Queens"
+        }
+      },
+      "warnings": [
+        "invalid language provided via header"
+      ],
+      "engine": {
+        "name": "Pelias",
+        "author": "Mapzen",
+        "version": "1.0"
+      },
+      "timestamp": 1780792962531
+    },
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.93608,
+            40.744072
+          ]
+        },
+        "properties": {
+          "id": "1805466",
+          "gid": "nycpad:venue:1805466",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "1805466",
+          "country_code": "US",
+          "name": "30-30 THOMSON AVENUE",
+          "housenumber": "30-30",
+          "street": "THOMSON AVENUE",
+          "postalcode": "11101",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Queens County",
+          "county_gid": "whosonfirst:county:102082377",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Queens",
+          "borough_gid": "whosonfirst:borough:421205767",
+          "neighbourhood": "Long Island City",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
+          "label": "30-30 THOMSON AVENUE, Long Island City, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "4002770001",
+              "bin": "4003533",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.934304,
+            40.743866
+          ]
+        },
+        "properties": {
+          "id": "1805693",
+          "gid": "nycpad:venue:1805693",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "1805693",
+          "country_code": "US",
+          "name": "31-30 THOMSON AVENUE",
+          "housenumber": "31-30",
+          "street": "THOMSON AVENUE",
+          "postalcode": "11101",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Queens County",
+          "county_gid": "whosonfirst:county:102082377",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Queens",
+          "borough_gid": "whosonfirst:borough:421205767",
+          "neighbourhood": "Long Island City",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
+          "label": "31-30 THOMSON AVENUE, Long Island City, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "4002790001",
+              "bin": "4003535",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.93692,
+            40.744583
+          ]
+        },
+        "properties": {
+          "id": "1804869",
+          "gid": "nycpad:venue:1804869",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "1804869",
+          "country_code": "US",
+          "name": "30-14 THOMSON AVENUE",
+          "housenumber": "30-14",
+          "street": "THOMSON AVENUE",
+          "postalcode": "11101",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Queens County",
+          "county_gid": "whosonfirst:county:102082377",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Queens",
+          "borough_gid": "whosonfirst:borough:421205767",
+          "neighbourhood": "Long Island City",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
+          "label": "30-14 THOMSON AVENUE, Long Island City, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "4002740001",
+              "bin": "4003517",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.93692,
+            40.744583
+          ]
+        },
+        "properties": {
+          "id": "1804871",
+          "gid": "nycpad:venue:1804871",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "1804871",
+          "country_code": "US",
+          "name": "30-16 THOMSON AVENUE",
+          "housenumber": "30-16",
+          "street": "THOMSON AVENUE",
+          "postalcode": "11101",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Queens County",
+          "county_gid": "whosonfirst:county:102082377",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Queens",
+          "borough_gid": "whosonfirst:borough:421205767",
+          "neighbourhood": "Long Island City",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
+          "label": "30-16 THOMSON AVENUE, Long Island City, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "4002740001",
+              "bin": "4003517",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.9358,
+            40.745426
+          ]
+        },
+        "properties": {
+          "id": "1804980",
+          "gid": "nycpad:venue:1804980",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "1804980",
+          "country_code": "US",
+          "name": "30-25 THOMSON AVENUE",
+          "housenumber": "30-25",
+          "street": "THOMSON AVENUE",
+          "postalcode": "11101",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Queens County",
+          "county_gid": "whosonfirst:county:102082377",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Queens",
+          "borough_gid": "whosonfirst:borough:421205767",
+          "neighbourhood": "Long Island City",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
+          "label": "30-25 THOMSON AVENUE, Long Island City, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "4002750023",
+              "bin": "4003523",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.9358,
+            40.745426
+          ]
+        },
+        "properties": {
+          "id": "1804982",
+          "gid": "nycpad:venue:1804982",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "1804982",
+          "country_code": "US",
+          "name": "30-27 THOMSON AVENUE",
+          "housenumber": "30-27",
+          "street": "THOMSON AVENUE",
+          "postalcode": "11101",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Queens County",
+          "county_gid": "whosonfirst:county:102082377",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Queens",
+          "borough_gid": "whosonfirst:borough:421205767",
+          "neighbourhood": "Long Island City",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
+          "label": "30-27 THOMSON AVENUE, Long Island City, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "4002750023",
+              "bin": "4003523",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.9358,
+            40.745426
+          ]
+        },
+        "properties": {
+          "id": "1805004",
+          "gid": "nycpad:venue:1805004",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "1805004",
+          "country_code": "US",
+          "name": "30-49 THOMSON AVENUE",
+          "housenumber": "30-49",
+          "street": "THOMSON AVENUE",
+          "postalcode": "11101",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Queens County",
+          "county_gid": "whosonfirst:county:102082377",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Queens",
+          "borough_gid": "whosonfirst:borough:421205767",
+          "neighbourhood": "Long Island City",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
+          "label": "30-49 THOMSON AVENUE, Long Island City, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "4002750023",
+              "bin": "4003523",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.9358,
+            40.745426
+          ]
+        },
+        "properties": {
+          "id": "1805022",
+          "gid": "nycpad:venue:1805022",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "1805022",
+          "country_code": "US",
+          "name": "30-67 THOMSON AVENUE",
+          "housenumber": "30-67",
+          "street": "THOMSON AVENUE",
+          "postalcode": "11101",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Queens County",
+          "county_gid": "whosonfirst:county:102082377",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Queens",
+          "borough_gid": "whosonfirst:borough:421205767",
+          "neighbourhood": "Long Island City",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
+          "label": "30-67 THOMSON AVENUE, Long Island City, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "4002750023",
+              "bin": "4003523",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.9358,
+            40.745426
+          ]
+        },
+        "properties": {
+          "id": "1805032",
+          "gid": "nycpad:venue:1805032",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "1805032",
+          "country_code": "US",
+          "name": "30-77 THOMSON AVENUE",
+          "housenumber": "30-77",
+          "street": "THOMSON AVENUE",
+          "postalcode": "11101",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Queens County",
+          "county_gid": "whosonfirst:county:102082377",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Queens",
+          "borough_gid": "whosonfirst:borough:421205767",
+          "neighbourhood": "Long Island City",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
+          "label": "30-77 THOMSON AVENUE, Long Island City, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "4002750023",
+              "bin": "4003523",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.9358,
+            40.745426
+          ]
+        },
+        "properties": {
+          "id": "1805038",
+          "gid": "nycpad:venue:1805038",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "1805038",
+          "country_code": "US",
+          "name": "30-83 THOMSON AVENUE",
+          "housenumber": "30-83",
+          "street": "THOMSON AVENUE",
+          "postalcode": "11101",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Queens County",
+          "county_gid": "whosonfirst:county:102082377",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Queens",
+          "borough_gid": "whosonfirst:borough:421205767",
+          "neighbourhood": "Long Island City",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85831303",
+          "label": "30-83 THOMSON AVENUE, Long Island City, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "4002750023",
+              "bin": "4003523",
+              "version": "26a"
+            }
+          }
+        }
+      }
+    ],
+    "bbox": [
+      -73.93692,
+      40.743866,
+      -73.934304,
+      40.745426
+    ]
+  }
+}

@@ -49,6 +49,11 @@ export async function prepareIntake(
         cbl.ll84 ? "ll84" : null,
         cbl.ll87 ? "ll87" : null,
         cbl.ll88 ? "ll88" : null,
+        // Gas service assumed present until DOB data lands (registry stub).
+        "ll152",
+        // Article 321 means rent-regulated residential — the allergen law
+        // rides along (residential proxy until unit counts land).
+        cbl.article321 ? "ll55" : null,
       ].filter((id): id is string => id !== null)
     : [];
 

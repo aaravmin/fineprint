@@ -1,9 +1,35 @@
 // Shared fetch helper: one place for timeouts, JSON parsing, and errors that
 // say which service failed and why. Every API client goes through this.
 
+import { cacheRead, cacheWrite } from "./cache.ts";
+
 export interface FetchJsonOptions {
   service: string; // human name for error messages ("GeoSearch", "LL84")
   timeoutMs?: number;
+}
+
+// Live-then-cache: a good response leaves a snapshot, a dead network serves
+// the last snapshot with a warning, and a never-seen URL fails loudly. The
+// fetcher is injectable so tests run offline.
+export async function cachedFetchJson<T>(
+  url: string,
+  options: FetchJsonOptions,
+  fetcher: (url: string, options: FetchJsonOptions) => Promise<T> = fetchJson,
+): Promise<T> {
+  try {
+    const fresh = await fetcher(url, options);
+    cacheWrite(options.service, url, fresh);
+    return fresh;
+  } catch (liveError) {
+    const snapshot = cacheRead<T>(options.service, url);
+    if (snapshot !== null) {
+      console.warn(
+        `[${options.service}] live fetch failed (${(liveError as Error).message}); serving cached snapshot`,
+      );
+      return snapshot;
+    }
+    throw liveError;
+  }
 }
 
 export async function fetchJson<T>(url: string, options: FetchJsonOptions): Promise<T> {

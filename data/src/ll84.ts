@@ -3,7 +3,7 @@
 // uses, reported emissions. Returns null when the building has no filing —
 // plenty don't, and the orchestrator must degrade honestly.
 
-import { fetchJson } from "./http.ts";
+import { cachedFetchJson } from "./http.ts";
 import type { Bbl, Ll84Facts, UseSplit } from "./types.ts";
 
 const LL84_URL = "https://data.cityofnewyork.us/resource/5zyy-y8am.json";
@@ -106,7 +106,9 @@ export async function fetchLl84(bbl: Bbl): Promise<Ll84Facts | null> {
     query.set("$$app_token", token);
   }
 
-  const rows = await fetchJson<Ll84Row[]>(`${LL84_URL}?${query}`, { service: "LL84" });
+  const rows = await cachedFetchJson<Ll84Row[]>(`${LL84_URL}?${query}`, {
+    service: "LL84",
+  });
 
   return parseLl84Rows(rows, bbl);
 }

@@ -48,6 +48,7 @@ describe("prepareIntake", () => {
       "ll84",
       "ll87",
       "ll88",
+      "ll152",
     ]);
     expect(JSON.parse(intake.ingestArgs.usesJson)).toHaveLength(1);
   });
@@ -71,6 +72,8 @@ describe("prepareIntake", () => {
     const lawIds = JSON.parse(intake.ingestArgs.coveredLawIdsJson);
     expect(lawIds).toContain("art321");
     expect(lawIds).not.toContain("ll97");
+    // Article 321 means rent-regulated residential — the allergen law rides along.
+    expect(lawIds).toContain("ll55");
   });
 
   test("the summary reads like a report: building, coverage, exposure, sources", async () => {
@@ -78,7 +81,7 @@ describe("prepareIntake", () => {
 
     expect(intake.summary).toMatch(/1008350041/);
     expect(intake.summary).toMatch(/2,852,257/);
-    expect(intake.summary).toMatch(/ll97, ll84, ll87, ll88/);
+    expect(intake.summary).toMatch(/ll97, ll84, ll87, ll88, ll152/);
     expect(intake.summary).toMatch(/NYC GeoSearch/);
   });
 

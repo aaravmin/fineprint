@@ -145,4 +145,52 @@ describe("draftScripted", () => {
     expect(draft).toMatch(/2030-2034/);
     expect(draft).toMatch(/2035-2039/);
   });
+
+  test("an over-cap LL97 draft names the cheapest retrofit path with the disclaimer", () => {
+    // Small but very dirty: fines dwarf the per-sqft capex, so the optimizer
+    // must pick at least one measure. (At ESB's scale and intensity the honest
+    // answer is do-nothing, which is why this fixture is not ESB.)
+    const draft = draftScripted(
+      draftInput({
+        sqft: 50_000,
+        uses: [{ group: "Office", sqft: 50_000 }],
+        annualEmissionsTco2e: 1_500,
+      }),
+    );
+
+    expect(draft).toMatch(/Cheapest path to compliance/);
+    expect(draft).toMatch(/assumptions, not quotes/);
+    expect(draft).toMatch(/avoids \$[\d,.]+ in fines through 2039/);
+  });
+
+  test("the LL152 draft covers the plumber, the fix, and the GPS2 filing", () => {
+    const draft = draftScripted(
+      draftInput({ kind: "gas_piping_certification", lawId: "ll152" }),
+    );
+
+    expect(draft).toMatch(/licensed master plumber/i);
+    expect(draft).toMatch(/GPS2/);
+    expect(draft).toMatch(/DOB NOW/);
+  });
+
+  test("the LL55 draft covers complaint triage and the underlying condition", () => {
+    const draft = draftScripted(
+      draftInput({ kind: "mold_pest_remediation", lawId: "ll55" }),
+    );
+
+    expect(draft).toMatch(/HPD complaints/i);
+    expect(draft).toMatch(/underlying condition/i);
+    expect(draft).toMatch(/tenant-safe/i);
+  });
+
+  test("a compliant building's LL97 draft has no retrofit pitch", () => {
+    const draft = draftScripted(
+      draftInput({
+        uses: [{ group: "Office", sqft: 2_852_257 }],
+        annualEmissionsTco2e: 100,
+      }),
+    );
+
+    expect(draft).not.toMatch(/Cheapest path/);
+  });
 });

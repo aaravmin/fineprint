@@ -24,10 +24,13 @@ describe("data tools for agents", () => {
 
     expect(names).toContain("lookup_building");
     expect(names).toContain("assess_building");
+    expect(names).toContain("ask_law");
     for (const tool of dataToolDefinitions) {
       expect(tool.description.length).toBeGreaterThan(20);
       expect(tool.input_schema.type).toBe("object");
-      expect(tool.input_schema.required).toContain("address");
+      // Building tools take an address; the law tool takes a question.
+      const required = tool.input_schema.required;
+      expect(required.includes("address") || required.includes("question")).toBe(true);
     }
   });
 
@@ -57,6 +60,20 @@ describe("data tools for agents", () => {
     // far under 16,678.22 actual, so the fine must be large and positive.
     expect(parsed.projections[1].period).toBe("2030-2034");
     expect(parsed.projections[1].annualFineUsd).toBeGreaterThan(1_000_000);
+  });
+
+  test("assess_building includes the retrofit assessment when projections exist", async () => {
+    const reply = await executeDataTool(
+      "assess_building",
+      { address: "350 5th Avenue, Manhattan" },
+      { lookupBuilding: fakeLookup },
+    );
+    const parsed = JSON.parse(reply);
+
+    expect(parsed.retrofit.evaluatedSubsets).toBe(128);
+    expect(parsed.retrofit.best.totalCostUsd).toBeLessThanOrEqual(
+      parsed.retrofit.doNothing.totalCostUsd,
+    );
   });
 
   test("a building without emissions data degrades to facts plus a note", async () => {
