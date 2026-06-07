@@ -11,6 +11,7 @@ import fetchBuildJobFilingsByBin from "./permits.ts";
 import fetchOpenEcbViolationsByBin from "./ecb.ts";
 import fetchPlutoByBbl from "./pluto.ts";
 import fetchSolarElectricalPermitsByBin from "./electrical.ts";
+import fetchFacadeFilingsByBin from "./facades.ts";
 import type {
   Bbl,
   BblResult,
@@ -20,6 +21,7 @@ import type {
   BuildingFacts,
   EcbViolation,
   ElectricalPermit,
+  FacadeFiling,
   Ll84Facts,
   PlutoCharacteristics,
   ProvenanceNote,
@@ -37,6 +39,7 @@ export interface LookupSources {
   fetchBuildJobFilingsByBin?: (bin: Bin) => Promise<BuildJobFiling[]>;
   fetchSolarElectricalPermitsByBin?: (bin: Bin) => Promise<ElectricalPermit[]>;
   fetchOpenEcbViolationsByBin?: (bin: Bin) => Promise<EcbViolation[]>;
+  fetchFacadeFilingsByBin?: (bin: Bin) => Promise<FacadeFiling[]>;
 }
 
 const realSources: LookupSources = {
@@ -48,6 +51,7 @@ const realSources: LookupSources = {
   fetchBuildJobFilingsByBin: fetchBuildJobFilingsByBin,
   fetchSolarElectricalPermitsByBin: fetchSolarElectricalPermitsByBin,
   fetchOpenEcbViolationsByBin: fetchOpenEcbViolationsByBin,
+  fetchFacadeFilingsByBin: fetchFacadeFilingsByBin,
 };
 
 export async function lookupBuilding(
@@ -78,6 +82,7 @@ export async function lookupBuilding(
     sources,
   );
   const openViolations = await resolveOpenViolations(geo.bin, sources, provenance);
+  const facadeFilings = await resolveFacadeFilings(geo.bin, sources, provenance);
 
   const grossFloorAreaSqft = resolveFloorArea(ll84, cbl, provenance);
   const annualEmissionsTco2e = resolveEmissions(ll84, provenance);
@@ -125,6 +130,7 @@ export async function lookupBuilding(
     provenance,
     infrastructureProfile,
     openViolations,
+    facadeFilings,
   };
 }
 
@@ -201,6 +207,29 @@ function deriveEfficiencyTier(energyStarScore: number | null): string | null {
     return "medium";
   }
   return "low";
+}
+
+// FISP filings are BIN-keyed; null (not empty) when the dataset can't be
+// queried, so downstream code can tell "no filings" from "no answer".
+async function resolveFacadeFilings(
+  bin: Bin | null,
+  sources: LookupSources,
+  provenance: ProvenanceNote[],
+): Promise<FacadeFiling[] | null> {
+  if (!bin || !sources.fetchFacadeFilingsByBin) {
+    return null;
+  }
+
+  const filings = await sources.fetchFacadeFilingsByBin(bin);
+  provenance.push({
+    field: "facadeFilings",
+    source: "DOB NOW: Safety - Facades",
+    detail:
+      filings.length === 0
+        ? "no FISP filings on record for this BIN"
+        : `${filings.length} FISP filing row(s) on record`,
+  });
+  return filings;
 }
 
 // Open ECB violations are BIN-keyed; with no BIN there is nothing to query.

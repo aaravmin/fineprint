@@ -18,7 +18,10 @@
     "seed": "tsx scripts/seed.ts",
     "worker": "npm run worker --workspace agents",
     "reviewer": "npm run reviewer --workspace agents",
-    "dashboard": "npm run dev --workspace client"
+    "dashboard": "npm run dev --workspace client",
+    "worker:emissions": "WORKER_KINDS=emissions_fine_analysis,prescriptive_measures_plan npm run worker",
+    "worker:filings": "WORKER_KINDS=benchmarking_filing,audit_filing,lighting_submetering_plan npm run worker",
+    "worker:inspections": "WORKER_KINDS=facade_inspection,gas_piping_certification,mold_pest_remediation npm run worker"
   },
   "devDependencies": {
     "tsx": "^4.19.2"

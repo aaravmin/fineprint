@@ -91,8 +91,17 @@ export interface RetrofitPlan {
   capexUsd: number;
   projectedEmissionsTco2e: number;
   horizonFinesUsd: number; // sum of annual fines x years in each period
-  totalCostUsd: number; // capex + horizon fines
+  // Procedural penalties this plan's measures avoid (each law credited once).
+  proceduralCreditUsd: number;
+  totalCostUsd: number; // capex + horizon fines - procedural credit
   results: FineResult[];
+}
+
+export interface OptimizeOptions {
+  // Avoidable procedural penalty per law id (e.g. { ll88: 1500 }). A subset
+  // containing any measure whose satisfiesLaws names the law is credited that
+  // amount in the objective — once per law, however many measures cover it.
+  proceduralPenaltySavingsByLaw?: Record<string, number>;
 }
 
 export interface MaccPoint {
@@ -115,6 +124,7 @@ export interface RetrofitAssessment {
 export function optimizeRetrofit(
   building: BuildingInput,
   measures: RetrofitMeasure[] = DEFAULT_MEASURES,
+  options: OptimizeOptions = {},
 ): RetrofitAssessment {
   if (measures.length > MAX_CATALOG) {
     throw new Error(
@@ -128,7 +138,7 @@ export function optimizeRetrofit(
 
   for (let mask = 0; mask < subsetCount; mask++) {
     const chosen = measures.filter((_, index) => mask & (1 << index));
-    const plan = evaluatePlan(building, chosen);
+    const plan = evaluatePlan(building, chosen, options);
 
     if (mask === 0) {
       doNothing = plan;
@@ -141,6 +151,12 @@ export function optimizeRetrofit(
   const notes = [
     "Capex and savings are typical-building assumptions, not quotes; every measure names its basis.",
   ];
+  if (best!.proceduralCreditUsd > 0) {
+    notes.push(
+      "Measure selection credits avoided procedural penalties (a measure that also " +
+        "retires a filing obligation counts that penalty as savings, once per law).",
+    );
+  }
   if (building.isArticle321) {
     notes.push(
       "Article 321 buildings face flat penalties rather than $268/tCO2e; the optimizer compares capex against the engine's Article 321 results.",
@@ -157,7 +173,11 @@ export function optimizeRetrofit(
   };
 }
 
-function evaluatePlan(building: BuildingInput, chosen: RetrofitMeasure[]): RetrofitPlan {
+function evaluatePlan(
+  building: BuildingInput,
+  chosen: RetrofitMeasure[],
+  options: OptimizeOptions = {},
+): RetrofitPlan {
   const { capexUsd, projectedEmissionsTco2e } = applyMeasures(building, chosen);
 
   const adjusted = { ...building, annualEmissionsTco2e: projectedEmissionsTco2e };
@@ -170,14 +190,35 @@ function evaluatePlan(building: BuildingInput, chosen: RetrofitMeasure[]): Retro
     0,
   );
 
+  const proceduralCreditUsd = proceduralCredit(chosen, options);
+
   return {
     measureIds: chosen.map(measure => measure.id),
     capexUsd,
     projectedEmissionsTco2e,
     horizonFinesUsd: round2(horizonFinesUsd),
-    totalCostUsd: round2(capexUsd + horizonFinesUsd),
+    proceduralCreditUsd,
+    totalCostUsd: round2(capexUsd + horizonFinesUsd - proceduralCreditUsd),
     results,
   };
+}
+
+// Each law is credited once, no matter how many chosen measures satisfy it.
+function proceduralCredit(
+  chosen: RetrofitMeasure[],
+  options: OptimizeOptions,
+): number {
+  const savings = options.proceduralPenaltySavingsByLaw;
+  if (!savings) {
+    return 0;
+  }
+
+  const lawsRetired = new Set(chosen.flatMap(measure => measure.satisfiesLaws ?? []));
+  let credit = 0;
+  for (const lawId of lawsRetired) {
+    credit += savings[lawId] ?? 0;
+  }
+  return round2(credit);
 }
 
 // The capex and resulting emissions of applying a measure set. Reductions

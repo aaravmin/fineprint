@@ -12,6 +12,7 @@ export const DATASET = {
   dobNowBuildJobFilings: "w9ak-ipjd", // BIN and BBL keyed
   dobJobApplicationsLegacy: "ic3t-wcy2",
   ecbViolations: "6bgk-3dad", // BIN-keyed
+  dobNowSafetyFacades: "xubg-57si", // BIN-keyed; FISP compliance filings
 } as const;
 
 export function resourceUrl(datasetId: string, domain = SOCRATA_DOMAIN): string {

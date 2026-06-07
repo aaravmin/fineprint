@@ -20,5 +20,6 @@ export default __t.row({
   usesJson: __t.option(__t.string()).name("uses_json"),
   ll97Covered: __t.option(__t.bool()).name("ll_97_covered"),
   provenanceJson: __t.option(__t.string()).name("provenance_json"),
+  compliancePlanJson: __t.option(__t.string()).name("compliance_plan_json"),
   createdAt: __t.timestamp().name("created_at"),
 });

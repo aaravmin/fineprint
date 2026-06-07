@@ -10,7 +10,11 @@ import {
 } from "../../engine/src/retrofit.ts";
 import { toEngineInput } from "./engineBridge.ts";
 import { assessObligations, type Obligation } from "./obligations.ts";
-import { buildCompliancePlan, type CompliancePlan } from "./compliancePlan.ts";
+import {
+  buildCompliancePlan,
+  proceduralPenaltySavings,
+  type CompliancePlan,
+} from "./compliancePlan.ts";
 import { planRetrofit, type MeasureExclusion } from "./retrofit.ts";
 import { retrieveLawChunks } from "./ask.ts";
 import { lookupBuilding as realLookupBuilding } from "./lookup.ts";
@@ -156,7 +160,9 @@ function assessBuilding(facts: BuildingFacts): Assessment {
     };
   }
 
-  const plan = planRetrofit(facts);
+  const plan = planRetrofit(facts, {
+    proceduralPenaltySavingsByLaw: proceduralPenaltySavings(obligations),
+  });
 
   return {
     facts,

@@ -11,6 +11,7 @@ import {
   optimizeArticle321,
   optimizeRetrofit,
   type Article321Assessment,
+  type OptimizeOptions,
   type RetrofitAssessment,
   type RetrofitMeasure,
 } from "../../engine/src/retrofit.ts";
@@ -42,7 +43,13 @@ export type RetrofitPlan =
 
 // One address's retrofit plan, or null when the engine can't price the building
 // (no emissions or use splits — same gate as the fine projections).
-export function planRetrofit(facts: BuildingFacts): RetrofitPlan | null {
+// options.proceduralPenaltySavingsByLaw lets the caller credit avoided
+// procedural penalties in measure selection (computed from the obligation set,
+// so this layer never re-derives law applicability).
+export function planRetrofit(
+  facts: BuildingFacts,
+  options: OptimizeOptions = {},
+): RetrofitPlan | null {
   const { input } = toEngineInput(facts);
   if (!input) {
     return null;
@@ -63,7 +70,7 @@ export function planRetrofit(facts: BuildingFacts): RetrofitPlan | null {
 
   return {
     pathway: "standard",
-    assessment: optimizeRetrofit(input, measures),
+    assessment: optimizeRetrofit(input, measures, options),
     excluded,
     findings,
   };

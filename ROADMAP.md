@@ -119,41 +119,46 @@ now presents.
 
 ### Coverage today
 
-| Law         | Kind        | Status                                             |
-| ----------- | ----------- | -------------------------------------------------- |
-| LL97        | performance | full — fine projections + building-aware optimizer |
-| Article 321 | performance | full — constrained optimizer, both pathways        |
-| LL84        | procedural  | full — cycle + on-record currency                  |
-| LL87        | procedural  | cycle dated; filing record not wired               |
-| LL88        | procedural  | deadline + LL97 cross-credit                       |
-| LL11        | procedural  | applicability only; sub-cycle window undated       |
-| LL152       | procedural  | applicability only; CD schedule undated            |
-| LL55        | —           | not yet analyzed (allergen hazards)                |
+| Law         | Kind        | Status                                                       |
+| ----------- | ----------- | ------------------------------------------------------------ |
+| LL97        | performance | full — fine projections + building-aware optimizer           |
+| Article 321 | performance | full — constrained optimizer, both pathways                  |
+| LL84        | procedural  | full — cycle + on-record currency                            |
+| LL87        | procedural  | cycle dated; city dataset is a file blob, not queryable      |
+| LL88        | procedural  | deadline + LL97 cross-credit, credited in measure selection  |
+| LL11        | procedural  | full — sub-cycle windows dated, filings from xubg-57si       |
+| LL152       | procedural  | CD schedule dated (1 RCNY 103-10); no filing dataset exists  |
+| LL55        | procedural  | analyzed — annual allergen duty keyed to PLUTO unit counts   |
 
 ## Forward roadmap
 
-Ordered by leverage.
+Ordered by leverage. Items 1-6 are done; what remains of each is noted.
 
-1. **Surface the compliance plan in the dashboard.** The richest output —
-   `assess_building.compliancePlan` — is not yet rendered. Build the per-address
-   view: exposure, the de-duplicated plan, dispositions, provenance footnotes.
-2. **Fill the deferred cycle mappings.** LL11 sub-cycle windows by tax block and
-   the LL152 community-district schedule. Both are published; both currently
-   return an undated deadline with guidance. Wiring them turns "go look this up"
-   into a real date.
-3. **Confirm procedural filings against real datasets.** LL87, LL11, and LL152
-   report `onRecord: null`. Where DOB NOW exposes filing records, flip them to
-   true/false so a satisfied building stops seeing a due item.
-4. **Add LL55 (indoor allergen hazards).** Procedural/remediation, keyed to
-   residential unit counts already pulled from PLUTO.
-5. **Fold procedural penalties into the optimizer objective.** Today cross-credit
-   is reporting only. A measure that also retires a procedural penalty could have
-   that avoided cost credited in selection — minor for LL88, a clean
-   generalization for future measure-satisfiable laws.
-6. **Orchestrate per-law agents off one address.** Intake already emits a task
-   per law `kind`, and workers filter by `WORKER_KINDS`. Route each obligation to
-   a specialized worker so analysis fans out and aggregates back into the plan.
-7. **Verify and date the assumptions.** Retrofit capex and savings are editorial
-   typical-building figures; the LL87 block-digit mapping needs confirming
-   against the DOB calendar. Replace assumptions with cited sources where a
-   defensible one exists, and keep disclosing the rest.
+1. **Surface the compliance plan in the dashboard.** Done — intake serializes
+   `buildCompliancePlan` into `building.compliancePlanJson`; the building view
+   renders pathway, measures, dispositions, cross-credits, and provenance
+   footnotes. Buildings added before this change carry no plan until re-ingested.
+2. **Fill the deferred cycle mappings.** Done — FISP Cycle 10 sub-cycle windows
+   (A: blocks 4/5/6/9 from Feb 2025; B: 0/7/8 from 2026; C: 1/2/3 from 2027,
+   recurring every 5 years) and the LL152 four-year district rotation
+   (2024: 1/3/10; 2025: 2/5/7/13/18; 2026: 4/6/8/9/16; 2027: 11/12/14/15/17).
+3. **Confirm procedural filings against real datasets.** LL11 done — DOB NOW
+   Safety Facades (xubg-57si) is wired; a real report reads satisfied, DOB's
+   auto-generated "No Report Filed" placeholder reads due. LL87's dataset
+   (au6c-jqvf) is a file attachment, not a queryable table, and LL152 has no
+   public certification dataset — both honestly stay `onRecord: null`.
+4. **Add LL55 (indoor allergen hazards).** Done — applies at 3+ residential
+   units from PLUTO (Article 321 flag as fallback when PLUTO is silent); annual
+   inspection duty with no filing to confirm, penalty left null honestly.
+5. **Fold procedural penalties into the optimizer objective.** Done — the
+   optimizer accepts `proceduralPenaltySavingsByLaw`; a subset containing a
+   measure that retires a due procedural law is credited that penalty once per
+   law. The compliance plan and the assess_building tool feed the same map, so
+   selection and narration agree.
+6. **Orchestrate per-law agents off one address.** Wired — `worker:emissions`,
+   `worker:filings`, and `worker:inspections` scripts run kind-filtered pools
+   over the existing per-law task emission.
+7. **Verify and date the assumptions.** Partially — the LL11 and LL152 cycle
+   rules now cite 1 RCNY 103-04 / 103-10 with verified windows. Still open:
+   retrofit capex and savings remain editorial typical-building figures, and the
+   LL87 block-digit mapping still needs confirming against the DOB calendar.
