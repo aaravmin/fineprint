@@ -29,16 +29,13 @@ export function AgentsClient() {
   const killWorker = useReducer(reducers.killWorker);
   const [killingId, setKillingId] = useState<bigint | null>(null);
 
-  async function kill(workerId: bigint, name: string) {
+  function kill(workerId: bigint, name: string) {
     setKillingId(workerId);
-    try {
-      await killWorker({ workerId });
-      toast(`${name} killed — its task returns to the queue`);
-    } catch (error) {
-      toast.error(`Kill failed: ${(error as Error).message}`);
-    } finally {
-      setKillingId(null);
-    }
+    toast(`${name} killed — its task returns to the queue`);
+
+    killWorker({ workerId })
+      .catch((error: Error) => toast.error(`Kill failed: ${error.message}`))
+      .finally(() => setKillingId(null));
   }
 
   const sorted = [...workers].sort((a, b) => (a.id < b.id ? -1 : 1));

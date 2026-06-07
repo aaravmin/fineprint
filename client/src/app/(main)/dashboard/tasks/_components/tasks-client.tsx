@@ -46,24 +46,25 @@ export function TasksClient() {
   const [pendingTaskId, setPendingTaskId] = useState<bigint | null>(null);
   const [statusFilter, setStatusFilter] = useState<Option[]>([]);
 
-  async function review(taskId: bigint, verdict: "approve" | "reject") {
+  function review(taskId: bigint, verdict: "approve" | "reject") {
     setPendingTaskId(taskId);
-    try {
-      if (verdict === "approve") {
-        await approve({ taskId, note: "approved from the dashboard" });
-        toast.success("Draft approved");
-      } else {
-        await reject({
-          taskId,
-          note: "rejected from the dashboard — returned to the queue",
-        });
-        toast("Draft rejected — task returned to the queue");
-      }
-    } catch (error) {
-      toast.error(`Review failed: ${(error as Error).message}`);
-    } finally {
-      setPendingTaskId(null);
+
+    // Optimistic: the verdict toast fires on click; the buttons stay disabled
+    // only until the server acks, and a refused reducer surfaces as an error.
+    const call =
+      verdict === "approve"
+        ? approve({ taskId, note: "approved from the dashboard" })
+        : reject({ taskId, note: "rejected from the dashboard — returned to the queue" });
+
+    if (verdict === "approve") {
+      toast.success("Draft approved");
+    } else {
+      toast("Draft rejected — task returned to the queue");
     }
+
+    call
+      .catch((error: Error) => toast.error(`Review failed: ${error.message}`))
+      .finally(() => setPendingTaskId(null));
   }
 
   const activeStatuses = statusFilter.map(option => option.value);

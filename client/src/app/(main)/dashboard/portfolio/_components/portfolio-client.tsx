@@ -13,7 +13,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyFolder } from "@/components/ui/empty-folder";
-import { LoadingDots } from "@/components/ui/loading-dots";
 import {
   Table,
   TableBody,
@@ -199,7 +198,6 @@ export function PortfolioClient() {
   const router = useRouter();
   const requestBuilding = useReducer(reducers.requestBuilding);
   const [address, setAddress] = useState("");
-  const [requesting, setRequesting] = useState(false);
   const [lawScope, setLawScope] = useState<LawScope>("all");
   const [fineBasisId, setFineBasisId] = useState(FINE_BASES[0].id);
   const [recentAddresses, setRecentAddresses] = useState<string[]>([]);
@@ -221,25 +219,21 @@ export function PortfolioClient() {
   }, [fineBasisId, lawScope]);
 
   const submitAddress = useCallback(
-    async (nextAddress = address) => {
+    (nextAddress = address) => {
       const trimmed = nextAddress.trim();
       if (!trimmed) {
         toast.error("Enter a street address with the borough");
         return;
       }
 
-      setAddress(trimmed);
+      // Optimistic: confirm immediately, surface a failure if the ack comes
+      // back negative. The reducer is the source of truth either way.
       setRecentAddresses(rememberAddress(trimmed));
-      setRequesting(true);
-      try {
-        await requestBuilding({ address: trimmed });
-        toast.success("Intake queued — an agent is pulling the city's records now");
-        setAddress("");
-      } catch (error) {
-        toast.error(`Request failed: ${(error as Error).message}`);
-      } finally {
-        setRequesting(false);
-      }
+      setAddress("");
+      toast.success("Intake queued — an agent is pulling the city's records now");
+      requestBuilding({ address: trimmed }).catch((error: Error) => {
+        toast.error(`Intake for "${trimmed}" failed: ${error.message}`);
+      });
     },
     [address, requestBuilding],
   );
@@ -252,7 +246,7 @@ export function PortfolioClient() {
 
     requestedQueryAddress.current = queryAddress;
     setAddress(queryAddress);
-    void submitAddress(queryAddress);
+    submitAddress(queryAddress);
   }, [submitAddress]);
 
   const visibleTasks = tasks.filter(task => lawMatches(task, lawScope));
@@ -288,10 +282,10 @@ export function PortfolioClient() {
     <div className="@container/main flex flex-col gap-6">
       <h1 className="font-heading text-2xl font-bold tracking-tight">Portfolio</h1>
 
-      <div className="grid gap-3 @xl/main:grid-cols-[minmax(32rem,1.08fr)_minmax(0,1.65fr)]">
-        <div className="rounded-xl border bg-background p-3">
-          <p className="px-1 pb-2 text-xs font-medium text-muted-foreground">Law scope</p>
-          <div className="flex flex-wrap gap-2">
+      <div className="rounded-xl border bg-background">
+        <div className="grid gap-2 px-4 py-3 @md/main:grid-cols-[5.5rem_1fr] @md/main:items-start">
+          <p className="pt-1.5 text-xs font-medium text-muted-foreground">Law scope</p>
+          <div className="flex flex-wrap gap-1.5">
             {LAW_OPTIONS.map(law => (
               <Button
                 key={law.id}
@@ -306,60 +300,50 @@ export function PortfolioClient() {
           </div>
         </div>
 
-        <div className="rounded-xl border bg-background p-3">
-          <div className="grid gap-3 @md/main:grid-cols-[max-content_1fr] @md/main:items-baseline">
-            <p className="whitespace-nowrap px-1 text-xs font-medium text-muted-foreground">
-              Fine basis
-            </p>
-            <div className="flex min-w-0 items-baseline gap-3 px-1">
-              <span className="shrink-0 whitespace-nowrap text-lg font-thin tracking-wide text-muted-foreground uppercase">
-                {activeFineBasis.type}
-              </span>
-              <span className="font-heading whitespace-nowrap text-xl font-bold italic text-destructive @md/main:text-2xl @2xl/main:text-3xl">
-                {activeFineBasis.value}
-                <span className="ml-1 text-base @md/main:text-lg @2xl/main:text-2xl">
-                  {activeFineBasis.unit}
-                </span>
-              </span>
+        <div className="grid gap-2 border-t px-4 py-3 @md/main:grid-cols-[5.5rem_1fr_auto] @md/main:items-start">
+          <p className="pt-1.5 text-xs font-medium text-muted-foreground">Fine basis</p>
+          <div className="min-w-0">
+            <div className="flex flex-wrap gap-1.5">
+              {visibleFineBases.map(basis => (
+                <Button
+                  key={basis.id}
+                  type="button"
+                  size="sm"
+                  variant={fineBasisId === basis.id ? "default" : "outline"}
+                  onClick={() => setFineBasisId(basis.id)}
+                >
+                  {basis.label}
+                </Button>
+              ))}
             </div>
+            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+              {activeFineBasis.detail}
+            </p>
           </div>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {visibleFineBases.map(basis => (
-              <Button
-                key={basis.id}
-                type="button"
-                size="sm"
-                variant={fineBasisId === basis.id ? "default" : "outline"}
-                onClick={() => setFineBasisId(basis.id)}
-              >
-                {basis.label}
-              </Button>
-            ))}
+          <div className="text-right">
+            <p className="text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
+              {activeFineBasis.type}
+            </p>
+            <p className="font-heading whitespace-nowrap text-xl font-bold text-destructive">
+              {activeFineBasis.value}
+              <span className="ml-1 text-sm font-medium">{activeFineBasis.unit}</span>
+            </p>
           </div>
-          <p className="mt-2 px-1 text-xs leading-relaxed text-muted-foreground">
-            {activeFineBasis.detail}
-          </p>
         </div>
       </div>
 
-      <Card>
-        <CardContent className="flex flex-col gap-2 py-4 @sm/main:flex-row">
-          <AddressAutocomplete
-            value={address}
-            onValueChange={setAddress}
-            placeholder="Street address with borough"
-            className="flex-1"
-            inputClassName="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-[3px] focus:ring-ring/20 disabled:cursor-not-allowed disabled:opacity-50"
-          />
-          <Button
-            onClick={() => void submitAddress()}
-            disabled={requesting}
-            className="shrink-0"
-          >
-            {requesting ? <LoadingDots>Queueing</LoadingDots> : "Get my number"}
-          </Button>
-        </CardContent>
-      </Card>
+      <div className="flex flex-col gap-2 @sm/main:flex-row">
+        <AddressAutocomplete
+          value={address}
+          onValueChange={setAddress}
+          placeholder="Street address with borough"
+          className="flex-1"
+          inputClassName="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-[3px] focus:ring-ring/20 disabled:cursor-not-allowed disabled:opacity-50"
+        />
+        <Button onClick={() => submitAddress()} className="shrink-0">
+          Get my number
+        </Button>
+      </div>
 
       {recentAddresses.length > 0 && (
         <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
@@ -370,7 +354,7 @@ export function PortfolioClient() {
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => void submitAddress(recent)}
+              onClick={() => submitAddress(recent)}
             >
               {recent}
             </Button>
