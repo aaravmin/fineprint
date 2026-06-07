@@ -198,7 +198,7 @@ function FineCell({ fine, highlight }: { fine: number | null; highlight?: boolea
   }
   if (fine === 0) {
     return (
-      <td className="px-6 py-4 text-right text-xs font-medium text-green-600 dark:text-green-400">
+      <td className="px-6 py-4 text-right text-xs font-medium text-success">
         $0
       </td>
     );
