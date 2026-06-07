@@ -85,11 +85,23 @@ async function workOn(taskId: bigint) {
   const task = [...conn.db.task.iter()].find(row => row.id === taskId);
   if (!task) return;
 
-  const body =
-    task.kind === "building_intake" ? await intakeBuilding(task) : await draftFor(task);
+  const result =
+    task.kind === "building_intake"
+      ? await intakeBuilding(task)
+      : { body: await draftFor(task), payloadJson: undefined };
 
   try {
-    await conn.reducers.submitWork({ taskId, body });
+    if ("failed" in result) {
+      await conn.reducers.failIntake({ taskId, reason: result.failed });
+      console.log(`[${NAME}] intake #${taskId} rejected: ${result.failed}`);
+      return;
+    }
+
+    await conn.reducers.submitWork({
+      taskId,
+      body: result.body,
+      payloadJson: result.payloadJson,
+    });
     console.log(`[${NAME}] submitted #${taskId} for review`);
   } catch (error) {
     // Task was likely reaped away from us (e.g. we were killed mid-work).
@@ -109,16 +121,21 @@ async function draftFor(
   return USE_LLM ? await draftLlm(input) : draftScripted(input);
 }
 
-// Intake: resolve the address through the data pipeline, ingest the building
-// (which spawns its real obligations), and submit the intake report for
-// review. A failed lookup becomes an honest report, not a stuck task.
+// Intake: resolve the address through the data pipeline and submit the
+// report for review with the ready-to-ingest args attached — the building
+// is only created when a human approves. A geocode the gate refuses
+// auto-rejects the task; any other failure becomes an honest report.
+type IntakeOutcome =
+  | { body: string; payloadJson: string | undefined }
+  | { failed: string };
+
 async function intakeBuilding(task: {
   id: bigint;
   intakeAddress?: string;
-}): Promise<string> {
+}): Promise<IntakeOutcome> {
   const address = task.intakeAddress;
   if (!address) {
-    return "Intake task has no address — flagging for manual triage.";
+    return { failed: "Intake task has no address — re-request with a street address." };
   }
 
   console.log(`[${NAME}] intake for #${task.id}: ${address}`);
@@ -127,14 +144,23 @@ async function intakeBuilding(task: {
     const { prepareIntake } = await import("../../data/src/intake.ts");
     const intake = await prepareIntake(address);
 
-    await conn.reducers.ingestBuilding(intake.ingestArgs);
-    return intake.summary;
+    return {
+      body: intake.summary,
+      payloadJson: JSON.stringify(intake.ingestArgs),
+    };
   } catch (error) {
-    return [
-      `BUILDING INTAKE FAILED — ${address}`,
-      ``,
-      `Reason: ${(error as Error).message}`,
-      `No building was ingested. Verify the address (include the borough) and re-request.`,
-    ].join("\n");
+    if ((error as Error).name === "GeocodeRejectionError") {
+      return { failed: (error as Error).message };
+    }
+
+    return {
+      body: [
+        `BUILDING INTAKE FAILED — ${address}`,
+        ``,
+        `Reason: ${(error as Error).message}`,
+        `No building was ingested. Verify the address (include the borough) and re-request.`,
+      ].join("\n"),
+      payloadJson: undefined,
+    };
   }
 }

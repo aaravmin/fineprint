@@ -8,7 +8,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 npm install                  # workspaces: spacetimedb, client, agents
 spacetime start --listen-addr 127.0.0.1:3011   # database; port 3000 belongs to the Next.js app
 npm run publish:local        # build + publish module to local db 'fineprint'
-npm run generate             # regenerate bindings — REQUIRED after any schema/reducer change
+npm run sync                 # publish + regenerate bindings in one step — use after any schema/reducer change
+npm run generate             # regenerate bindings only
 npm run worker               # one agent process; WORKER_NAME=atlas npm run worker
 npm run dashboard            # Next.js dev server, port 3000
 npm run typecheck            # all workspaces
@@ -39,6 +40,11 @@ Reads are table subscriptions, writes are reducer calls — nothing else writes.
   gives exactly one owner per task. Never enforce ownership client-side.
 - `reap` runs on a 5s schedule: stale heartbeat means the worker is marked
   dead and its task returns to open.
+- Intake is approve-then-ingest: the worker resolves an address (geocode
+  gate in `data/src/geosearch.ts` rejects wrong-street/wrong-borough
+  matches via `fail_intake`) and submits the draft with `payloadJson`;
+  the building and its obligations are created inside `approve`. Rejecting
+  an intake is terminal. Workers cannot call `approve`/`reject`.
 - `client/src/module_bindings/` and `agents/src/module_bindings/` are
   generated. Never hand-edit them; regenerate both with `npm run generate`.
 - One worker process = one connection = one identity = one `worker` row.

@@ -4,7 +4,11 @@
 // dataset is silent. Sources are injectable so tests run offline.
 
 import { getCblEntry as realGetCblEntry, type CblEntry } from "./coveredBuildings.ts";
-import { lookupBblCandidates as realLookupBblCandidates } from "./geosearch.ts";
+import {
+  assessGeocode,
+  GeocodeRejectionError,
+  lookupBblCandidates as realLookupBblCandidates,
+} from "./geosearch.ts";
 import { fetchLl84 as realFetchLl84 } from "./ll84.ts";
 import fetchBoilerRecordsByBin from "./boilers.ts";
 import fetchBuildJobFilingsByBin from "./permits.ts";
@@ -272,13 +276,28 @@ async function resolveBbl(
 ): Promise<BblResult> {
   const candidates = await sources.lookupBblCandidates(address);
 
+  // The geocode gate runs before any preference logic: a candidate on a
+  // different street or in the wrong borough is not this address, no matter
+  // how Pelias ranked it ("999 Nowhere Street, Atlantis" once landed on a
+  // real covered Brooklyn lot this way). This also picks the right borough's
+  // lot when the same street exists in several.
+  const plausibleCandidates = candidates.filter(
+    candidate => assessGeocode(address, candidate).ok,
+  );
+  if (plausibleCandidates.length === 0) {
+    const verdict = assessGeocode(address, candidates[0]);
+    throw new GeocodeRejectionError(
+      verdict.reason ?? `no candidate matches "${address}"`,
+    );
+  }
+
   const queriedHouseNumber = houseNumber(address);
-  const knownToDof = candidates.find(
+  const knownToDof = plausibleCandidates.find(
     candidate =>
       houseNumber(candidate.normalizedAddress) === queriedHouseNumber &&
       sources.getCblEntry(candidate.bbl) !== null,
   );
-  const chosen = knownToDof ?? candidates[0];
+  const chosen = knownToDof ?? plausibleCandidates[0];
 
   if (knownToDof && knownToDof !== candidates[0]) {
     provenance.push({

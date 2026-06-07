@@ -11,6 +11,8 @@ const geoResult: BblResult = {
   bin: "1015862",
   normalizedAddress: "350 5 AVENUE, New York, NY, USA",
   borough: "Manhattan",
+  confidence: null,
+  matchType: null,
 };
 
 const ll84Facts: Ll84Facts = {
@@ -101,12 +103,16 @@ describe("lookupBuilding", () => {
       bin: null,
       normalizedAddress: "1 PIKE STREET, New York, NY, USA",
       borough: "Manhattan",
+      confidence: null,
+      matchType: null,
     };
     const dofLot: BblResult = {
       bbl: "1000020023",
       bin: null,
       normalizedAddress: "1 PIKE ST., New York, NY, USA",
       borough: "Manhattan",
+      confidence: null,
+      matchType: null,
     };
 
     const facts = await lookupBuilding(
@@ -128,12 +134,16 @@ describe("lookupBuilding", () => {
       bin: null,
       normalizedAddress: "1 PIKE STREET, New York, NY, USA",
       borough: "Manhattan",
+      confidence: null,
+      matchType: null,
     };
     const otherBuildingDownTheStreet: BblResult = {
       bbl: "1002550001",
       bin: null,
       normalizedAddress: "51 PIKE STREET, New York, NY, USA",
       borough: "Manhattan",
+      confidence: null,
+      matchType: null,
     };
 
     const facts = await lookupBuilding(
@@ -181,7 +191,7 @@ describe("lookupBuilding", () => {
 
   test("proxied and unmapped uses surface in provenance", async () => {
     const facts = await lookupBuilding(
-      "1 Firehouse Plaza, Manhattan",
+      "350 5th Avenue, Manhattan",
       fakeSources({
         fetchLl84: async () => ({
           ...ll84Facts,

@@ -102,7 +102,9 @@ export const request_building = spacetimedb.reducer(
       task =>
         task.kind === "building_intake" &&
         task.intakeAddress === address &&
-        (task.status === "open" || task.status === "claimed"),
+        (task.status === "open" ||
+          task.status === "claimed" ||
+          task.status === "in_review"),
     );
     if (alreadyQueued) {
       throw new Error(`an intake for "${address}" is already in the queue`);
@@ -137,7 +139,7 @@ export const ingest_building = spacetimedb.reducer(
     bbl: t.string(),
     sqft: t.u32(),
     isArticle321: t.bool(),
-    annualEmissionsTco2e: t.option(t.f64()),
+    annualEmissionsTco2E: t.option(t.f64()),
     usesJson: t.string(),
     coveredLawIdsJson: t.string(),
     provenanceJson: t.string(),
@@ -149,96 +151,115 @@ export const ingest_building = spacetimedb.reducer(
     compliancePlanJson: t.option(t.string()),
   },
   (ctx, args) => {
-    if (args.address.trim() === "") throw new Error("address cannot be empty");
-    if (args.bbl.trim() === "") throw new Error("bbl cannot be empty");
+    ingestFromArgs(ctx, args);
+  },
+);
 
-    const existingBuilding = [...ctx.db.building.iter()].find(
-      row => row.bbl === args.bbl,
-    );
+interface IngestArgs {
+  address: string;
+  bbl: string;
+  sqft: number;
+  isArticle321: boolean;
+  annualEmissionsTco2E: number | undefined;
+  usesJson: string;
+  coveredLawIdsJson: string;
+  provenanceJson: string;
+  ll97AnnualFineUsd: number | undefined;
+  compliancePlanJson: string | undefined;
+}
 
-    if (existingBuilding) {
-      ctx.db.building.id.update({
-        ...existingBuilding,
-        address: args.address,
-        sqft: args.sqft,
-        isAffordable: args.isArticle321,
-        annualEmissionsTco2e: args.annualEmissionsTco2e,
-        usesJson: args.usesJson,
-        ll97Covered: deriveLl97Covered(args.coveredLawIdsJson),
-        provenanceJson: args.provenanceJson,
-        compliancePlanJson: args.compliancePlanJson,
-      });
+// The one place a building comes to exist: called by the ingest_building
+// reducer (scripts) and by approve when an intake draft is signed off.
+function ingestFromArgs(ctx: any, args: IngestArgs) {
+  if (args.address.trim() === "") throw new Error("address cannot be empty");
+  if (args.bbl.trim() === "") throw new Error("bbl cannot be empty");
 
-      // Fresher data means a fresher fine: keep the LL97 task's estimate in
-      // step with the engine instead of letting a stale stub survive.
-      if (args.ll97AnnualFineUsd !== undefined) {
-        for (const task of ctx.db.task.iter()) {
-          const isLl97Task = task.lawId === "ll97" || task.lawId === "art321";
-          if (task.buildingId === existingBuilding.id && isLl97Task) {
-            ctx.db.task.id.update({
-              ...task,
-              fineEstimateUsd: args.ll97AnnualFineUsd,
-            });
-          }
-        }
-      }
+  const existingBuilding = [...ctx.db.building.iter()].find(
+    (row: any) => row.bbl === args.bbl,
+  );
 
-      logEvent(
-        ctx,
-        "building_updated",
-        `${args.address} (BBL ${args.bbl}) refreshed from city data`,
-      );
-      return;
-    }
-
-    const newBuilding = ctx.db.building.insert({
-      id: 0n,
+  if (existingBuilding) {
+    ctx.db.building.id.update({
+      ...existingBuilding,
       address: args.address,
-      bbl: args.bbl,
       sqft: args.sqft,
       isAffordable: args.isArticle321,
-      annualEmissionsTco2e: args.annualEmissionsTco2e,
+      annualEmissionsTco2e: args.annualEmissionsTco2E,
       usesJson: args.usesJson,
       ll97Covered: deriveLl97Covered(args.coveredLawIdsJson),
       provenanceJson: args.provenanceJson,
       compliancePlanJson: args.compliancePlanJson,
-      createdAt: ctx.timestamp,
     });
 
-    const coveredLawIds: string[] = JSON.parse(args.coveredLawIdsJson);
-    const laws =
-      coveredLawIds.length > 0
-        ? LAWS.filter(law => coveredLawIds.includes(law.id))
-        : applicableLaws(args.sqft, args.isArticle321);
-
-    for (const law of laws) {
-      const isLl97Law = law.id === "ll97" || law.id === "art321";
-      const engineFine = isLl97Law ? args.ll97AnnualFineUsd : undefined;
-      const stubFine = law.fineEstimateUsd(args.sqft, args.isArticle321);
-
-      ctx.db.task.insert({
-        id: 0n,
-        buildingId: newBuilding.id,
-        lawId: law.id,
-        kind: law.kind,
-        title: `${law.name} — ${args.address}`,
-        status: "open",
-        deadline: addMs(ctx.timestamp, law.deadlineDays * 86_400_000),
-        slaBreached: false,
-        fineEstimateUsd: engineFine ?? (stubFine === null ? undefined : stubFine),
-        claimedBy: undefined,
-        intakeAddress: undefined,
-        createdAt: ctx.timestamp,
-      });
+    // Fresher data means a fresher fine: keep the LL97 task's estimate in
+    // step with the engine instead of letting a stale stub survive.
+    if (args.ll97AnnualFineUsd !== undefined) {
+      for (const task of ctx.db.task.iter()) {
+        const isLl97Task = task.lawId === "ll97" || task.lawId === "art321";
+        if (task.buildingId === existingBuilding.id && isLl97Task) {
+          ctx.db.task.id.update({
+            ...task,
+            fineEstimateUsd: args.ll97AnnualFineUsd,
+          });
+        }
+      }
     }
 
     logEvent(
       ctx,
-      "building_ingested",
-      `${args.address} (BBL ${args.bbl}) ingested from city data → ${laws.length} obligations spawned`,
+      "building_updated",
+      `${args.address} (BBL ${args.bbl}) refreshed from city data`,
     );
-  },
-);
+    return;
+  }
+
+  const newBuilding = ctx.db.building.insert({
+    id: 0n,
+    address: args.address,
+    bbl: args.bbl,
+    sqft: args.sqft,
+    isAffordable: args.isArticle321,
+    annualEmissionsTco2e: args.annualEmissionsTco2E,
+    usesJson: args.usesJson,
+    ll97Covered: deriveLl97Covered(args.coveredLawIdsJson),
+    provenanceJson: args.provenanceJson,
+    compliancePlanJson: args.compliancePlanJson,
+    createdAt: ctx.timestamp,
+  });
+
+  const coveredLawIds: string[] = JSON.parse(args.coveredLawIdsJson);
+  const laws =
+    coveredLawIds.length > 0
+      ? LAWS.filter(law => coveredLawIds.includes(law.id))
+      : applicableLaws(args.sqft, args.isArticle321);
+
+  for (const law of laws) {
+    const isLl97Law = law.id === "ll97" || law.id === "art321";
+    const engineFine = isLl97Law ? args.ll97AnnualFineUsd : undefined;
+    const stubFine = law.fineEstimateUsd(args.sqft, args.isArticle321);
+
+    ctx.db.task.insert({
+      id: 0n,
+      buildingId: newBuilding.id,
+      lawId: law.id,
+      kind: law.kind,
+      title: `${law.name} — ${args.address}`,
+      status: "open",
+      deadline: addMs(ctx.timestamp, law.deadlineDays * 86_400_000),
+      slaBreached: false,
+      fineEstimateUsd: engineFine ?? (stubFine === null ? undefined : stubFine),
+      claimedBy: undefined,
+      intakeAddress: undefined,
+      createdAt: ctx.timestamp,
+    });
+  }
+
+  logEvent(
+    ctx,
+    "building_ingested",
+    `${args.address} (BBL ${args.bbl}) ingested from city data → ${laws.length} obligations spawned`,
+  );
+}
 
 function deriveLl97Covered(coveredLawIdsJson: string): boolean | undefined {
   const coveredLawIds: string[] = JSON.parse(coveredLawIdsJson);
@@ -339,8 +360,8 @@ export const claim_task = spacetimedb.reducer({ taskId: t.u64() }, (ctx, { taskI
 });
 
 export const submit_work = spacetimedb.reducer(
-  { taskId: t.u64(), body: t.string() },
-  (ctx, { taskId, body }) => {
+  { taskId: t.u64(), body: t.string(), payloadJson: t.option(t.string()) },
+  (ctx, { taskId, body, payloadJson }) => {
     const submittingWorker = workerBySender(ctx);
     if (!submittingWorker) {
       throw new Error("submission came from an unregistered worker");
@@ -360,6 +381,7 @@ export const submit_work = spacetimedb.reducer(
       taskId,
       workerId: submittingWorker.id,
       body,
+      payloadJson,
       submittedAt: ctx.timestamp,
     });
     ctx.db.task.id.update({ ...task, status: "in_review" });
@@ -380,12 +402,75 @@ export const submit_work = spacetimedb.reducer(
   },
 );
 
+// A worker's dead end: the address didn't survive the geocode gate (or the
+// lookup itself blew up in a way retrying won't fix). The reason lands as a
+// submission so the dashboard shows why, and the task closes as rejected.
+export const fail_intake = spacetimedb.reducer(
+  { taskId: t.u64(), reason: t.string() },
+  (ctx, { taskId, reason }) => {
+    const failingWorker = workerBySender(ctx);
+    if (!failingWorker) {
+      throw new Error("intake failure came from an unregistered worker");
+    }
+
+    const task = ctx.db.task.id.find(taskId);
+    if (!task) {
+      throw new Error(`no task with id ${taskId}`);
+    }
+    if (task.kind !== "building_intake") {
+      throw new Error(`task ${taskId} is not an intake task`);
+    }
+    if (task.status !== "claimed" || task.claimedBy !== failingWorker.id) {
+      throw new Error(`task ${taskId} is not claimed by ${failingWorker.name}`);
+    }
+    if (reason.trim() === "") throw new Error("failure reason cannot be empty");
+
+    ctx.db.submission.insert({
+      id: 0n,
+      taskId,
+      workerId: failingWorker.id,
+      body: reason,
+      payloadJson: undefined,
+      submittedAt: ctx.timestamp,
+    });
+    ctx.db.task.id.update({ ...task, status: "rejected", claimedBy: undefined });
+    ctx.db.worker.id.update({
+      ...failingWorker,
+      status: "idle",
+      currentTaskId: undefined,
+      lastHeartbeat: ctx.timestamp,
+    });
+
+    logEvent(ctx, "intake_failed", reason, taskId, failingWorker.id);
+  },
+);
+
 export const approve = spacetimedb.reducer(
   { taskId: t.u64(), note: t.string() },
   (ctx, { taskId, note }) => {
+    if (workerBySender(ctx)) {
+      throw new Error("workers cannot approve drafts — a human signs off");
+    }
+
     const task = ctx.db.task.id.find(taskId);
     if (!task) throw new Error(`task ${taskId} not found`);
     if (task.status !== "in_review") throw new Error(`task ${taskId} is not in review`);
+
+    // Approving an intake is what creates the building: replay the resolved
+    // city data the worker attached to its submission.
+    if (task.kind === "building_intake") {
+      const latestSubmission = [...ctx.db.submission.iter()]
+        .filter(submission => submission.taskId === taskId)
+        .sort((a, b) => (a.id > b.id ? -1 : 1))[0];
+
+      if (!latestSubmission?.payloadJson) {
+        throw new Error(
+          `intake ${taskId} has no ingest payload — reject it and re-request the address`,
+        );
+      }
+
+      ingestFromArgs(ctx, JSON.parse(latestSubmission.payloadJson));
+    }
 
     ctx.db.approval.insert({
       id: 0n,
@@ -407,6 +492,10 @@ export const approve = spacetimedb.reducer(
 export const reject = spacetimedb.reducer(
   { taskId: t.u64(), note: t.string() },
   (ctx, { taskId, note }) => {
+    if (workerBySender(ctx)) {
+      throw new Error("workers cannot reject drafts — a human signs off");
+    }
+
     const task = ctx.db.task.id.find(taskId);
     if (!task) throw new Error(`task ${taskId} not found`);
     if (task.status !== "in_review") throw new Error(`task ${taskId} is not in review`);
@@ -419,6 +508,16 @@ export const reject = spacetimedb.reducer(
       note,
       at: ctx.timestamp,
     });
+
+    if (task.kind === "building_intake") {
+      // Rejecting an intake means "wrong building" — re-running the same
+      // lookup would reproduce the same answer. Terminal; re-request with a
+      // corrected address instead.
+      ctx.db.task.id.update({ ...task, status: "rejected", claimedBy: undefined });
+      logEvent(ctx, "task_rejected", note || "intake rejected", taskId);
+      return;
+    }
+
     // Back to the queue for another worker.
     ctx.db.task.id.update({ ...task, status: "open", claimedBy: undefined });
     logEvent(ctx, "task_rejected", note || "rejected — returned to queue", taskId);

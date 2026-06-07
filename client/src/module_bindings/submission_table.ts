@@ -15,5 +15,6 @@ export default __t.row({
   taskId: __t.u64().name("task_id"),
   workerId: __t.u64().name("worker_id"),
   body: __t.string(),
+  payloadJson: __t.option(__t.string()).name("payload_json"),
   submittedAt: __t.timestamp().name("submitted_at"),
 });

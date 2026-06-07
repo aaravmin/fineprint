@@ -1,12 +1,12 @@
 {
-  "key": "https://geosearch.planninglabs.nyc/v2/search?text=345%20Park%20Avenue%2C%20Manhattan",
-  "recordedAt": "2026-06-07T09:12:09.839Z",
+  "key": "https://geosearch.planninglabs.nyc/v2/search?text=345%20PARK%20AVENUE%2C%20New%20York",
+  "recordedAt": "2026-06-07T09:17:41.186Z",
   "value": {
     "geocoding": {
       "version": "0.2",
       "attribution": "http://geosearch.planninglabs.nyc/attribution",
       "query": {
-        "text": "345 Park Avenue, Manhattan",
+        "text": "345 PARK AVENUE, New York",
         "size": 10,
         "private": false,
         "lang": {
@@ -19,11 +19,11 @@
         "querySize": 20,
         "parser": "pelias",
         "parsed_text": {
-          "subject": "345 Park Avenue",
+          "subject": "345 PARK AVENUE",
           "housenumber": "345",
-          "street": "Park Avenue",
-          "locality": "Manhattan",
-          "admin": "Manhattan"
+          "street": "PARK AVENUE",
+          "locality": "New York",
+          "admin": "New York"
         }
       },
       "warnings": [
@@ -34,7 +34,7 @@
         "author": "Mapzen",
         "version": "1.0"
       },
-      "timestamp": 1780823529873
+      "timestamp": 1780823861193
     },
     "type": "FeatureCollection",
     "features": [
@@ -286,6 +286,102 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
+            -73.965717,
+            40.790815
+          ]
+        },
+        "properties": {
+          "id": "150943",
+          "gid": "nycpad:venue:150943",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "150943",
+          "country_code": "US",
+          "name": "345 CENTRAL PARK WEST",
+          "housenumber": "345",
+          "street": "CENTRAL PARK WEST",
+          "postalcode": "10025",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "New York County",
+          "county_gid": "whosonfirst:county:102081863",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Manhattan",
+          "borough_gid": "whosonfirst:borough:421205771",
+          "neighbourhood": "Upper West Side",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85853285",
+          "label": "345 CENTRAL PARK WEST, New York, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "1012080029",
+              "bin": "1031679",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.965717,
+            40.790815
+          ]
+        },
+        "properties": {
+          "id": "150942",
+          "gid": "nycpad:venue:150942",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "150942",
+          "country_code": "US",
+          "name": "345 CEN PARK WEST",
+          "housenumber": "345",
+          "street": "CEN PARK WEST",
+          "postalcode": "10025",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "New York County",
+          "county_gid": "whosonfirst:county:102081863",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Manhattan",
+          "borough_gid": "whosonfirst:borough:421205771",
+          "neighbourhood": "Upper West Side",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85853285",
+          "label": "345 CEN PARK WEST, New York, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "1012080029",
+              "bin": "1031679",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
             -73.746561,
             40.775264
           ]
@@ -421,102 +517,6 @@
             "pad": {
               "bbl": "4039160091",
               "bin": "4535096",
-              "version": "26a"
-            }
-          }
-        }
-      },
-      {
-        "type": "Feature",
-        "geometry": {
-          "type": "Point",
-          "coordinates": [
-            -73.965717,
-            40.790815
-          ]
-        },
-        "properties": {
-          "id": "150943",
-          "gid": "nycpad:venue:150943",
-          "layer": "venue",
-          "source": "nycpad",
-          "source_id": "150943",
-          "country_code": "US",
-          "name": "345 CENTRAL PARK WEST",
-          "housenumber": "345",
-          "street": "CENTRAL PARK WEST",
-          "postalcode": "10025",
-          "confidence": 0.8,
-          "match_type": "fallback",
-          "accuracy": "point",
-          "country": "United States",
-          "country_gid": "whosonfirst:country:85633793",
-          "country_a": "USA",
-          "region": "New York",
-          "region_gid": "whosonfirst:region:85688543",
-          "region_a": "NY",
-          "county": "New York County",
-          "county_gid": "whosonfirst:county:102081863",
-          "locality": "New York",
-          "locality_gid": "whosonfirst:locality:85977539",
-          "locality_a": "NYC",
-          "borough": "Manhattan",
-          "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Upper West Side",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85853285",
-          "label": "345 CENTRAL PARK WEST, New York, NY, USA",
-          "addendum": {
-            "pad": {
-              "bbl": "1012080029",
-              "bin": "1031679",
-              "version": "26a"
-            }
-          }
-        }
-      },
-      {
-        "type": "Feature",
-        "geometry": {
-          "type": "Point",
-          "coordinates": [
-            -73.965717,
-            40.790815
-          ]
-        },
-        "properties": {
-          "id": "150942",
-          "gid": "nycpad:venue:150942",
-          "layer": "venue",
-          "source": "nycpad",
-          "source_id": "150942",
-          "country_code": "US",
-          "name": "345 CEN PARK WEST",
-          "housenumber": "345",
-          "street": "CEN PARK WEST",
-          "postalcode": "10025",
-          "confidence": 0.8,
-          "match_type": "fallback",
-          "accuracy": "point",
-          "country": "United States",
-          "country_gid": "whosonfirst:country:85633793",
-          "country_a": "USA",
-          "region": "New York",
-          "region_gid": "whosonfirst:region:85688543",
-          "region_a": "NY",
-          "county": "New York County",
-          "county_gid": "whosonfirst:county:102081863",
-          "locality": "New York",
-          "locality_gid": "whosonfirst:locality:85977539",
-          "locality_a": "NYC",
-          "borough": "Manhattan",
-          "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Upper West Side",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85853285",
-          "label": "345 CEN PARK WEST, New York, NY, USA",
-          "addendum": {
-            "pad": {
-              "bbl": "1012080029",
-              "bin": "1031679",
               "version": "26a"
             }
           }

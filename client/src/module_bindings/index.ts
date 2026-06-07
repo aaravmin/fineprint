@@ -37,6 +37,7 @@ import {
 import AddBuildingReducer from "./add_building_reducer";
 import ApproveReducer from "./approve_reducer";
 import ClaimTaskReducer from "./claim_task_reducer";
+import FailIntakeReducer from "./fail_intake_reducer";
 import HeartbeatReducer from "./heartbeat_reducer";
 import IngestBuildingReducer from "./ingest_building_reducer";
 import KillWorkerReducer from "./kill_worker_reducer";
@@ -148,6 +149,7 @@ const reducersSchema = __reducers(
   __reducerSchema("add_building", AddBuildingReducer),
   __reducerSchema("approve", ApproveReducer),
   __reducerSchema("claim_task", ClaimTaskReducer),
+  __reducerSchema("fail_intake", FailIntakeReducer),
   __reducerSchema("heartbeat", HeartbeatReducer),
   __reducerSchema("ingest_building", IngestBuildingReducer),
   __reducerSchema("kill_worker", KillWorkerReducer),

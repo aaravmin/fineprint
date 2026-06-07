@@ -17,6 +17,10 @@ export interface BblResult {
   bin: Bin | null;
   normalizedAddress: string;
   borough: string;
+  // Pelias match quality: confidence 0..1 and match_type
+  // ("exact" | "interpolated" | "fallback"). Null when the API omits them.
+  confidence: number | null;
+  matchType: string | null;
 }
 
 // One use within a building, in the engine's vocabulary: ESPM property type

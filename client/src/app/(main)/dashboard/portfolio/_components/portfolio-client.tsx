@@ -338,9 +338,9 @@ export function PortfolioClient() {
           onValueChange={setAddress}
           placeholder="Street address with borough"
           className="flex-1"
-          inputClassName="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-[3px] focus:ring-ring/20 disabled:cursor-not-allowed disabled:opacity-50"
+          inputClassName="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-[3px] focus:ring-ring/20 disabled:cursor-not-allowed disabled:opacity-50"
         />
-        <Button onClick={() => submitAddress()} className="shrink-0">
+        <Button onClick={() => submitAddress()} className="h-10 shrink-0">
           Get my number
         </Button>
       </div>

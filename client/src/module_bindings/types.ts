@@ -56,6 +56,7 @@ export const Submission = __t.object("Submission", {
   taskId: __t.u64(),
   workerId: __t.u64(),
   body: __t.string(),
+  payloadJson: __t.option(__t.string()),
   submittedAt: __t.timestamp(),
 });
 export type Submission = __Infer<typeof Submission>;

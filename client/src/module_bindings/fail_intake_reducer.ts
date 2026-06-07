@@ -12,6 +12,5 @@ import {
 
 export default {
   taskId: __t.u64(),
-  body: __t.string(),
-  payloadJson: __t.option(__t.string()),
+  reason: __t.string(),
 };

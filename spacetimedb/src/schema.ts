@@ -68,6 +68,10 @@ export const submission = table(
     taskId: t.u64().index("btree"),
     workerId: t.u64(),
     body: t.string(),
+    // Intake submissions carry the ready-to-ingest building args as JSON;
+    // approval replays them through the shared ingest path. Absent on
+    // ordinary drafts.
+    payloadJson: t.option(t.string()),
     submittedAt: t.timestamp(),
   },
 );

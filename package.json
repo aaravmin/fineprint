@@ -14,6 +14,7 @@
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "publish:local": "spacetime publish --module-path spacetimedb --server local fineprint",
+    "sync": "spacetime publish --module-path spacetimedb --server local fineprint -y && npm run generate",
     "generate": "spacetime generate --lang typescript --out-dir client/src/module_bindings --module-path spacetimedb && spacetime generate --lang typescript --out-dir agents/src/module_bindings --module-path spacetimedb",
     "worker": "npm run worker --workspace agents",
     "reviewer": "npm run reviewer --workspace agents",
