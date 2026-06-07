@@ -8,8 +8,13 @@
 // 10-digit borough-block-lot, the join key across every NYC dataset.
 export type Bbl = string;
 
+// BIN is the building identifier (one tax lot can hold several BINs). Optional
+// because GeoSearch returns no BIN for a vacant or non-building lot.
+export type Bin = string;
+
 export interface BblResult {
   bbl: Bbl;
+  bin: Bin | null;
   normalizedAddress: string;
   borough: string;
 }
@@ -42,6 +47,13 @@ export interface Ll84Facts {
   // Uses with no defensible factor at all ("Other", utility plants). They
   // are excluded from occupancyGroups so the engine never prices them.
   unmappedUses: UseSplit[];
+  // Fuels with non-zero consumption, ordered by energy (largest first).
+  fuelMix: string[];
+  // The largest combustion or district heating fuel; "electricity" when the
+  // building is all-electric; null when the filing reports no fuel use.
+  heatingFuel: string | null;
+  siteEuiKbtuPerSqft: number | null;
+  energyStarScore: number | null;
 }
 
 export interface ProvenanceNote {
@@ -50,15 +62,124 @@ export interface ProvenanceNote {
   detail?: string; // anything a footnote should add ("no LL84 filing found")
 }
 
+// One DOB NOW: Safety Boiler filing (dataset 52dp-yji6). The dataset records
+// inspection reports, so a single physical boiler (boilerId) appears once per
+// report; callers dedupe on boilerId when they want a boiler count.
+export interface BoilerRecord {
+  boilerId: string;
+  trackingNumber: string;
+  bin: Bin | null;
+  make: string | null;
+  pressureType: string | null; // "Low Pressure" | "High Pressure"
+  inspectionType: string | null;
+  inspectionDate: string | null;
+  defectsExist: boolean | null;
+  reportStatus: string | null;
+  raw: Record<string, unknown>;
+}
+
+// One DOB NOW: Build job filing (dataset w9ak-ipjd). The work-type flags are
+// the building-specific signal: which systems were actually altered.
+export interface BuildJobFiling {
+  jobFilingNumber: string;
+  bin: Bin | null;
+  bbl: Bbl | null;
+  jobType: string | null;
+  filingStatus: string | null;
+  filingDate: string | null;
+  approvedDate: string | null;
+  description: string | null;
+  workTypes: {
+    mechanical: boolean;
+    boiler: boolean;
+    plumbing: boolean;
+    solar: boolean;
+  };
+  raw: Record<string, unknown>;
+}
+
+// Tax-lot characteristics from PLUTO (dataset 64uk-42ks), keyed by BBL.
+// numFloors is what makes LL11/FISP applicability honest — the rule turns on
+// building height, not square footage.
+export interface PlutoCharacteristics {
+  bbl: Bbl;
+  numFloors: number | null;
+  buildingClass: string | null;
+  bldgAreaSqft: number | null;
+  unitsResidential: number | null;
+  unitsTotal: number | null;
+  yearBuilt: number | null;
+  landUse: string | null;
+  ownerName: string | null;
+  raw: Record<string, unknown>;
+}
+
+// One DOB NOW: Electrical permit (dataset dm9a-ab7w), keyed by BIN. The
+// dataset has no structured sustainability column, so PV and storage are read
+// from the job description text — an evidence signal, not a clean flag.
+export interface ElectricalPermit {
+  filingNumber: string;
+  bin: Bin | null;
+  jobDescription: string | null;
+  filingStatus: string | null;
+  filingDate: string | null;
+  permitIssuedDate: string | null;
+  isSolar: boolean;
+  isStorage: boolean;
+  raw: Record<string, unknown>;
+}
+
+// One open ECB violation from DOB (dataset 6bgk-3dad), with the penalty math
+// the board attaches as a real dollar figure. Only ACTIVE violations are
+// fetched — resolved ones carry no outstanding obligation.
+export interface EcbViolation {
+  ecbViolationNumber: string;
+  dobViolationNumber: string | null;
+  bin: Bin | null;
+  status: string | null;
+  violationType: string | null;
+  severity: string | null; // "CLASS - 1" | "CLASS - 2"
+  infractionCode: string | null;
+  sectionLaw: string | null; // AC/BC citation plus its short description
+  description: string | null;
+  issueDate: string | null; // as filed, YYYYMMDD
+  penaltyImposedUsd: number | null;
+  amountPaidUsd: number | null;
+  balanceDueUsd: number | null;
+  raw: Record<string, unknown>;
+}
+
+export interface InfrastructureProfile {
+  hasLl84Filing: boolean;
+  hasRecomputedEmissions: boolean;
+  fuelTypes: string[]; // detected fuel types (e.g. natural_gas, fuel_oil_4)
+  // Raw evidence, kept for audit.
+  boilerRecords: BoilerRecord[];
+  buildJobFilings: BuildJobFiling[];
+  electricalPermits: ElectricalPermit[];
+  // Derived signals the drafting policies branch on. Each is backed by the
+  // raw evidence above, so a suggestion can cite what it relied on.
+  heatingFuel: string | null;
+  hasPV: boolean;
+  boilerCount: number;
+  boilerCondition: string | null; // "defects_on_record" | "no_defects_on_record"
+  recentHvacWork: boolean;
+  efficiencyTier: string | null; // "high" | "medium" | "low" from ENERGY STAR
+}
+
 // The orchestrator's answer: everything Fineprint knows about one building,
 // assembled from public data, engine-ready where the data allows it.
 export interface BuildingFacts {
   bbl: Bbl;
+  bin: Bin | null;
   address: string;
   grossFloorAreaSqft: number | null;
   occupancyGroups: UseSplit[];
   annualEmissionsTco2e: number | null;
   isLl97Covered: boolean | null;
   isArticle321: boolean | null;
+  plutoCharacteristics: PlutoCharacteristics | null;
+  infrastructureProfile?: InfrastructureProfile | null;
+  openViolations: EcbViolation[];
   provenance: ProvenanceNote[];
 }

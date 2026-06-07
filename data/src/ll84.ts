@@ -83,6 +83,23 @@ const UNPRICEABLE_FUEL_COLUMNS = [
   "electricity_use_generated",
 ];
 
+// Fuel-use columns mapped to the names the profile reports. Covers priced,
+// unpriceable, and district fuels — every combustion or district source.
+const FUEL_USE_COLUMNS: Record<string, string> = {
+  natural_gas_use_kbtu: "natural_gas",
+  fuel_oil_1_use_kbtu: "fuel_oil_1",
+  fuel_oil_2_use_kbtu: "fuel_oil_2",
+  fuel_oil_4_use_kbtu: "fuel_oil_4",
+  fuel_oil_5_6_use_kbtu: "fuel_oil_5_6",
+  diesel_2_use_kbtu: "diesel_2",
+  propane_use_kbtu: "propane",
+  kerosene_use_kbtu: "kerosene",
+  district_steam_use_kbtu: "district_steam",
+  district_hot_water_use_kbtu: "district_hot_water",
+};
+
+const KBTU_PER_KWH = 3.412;
+
 interface Ll84Row {
   report_year?: string;
   property_name?: string;
@@ -91,6 +108,8 @@ interface Ll84Row {
   property_gfa_self_reported?: string;
   list_of_all_property_use?: string;
   total_location_based_ghg?: string;
+  site_eui_kbtu_ft?: string;
+  energy_star_score?: string;
   [fuelColumn: string]: string | undefined;
 }
 
@@ -126,6 +145,7 @@ export function parseLl84Rows(rows: Ll84Row[], bbl: Bbl): Ll84Facts | null {
 
   const { mapped, proxied, unmapped } = mapUseList(latestFiling.list_of_all_property_use);
   const { recomputed, unpriceable } = recomputeEmissions(latestFiling);
+  const { fuelMix, heatingFuel } = deriveFuels(latestFiling);
 
   return {
     bbl,
@@ -138,7 +158,41 @@ export function parseLl84Rows(rows: Ll84Row[], bbl: Bbl): Ll84Facts | null {
     reportingYear: parseNumber(latestFiling.report_year),
     proxiedUses: proxied,
     unmappedUses: unmapped,
+    fuelMix,
+    heatingFuel,
+    siteEuiKbtuPerSqft: parseNumber(latestFiling.site_eui_kbtu_ft),
+    energyStarScore: parseNumber(latestFiling.energy_star_score),
   };
+}
+
+// The building's fuel mix from its non-zero use columns, ordered by energy.
+// heatingFuel is the largest combustion/district source; an all-electric
+// building reports "electricity"; a filing with no fuel use reports null.
+function deriveFuels(row: Ll84Row): { fuelMix: string[]; heatingFuel: string | null } {
+  const consumption: Array<{ fuel: string; kbtu: number; isHeating: boolean }> = [];
+
+  for (const [column, label] of Object.entries(FUEL_USE_COLUMNS)) {
+    const kbtu = parseNumber(row[column]) ?? 0;
+    if (kbtu > 0) {
+      consumption.push({ fuel: label, kbtu, isHeating: true });
+    }
+  }
+
+  const electricityKwh = parseNumber(row[ELECTRICITY_KWH_COLUMN]) ?? 0;
+  if (electricityKwh > 0) {
+    consumption.push({
+      fuel: "electricity",
+      kbtu: electricityKwh * KBTU_PER_KWH,
+      isHeating: false,
+    });
+  }
+
+  consumption.sort((a, b) => b.kbtu - a.kbtu);
+
+  const topHeatingFuel = consumption.find(entry => entry.isHeating)?.fuel;
+  const heatingFuel = topHeatingFuel ?? (electricityKwh > 0 ? "electricity" : null);
+
+  return { fuelMix: consumption.map(entry => entry.fuel), heatingFuel };
 }
 
 // ESPM's location-based GHG prices electricity with national eGRID factors;

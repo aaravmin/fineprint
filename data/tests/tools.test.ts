@@ -7,12 +7,15 @@ import type { BuildingFacts } from "../src/types.ts";
 // underneath is the real engine.
 const emirateFacts: BuildingFacts = {
   bbl: "1008350041",
+  bin: "1015862",
   address: "350 5 AVENUE, New York, NY, USA",
   grossFloorAreaSqft: 2_852_257,
   occupancyGroups: [{ group: "Office", sqft: 2_852_257 }],
   annualEmissionsTco2e: 16_678.22,
   isLl97Covered: true,
   isArticle321: false,
+  plutoCharacteristics: null,
+  openViolations: [],
   provenance: [{ field: "bbl", source: "NYC GeoSearch" }],
 };
 

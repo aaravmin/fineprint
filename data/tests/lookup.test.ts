@@ -8,6 +8,7 @@ import type { BblResult, Ll84Facts } from "../src/types.ts";
 // mirror the Empire State Building.
 const geoResult: BblResult = {
   bbl: "1008350041",
+  bin: "1015862",
   normalizedAddress: "350 5 AVENUE, New York, NY, USA",
   borough: "Manhattan",
 };
@@ -26,6 +27,10 @@ const ll84Facts: Ll84Facts = {
   proxiedUses: [],
   unmappedUses: [],
   unpriceableFuels: [],
+  fuelMix: ["electricity", "district_steam"],
+  heatingFuel: "district_steam",
+  siteEuiKbtuPerSqft: 61.4,
+  energyStarScore: 78,
 };
 
 const cblEntry: CblEntry = {
@@ -93,11 +98,13 @@ describe("lookupBuilding", () => {
   test("prefers the GeoSearch candidate that DOF actually knows", async () => {
     const wrongLot: BblResult = {
       bbl: "1002830094",
+      bin: null,
       normalizedAddress: "1 PIKE STREET, New York, NY, USA",
       borough: "Manhattan",
     };
     const dofLot: BblResult = {
       bbl: "1000020023",
+      bin: null,
       normalizedAddress: "1 PIKE ST., New York, NY, USA",
       borough: "Manhattan",
     };
@@ -118,11 +125,13 @@ describe("lookupBuilding", () => {
   test("never hops to a covered lot with a different house number", async () => {
     const queriedLot: BblResult = {
       bbl: "1002830094",
+      bin: null,
       normalizedAddress: "1 PIKE STREET, New York, NY, USA",
       borough: "Manhattan",
     };
     const otherBuildingDownTheStreet: BblResult = {
       bbl: "1002550001",
+      bin: null,
       normalizedAddress: "51 PIKE STREET, New York, NY, USA",
       borough: "Manhattan",
     };

@@ -6,24 +6,48 @@
 import { getCblEntry as realGetCblEntry, type CblEntry } from "./coveredBuildings.ts";
 import { lookupBblCandidates as realLookupBblCandidates } from "./geosearch.ts";
 import { fetchLl84 as realFetchLl84 } from "./ll84.ts";
+import fetchBoilerRecordsByBin from "./boilers.ts";
+import fetchBuildJobFilingsByBin from "./permits.ts";
+import fetchOpenEcbViolationsByBin from "./ecb.ts";
+import fetchPlutoByBbl from "./pluto.ts";
+import fetchSolarElectricalPermitsByBin from "./electrical.ts";
 import type {
   Bbl,
   BblResult,
+  Bin,
+  BoilerRecord,
+  BuildJobFiling,
   BuildingFacts,
+  EcbViolation,
+  ElectricalPermit,
   Ll84Facts,
+  PlutoCharacteristics,
   ProvenanceNote,
+  InfrastructureProfile,
 } from "./types.ts";
 
 export interface LookupSources {
   lookupBblCandidates: (address: string) => Promise<BblResult[]>;
   fetchLl84: (bbl: Bbl) => Promise<Ll84Facts | null>;
   getCblEntry: (bbl: Bbl) => CblEntry | null;
+  // Optional dataset enrichers. Optional so tests can run with small
+  // fakeSources that only provide the three core functions.
+  fetchPlutoByBbl?: (bbl: Bbl) => Promise<PlutoCharacteristics | null>;
+  fetchBoilerRecordsByBin?: (bin: Bin) => Promise<BoilerRecord[]>;
+  fetchBuildJobFilingsByBin?: (bin: Bin) => Promise<BuildJobFiling[]>;
+  fetchSolarElectricalPermitsByBin?: (bin: Bin) => Promise<ElectricalPermit[]>;
+  fetchOpenEcbViolationsByBin?: (bin: Bin) => Promise<EcbViolation[]>;
 }
 
 const realSources: LookupSources = {
   lookupBblCandidates: realLookupBblCandidates,
   fetchLl84: realFetchLl84,
   getCblEntry: realGetCblEntry,
+  fetchPlutoByBbl: fetchPlutoByBbl,
+  fetchBoilerRecordsByBin: fetchBoilerRecordsByBin,
+  fetchBuildJobFilingsByBin: fetchBuildJobFilingsByBin,
+  fetchSolarElectricalPermitsByBin: fetchSolarElectricalPermitsByBin,
+  fetchOpenEcbViolationsByBin: fetchOpenEcbViolationsByBin,
 };
 
 export async function lookupBuilding(
@@ -36,6 +60,20 @@ export async function lookupBuilding(
 
   const ll84 = await sources.fetchLl84(geo.bbl);
   const cbl = sources.getCblEntry(geo.bbl);
+
+  const plutoCharacteristics = sources.fetchPlutoByBbl
+    ? await sources.fetchPlutoByBbl(geo.bbl)
+    : null;
+  if (plutoCharacteristics) {
+    provenance.push({
+      field: "plutoCharacteristics",
+      source: "NYC PLUTO",
+      detail: `${plutoCharacteristics.numFloors ?? "unknown"} floors, building class ${plutoCharacteristics.buildingClass ?? "unknown"}`,
+    });
+  }
+
+  const infrastructureProfile = await resolveInfrastructureProfile(geo.bin, ll84, sources);
+  const openViolations = await resolveOpenViolations(geo.bin, sources, provenance);
 
   const grossFloorAreaSqft = resolveFloorArea(ll84, cbl, provenance);
   const annualEmissionsTco2e = resolveEmissions(ll84, provenance);
@@ -72,14 +110,120 @@ export async function lookupBuilding(
 
   return {
     bbl: geo.bbl,
+    bin: geo.bin,
     address: geo.normalizedAddress,
     grossFloorAreaSqft,
     occupancyGroups: ll84?.occupancyGroups ?? [],
     annualEmissionsTco2e,
     isLl97Covered: cbl?.ll97 ?? false,
     isArticle321: cbl?.article321 ?? false,
+    plutoCharacteristics,
     provenance,
+    infrastructureProfile,
+    openViolations,
   };
+}
+
+async function resolveInfrastructureProfile(
+  bin: Bin | null,
+  ll84: Ll84Facts | null,
+  sources: LookupSources,
+): Promise<InfrastructureProfile> {
+  const hasLl84Filing = !!ll84;
+  const hasRecomputedEmissions = !!ll84?.recomputedEmissionsTco2e;
+
+  // The boiler, build-job, and electrical datasets are BIN-keyed; with no BIN
+  // there is nothing to query, so the equipment lists stay empty.
+  const boilerRecords =
+    bin && sources.fetchBoilerRecordsByBin
+      ? await sources.fetchBoilerRecordsByBin(bin)
+      : [];
+
+  const buildJobFilings =
+    bin && sources.fetchBuildJobFilingsByBin
+      ? await sources.fetchBuildJobFilingsByBin(bin)
+      : [];
+
+  const electricalPermits =
+    bin && sources.fetchSolarElectricalPermitsByBin
+      ? await sources.fetchSolarElectricalPermitsByBin(bin)
+      : [];
+
+  const distinctBoilers = new Set(boilerRecords.map(record => record.boilerId));
+  const hasPV =
+    buildJobFilings.some(filing => filing.workTypes.solar) ||
+    electricalPermits.some(permit => permit.isSolar);
+  const recentHvacWork = buildJobFilings.some(
+    filing => filing.workTypes.mechanical || filing.workTypes.boiler,
+  );
+
+  return {
+    hasLl84Filing,
+    hasRecomputedEmissions,
+    fuelTypes: ll84?.fuelMix ?? [],
+    boilerRecords,
+    buildJobFilings,
+    electricalPermits,
+    heatingFuel: ll84?.heatingFuel ?? null,
+    hasPV,
+    boilerCount: distinctBoilers.size,
+    boilerCondition: deriveBoilerCondition(boilerRecords),
+    recentHvacWork,
+    efficiencyTier: deriveEfficiencyTier(ll84?.energyStarScore ?? null),
+  };
+}
+
+// Any boiler with a defect on its latest reports flags the building; the
+// inspection record is point-in-time evidence, not a guarantee of condition.
+function deriveBoilerCondition(boilerRecords: BoilerRecord[]): string | null {
+  if (boilerRecords.length === 0) {
+    return null;
+  }
+  const anyDefect = boilerRecords.some(record => record.defectsExist === true);
+  return anyDefect ? "defects_on_record" : "no_defects_on_record";
+}
+
+// ENERGY STAR score banded into a tier: 75 is the certification threshold,
+// 50 the national median. Null when the filing carries no score.
+function deriveEfficiencyTier(energyStarScore: number | null): string | null {
+  if (energyStarScore === null) {
+    return null;
+  }
+  if (energyStarScore >= 75) {
+    return "high";
+  }
+  if (energyStarScore >= 50) {
+    return "medium";
+  }
+  return "low";
+}
+
+// Open ECB violations are BIN-keyed; with no BIN there is nothing to query.
+async function resolveOpenViolations(
+  bin: Bin | null,
+  sources: LookupSources,
+  provenance: ProvenanceNote[],
+): Promise<EcbViolation[]> {
+  if (!bin || !sources.fetchOpenEcbViolationsByBin) {
+    return [];
+  }
+
+  const violations = await sources.fetchOpenEcbViolationsByBin(bin);
+
+  const totalBalanceDue = violations.reduce(
+    (sum, violation) => sum + (violation.balanceDueUsd ?? 0),
+    0,
+  );
+  provenance.push({
+    field: "openViolations",
+    source: "DOB ECB violations",
+    detail:
+      violations.length === 0
+        ? "no open ECB violations on record for this building"
+        : `${violations.length} open ECB violation(s), $${totalBalanceDue.toLocaleString("en-US")} outstanding`,
+  });
+
+  return violations;
 }
 
 // GeoSearch's top pick is sometimes a different tax lot than the one DOF
