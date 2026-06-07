@@ -1,0 +1,20 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Start SpacetimeDB",
+      "type": "shell",
+      "command": "${env:HOME}/.local/bin/spacetime start",
+      "isBackground": true,
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "presentation": {
+        "reveal": "silent",
+        "panel": "dedicated",
+        "showReuseMessage": false
+      },
+      "problemMatcher": []
+    }
+  ]
+}
