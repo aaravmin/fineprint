@@ -44,6 +44,7 @@ import KillWorkerReducer from "./kill_worker_reducer";
 import RegisterWorkerReducer from "./register_worker_reducer";
 import RejectReducer from "./reject_reducer";
 import RequestBuildingReducer from "./request_building_reducer";
+import SetReviewModeReducer from "./set_review_mode_reducer";
 import SubmitWorkReducer from "./submit_work_reducer";
 
 // Import all procedure arg schemas
@@ -52,6 +53,7 @@ import SubmitWorkReducer from "./submit_work_reducer";
 import ApprovalRow from "./approval_table";
 import BuildingRow from "./building_table";
 import EventRow from "./event_table";
+import SettingsRow from "./settings_table";
 import SubmissionRow from "./submission_table";
 import TaskRow from "./task_table";
 import WorkerRow from "./worker_table";
@@ -96,6 +98,17 @@ const tablesSchema = __schema({
       { name: 'event_id_key', constraint: 'unique', columns: ['id'] },
     ],
   }, EventRow),
+  settings: __table({
+    name: 'settings',
+    indexes: [
+      { accessor: 'id', name: 'settings_id_idx_btree', algorithm: 'btree', columns: [
+        'id',
+      ] },
+    ],
+    constraints: [
+      { name: 'settings_id_key', constraint: 'unique', columns: ['id'] },
+    ],
+  }, SettingsRow),
   submission: __table({
     name: 'submission',
     indexes: [
@@ -156,6 +169,7 @@ const reducersSchema = __reducers(
   __reducerSchema("register_worker", RegisterWorkerReducer),
   __reducerSchema("reject", RejectReducer),
   __reducerSchema("request_building", RequestBuildingReducer),
+  __reducerSchema("set_review_mode", SetReviewModeReducer),
   __reducerSchema("submit_work", SubmitWorkReducer),
 );
 

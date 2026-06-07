@@ -88,6 +88,17 @@ export const approval = table(
   },
 );
 
+// One row (id 1): operator-level switches. reviewMode "manual" means every
+// draft waits for a human; "auto" approves obligation drafts on submit —
+// building intakes always wait either way.
+export const settings = table(
+  { name: "settings", public: true },
+  {
+    id: t.u64().primaryKey(),
+    reviewMode: t.string(),
+  },
+);
+
 // Append-only audit log. Every reducer writes one row.
 export const event = table(
   { name: "event", public: true },
@@ -117,6 +128,7 @@ const spacetimedb = schema({
   worker,
   submission,
   approval,
+  settings,
   event,
   reaperTick,
 });

@@ -10,7 +10,7 @@ import type { DraftInput } from "./types.ts";
 const TEMPLATES: Record<string, (i: DraftInput) => string> = {
   emissions_fine_analysis: input =>
     [
-      `LL97 EXPOSURE ANALYSIS — ${input.address}`,
+      `LL97 EXPOSURE ANALYSIS · ${input.address}`,
       ``,
       ...(input.annualEmissionsTco2e !== undefined
         ? [
@@ -25,12 +25,10 @@ const TEMPLATES: Record<string, (i: DraftInput) => string> = {
       `  2. Commission energy model to size the overage before paying a dollar of fines.`,
       `  3. Price the gap closers: BMS scheduling fixes, heating plant controls, LED completion.`,
       `  4. If overage persists, evaluate Good Faith Efforts filing to defer penalties.`,
-      ``,
-      `Draft prepared by scripted policy. Human review required before any filing.`,
     ].join("\n"),
   prescriptive_measures_plan: input =>
     [
-      `ARTICLE 321 COMPLIANCE PLAN — ${input.address}`,
+      `ARTICLE 321 COMPLIANCE PLAN · ${input.address}`,
       ``,
       `Building qualifies for the affordable-housing pathway: implement the prescriptive`,
       `measures list instead of meeting the emissions cap.`,
@@ -38,77 +36,63 @@ const TEMPLATES: Record<string, (i: DraftInput) => string> = {
       `  1. Confirm eligibility documentation with HPD records.`,
       `  2. Schedule the 13 prescriptive measures survey (controls, insulation, low-flow).`,
       `  3. File certification of completed measures before the deadline.`,
-      ``,
-      `Draft prepared by scripted policy. Human review required before any filing.`,
     ].join("\n"),
   benchmarking_filing: input =>
     [
-      `LL84 BENCHMARKING FILING — ${input.address}`,
+      `LL84 BENCHMARKING FILING · ${input.address}`,
       ``,
       `Annual energy and water benchmarking due. Exposure if missed: $${fmt(input.fineEstimateUsd)}/yr.`,
       `  1. Confirm ESPM property profile is current (sqft: ${input.sqft.toLocaleString()}).`,
       `  2. Request whole-building aggregate data from utilities.`,
       `  3. Submit through the NYC portal; archive the confirmation number.`,
-      ``,
-      `Draft prepared by scripted policy. Human review required before any filing.`,
     ].join("\n"),
   audit_filing: input =>
     [
-      `LL87 AUDIT & RETRO-COMMISSIONING — ${input.address}`,
+      `LL87 AUDIT & RETRO-COMMISSIONING · ${input.address}`,
       ``,
       `Energy audit + RCx filing cycle is due. Exposure if missed: $${fmt(input.fineEstimateUsd)}.`,
       `  1. Engage a registered energy auditor (ASHRAE Level II).`,
       `  2. Complete retro-commissioning checklist on base building systems.`,
       `  3. File EER through DOB NOW before the deadline.`,
-      ``,
-      `Draft prepared by scripted policy. Human review required before any filing.`,
     ].join("\n"),
   facade_inspection: input =>
     [
-      `LL11 / FISP FACADE CYCLE — ${input.address}`,
+      `LL11 / FISP FACADE CYCLE · ${input.address}`,
       ``,
       `Facade inspection filing window is open. Failure-to-file exposure: $${fmt(input.fineEstimateUsd)}/yr.`,
       `  1. Retain a QEWI (Qualified Exterior Wall Inspector).`,
       `  2. Schedule close-up inspection; budget sidewalk shed only if unsafe conditions found.`,
       `  3. File SWARMP or Safe report in DOB NOW: Safety.`,
-      ``,
-      `Draft prepared by scripted policy. Human review required before any filing.`,
     ].join("\n"),
   lighting_submetering_plan: input =>
     [
-      `LL88 LIGHTING & SUBMETERING — ${input.address}`,
+      `LL88 LIGHTING & SUBMETERING · ${input.address}`,
       ``,
       `Lighting code upgrade + tenant submetering required by deadline.`,
       `  1. Survey non-compliant fixtures against NYCECC lighting standards.`,
       `  2. Identify tenant spaces over 5,000 sqft lacking submeters.`,
       `  3. Stage installs with tenant turnover to cut cost; file compliance report.`,
-      ``,
-      `Draft prepared by scripted policy. Human review required before any filing.`,
     ].join("\n"),
   gas_piping_certification: input =>
     [
-      `LL152 GAS PIPING CERTIFICATION — ${input.address}`,
+      `LL152 GAS PIPING CERTIFICATION · ${input.address}`,
       ``,
       `Periodic gas piping inspection is due this community district cycle.`,
       `Failure-to-certify exposure: $${fmt(input.fineEstimateUsd)}.`,
       `  1. Retain a licensed master plumber (LMP) to inspect all exposed gas piping.`,
       `  2. Correct any unsafe or hazardous conditions found; document the repairs.`,
       `  3. File the GPS2 certification through DOB NOW before the cycle deadline.`,
-      `  4. Calendar the next cycle — certification recurs every four years.`,
-      ``,
-      `Draft prepared by scripted policy. Human review required before any filing.`,
+      `  4. Calendar the next cycle; certification recurs every four years.`,
     ].join("\n"),
   mold_pest_remediation: input =>
     [
-      `LL55 INDOOR ALLERGEN HAZARDS — ${input.address}`,
+      `LL55 INDOOR ALLERGEN HAZARDS · ${input.address}`,
       ``,
       `Annual mold and pest duties apply to this residential building.`,
       `  1. Triage open HPD complaints for mold and pest conditions; inspect units yearly.`,
       `  2. Remediate using tenant-safe practices (HPD-approved methods, no tenant in unit).`,
-      `  3. Fix the underlying condition — a leak behind recurring mold, entry points behind pests.`,
+      `  3. Fix the underlying condition: a leak behind recurring mold, entry points behind pests.`,
       `  4. Keep records of inspections and remediation for HPD review.`,
-      ``,
-      `Draft prepared by scripted policy. Human review required before any filing.`,
     ].join("\n"),
 };
 
@@ -140,10 +124,9 @@ export function draftScripted(input: DraftInput): string {
   const body = template
     ? template(input)
     : [
-        `COMPLIANCE DRAFT — ${input.title}`,
+        `COMPLIANCE DRAFT · ${input.title}`,
         ``,
         `No playbook for kind "${input.kind}" yet. Flagging for manual triage.`,
-        `Draft prepared by scripted policy. Human review required.`,
       ].join("\n");
 
   return [body, deadlineLine(input), sourcesFootnote(input)].filter(Boolean).join("\n\n");

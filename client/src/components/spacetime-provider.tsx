@@ -51,10 +51,34 @@ const connectionBuilder = DbConnection.builder()
   .onDisconnect(() => {
     if (!connectionLost && everConnected) {
       connectionLost = true;
-      toast.error("Disconnected from the live board. Refresh to reconnect.");
+      scheduleReconnect();
     }
   });
 
+// The SDK neither reconnects nor rejects reducer calls on a dead socket, so
+// a dropped connection (module republish, server restart) silently eats
+// every click. A reload rebuilds the connection AND picks up fresh bindings.
+// The timestamp guard stops a reload loop while the server is actually down.
+const LAST_RELOAD_KEY = "fineprint:last-auto-reload";
+const RELOAD_LOOP_WINDOW_MS = 30_000;
+
+function scheduleReconnect() {
+  const lastReload = Number(sessionStorage.getItem(LAST_RELOAD_KEY) ?? 0);
+
+  if (Date.now() - lastReload < RELOAD_LOOP_WINDOW_MS) {
+    toast.error("Can't reach the database. Refresh once it's back.");
+    return;
+  }
+
+  toast.error("Connection lost — reconnecting…");
+  sessionStorage.setItem(LAST_RELOAD_KEY, String(Date.now()));
+  setTimeout(() => window.location.reload(), 1_200);
+}
+
 export function SpacetimeProvider({ children }: { children: ReactNode }) {
-  return <SpacetimeDBProvider connectionBuilder={connectionBuilder}>{children}</SpacetimeDBProvider>;
+  return (
+    <SpacetimeDBProvider connectionBuilder={connectionBuilder}>
+      {children}
+    </SpacetimeDBProvider>
+  );
 }

@@ -43,14 +43,14 @@ describe("draftScripted", () => {
     }
   });
 
-  test("every draft ends with the human-review disclaimer", () => {
+  test("drafts carry no boilerplate disclaimers — the review gate enforces sign-off", () => {
     const kinds = [...LAWS.map(law => law.kind), "unknown_kind"];
 
     for (const kind of kinds) {
       const draft = draftScripted(draftInput({ kind }));
 
-      expect(draft, `kind "${kind}" is missing the disclaimer`).toMatch(
-        /Human review required/,
+      expect(draft, `kind "${kind}" reintroduced boilerplate`).not.toMatch(
+        /Human review required|scripted policy/,
       );
     }
   });

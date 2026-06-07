@@ -51,6 +51,12 @@ export const ReaperTick = __t.object("ReaperTick", {
 });
 export type ReaperTick = __Infer<typeof ReaperTick>;
 
+export const Settings = __t.object("Settings", {
+  id: __t.u64(),
+  reviewMode: __t.string(),
+});
+export type Settings = __Infer<typeof Settings>;
+
 export const Submission = __t.object("Submission", {
   id: __t.u64(),
   taskId: __t.u64(),

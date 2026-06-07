@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/table";
 import { computePeriods, fmtUsd } from "@/lib/engine";
 import { getLocalStorageValue, setLocalStorageValue } from "@/lib/local-storage.client";
+import { withAck } from "@/lib/reducer-call";
 import { reducers, tables } from "@/module_bindings/index";
 import type { Building, Task } from "@/module_bindings/types";
 
@@ -230,10 +231,12 @@ export function PortfolioClient() {
       // back negative. The reducer is the source of truth either way.
       setRecentAddresses(rememberAddress(trimmed));
       setAddress("");
-      toast.success("Intake queued — an agent is pulling the city's records now");
-      requestBuilding({ address: trimmed }).catch((error: Error) => {
-        toast.error(`Intake for "${trimmed}" failed: ${error.message}`);
-      });
+      toast.success("Intake queued. An agent is pulling the city's records now");
+      withAck(requestBuilding({ address: trimmed }), `Intake for "${trimmed}"`).catch(
+        (error: Error) => {
+          toast.error(`Intake for "${trimmed}" failed: ${error.message}`);
+        },
+      );
     },
     [address, requestBuilding],
   );
@@ -461,7 +464,7 @@ export function PortfolioClient() {
                             {b.annualEmissionsTco2E !== undefined ? (
                               `${b.annualEmissionsTco2E.toLocaleString(undefined, { maximumFractionDigits: 0 })} t`
                             ) : (
-                              <span className="text-xs">—</span>
+                              <span className="text-xs italic">missing</span>
                             )}
                           </TableCell>
                           <FineCell fine={fine0} />
@@ -472,14 +475,16 @@ export function PortfolioClient() {
                         <>
                           <TableCell className="text-right text-muted-foreground">
                             {buildingLawTasks.length || (
-                              <span className="text-xs">—</span>
+                              <span className="text-xs italic">missing</span>
                             )}
                           </TableCell>
                           <TableCell className="text-right text-muted-foreground">
                             {buildingExposure > 0 ? (
                               fmtUsd(buildingExposure)
-                            ) : (
+                            ) : buildingLawTasks.length > 0 ? (
                               <span className="text-xs">Tracked</span>
+                            ) : (
+                              <span className="text-xs italic">missing</span>
                             )}
                           </TableCell>
                         </>
@@ -544,7 +549,11 @@ function MetricTile({
 
 function FineCell({ fine, highlight }: { fine: number | null; highlight?: boolean }) {
   if (fine === null) {
-    return <TableCell className="text-right text-muted-foreground">—</TableCell>;
+    return (
+      <TableCell className="text-right text-xs italic text-muted-foreground">
+        missing
+      </TableCell>
+    );
   }
   if (fine === 0) {
     return (

@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyFolder } from "@/components/ui/empty-folder";
 import { LoadingDots } from "@/components/ui/loading-dots";
+import { withAck } from "@/lib/reducer-call";
 import { reducers, tables } from "@/module_bindings/index";
 
 const STATUS_VARIANT: Record<
@@ -33,7 +34,7 @@ export function AgentsClient() {
     setKillingId(workerId);
     toast(`${name} killed — its task returns to the queue`);
 
-    killWorker({ workerId })
+    withAck(killWorker({ workerId }), "The kill order")
       .catch((error: Error) => toast.error(`Kill failed: ${error.message}`))
       .finally(() => setKillingId(null));
   }

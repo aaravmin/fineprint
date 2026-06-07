@@ -75,6 +75,7 @@ describe("LLM draft cache", () => {
   test("a dead API with no cache still falls back to the scripted policy", async () => {
     const draft = await draftLlm(input, brokenDeps);
 
-    expect(draft).toMatch(/scripted policy/);
+    // The scripted template's header proves the fallback ran.
+    expect(draft).toMatch(/LL97 EXPOSURE ANALYSIS/);
   });
 });

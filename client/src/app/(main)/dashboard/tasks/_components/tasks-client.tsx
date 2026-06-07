@@ -11,9 +11,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyFolder } from "@/components/ui/empty-folder";
+import { Label } from "@/components/ui/label";
 import { LoadingDots } from "@/components/ui/loading-dots";
 import MultipleSelector, { type Option } from "@/components/ui/multiselect";
+import { Switch } from "@/components/ui/switch";
 import { fmtUsd } from "@/lib/engine";
+import { withAck } from "@/lib/reducer-call";
 import { reducers, tables } from "@/module_bindings/index";
 
 const STATUS_VARIANT: Record<
@@ -41,10 +44,26 @@ export function TasksClient() {
   const [tasks] = useTable(tables.task);
   const [buildings] = useTable(tables.building);
   const [workers] = useTable(tables.worker);
+  const [settingsRows] = useTable(tables.settings);
   const approve = useReducer(reducers.approve);
   const reject = useReducer(reducers.reject);
+  const setReviewMode = useReducer(reducers.setReviewMode);
   const [pendingTaskId, setPendingTaskId] = useState<bigint | null>(null);
   const [statusFilter, setStatusFilter] = useState<Option[]>([]);
+
+  const reviewMode = settingsRows[0]?.reviewMode ?? "manual";
+
+  function toggleReviewMode(autoEnabled: boolean) {
+    const mode = autoEnabled ? "auto" : "manual";
+    toast(
+      autoEnabled
+        ? "Auto-approve on. Obligation drafts approve on submit; intakes still wait for you"
+        : "Manual review. Every draft waits for your sign-off",
+    );
+    withAck(setReviewMode({ mode }), "Review mode change").catch((error: Error) =>
+      toast.error(`Could not change review mode: ${error.message}`),
+    );
+  }
 
   function review(taskId: bigint, verdict: "approve" | "reject") {
     setPendingTaskId(taskId);
@@ -54,15 +73,15 @@ export function TasksClient() {
     const call =
       verdict === "approve"
         ? approve({ taskId, note: "approved from the dashboard" })
-        : reject({ taskId, note: "rejected from the dashboard — returned to the queue" });
+        : reject({ taskId, note: "rejected from the dashboard; returned to the queue" });
 
     if (verdict === "approve") {
       toast.success("Draft approved");
     } else {
-      toast("Draft rejected — task returned to the queue");
+      toast("Draft rejected. Task returned to the queue");
     }
 
-    call
+    withAck(call, "The review verdict")
       .catch((error: Error) => toast.error(`Review failed: ${error.message}`))
       .finally(() => setPendingTaskId(null));
   }
@@ -93,7 +112,20 @@ export function TasksClient() {
 
   return (
     <div className="@container/main flex flex-col gap-4 md:gap-6">
-      <h1 className="font-heading text-2xl font-bold tracking-tight">Task Queue</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="font-heading text-2xl font-bold tracking-tight">Task Queue</h1>
+        <div className="flex items-center gap-2">
+          <Switch
+            id="auto-approve"
+            checked={reviewMode === "auto"}
+            onCheckedChange={toggleReviewMode}
+          />
+          <Label htmlFor="auto-approve" className="text-sm text-muted-foreground">
+            Auto-approve drafts
+            <span className="hidden text-xs sm:inline"> (intakes always manual)</span>
+          </Label>
+        </div>
+      </div>
 
       <div className="flex flex-wrap gap-3">
         {Object.entries(counts).map(([status, count]) => (

@@ -33,14 +33,47 @@ function workerBySender(ctx: any) {
   return ctx.db.worker.identity.find(ctx.sender);
 }
 
+// Missing row means a database that predates the settings table: manual.
+function currentReviewMode(ctx: any): string {
+  return ctx.db.settings.id.find(1n)?.reviewMode ?? "manual";
+}
+
 export const init = spacetimedb.init(ctx => {
   // Initial publish only: arm the reaper tick.
   ctx.db.reaperTick.insert({
     id: 0n,
     scheduledAt: ScheduleAt.interval(REAP_INTERVAL_MICROS),
   });
+  ctx.db.settings.insert({ id: 1n, reviewMode: "manual" });
   logEvent(ctx, "system", "module initialized; reaper armed (5s)");
 });
+
+export const set_review_mode = spacetimedb.reducer(
+  { mode: t.string() },
+  (ctx, { mode }) => {
+    if (workerBySender(ctx)) {
+      throw new Error("workers cannot change the review mode");
+    }
+    if (mode !== "manual" && mode !== "auto") {
+      throw new Error(`review mode must be "manual" or "auto", got "${mode}"`);
+    }
+
+    const existingSettings = ctx.db.settings.id.find(1n);
+    if (existingSettings) {
+      ctx.db.settings.id.update({ ...existingSettings, reviewMode: mode });
+    } else {
+      ctx.db.settings.insert({ id: 1n, reviewMode: mode });
+    }
+
+    logEvent(
+      ctx,
+      "review_mode_changed",
+      mode === "auto"
+        ? "auto — obligation drafts approve on submit; intakes still wait for a human"
+        : "manual — every draft waits for a human",
+    );
+  },
+);
 
 export const add_building = spacetimedb.reducer(
   { address: t.string(), sqft: t.u32(), isAffordable: t.bool() },
@@ -384,7 +417,6 @@ export const submit_work = spacetimedb.reducer(
       payloadJson,
       submittedAt: ctx.timestamp,
     });
-    ctx.db.task.id.update({ ...task, status: "in_review" });
     ctx.db.worker.id.update({
       ...submittingWorker,
       status: "idle",
@@ -399,6 +431,27 @@ export const submit_work = spacetimedb.reducer(
       taskId,
       submittingWorker.id,
     );
+
+    // Auto mode signs off obligation drafts on the spot. Intakes are exempt:
+    // creating a building always takes a human, whatever the mode says.
+    const autoApprove =
+      currentReviewMode(ctx) === "auto" && task.kind !== "building_intake";
+
+    if (!autoApprove) {
+      ctx.db.task.id.update({ ...task, status: "in_review" });
+      return;
+    }
+
+    ctx.db.approval.insert({
+      id: 0n,
+      taskId,
+      approvedBy: ctx.sender,
+      verdict: "approved",
+      note: "auto-approved — review mode is auto",
+      at: ctx.timestamp,
+    });
+    ctx.db.task.id.update({ ...task, status: "approved", claimedBy: undefined });
+    logEvent(ctx, "task_approved", "auto-approved — review mode is auto", taskId);
   },
 );
 

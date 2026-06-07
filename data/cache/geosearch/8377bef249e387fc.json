@@ -1,12 +1,12 @@
 {
-  "key": "https://geosearch.planninglabs.nyc/v2/search?text=345%20Park%20Avenue%2C%20Manhattan",
-  "recordedAt": "2026-06-07T09:28:14.636Z",
+  "key": "https://geosearch.planninglabs.nyc/v2/search?text=72%20ELLWOOD%20STREET%2C%20New%20York",
+  "recordedAt": "2026-06-07T09:42:59.203Z",
   "value": {
     "geocoding": {
       "version": "0.2",
       "attribution": "http://geosearch.planninglabs.nyc/attribution",
       "query": {
-        "text": "345 Park Avenue, Manhattan",
+        "text": "72 ELLWOOD STREET, New York",
         "size": 10,
         "private": false,
         "lang": {
@@ -19,11 +19,11 @@
         "querySize": 20,
         "parser": "pelias",
         "parsed_text": {
-          "subject": "345 Park Avenue",
-          "housenumber": "345",
-          "street": "Park Avenue",
-          "locality": "Manhattan",
-          "admin": "Manhattan"
+          "subject": "72 ELLWOOD STREET",
+          "housenumber": "72",
+          "street": "ELLWOOD STREET",
+          "locality": "New York",
+          "admin": "New York"
         }
       },
       "warnings": [
@@ -34,7 +34,7 @@
         "author": "Mapzen",
         "version": "1.0"
       },
-      "timestamp": 1780824494624
+      "timestamp": 1780825379177
     },
     "type": "FeatureCollection",
     "features": [
@@ -43,21 +43,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.972215,
-            40.757749
+            -73.929153,
+            40.860927
           ]
         },
         "properties": {
-          "id": "169565",
-          "gid": "nycpad:venue:169565",
+          "id": "348105",
+          "gid": "nycpad:venue:348105",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "169565",
+          "source_id": "348105",
           "country_code": "US",
-          "name": "345 PARK AVENUE",
-          "housenumber": "345",
-          "street": "PARK AVENUE",
-          "postalcode": "10022",
+          "name": "72 ELLWOOD STREET",
+          "housenumber": "72",
+          "street": "ELLWOOD STREET",
+          "postalcode": "10040",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -74,13 +74,13 @@
           "locality_a": "NYC",
           "borough": "Manhattan",
           "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Midtown East",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:907215785",
-          "label": "345 PARK AVENUE, New York, NY, USA",
+          "neighbourhood": "Inwood",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85826989",
+          "label": "72 ELLWOOD STREET, New York, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1013060001",
-              "bin": "1036460",
+              "bbl": "1021720049",
+              "bin": "1064143",
               "version": "26a"
             }
           }
@@ -91,70 +91,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.962481,
-            40.696315
+            -73.928513,
+            40.859916
           ]
         },
         "properties": {
-          "id": "971073",
-          "gid": "nycpad:venue:971073",
+          "id": "347843",
+          "gid": "nycpad:venue:347843",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "971073",
+          "source_id": "347843",
           "country_code": "US",
-          "name": "345 PARK AVENUE",
-          "housenumber": "345",
-          "street": "PARK AVENUE",
-          "postalcode": "11205",
-          "confidence": 0.8,
-          "match_type": "fallback",
-          "accuracy": "point",
-          "country": "United States",
-          "country_gid": "whosonfirst:country:85633793",
-          "country_a": "USA",
-          "region": "New York",
-          "region_gid": "whosonfirst:region:85688543",
-          "region_a": "NY",
-          "county": "Kings County",
-          "county_gid": "whosonfirst:county:102082361",
-          "county_a": "BK",
-          "locality": "New York",
-          "locality_gid": "whosonfirst:locality:85977539",
-          "locality_a": "NYC",
-          "borough": "Brooklyn",
-          "borough_gid": "whosonfirst:borough:421205765",
-          "neighbourhood": "Clinton Hill",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85865613",
-          "label": "345 PARK AVENUE, Brooklyn, NY, USA",
-          "addendum": {
-            "pad": {
-              "bbl": "3018800001",
-              "bin": "3054173",
-              "version": "26a"
-            }
-          }
-        }
-      },
-      {
-        "type": "Feature",
-        "geometry": {
-          "type": "Point",
-          "coordinates": [
-            -73.984856,
-            40.741737
-          ]
-        },
-        "properties": {
-          "id": "95807",
-          "gid": "nycpad:venue:95807",
-          "layer": "venue",
-          "source": "nycpad",
-          "source_id": "95807",
-          "country_code": "US",
-          "name": "345 PARK AVENUE SOUTH",
-          "housenumber": "345",
-          "street": "PARK AVENUE SOUTH",
-          "postalcode": "10010",
+          "name": "44 ELLWOOD STREET",
+          "housenumber": "44",
+          "street": "ELLWOOD STREET",
+          "postalcode": "10040",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -171,13 +122,13 @@
           "locality_a": "NYC",
           "borough": "Manhattan",
           "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Flatiron District",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85869245",
-          "label": "345 PARK AVENUE SOUTH, New York, NY, USA",
+          "neighbourhood": "Inwood",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85826989",
+          "label": "44 ELLWOOD STREET, New York, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008810001",
-              "bin": "1018102",
+              "bbl": "1021710028",
+              "bin": "1064126",
               "version": "26a"
             }
           }
@@ -188,264 +139,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.876565,
-            40.838846
+            -73.928337,
+            40.859675
           ]
         },
         "properties": {
-          "id": "532686",
-          "gid": "nycpad:venue:532686",
+          "id": "347853",
+          "gid": "nycpad:venue:347853",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "532686",
+          "source_id": "347853",
           "country_code": "US",
-          "name": "345 BRONX PARK AVENUE",
-          "housenumber": "345",
-          "street": "BRONX PARK AVENUE",
-          "postalcode": "10460",
-          "confidence": 0.8,
-          "match_type": "fallback",
-          "accuracy": "point",
-          "country": "United States",
-          "country_gid": "whosonfirst:country:85633793",
-          "country_a": "USA",
-          "region": "New York",
-          "region_gid": "whosonfirst:region:85688543",
-          "region_a": "NY",
-          "county": "Bronx County",
-          "county_gid": "whosonfirst:county:102083063",
-          "county_a": "BX",
-          "locality": "New York",
-          "locality_gid": "whosonfirst:locality:85977539",
-          "locality_a": "NYC",
-          "borough": "Bronx",
-          "borough_gid": "whosonfirst:borough:421205773",
-          "neighbourhood": "West Farms",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85855481",
-          "label": "345 BRONX PARK AVENUE, Bronx, NY, USA",
-          "addendum": {
-            "pad": {
-              "bbl": "2039060023",
-              "bin": "2028351",
-              "version": "26a"
-            }
-          }
-        }
-      },
-      {
-        "type": "Feature",
-        "geometry": {
-          "type": "Point",
-          "coordinates": [
-            -73.876565,
-            40.838846
-          ]
-        },
-        "properties": {
-          "id": "532687",
-          "gid": "nycpad:venue:532687",
-          "layer": "venue",
-          "source": "nycpad",
-          "source_id": "532687",
-          "country_code": "US",
-          "name": "345 BX PARK AVENUE",
-          "housenumber": "345",
-          "street": "BX PARK AVENUE",
-          "postalcode": "10460",
-          "confidence": 0.8,
-          "match_type": "fallback",
-          "accuracy": "point",
-          "country": "United States",
-          "country_gid": "whosonfirst:country:85633793",
-          "country_a": "USA",
-          "region": "New York",
-          "region_gid": "whosonfirst:region:85688543",
-          "region_a": "NY",
-          "county": "Bronx County",
-          "county_gid": "whosonfirst:county:102083063",
-          "county_a": "BX",
-          "locality": "New York",
-          "locality_gid": "whosonfirst:locality:85977539",
-          "locality_a": "NYC",
-          "borough": "Bronx",
-          "borough_gid": "whosonfirst:borough:421205773",
-          "neighbourhood": "West Farms",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85855481",
-          "label": "345 BX PARK AVENUE, Bronx, NY, USA",
-          "addendum": {
-            "pad": {
-              "bbl": "2039060023",
-              "bin": "2028351",
-              "version": "26a"
-            }
-          }
-        }
-      },
-      {
-        "type": "Feature",
-        "geometry": {
-          "type": "Point",
-          "coordinates": [
-            -73.746561,
-            40.775264
-          ]
-        },
-        "properties": {
-          "id": "3002177",
-          "gid": "nycpad:venue:3002177",
-          "layer": "venue",
-          "source": "nycpad",
-          "source_id": "3002177",
-          "country_code": "US",
-          "name": "345 PARK LANE",
-          "housenumber": "345",
-          "street": "PARK LANE",
-          "postalcode": "11363",
-          "confidence": 0.8,
-          "match_type": "fallback",
-          "accuracy": "point",
-          "country": "United States",
-          "country_gid": "whosonfirst:country:85633793",
-          "country_a": "USA",
-          "region": "New York",
-          "region_gid": "whosonfirst:region:85688543",
-          "region_a": "NY",
-          "county": "Queens County",
-          "county_gid": "whosonfirst:county:102082377",
-          "locality": "New York",
-          "locality_gid": "whosonfirst:locality:85977539",
-          "locality_a": "NYC",
-          "borough": "Queens",
-          "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "Douglaston",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85815033",
-          "label": "345 PARK LANE, Douglaston, NY, USA",
-          "addendum": {
-            "pad": {
-              "bbl": "4080520042",
-              "bin": "4168402",
-              "version": "26a"
-            }
-          }
-        }
-      },
-      {
-        "type": "Feature",
-        "geometry": {
-          "type": "Point",
-          "coordinates": [
-            -73.966495,
-            40.676375
-          ]
-        },
-        "properties": {
-          "id": "815321",
-          "gid": "nycpad:venue:815321",
-          "layer": "venue",
-          "source": "nycpad",
-          "source_id": "815321",
-          "country_code": "US",
-          "name": "345 PARK PLACE",
-          "housenumber": "345",
-          "street": "PARK PLACE",
-          "postalcode": "11238",
-          "confidence": 0.8,
-          "match_type": "fallback",
-          "accuracy": "point",
-          "country": "United States",
-          "country_gid": "whosonfirst:country:85633793",
-          "country_a": "USA",
-          "region": "New York",
-          "region_gid": "whosonfirst:region:85688543",
-          "region_a": "NY",
-          "county": "Kings County",
-          "county_gid": "whosonfirst:county:102082361",
-          "county_a": "BK",
-          "locality": "New York",
-          "locality_gid": "whosonfirst:locality:85977539",
-          "locality_a": "NYC",
-          "borough": "Brooklyn",
-          "borough_gid": "whosonfirst:borough:421205765",
-          "neighbourhood": "Prospect Heights",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85869601",
-          "label": "345 PARK PLACE, Brooklyn, NY, USA",
-          "addendum": {
-            "pad": {
-              "bbl": "3011590056",
-              "bin": "3028828",
-              "version": "26a"
-            }
-          }
-        }
-      },
-      {
-        "type": "Feature",
-        "geometry": {
-          "type": "Point",
-          "coordinates": [
-            -73.848327,
-            40.793566
-          ]
-        },
-        "properties": {
-          "id": "2551894",
-          "gid": "nycpad:venue:2551894",
-          "layer": "venue",
-          "source": "nycpad",
-          "source_id": "2551894",
-          "country_code": "US",
-          "name": "345 PARK CRESCENT",
-          "housenumber": "345",
-          "street": "PARK CRESCENT",
-          "postalcode": "11356",
-          "confidence": 0.8,
-          "match_type": "fallback",
-          "accuracy": "point",
-          "country": "United States",
-          "country_gid": "whosonfirst:country:85633793",
-          "country_a": "USA",
-          "region": "New York",
-          "region_gid": "whosonfirst:region:85688543",
-          "region_a": "NY",
-          "county": "Queens County",
-          "county_gid": "whosonfirst:county:102082377",
-          "locality": "New York",
-          "locality_gid": "whosonfirst:locality:85977539",
-          "locality_a": "NYC",
-          "borough": "Queens",
-          "borough_gid": "whosonfirst:borough:421205767",
-          "neighbourhood": "College Point",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85811813",
-          "label": "345 PARK CRESCENT, College Point, NY, USA",
-          "addendum": {
-            "pad": {
-              "bbl": "4039160091",
-              "bin": "4535096",
-              "version": "26a"
-            }
-          }
-        }
-      },
-      {
-        "type": "Feature",
-        "geometry": {
-          "type": "Point",
-          "coordinates": [
-            -73.965717,
-            40.790815
-          ]
-        },
-        "properties": {
-          "id": "150943",
-          "gid": "nycpad:venue:150943",
-          "layer": "venue",
-          "source": "nycpad",
-          "source_id": "150943",
-          "country_code": "US",
-          "name": "345 CENTRAL PARK WEST",
-          "housenumber": "345",
-          "street": "CENTRAL PARK WEST",
-          "postalcode": "10025",
+          "name": "30 ELLWOOD STREET",
+          "housenumber": "30",
+          "street": "ELLWOOD STREET",
+          "postalcode": "10040",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -462,13 +170,13 @@
           "locality_a": "NYC",
           "borough": "Manhattan",
           "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Upper West Side",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85853285",
-          "label": "345 CENTRAL PARK WEST, New York, NY, USA",
+          "neighbourhood": "Inwood",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85826989",
+          "label": "30 ELLWOOD STREET, New York, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1012080029",
-              "bin": "1031679",
+              "bbl": "1021710032",
+              "bin": "1064127",
               "version": "26a"
             }
           }
@@ -479,21 +187,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.965717,
-            40.790815
+            -73.928299,
+            40.859249
           ]
         },
         "properties": {
-          "id": "150942",
-          "gid": "nycpad:venue:150942",
+          "id": "347859",
+          "gid": "nycpad:venue:347859",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "150942",
+          "source_id": "347859",
           "country_code": "US",
-          "name": "345 CEN PARK WEST",
-          "housenumber": "345",
-          "street": "CEN PARK WEST",
-          "postalcode": "10025",
+          "name": "12 ELLWOOD STREET",
+          "housenumber": "12",
+          "street": "ELLWOOD STREET",
+          "postalcode": "10040",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -510,13 +218,301 @@
           "locality_a": "NYC",
           "borough": "Manhattan",
           "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Upper West Side",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85853285",
-          "label": "345 CEN PARK WEST, New York, NY, USA",
+          "neighbourhood": "Inwood",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85826989",
+          "label": "12 ELLWOOD STREET, New York, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1012080029",
-              "bin": "1031679",
+              "bbl": "1021710036",
+              "bin": "1064128",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.928299,
+            40.859249
+          ]
+        },
+        "properties": {
+          "id": "347861",
+          "gid": "nycpad:venue:347861",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "347861",
+          "country_code": "US",
+          "name": "16 ELLWOOD STREET",
+          "housenumber": "16",
+          "street": "ELLWOOD STREET",
+          "postalcode": "10040",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "New York County",
+          "county_gid": "whosonfirst:county:102081863",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Manhattan",
+          "borough_gid": "whosonfirst:borough:421205771",
+          "neighbourhood": "Inwood",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85826989",
+          "label": "16 ELLWOOD STREET, New York, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "1021710036",
+              "bin": "1064128",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.928299,
+            40.859249
+          ]
+        },
+        "properties": {
+          "id": "347862",
+          "gid": "nycpad:venue:347862",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "347862",
+          "country_code": "US",
+          "name": "18 ELLWOOD STREET",
+          "housenumber": "18",
+          "street": "ELLWOOD STREET",
+          "postalcode": "10040",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "New York County",
+          "county_gid": "whosonfirst:county:102081863",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Manhattan",
+          "borough_gid": "whosonfirst:borough:421205771",
+          "neighbourhood": "Inwood",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85826989",
+          "label": "18 ELLWOOD STREET, New York, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "1021710036",
+              "bin": "1064128",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.928133,
+            40.858971
+          ]
+        },
+        "properties": {
+          "id": "347865",
+          "gid": "nycpad:venue:347865",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "347865",
+          "country_code": "US",
+          "name": "6 ELLWOOD STREET",
+          "housenumber": "6",
+          "street": "ELLWOOD STREET",
+          "postalcode": "10040",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "New York County",
+          "county_gid": "whosonfirst:county:102081863",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Manhattan",
+          "borough_gid": "whosonfirst:borough:421205771",
+          "neighbourhood": "Inwood",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85826989",
+          "label": "6 ELLWOOD STREET, New York, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "1021710042",
+              "bin": "1064129",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.929421,
+            40.861432
+          ]
+        },
+        "properties": {
+          "id": "348101",
+          "gid": "nycpad:venue:348101",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "348101",
+          "country_code": "US",
+          "name": "90 ELLWOOD STREET",
+          "housenumber": "90",
+          "street": "ELLWOOD STREET",
+          "postalcode": "10040",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "New York County",
+          "county_gid": "whosonfirst:county:102081863",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Manhattan",
+          "borough_gid": "whosonfirst:borough:421205771",
+          "neighbourhood": "Inwood",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85826989",
+          "label": "90 ELLWOOD STREET, New York, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "1021720041",
+              "bin": "1064141",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.929153,
+            40.860927
+          ]
+        },
+        "properties": {
+          "id": "348106",
+          "gid": "nycpad:venue:348106",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "348106",
+          "country_code": "US",
+          "name": "74 ELLWOOD STREET",
+          "housenumber": "74",
+          "street": "ELLWOOD STREET",
+          "postalcode": "10040",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "New York County",
+          "county_gid": "whosonfirst:county:102081863",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Manhattan",
+          "borough_gid": "whosonfirst:borough:421205771",
+          "neighbourhood": "Inwood",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85826989",
+          "label": "74 ELLWOOD STREET, New York, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "1021720049",
+              "bin": "1064143",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.928846,
+            40.860401
+          ]
+        },
+        "properties": {
+          "id": "348119",
+          "gid": "nycpad:venue:348119",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "348119",
+          "country_code": "US",
+          "name": "50 ELLWOOD STREET",
+          "housenumber": "50",
+          "street": "ELLWOOD STREET",
+          "postalcode": "10040",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "New York County",
+          "county_gid": "whosonfirst:county:102081863",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Manhattan",
+          "borough_gid": "whosonfirst:borough:421205771",
+          "neighbourhood": "Inwood",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85826989",
+          "label": "50 ELLWOOD STREET, New York, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "1021720056",
+              "bin": "1064145",
               "version": "26a"
             }
           }
@@ -524,10 +520,10 @@
       }
     ],
     "bbox": [
-      -73.984856,
-      40.676375,
-      -73.746561,
-      40.838846
+      -73.929421,
+      40.858971,
+      -73.928133,
+      40.861432
     ]
   }
 }

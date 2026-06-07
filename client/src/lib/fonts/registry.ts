@@ -19,8 +19,11 @@ import {
   Space_Grotesk,
 } from "next/font/google";
 
-import { GeistPixelSquare } from "geist/font/pixel";
-
+// Only the fonts the page actually renders at first paint get preloaded:
+// Inter (the default body) and Space Grotesk (the heading face). The rest
+// are picker options — their @font-face rules ship, but the .woff2 only
+// downloads if the user selects them. Preloading all of them flooded the
+// console with unused-preload warnings and burned ~20 requests per load.
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
@@ -29,83 +32,99 @@ const inter = Inter({
 const notoSans = Noto_Sans({
   subsets: ["latin"],
   variable: "--font-noto-sans",
+  preload: false,
 });
 
 const roboto = Roboto({
   subsets: ["latin"],
   weight: ["400", "500", "700"],
   variable: "--font-roboto",
+  preload: false,
 });
 
 const geist = Geist({
   subsets: ["latin"],
   variable: "--font-geist",
+  preload: false,
 });
 
 const outfit = Outfit({
   subsets: ["latin"],
   variable: "--font-outfit",
+  preload: false,
 });
 
 const geistMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-geist-mono",
+  preload: false,
 });
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
   variable: "--font-dm-sans",
+  preload: false,
 });
 
 const nunitoSans = Nunito_Sans({
   subsets: ["latin"],
   variable: "--font-nunito-sans",
+  preload: false,
 });
 
 const figtree = Figtree({
   subsets: ["latin"],
   variable: "--font-figtree",
+  preload: false,
 });
 
 const raleway = Raleway({
   subsets: ["latin"],
   variable: "--font-raleway",
+  preload: false,
 });
 
 const publicSans = Public_Sans({
   subsets: ["latin"],
   variable: "--font-public-sans",
+  preload: false,
 });
 
 const jetBrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-jetbrains-mono",
+  preload: false,
 });
 
 const notoSerif = Noto_Serif({
   subsets: ["latin"],
   variable: "--font-noto-serif",
+  preload: false,
 });
 
 const robotoSlab = Roboto_Slab({
   subsets: ["latin"],
   variable: "--font-roboto-slab",
+  preload: false,
 });
 
 const merriweather = Merriweather({
   subsets: ["latin"],
   weight: ["400", "700"],
   variable: "--font-merriweather",
+  preload: false,
 });
 
 const lora = Lora({
   subsets: ["latin"],
   variable: "--font-lora",
+  preload: false,
 });
 
 const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-playfair-display",
+  preload: false,
 });
 
 // Display/heading font for the Fineprint brand (matches the homepage). Injected
@@ -160,10 +179,6 @@ export const fontRegistry = {
   geistMono: {
     label: "Geist Mono",
     font: geistMono,
-  },
-  geistPixelSquare: {
-    label: "Geist Pixel Square",
-    font: GeistPixelSquare,
   },
   jetBrainsMono: {
     label: "JetBrains Mono",
