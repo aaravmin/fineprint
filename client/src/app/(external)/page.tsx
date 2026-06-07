@@ -94,7 +94,7 @@ const LAWS = [
     statute: "LL152",
     obligation: "Gas piping inspection, 4-year cycle",
     computed: false,
-    stakes: "$10,000 for a missed filing",
+    stakes: "$5,000 for a missed filing",
   },
   {
     statute: "LL33 / LL95",
@@ -102,6 +102,18 @@ const LAWS = [
     computed: false,
     stakes: "Grade posted at your door",
   },
+];
+
+// Non-breaking spaces keep each exposure on a single line — TextRotate splits
+// on regular spaces and lets the resulting words reflow.
+const HERO_FINE_EXPOSURES = [
+  "LL97: ~$200M/yr",
+  "LL84: ~$56M/yr",
+  "LL87: ~$70M/yr",
+  "LL11: ~$192M/yr",
+  "LL88: ~$42M+/yr",
+  "LL152: ~$35M/yr",
+  "LL55: ~$24M/yr",
 ];
 
 const TICKET_CARDS = [
@@ -285,15 +297,32 @@ export default function Home() {
                 </p>
               </motion.div>
 
-              {/* Ledger rule — jurisdiction stamp + rate signature on one line */}
-              <motion.div variants={rise} className="mt-8 md:mt-12">
+              {/* Ledger rule — jurisdiction stamp + rotating statutory exposure. */}
+              <motion.div variants={rise} className="mt-8 w-full max-w-[52rem] md:mt-12">
                 <Separator />
-                <div className="mt-4 flex flex-col gap-2 text-muted-foreground md:flex-row md:items-baseline md:justify-between">
-                  <span className="text-xs tracking-wide md:text-sm">NEW YORK CITY, NY / 28,000 COVERED BUILDINGS</span>
-                  <span className="flex items-baseline gap-3">
-                    <span className="text-lg font-thin tracking-wide text-foreground md:text-2xl">FINE RATE</span>
-                    <span className="font-heading text-2xl font-bold italic text-destructive md:text-4xl">
-                      $268/ton
+                <div className="mt-4 grid gap-2 text-muted-foreground sm:grid-cols-[minmax(0,36rem)_minmax(0,1fr)] sm:items-baseline">
+                  <span className="text-xs tracking-wide md:text-sm md:whitespace-nowrap">
+                    NEW YORK CITY, NY / 28,000 COVERED BUILDINGS
+                  </span>
+                  <span className="flex flex-col gap-1 text-left sm:flex-row sm:items-baseline sm:gap-3 md:text-right">
+                    <span className="whitespace-nowrap text-lg font-thin tracking-wide text-foreground md:text-2xl">
+                      ANNUAL RISK
+                    </span>
+                    <span className="inline-grid font-heading text-2xl font-bold italic text-destructive tabular-nums md:text-3xl lg:text-4xl">
+                      {HERO_FINE_EXPOSURES.map((exposure) => (
+                        <span key={exposure} aria-hidden="true" className="invisible whitespace-nowrap [grid-area:1/1]">
+                          {exposure}
+                        </span>
+                      ))}
+                      <span className="[grid-area:1/1]">
+                        <TextRotate
+                          texts={HERO_FINE_EXPOSURES}
+                          mainClassName="inline-flex overflow-hidden whitespace-nowrap"
+                          staggerDuration={0.01}
+                          staggerFrom="first"
+                          rotationInterval={2600}
+                        />
+                      </span>
                     </span>
                   </span>
                 </div>
@@ -302,7 +331,7 @@ export default function Home() {
               {/* Address search — the primary CTA. */}
               <motion.form
                 variants={rise}
-                className="mt-8 w-full md:mt-10"
+                className="mt-8 w-full max-w-[52rem] md:mt-10"
                 onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
                   e.preventDefault();
                   search(address);
@@ -348,8 +377,8 @@ export default function Home() {
               className="mx-auto grid max-w-6xl grid-cols-2 divide-border px-5 md:grid-cols-4 md:divide-x"
             >
               {[
-                { n: "$268", s: "fine per ton of CO₂e over your cap", red: false },
-                { n: "2030", s: "the year limits tighten hard", red: true },
+                { n: "8", s: "NYC building laws tracked in one dashboard", red: false },
+                { n: "$595M+", s: "modeled annual fine exposure across tracked laws", red: true },
                 { n: "~28,000", s: "NYC buildings covered", red: false },
                 { n: "40+", s: "cities passed the same standard", red: false },
               ].map((s) => (
