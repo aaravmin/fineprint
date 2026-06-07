@@ -1,5 +1,5 @@
 import { schema, table, t } from "spacetimedb/server";
-import { reap } from "./reducers";
+import { reaperRef } from "./reaper-ref";
 
 // Statuses are plain strings, validated in reducers:
 // task:   open | claimed | in_review | approved | rejected | done
@@ -94,8 +94,9 @@ export const event = table(
 );
 
 // Scheduled table: drives the heartbeat reaper every ~5s (see reducers.reap).
+// The reducer arrives through reaperRef — see reaper-ref.ts for why.
 export const reaperTick = table(
-  { name: "reaper_tick", scheduled: (): any => reap },
+  { name: "reaper_tick", scheduled: (): any => reaperRef.reap },
   {
     id: t.u64().primaryKey().autoInc(),
     scheduledAt: t.scheduleAt(),

@@ -1,6 +1,7 @@
 import { ScheduleAt, Timestamp } from "spacetimedb";
 import { t } from "spacetimedb/server";
 import spacetimedb, { reaperTick } from "./schema";
+import { reaperRef } from "./reaper-ref";
 import { applicableLaws, LAWS } from "./laws";
 
 const HEARTBEAT_STALE_MS = 15_000; // 3 missed 5s heartbeats = dead
@@ -492,3 +493,6 @@ export const reap = spacetimedb.reducer({ arg: reaperTick.rowType }, (ctx, _args
     }
   }
 });
+
+// Hand the reducer to the schema's scheduled table (see reaper-ref.ts).
+reaperRef.reap = reap;
