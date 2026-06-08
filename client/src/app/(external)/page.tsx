@@ -331,7 +331,7 @@ export default function Home() {
                     <span className="whitespace-nowrap text-lg font-thin tracking-wide text-foreground md:text-2xl">
                       ANNUAL RISK
                     </span>
-                    <span className="inline-grid font-heading text-2xl font-bold italic text-destructive tabular-nums md:text-3xl lg:text-4xl">
+                    <span className="inline-grid font-heading text-2xl font-bold italic text-destructive tabular-nums [&_*]:whitespace-nowrap [&_.flex-wrap]:!flex-nowrap md:text-3xl lg:text-4xl">
                       {HERO_FINE_EXPOSURES.map(exposure => (
                         <span
                           key={exposure}

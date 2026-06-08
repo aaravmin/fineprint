@@ -101,20 +101,11 @@ function tailorMeasures(profile: InfrastructureProfile | null): {
       return false;
     }
 
-    if (measure.id === "heating_plant" && isAllElectric) {
+    if (measure.id === "full_electrification" && isAllElectric) {
       excluded.push({
         id: measure.id,
         name: measure.name,
-        reason: "building is all-electric — no combustion plant to upgrade",
-      });
-      return false;
-    }
-
-    if (measure.id === "heat_pumps" && isAllElectric) {
-      excluded.push({
-        id: measure.id,
-        name: measure.name,
-        reason: "building is already all-electric — partial electrification adds little",
+        reason: "building is already all-electric — there is no combustion heating to convert",
       });
       return false;
     }
@@ -150,7 +141,7 @@ function retrofitFindings(profile: InfrastructureProfile | null): string[] {
     findings.push(
       `${profile.boilerCount} boiler(s) on record${condition}.` +
         (profile.boilerCondition === "defects_on_record"
-          ? " A heating-plant burner and distribution upgrade is both a repair and the cheapest combustion-emissions cut."
+          ? " Failing combustion plant is the moment to weigh full electrification, which both retires the repair and is the deepest emissions cut."
           : ""),
     );
   }

@@ -21,7 +21,7 @@ import { reducers, tables } from "@/module_bindings/index";
 import type { Task } from "@/module_bindings/types";
 
 // Mirrors the canonical registry in spacetimedb/src/laws.ts — task lawId values.
-const LAW_REGISTRY = [
+export const LAW_REGISTRY = [
   { id: "ll97", short: "LL97", name: "Building Emissions Cap" },
   { id: "art321", short: "Art 321", name: "Affordable-Housing Emissions Pathway" },
   { id: "ll84", short: "LL84", name: "Energy & Water Benchmarking" },
@@ -34,7 +34,7 @@ const LAW_REGISTRY = [
 
 // Status reads as a dot + word, one fixed-width column, so every row lines
 // up no matter the state. Dot carries the color; text stays quiet.
-const STATUS_DOT: Record<string, string> = {
+export const STATUS_DOT: Record<string, string> = {
   open: "bg-muted-foreground/50",
   claimed: "bg-foreground/70",
   in_review: "bg-amber-500",
@@ -187,7 +187,13 @@ function DraftBody({ body }: { body: string }) {
   );
 }
 
-export function ComplianceSection({ buildingId }: { buildingId: bigint }) {
+export function ComplianceSection({
+  buildingId,
+  onlyLawId,
+}: {
+  buildingId: bigint;
+  onlyLawId?: string;
+}) {
   const [tasks] = useTable(tables.task);
   const [submissions] = useTable(tables.submission);
   const [workers] = useTable(tables.worker);
@@ -198,6 +204,9 @@ export function ComplianceSection({ buildingId }: { buildingId: bigint }) {
   const reduceMotion = useReducedMotion();
 
   const buildingTasks = tasks.filter(task => task.buildingId === buildingId);
+  const laws = onlyLawId
+    ? LAW_REGISTRY.filter(law => law.id === onlyLawId)
+    : LAW_REGISTRY;
 
   function review(task: Task, verdict: "approve" | "reject") {
     setPendingTaskId(task.id);
@@ -234,7 +243,7 @@ export function ComplianceSection({ buildingId }: { buildingId: bigint }) {
       </CardHeader>
       <CardContent className="p-0">
         <Accordion type="multiple" className="w-full">
-          {LAW_REGISTRY.map((law, index) => {
+          {laws.map((law, index) => {
             const lawTask = buildingTasks.find(task => task.lawId === law.id);
             const latestSubmission = lawTask
               ? [...submissions]

@@ -1,6 +1,6 @@
 {
   "key": "https://geosearch.planninglabs.nyc/v2/search?text=345%20Park%20Avenue%2C%20Manhattan",
-  "recordedAt": "2026-06-07T09:28:14.636Z",
+  "recordedAt": "2026-06-08T15:31:18.562Z",
   "value": {
     "geocoding": {
       "version": "0.2",
@@ -34,7 +34,7 @@
         "author": "Mapzen",
         "version": "1.0"
       },
-      "timestamp": 1780824494624
+      "timestamp": 1780932678848
     },
     "type": "FeatureCollection",
     "features": [

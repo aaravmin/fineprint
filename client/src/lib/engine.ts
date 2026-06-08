@@ -1,17 +1,20 @@
 import {
   computeAllPeriods,
   DEFAULT_MEASURES,
+  fullCostFor,
   optimizeRetrofit,
   planForBudget,
+  planFromFunding,
   type BuildingInput,
   type FineResult,
+  type FundedPlan,
   type RetrofitAssessment,
   type RetrofitPlan,
 } from "fineprint-engine";
 import type { Building } from "@/module_bindings/types";
 
 export { DEFAULT_MEASURES };
-export type { FineResult, RetrofitAssessment, RetrofitPlan };
+export type { FineResult, FundedPlan, RetrofitAssessment, RetrofitPlan };
 
 export function toBuildingInput(building: Building): BuildingInput | null {
   if (building.annualEmissionsTco2E === undefined || building.usesJson === undefined) {
@@ -71,6 +74,30 @@ export function maxRetrofitCapex(building: Building): number {
   return DEFAULT_MEASURES.reduce(
     (sum, measure) => sum + measure.capexUsdPerSqft * building.sqft,
     0,
+  );
+}
+
+// The compliance path a per-measure funding split buys, recomputed live as the
+// owner moves each measure's dollars. Same pure engine the rest of the page
+// uses, run in the browser off the live building row.
+export function computeFundedPlan(
+  building: Building,
+  fundingByMeasureId: Record<string, number>,
+): FundedPlan | null {
+  const input = toBuildingInput(building);
+  if (!input) return null;
+  try {
+    return planFromFunding(input, fundingByMeasureId);
+  } catch {
+    return null;
+  }
+}
+
+// The full implementation cost of every measure for this building, keyed by
+// measure id — the upper bound on each per-measure slider.
+export function measureFullCosts(building: Building): Record<string, number> {
+  return Object.fromEntries(
+    DEFAULT_MEASURES.map(measure => [measure.id, fullCostFor(measure, building.sqft)]),
   );
 }
 

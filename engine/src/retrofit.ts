@@ -24,6 +24,12 @@ export interface RetrofitMeasure {
   satisfiesLaws?: string[];
 }
 
+// Reduction fractions multiply, so the catalog's deepest reachable cut is
+// 1 - Π(1 - fraction). With full electrification carrying the bulk of the
+// abatement, funding the whole catalog lands around an 82% cut — enough for a
+// typical over-cap building to clear even the 2035 limit, which the old catalog
+// (max ~47%) could never do. Capex and savings are typical-building editorial
+// assumptions, never quotes; each measure names its basis.
 export const DEFAULT_MEASURES: RetrofitMeasure[] = [
   {
     id: "hvac_controls",
@@ -44,37 +50,37 @@ export const DEFAULT_MEASURES: RetrofitMeasure[] = [
   {
     id: "air_sealing",
     name: "Envelope air sealing and insulation",
-    capexUsdPerSqft: 3.0,
-    emissionsReductionFraction: 0.05,
-    basis: "Urban Green Council retrofit guidance",
-  },
-  {
-    id: "heating_plant",
-    name: "Heating plant burner and distribution upgrade",
     capexUsdPerSqft: 4.0,
     emissionsReductionFraction: 0.1,
-    basis: "NYC Accelerator case studies",
+    basis: "Urban Green Council retrofit guidance",
   },
   {
     id: "solar_pv",
     name: "Rooftop solar PV",
     capexUsdPerSqft: 5.0,
-    emissionsReductionFraction: 0.03,
+    emissionsReductionFraction: 0.05,
     basis: "NYSERDA NY-Sun cost data",
   },
   {
-    id: "heat_pumps",
-    name: "Partial heat pump electrification",
-    capexUsdPerSqft: 12.0,
-    emissionsReductionFraction: 0.2,
+    id: "heat_pump_cooling",
+    name: "Heat-pump cooling and VRF distribution",
+    capexUsdPerSqft: 9.0,
+    emissionsReductionFraction: 0.12,
     basis: "NYC Accelerator electrification studies",
   },
   {
     id: "windows",
     name: "High-performance window replacement",
     capexUsdPerSqft: 15.0,
-    emissionsReductionFraction: 0.07,
+    emissionsReductionFraction: 0.1,
     basis: "Urban Green Council deep retrofit data",
+  },
+  {
+    id: "full_electrification",
+    name: "Full electrification (all-electric heating and hot water)",
+    capexUsdPerSqft: 24.0,
+    emissionsReductionFraction: 0.7,
+    basis: "NYC Accelerator deep-electrification case studies on a decarbonizing grid",
   },
 ];
 
@@ -215,6 +221,98 @@ export function planForBudget(
   }
 
   return best!;
+}
+
+// The full cost of implementing a measure across the whole building.
+export function fullCostFor(measure: RetrofitMeasure, grossFloorAreaSqft: number): number {
+  return round2(measure.capexUsdPerSqft * grossFloorAreaSqft);
+}
+
+export interface FundedMeasure {
+  id: string;
+  name: string;
+  basis: string;
+  satisfiesLaws?: string[];
+  fullCostUsd: number;
+  fundedUsd: number;
+  fundedFraction: number; // 0..1, the share of the measure paid for
+  emissionsCutTco2e: number; // standalone annual cut from this measure's funded share
+}
+
+export interface FundedPlan {
+  measures: FundedMeasure[];
+  capexUsd: number;
+  baselineEmissionsTco2e: number;
+  projectedEmissionsTco2e: number;
+  horizonFinesUsd: number;
+  proceduralCreditUsd: number;
+  results: FineResult[];
+}
+
+// What a per-measure funding split actually buys. Unlike the optimizer, the
+// owner here decides how much to put into each measure; a partially funded
+// measure delivers that fraction of its emissions cut (e.g. half the heat-pump
+// budget, half its reduction). Reductions still compound multiplicatively, so
+// the projected emissions use the product of the funded fractions, while each
+// measure also reports the standalone cut its own dollars bought.
+export function planFromFunding(
+  building: BuildingInput,
+  fundingByMeasureId: Record<string, number>,
+  measures: RetrofitMeasure[] = DEFAULT_MEASURES,
+  options: OptimizeOptions = {},
+): FundedPlan {
+  const baseline = building.annualEmissionsTco2e;
+
+  const detailed = measures.map(measure => {
+    const fullCostUsd = fullCostFor(measure, building.grossFloorAreaSqft);
+    const fundedUsd = clamp(fundingByMeasureId[measure.id] ?? 0, 0, fullCostUsd);
+    const fundedFraction = fullCostUsd > 0 ? fundedUsd / fullCostUsd : 0;
+    const appliedReduction = measure.emissionsReductionFraction * fundedFraction;
+
+    return { measure, fullCostUsd, fundedUsd, fundedFraction, appliedReduction };
+  });
+
+  const remainingFraction = detailed.reduce(
+    (fraction, line) => fraction * (1 - line.appliedReduction),
+    1,
+  );
+  const projectedEmissionsTco2e = round2(baseline * remainingFraction);
+  const capexUsd = round2(detailed.reduce((sum, line) => sum + line.fundedUsd, 0));
+
+  const adjusted = { ...building, annualEmissionsTco2e: projectedEmissionsTco2e };
+  const results = (Object.keys(PERIOD_YEARS) as Period[]).map(period =>
+    computeFine(adjusted, period),
+  );
+  const horizonFinesUsd = round2(
+    results.reduce((sum, result) => sum + result.annualFineUsd * PERIOD_YEARS[result.period], 0),
+  );
+
+  // A filing obligation is only retired once the measure that covers it is
+  // fully funded — a half-paid lighting job hasn't satisfied LL88.
+  const fullyFunded = detailed
+    .filter(line => line.fullCostUsd > 0 && line.fundedUsd >= line.fullCostUsd)
+    .map(line => line.measure);
+
+  const measureBreakdown: FundedMeasure[] = detailed.map(line => ({
+    id: line.measure.id,
+    name: line.measure.name,
+    basis: line.measure.basis,
+    satisfiesLaws: line.measure.satisfiesLaws,
+    fullCostUsd: round2(line.fullCostUsd),
+    fundedUsd: round2(line.fundedUsd),
+    fundedFraction: line.fundedFraction,
+    emissionsCutTco2e: round2(baseline * line.appliedReduction),
+  }));
+
+  return {
+    measures: measureBreakdown,
+    capexUsd,
+    baselineEmissionsTco2e: baseline,
+    projectedEmissionsTco2e,
+    horizonFinesUsd,
+    proceduralCreditUsd: proceduralCredit(fullyFunded, options),
+    results,
+  };
 }
 
 function evaluatePlan(
@@ -407,4 +505,8 @@ function maccCurve(building: BuildingInput, measures: RetrofitMeasure[]): MaccPo
 
 function round2(value: number): number {
   return Math.round(value * 100) / 100;
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(Math.max(value, min), max);
 }

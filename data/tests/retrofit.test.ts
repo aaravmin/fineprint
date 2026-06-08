@@ -60,7 +60,7 @@ describe("planRetrofit", () => {
     expect(plan!.assessment.macc.map(point => point.measureId)).not.toContain("solar_pv");
   });
 
-  test("an all-electric building drops both combustion measures", () => {
+  test("an all-electric building drops the electrification measure", () => {
     const allElectric: BuildingFacts = {
       ...gasOffice,
       infrastructureProfile: {
@@ -75,9 +75,8 @@ describe("planRetrofit", () => {
     const plan = planRetrofit(allElectric);
     const excludedIds = plan!.excluded.map(measure => measure.id);
 
-    expect(excludedIds).toContain("heating_plant");
-    expect(excludedIds).toContain("heat_pumps");
-    expect(plan!.assessment.evaluatedSubsets).toBe(32); // 5 measures left
+    expect(excludedIds).toContain("full_electrification");
+    expect(plan!.assessment.evaluatedSubsets).toBe(64); // 6 measures left
   });
 
   test("no infrastructure profile means no tailoring — the full catalog runs", () => {
