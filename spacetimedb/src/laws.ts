@@ -36,7 +36,9 @@ export const LAWS: Law[] = [
     kind: "benchmarking_filing",
     deadlineDays: 45,
     appliesTo: sqft => sqft >= 25_000,
-    fineEstimateUsd: () => 2_500, // quarterly $500 violations, annualized stub
+    // $500 per quarter not benchmarked, capped at $2,000/yr — a flat statutory
+    // penalty that does not scale with building size.
+    fineEstimateUsd: () => 2_000,
   },
   {
     id: "ll87",
@@ -44,7 +46,10 @@ export const LAWS: Law[] = [
     kind: "audit_filing",
     deadlineDays: 240,
     appliesTo: sqft => sqft >= 50_000,
-    fineEstimateUsd: () => 3_000,
+    // Audit and retro-commissioning scope scales with the systems audited, i.e.
+    // floor area. Rate is anchored so a building at the 50k applicability
+    // threshold sees ~$3,000 and exposure grows from there.
+    fineEstimateUsd: sqft => Math.max(3_000, Math.round(sqft * 0.06)),
   },
   {
     id: "ll11",
@@ -53,7 +58,10 @@ export const LAWS: Law[] = [
     deadlineDays: 90,
     // Stories not tracked yet; sqft is a stand-in for "over six stories" (P1: real DOB data).
     appliesTo: sqft => sqft >= 60_000,
-    fineEstimateUsd: () => 5_000, // failure-to-file civil penalties, annualized stub
+    // Facade inspection scope and unsafe-condition penalty risk grow with the
+    // building's envelope; sqft is the available proxy. Rate is anchored so a
+    // building at the 60k applicability threshold sees ~$5,000 and grows up.
+    fineEstimateUsd: sqft => Math.max(5_000, Math.round(sqft * 0.083)),
   },
   {
     id: "ll88",
@@ -61,7 +69,10 @@ export const LAWS: Law[] = [
     kind: "lighting_submetering_plan",
     deadlineDays: 300,
     appliesTo: sqft => sqft >= 25_000,
-    fineEstimateUsd: () => 1_500,
+    // Lighting upgrade and tenant-submetering scope scale with floor area. Rate
+    // is anchored so a building at the 25k applicability threshold sees ~$1,500
+    // and exposure grows from there.
+    fineEstimateUsd: sqft => Math.max(1_500, Math.round(sqft * 0.06)),
   },
   {
     id: "ll152",
@@ -71,7 +82,9 @@ export const LAWS: Law[] = [
     // Gas service assumed present until DOB data lands (1-2 family homes are
     // exempt, but they never reach our intake in the first place).
     appliesTo: () => true,
-    fineEstimateUsd: () => 10_000, // failure-to-certify civil penalty
+    // $10,000 failure-to-certify civil penalty — flat per statute, the same for
+    // every building.
+    fineEstimateUsd: () => 10_000,
   },
   {
     id: "ll55",
