@@ -21,4 +21,8 @@ export default {
   provenanceJson: __t.string(),
   ll97AnnualFineUsd: __t.option(__t.u32()),
   compliancePlanJson: __t.option(__t.string()),
+  numFloors: __t.option(__t.u32()),
+  unitsResidential: __t.option(__t.u32()),
+  communityDistrict: __t.option(__t.u32()),
+  energyStarScore: __t.option(__t.u32()),
 };

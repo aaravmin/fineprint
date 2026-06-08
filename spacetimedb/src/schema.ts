@@ -21,6 +21,13 @@ export const building = table(
     usesJson: t.option(t.string()),
     ll97Covered: t.option(t.bool()),
     provenanceJson: t.option(t.string()),
+    // Real building characteristics from PLUTO and LL84, used by the law
+    // registry to decide applicability and statutory cycle dates instead of
+    // guessing from floor area. Absent until intake resolves them.
+    numFloors: t.option(t.u32()),
+    unitsResidential: t.option(t.u32()),
+    communityDistrict: t.option(t.u32()),
+    energyStarScore: t.option(t.u32()),
     // The whole-building compliance plan (data layer's buildCompliancePlan),
     // serialized at intake time — the module can't import the data layer, so
     // the plan rides in like the engine's fine figure does.

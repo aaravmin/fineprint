@@ -28,8 +28,10 @@ export const LAW_REGISTRY = [
   { id: "ll87", short: "LL87", name: "Energy Audit & Retro-commissioning" },
   { id: "ll11", short: "LL11", name: "Facade Inspection (FISP)" },
   { id: "ll88", short: "LL88", name: "Lighting Upgrades & Submetering" },
+  { id: "ll33", short: "LL33", name: "Building Energy Grade" },
   { id: "ll152", short: "LL152", name: "Gas Piping Inspection & Certification" },
   { id: "ll55", short: "LL55", name: "Indoor Allergen Hazards" },
+  { id: "ll96", short: "LL96", name: "PACE Clean Energy Financing" },
 ];
 
 // Status reads as a dot + word, one fixed-width column, so every row lines
@@ -204,9 +206,12 @@ export function ComplianceSection({
   const reduceMotion = useReducedMotion();
 
   const buildingTasks = tasks.filter(task => task.buildingId === buildingId);
-  const laws = onlyLawId
-    ? LAW_REGISTRY.filter(law => law.id === onlyLawId)
-    : LAW_REGISTRY;
+  // LL96 (PACE financing) is an opportunity, not an obligation — it spawns no
+  // task, so it never belongs in the obligation ledger where a missing task
+  // reads as non-compliance. Its own tab surfaces it on its own terms.
+  const laws = (onlyLawId ? LAW_REGISTRY.filter(law => law.id === onlyLawId) : LAW_REGISTRY).filter(
+    law => law.id !== "ll96",
+  );
 
   function review(task: Task, verdict: "approve" | "reject") {
     setPendingTaskId(task.id);

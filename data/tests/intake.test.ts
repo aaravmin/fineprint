@@ -69,6 +69,7 @@ describe("prepareIntake", () => {
       "ll84",
       "ll87",
       "ll88",
+      "ll33",
       "ll11",
       "ll152",
     ]);
@@ -109,7 +110,7 @@ describe("prepareIntake", () => {
 
     expect(intake.summary).toMatch(/1008350041/);
     expect(intake.summary).toMatch(/2,852,257/);
-    expect(intake.summary).toMatch(/ll97, ll84, ll87, ll88, ll11, ll152/);
+    expect(intake.summary).toMatch(/ll97, ll84, ll87, ll88, ll33, ll11, ll152/);
     expect(intake.summary).toMatch(/NYC GeoSearch/);
   });
 
@@ -192,7 +193,7 @@ describe("prepareIntake coverage", () => {
 
   test("the 25k threshold is inclusive for the floor-area laws", async () => {
     expect(await coverageFor(buildingOf(25_000))).toEqual(
-      new Set(["ll84", "ll88", "ll152"]),
+      new Set(["ll84", "ll88", "ll33", "ll152"]),
     );
     // One square foot short stays LL152-only — the boundary is exact.
     expect(await coverageFor(buildingOf(24_999))).toEqual(new Set(["ll152"]));
@@ -200,7 +201,7 @@ describe("prepareIntake coverage", () => {
 
   test("crossing 50k adds the LL87 audit obligation", async () => {
     expect(await coverageFor(buildingOf(50_000))).toEqual(
-      new Set(["ll84", "ll87", "ll88", "ll152"]),
+      new Set(["ll84", "ll87", "ll88", "ll33", "ll152"]),
     );
   });
 
@@ -239,7 +240,7 @@ describe("prepareIntake coverage", () => {
 
     expect(coverage.has("ll97")).toBe(false);
     // The size- and height-based obligations still apply regardless of LL97.
-    expect(coverage).toEqual(new Set(["ll84", "ll87", "ll88", "ll11", "ll152"]));
+    expect(coverage).toEqual(new Set(["ll84", "ll87", "ll88", "ll33", "ll11", "ll152"]));
   });
 
   test("an affordable residential building maps to art321 and the allergen law", async () => {

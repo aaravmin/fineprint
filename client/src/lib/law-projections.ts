@@ -88,6 +88,36 @@ export const LAW_PROJECTIONS: Record<string, LawProjection> = {
       "File the certification of compliance with DOB.",
     ],
   },
+  ll33: {
+    cadence: "Annual — post the energy efficiency label (A-F) near every public entrance",
+    basis:
+      "LL33 of 2018 (amended by LL95) / Admin Code 28-309.12.2 — $1,250 for failure to post the grade",
+    accrual: [
+      { label: "Label not posted", cumulativeUsd: 1_250 },
+      { label: "+ continued non-posting", cumulativeUsd: 2_500 },
+    ],
+    steps: [
+      "Confirm the building's ENERGY STAR score from the LL84 benchmarking submission.",
+      'Generate the DOB energy efficiency label (letter grade A-F and numeric score) at 8.5" x 11".',
+      "Post it within 30 days of issuance near every public entrance, and refresh it each year.",
+    ],
+  },
+  ll96: {
+    cadence: "Optional financing — no deadline",
+    basis:
+      "LL96 of 2019 — Property Assessed Clean Energy (PACE) financing for energy and water improvements",
+    accrual: [],
+    variableNote:
+      "PACE is a financing pathway, not a penalty: it funds the energy retrofits LL97 and LL87 " +
+      "call for with no upfront capital, repaid as a charge on the property tax bill over 20-30 " +
+      "years (and the balance transfers with the building on sale). There is no deadline and no " +
+      "fine — it is an option for closing the LL97 gap, surfaced here so it is not overlooked.",
+    steps: [
+      "Confirm the planned work is PACE-eligible (energy efficiency, renewables, or resiliency).",
+      "Engage an approved PACE lender through the NYC Accelerator / NYCEEC program.",
+      "Finance the LL97 / LL87 retrofit through PACE and repay via the property tax assessment.",
+    ],
+  },
   ll152: {
     cadence: "4-year cycle by community district",
     basis: "Admin Code 28-318.3 — $10,000 civil penalty for failure to certify",

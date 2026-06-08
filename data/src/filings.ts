@@ -122,6 +122,30 @@ export function ll88FilingStatus(_facts: BuildingFacts, asOf: Date): FilingStatu
   };
 }
 
+// LL33 — the building energy efficiency grade (A-F) derived from the LL84
+// ENERGY STAR score, posted near every public entrance. Posting is an annual
+// duty tied to the benchmarking cycle; no dataset confirms the physical label
+// is up, so onRecord stays null.
+export function ll33FilingStatus(_facts: BuildingFacts, asOf: Date): FilingStatus {
+  const dueDate = nextAnnualDeadline(asOf, 10, 31);
+
+  return {
+    lawId: "ll33",
+    title: "Post the building energy efficiency grade",
+    dueDate: toIso(dueDate),
+    cycle: "Annual — display the A-F energy label within 30 days of issuance",
+    onRecord: null,
+    status: "due",
+    action:
+      "Post the current energy efficiency label (letter grade and ENERGY STAR score) " +
+      "near every public entrance; the grade is set by the LL84 benchmarking score.",
+    basis:
+      "LL33 of 2018 (amended by LL95) / Admin Code 28-309.12.2; grade thresholds " +
+      "A 85+, B 70-84, C 55-69, D 20-54, F under 20, N when not score-eligible. " +
+      "No dataset confirms the label is posted",
+  };
+}
+
 // FISP sub-cycles, set by the last digit of the tax block (1 RCNY 103-04).
 // Cycle 10 filing windows, per the DOB facade cycle service notice:
 //   A (blocks ending 4,5,6,9): Feb 21 2025 - Feb 21 2027

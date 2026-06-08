@@ -32,7 +32,17 @@ import { FineTimeline } from "./fine-timeline";
 import { InvestmentPlanner } from "./investment-planner";
 import { LawPanel } from "./law-panel";
 
-type LawScope = "all" | "ll97" | "ll84" | "ll87" | "ll11" | "ll88" | "ll152" | "ll55";
+type LawScope =
+  | "all"
+  | "ll97"
+  | "ll84"
+  | "ll87"
+  | "ll11"
+  | "ll88"
+  | "ll33"
+  | "ll152"
+  | "ll55"
+  | "ll96";
 
 // Article 321 rides inside the LL97 tab (same emissions pathway), so it gets no
 // pill of its own here. Every other registry law is a focused tab.
@@ -43,11 +53,22 @@ const LAW_TABS: { id: LawScope; label: string }[] = [
   { id: "ll87", label: "LL87" },
   { id: "ll11", label: "LL11" },
   { id: "ll88", label: "LL88" },
+  { id: "ll33", label: "LL33" },
   { id: "ll152", label: "LL152" },
   { id: "ll55", label: "LL55" },
+  { id: "ll96", label: "LL96" },
 ];
 
-const TRACKED_SCOPES = new Set<LawScope>(["ll84", "ll87", "ll11", "ll88", "ll152", "ll55"]);
+const TRACKED_SCOPES = new Set<LawScope>([
+  "ll84",
+  "ll87",
+  "ll11",
+  "ll88",
+  "ll33",
+  "ll152",
+  "ll55",
+  "ll96",
+]);
 
 // The whole building compliance view, behind a law toggle, reused by both the
 // single-building page and the Buildings selector. Funding state lives here so
@@ -75,7 +96,9 @@ export function ComplianceDashboard({ building }: { building: Building }) {
   );
 
   const buildingTasks = tasks.filter(task => task.buildingId === building.id);
-  const lawRows: LawExposureRow[] = LAW_REGISTRY.filter(law => law.id !== "art321").map(
+  const lawRows: LawExposureRow[] = LAW_REGISTRY.filter(
+    law => law.id !== "art321" && law.id !== "ll96",
+  ).map(
     law => {
       const task = buildingTasks.find(candidate => candidate.lawId === law.id);
       return {
@@ -186,7 +209,9 @@ export function ComplianceDashboard({ building }: { building: Building }) {
               {law && projection && (
                 <LawPanel lawName={law.name} projection={projection} task={task} />
               )}
-              <ComplianceSection buildingId={building.id} onlyLawId={scope} />
+              {scope !== "ll96" && (
+                <ComplianceSection buildingId={building.id} onlyLawId={scope} />
+              )}
             </>
           );
         })()}

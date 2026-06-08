@@ -30,6 +30,10 @@ export const Building = __t.object("Building", {
   usesJson: __t.option(__t.string()),
   ll97Covered: __t.option(__t.bool()),
   provenanceJson: __t.option(__t.string()),
+  numFloors: __t.option(__t.u32()),
+  unitsResidential: __t.option(__t.u32()),
+  communityDistrict: __t.option(__t.u32()),
+  energyStarScore: __t.option(__t.u32()),
   compliancePlanJson: __t.option(__t.string()),
   createdAt: __t.timestamp(),
 });
