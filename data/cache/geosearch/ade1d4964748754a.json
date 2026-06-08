@@ -1,0 +1,529 @@
+{
+  "key": "https://geosearch.planninglabs.nyc/v2/search?text=55%20BROADWAY%2C%20New%20York",
+  "recordedAt": "2026-06-08T17:25:03.439Z",
+  "value": {
+    "geocoding": {
+      "version": "0.2",
+      "attribution": "http://geosearch.planninglabs.nyc/attribution",
+      "query": {
+        "text": "55 BROADWAY, New York",
+        "size": 10,
+        "private": false,
+        "lang": {
+          "name": "English",
+          "iso6391": "en",
+          "iso6393": "eng",
+          "via": "default",
+          "defaulted": true
+        },
+        "querySize": 20,
+        "parser": "pelias",
+        "parsed_text": {
+          "subject": "55 BROADWAY",
+          "housenumber": "55",
+          "street": "BROADWAY",
+          "locality": "New York",
+          "admin": "New York"
+        }
+      },
+      "warnings": [
+        "invalid language provided via header"
+      ],
+      "engine": {
+        "name": "Pelias",
+        "author": "Mapzen",
+        "version": "1.0"
+      },
+      "timestamp": 1780939503278
+    },
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.013095,
+            40.706872
+          ]
+        },
+        "properties": {
+          "id": "2690",
+          "gid": "nycpad:venue:2690",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "2690",
+          "country_code": "US",
+          "name": "55 B'WAY",
+          "housenumber": "55",
+          "street": "B'WAY",
+          "postalcode": "10006",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "New York County",
+          "county_gid": "whosonfirst:county:102081863",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Manhattan",
+          "borough_gid": "whosonfirst:borough:421205771",
+          "neighbourhood": "Financial District",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85865711",
+          "label": "55 B'WAY, New York, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "1000200016",
+              "bin": "1000807",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.013095,
+            40.706872
+          ]
+        },
+        "properties": {
+          "id": "2691",
+          "gid": "nycpad:venue:2691",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "2691",
+          "country_code": "US",
+          "name": "55 BROADWAY",
+          "housenumber": "55",
+          "street": "BROADWAY",
+          "postalcode": "10006",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "New York County",
+          "county_gid": "whosonfirst:county:102081863",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Manhattan",
+          "borough_gid": "whosonfirst:borough:421205771",
+          "neighbourhood": "Financial District",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85865711",
+          "label": "55 BROADWAY, New York, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "1000200016",
+              "bin": "1000807",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.877075,
+            40.737186
+          ]
+        },
+        "properties": {
+          "id": "2055410",
+          "gid": "nycpad:venue:2055410",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "2055410",
+          "country_code": "US",
+          "name": "86-55 B'WAY",
+          "housenumber": "86-55",
+          "street": "B'WAY",
+          "postalcode": "11373",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Queens County",
+          "county_gid": "whosonfirst:county:102082377",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Queens",
+          "borough_gid": "whosonfirst:borough:421205767",
+          "neighbourhood": "Elmhurst",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85817879",
+          "label": "86-55 B'WAY, Elmhurst, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "4018427502",
+              "bin": "4045397",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.88105,
+            40.742149
+          ]
+        },
+        "properties": {
+          "id": "2012572",
+          "gid": "nycpad:venue:2012572",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "2012572",
+          "country_code": "US",
+          "name": "82-55 B'WAY",
+          "housenumber": "82-55",
+          "street": "B'WAY",
+          "postalcode": "11373",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Queens County",
+          "county_gid": "whosonfirst:county:102082377",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Queens",
+          "borough_gid": "whosonfirst:borough:421205767",
+          "neighbourhood": "Elmhurst",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85817879",
+          "label": "82-55 B'WAY, Elmhurst, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "4015180088",
+              "bin": "4037524",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.928493,
+            40.763759
+          ]
+        },
+        "properties": {
+          "id": "1840293",
+          "gid": "nycpad:venue:1840293",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "1840293",
+          "country_code": "US",
+          "name": "23-55 BROADWAY",
+          "housenumber": "23-55",
+          "street": "BROADWAY",
+          "postalcode": "11106",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Queens County",
+          "county_gid": "whosonfirst:county:102082377",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Queens",
+          "borough_gid": "whosonfirst:borough:421205767",
+          "neighbourhood": "Astoria",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85803821",
+          "label": "23-55 BROADWAY, Astoria, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "4005670001",
+              "bin": "4006566",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.88105,
+            40.742149
+          ]
+        },
+        "properties": {
+          "id": "2012573",
+          "gid": "nycpad:venue:2012573",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "2012573",
+          "country_code": "US",
+          "name": "82-55 BROADWAY",
+          "housenumber": "82-55",
+          "street": "BROADWAY",
+          "postalcode": "11373",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Queens County",
+          "county_gid": "whosonfirst:county:102082377",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Queens",
+          "borough_gid": "whosonfirst:borough:421205767",
+          "neighbourhood": "Elmhurst",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85817879",
+          "label": "82-55 BROADWAY, Elmhurst, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "4015180088",
+              "bin": "4037524",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.877075,
+            40.737186
+          ]
+        },
+        "properties": {
+          "id": "2055411",
+          "gid": "nycpad:venue:2055411",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "2055411",
+          "country_code": "US",
+          "name": "86-55 BROADWAY",
+          "housenumber": "86-55",
+          "street": "BROADWAY",
+          "postalcode": "11373",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Queens County",
+          "county_gid": "whosonfirst:county:102082377",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Queens",
+          "borough_gid": "whosonfirst:borough:421205767",
+          "neighbourhood": "Elmhurst",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85817879",
+          "label": "86-55 BROADWAY, Elmhurst, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "4018427502",
+              "bin": "4045397",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.931801,
+            40.76555
+          ]
+        },
+        "properties": {
+          "id": "1836474",
+          "gid": "nycpad:venue:1836474",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "1836474",
+          "country_code": "US",
+          "name": "14-55 B'WAY",
+          "housenumber": "14-55",
+          "street": "B'WAY",
+          "postalcode": "11106",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Queens County",
+          "county_gid": "whosonfirst:county:102082377",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Queens",
+          "borough_gid": "whosonfirst:borough:421205767",
+          "neighbourhood": "Astoria",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85803821",
+          "label": "14-55 B'WAY, Astoria, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "4005310002",
+              "bin": "4005793",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.931801,
+            40.76555
+          ]
+        },
+        "properties": {
+          "id": "1836475",
+          "gid": "nycpad:venue:1836475",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "1836475",
+          "country_code": "US",
+          "name": "14-55 BROADWAY",
+          "housenumber": "14-55",
+          "street": "BROADWAY",
+          "postalcode": "11106",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Queens County",
+          "county_gid": "whosonfirst:county:102082377",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Queens",
+          "borough_gid": "whosonfirst:borough:421205767",
+          "neighbourhood": "Astoria",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85803821",
+          "label": "14-55 BROADWAY, Astoria, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "4005310002",
+              "bin": "4005793",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.928493,
+            40.763759
+          ]
+        },
+        "properties": {
+          "id": "1840292",
+          "gid": "nycpad:venue:1840292",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "1840292",
+          "country_code": "US",
+          "name": "23-55 B'WAY",
+          "housenumber": "23-55",
+          "street": "B'WAY",
+          "postalcode": "11106",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Queens County",
+          "county_gid": "whosonfirst:county:102082377",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Queens",
+          "borough_gid": "whosonfirst:borough:421205767",
+          "neighbourhood": "Astoria",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85803821",
+          "label": "23-55 B'WAY, Astoria, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "4005670001",
+              "bin": "4006566",
+              "version": "26a"
+            }
+          }
+        }
+      }
+    ],
+    "bbox": [
+      -74.013095,
+      40.706872,
+      -73.877075,
+      40.76555
+    ]
+  }
+}

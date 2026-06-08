@@ -157,6 +157,7 @@ export function ComplianceDashboard({ building }: { building: Building }) {
             <PlainEnglishCard periods={periods} address={building.address} />
 
             <InvestmentPlanner
+              building={building}
               plan={fundedPlan}
               assessment={assessment}
               funding={funding}

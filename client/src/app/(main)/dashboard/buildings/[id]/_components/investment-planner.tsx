@@ -1,13 +1,21 @@
 "use client";
 
-import { Banknote, Leaf, RotateCcw, TrendingDown, Wand2 } from "lucide-react";
+import { useState } from "react";
 
-import { Badge } from "@/components/ui/badge";
+import { Banknote, Leaf, RotateCcw, Sparkles, TrendingDown, Wand2 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
-import { fmtTco2e, fmtUsd, type FundedPlan, type RetrofitAssessment } from "@/lib/engine";
+import {
+  computeBudgetPlan,
+  fmtTco2e,
+  fmtUsd,
+  type FundedPlan,
+  type RetrofitAssessment,
+} from "@/lib/engine";
+import type { Building } from "@/module_bindings/types";
 
 // Owners fund in whole $500 steps — anything finer is noise on a retrofit quote.
 const STEP = 500;
@@ -22,16 +30,21 @@ function snap(value: number, max: number): number {
 // page recomputes the whole LL97 path against the funding split, live. Funding
 // state is owned by the parent so the same numbers drive the chart and export.
 export function InvestmentPlanner({
+  building,
   plan,
   assessment,
   funding,
   onFundingChange,
 }: {
+  building: Building;
   plan: FundedPlan;
   assessment: RetrofitAssessment;
   funding: Record<string, number>;
   onFundingChange: (next: Record<string, number>) => void;
 }) {
+  const [budgetInput, setBudgetInput] = useState(() =>
+    snap(assessment.best.capexUsd, Number.MAX_SAFE_INTEGER),
+  );
   const doNothingFines = assessment.doNothing.horizonFinesUsd;
   const finesAvoided = Math.max(0, doNothingFines - plan.horizonFinesUsd);
   const emissionsCut = Math.max(
@@ -71,6 +84,23 @@ export function InvestmentPlanner({
     onFundingChange(next);
   };
 
+  // "I can spend $X — what's the best use of it?" The engine finds the measure
+  // set within budget that leaves the lowest fines through 2039; we fully fund
+  // exactly those measures.
+  const optimizeForBudget = () => {
+    const budgetPlan = computeBudgetPlan(building, snap(budgetInput, Number.MAX_SAFE_INTEGER));
+    if (!budgetPlan) {
+      return;
+    }
+
+    const picks = new Set(budgetPlan.measureIds);
+    const next: Record<string, number> = {};
+    for (const measure of plan.measures) {
+      next[measure.id] = picks.has(measure.id) ? measure.fullCostUsd : 0;
+    }
+    onFundingChange(next);
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -92,6 +122,34 @@ export function InvestmentPlanner({
           <Button type="button" variant="outline" size="sm" onClick={fundAll}>
             Fund all ({fmtUsd(plan.measures.reduce((sum, m) => sum + m.fullCostUsd, 0))})
           </Button>
+        </div>
+
+        <div className="flex flex-wrap items-end gap-2 rounded-xl border bg-muted/30 px-4 py-3">
+          <div className="space-y-1">
+            <label htmlFor="budget" className="text-xs font-medium text-muted-foreground">
+              Optimize a budget
+            </label>
+            <div className="flex items-center gap-1">
+              <span className="text-sm text-muted-foreground">$</span>
+              <Input
+                id="budget"
+                type="number"
+                min={0}
+                step={STEP}
+                value={budgetInput}
+                onChange={event =>
+                  setBudgetInput(snap(Number(event.target.value), Number.MAX_SAFE_INTEGER))
+                }
+                className="w-40 text-right tabular-nums"
+              />
+            </div>
+          </div>
+          <Button type="button" size="sm" onClick={optimizeForBudget}>
+            <Sparkles className="mr-1 size-3.5" /> Optimize spend
+          </Button>
+          <p className="text-xs text-muted-foreground">
+            Funds the measure set that leaves the lowest fines for what you can spend.
+          </p>
         </div>
 
         <div className="space-y-2.5">
