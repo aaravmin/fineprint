@@ -23,12 +23,14 @@ import {
   slugForBuilding,
   type LawExposureRow,
 } from "@/lib/export-compliance";
+import { projectionFor } from "@/lib/law-projections";
 import { tables } from "@/module_bindings/index";
 import type { Building } from "@/module_bindings/types";
 
 import { ComplianceSection, LAW_REGISTRY, STATUS_DOT } from "./compliance-section";
 import { FineTimeline } from "./fine-timeline";
 import { InvestmentPlanner } from "./investment-planner";
+import { LawPanel } from "./law-panel";
 
 type LawScope = "all" | "ll97" | "ll84" | "ll87" | "ll11" | "ll88" | "ll152" | "ll55";
 
@@ -173,9 +175,21 @@ export function ComplianceDashboard({ building }: { building: Building }) {
           </Card>
         ))}
 
-      {TRACKED_SCOPES.has(scope) && (
-        <ComplianceSection buildingId={building.id} onlyLawId={scope} />
-      )}
+      {TRACKED_SCOPES.has(scope) &&
+        (() => {
+          const law = LAW_REGISTRY.find(entry => entry.id === scope);
+          const projection = projectionFor(scope);
+          const task = buildingTasks.find(candidate => candidate.lawId === scope);
+
+          return (
+            <>
+              {law && projection && (
+                <LawPanel lawName={law.name} projection={projection} task={task} />
+              )}
+              <ComplianceSection buildingId={building.id} onlyLawId={scope} />
+            </>
+          );
+        })()}
     </div>
   );
 }
