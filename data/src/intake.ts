@@ -4,11 +4,11 @@
 // coverage mapping or the engine handoff.
 
 import { computeFine } from "../../engine/src/index.ts";
-import { applicableLaws } from "../laws.ts";
 import { buildCompliancePlan } from "./compliancePlan.ts";
 import { getCblEntry as realGetCblEntry, type CblEntry } from "./coveredBuildings.ts";
 import { toEngineInput } from "./engineBridge.ts";
 import { lookupBuilding as realLookupBuilding } from "./lookup.ts";
+import { LAW_ANALYZERS } from "./obligations.ts";
 import type { Bbl, BuildingFacts } from "./types.ts";
 
 export interface IntakeDeps {
@@ -54,23 +54,30 @@ export async function prepareIntake(
   // registry's thresholds instead, and let the CBL stay authoritative for just
   // the one thing it decides best: the LL97 performance pathway. With no floor
   // area known and no CBL row, we know nothing — claim nothing.
-  const knownSqft = facts.grossFloorAreaSqft ?? 0;
-  const sizeApplicableLawIds =
-    knownSqft > 0
-      ? applicableLaws(knownSqft, facts.isArticle321 ?? false).map(law => law.id)
-      : [];
+  // Which laws actually bind this building, decided by the obligation analyzers
+  // — the same PLUTO-aware tests buildCompliancePlan reasons with, so the tasks
+  // we spawn match the obligations the plan covers. LL11 turns on stories, LL55
+  // on residential unit count, not floor area alone. With no floor area and no
+  // PLUTO record we know nothing, so we claim nothing.
+  const hasBuildingData =
+    (facts.grossFloorAreaSqft ?? 0) > 0 || facts.plutoCharacteristics != null;
+  const analyzerLawIds = hasBuildingData
+    ? LAW_ANALYZERS.filter(analyzer => analyzer.appliesTo(facts)).map(
+        analyzer => analyzer.lawId,
+      )
+    : [];
 
   const ll97PathwayLawIds = cbl
     ? [
         cbl.ll97 && !cbl.article321 ? "ll97" : null,
         cbl.article321 ? "art321" : null,
       ].filter((id): id is string => id !== null)
-    : sizeApplicableLawIds.filter(id => id === "ll97" || id === "art321");
+    : analyzerLawIds.filter(id => id === "ll97" || id === "art321");
 
   const coveredLawIds = Array.from(
     new Set([
       ...ll97PathwayLawIds,
-      ...sizeApplicableLawIds.filter(id => id !== "ll97" && id !== "art321"),
+      ...analyzerLawIds.filter(id => id !== "ll97" && id !== "art321"),
     ]),
   );
 

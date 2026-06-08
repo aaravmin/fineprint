@@ -124,7 +124,19 @@ export async function lookupBuilding(
       ? "annual reference snapshot; DOB refreshes the list each filing year"
       : "BBL absent from the covered buildings list",
   });
-  provenance.push({ field: "isArticle321", source: cblSource });
+  // The CBL is authoritative on the Article 321 pathway when it lists the BBL.
+  // When it doesn't — which is most of the time — fall back to a PLUTO ownership
+  // proxy so affordable housing isn't silently dropped. The proxy is a signal,
+  // not a DOB determination, and says so in its provenance.
+  const affordableByProxy = !cbl && looksAffordable(plutoCharacteristics);
+  const isArticle321 = cbl ? cbl.article321 : affordableByProxy;
+  provenance.push({
+    field: "isArticle321",
+    source: affordableByProxy ? "PLUTO ownership (affordability proxy)" : cblSource,
+    detail: affordableByProxy
+      ? "inferred from owner name (NYCHA / HDFC); not a DOB Article 321 determination"
+      : undefined,
+  });
 
   return {
     bbl: geo.bbl,
@@ -134,7 +146,7 @@ export async function lookupBuilding(
     occupancyGroups: ll84?.occupancyGroups ?? [],
     annualEmissionsTco2e,
     isLl97Covered: cbl?.ll97 ?? false,
-    isArticle321: cbl?.article321 ?? false,
+    isArticle321,
     plutoCharacteristics,
     provenance,
     infrastructureProfile,
@@ -406,4 +418,25 @@ function resolveFloorArea(
     detail: "no LL84, DOF, or PLUTO record — floor area unknown",
   });
   return null;
+}
+
+// A conservative affordability signal from PLUTO ownership. Public housing and
+// HDFC ownership are the honest, recognizable markers of the rent-regulated /
+// project-based housing that uses the Article 321 pathway; we deliberately stop
+// at owner name rather than guess from building class.
+const AFFORDABLE_OWNER_SIGNALS = [
+  "HOUSING AUTHORITY",
+  "NYCHA",
+  "HDFC",
+  "HOUSING DEVELOPMENT FUND",
+  "MUTUAL HOUSING",
+];
+
+function looksAffordable(pluto: PlutoCharacteristics | null): boolean {
+  if (!pluto?.ownerName) {
+    return false;
+  }
+
+  const owner = pluto.ownerName.toUpperCase();
+  return AFFORDABLE_OWNER_SIGNALS.some(signal => owner.includes(signal));
 }
