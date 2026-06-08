@@ -202,6 +202,7 @@ async function resolveInfrastructureProfile(
     boilerCondition: deriveBoilerCondition(boilerRecords),
     recentHvacWork,
     efficiencyTier: deriveEfficiencyTier(ll84?.energyStarScore ?? null),
+    energyStarScore: ll84?.energyStarScore ?? null,
   };
 }
 

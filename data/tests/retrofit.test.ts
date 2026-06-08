@@ -16,6 +16,7 @@ const baseProfile: InfrastructureProfile = {
   boilerCondition: "defects_on_record",
   recentHvacWork: false,
   efficiencyTier: "low",
+  energyStarScore: 30,
 };
 
 const gasOffice: BuildingFacts = {

@@ -187,6 +187,7 @@ function profileWith(
     boilerCondition: null,
     recentHvacWork: false,
     efficiencyTier: "low",
+    energyStarScore: 30,
     ...overrides,
   };
 }

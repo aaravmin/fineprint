@@ -110,7 +110,7 @@ export async function prepareIntake(
       numFloors: facts.plutoCharacteristics?.numFloors ?? undefined,
       unitsResidential: facts.plutoCharacteristics?.unitsResidential ?? undefined,
       communityDistrict: facts.plutoCharacteristics?.communityDistrict ?? undefined,
-      energyStarScore: undefined,
+      energyStarScore: facts.infrastructureProfile?.energyStarScore ?? undefined,
     },
     summary: intakeSummary(facts, coveredLawIds, ll97AnnualFineUsd),
   };

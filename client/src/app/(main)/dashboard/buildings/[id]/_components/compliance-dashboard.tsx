@@ -206,6 +206,7 @@ export function ComplianceDashboard({ building }: { building: Building }) {
 
           return (
             <>
+              {scope === "ll33" && <EnergyGradeCard score={building.energyStarScore} />}
               {law && projection && (
                 <LawPanel lawName={law.name} projection={projection} task={task} />
               )}
@@ -219,8 +220,61 @@ export function ComplianceDashboard({ building }: { building: Building }) {
   );
 }
 
-// A horizontal exposure bar per law: bar length tracks the dollar exposure, bar
-// color tracks the filing status (same palette as the per-law ledger dots).
+// The LL33 letter grade for an ENERGY STAR score, per the statutory LL33/LL95
+// bands (Admin Code 28-309.12.2). Mirrors energyGradeForScore in
+// spacetimedb/src/laws.ts. undefined means the building has no score on file.
+function energyGradeFor(score: number | undefined): { grade: string; tone: string } {
+  if (score === undefined) {
+    return { grade: "N", tone: "text-muted-foreground" };
+  }
+  if (score >= 85) return { grade: "A", tone: "text-success" };
+  if (score >= 70) return { grade: "B", tone: "text-success" };
+  if (score >= 55) return { grade: "C", tone: "text-amber-500" };
+  if (score >= 20) return { grade: "D", tone: "text-destructive" };
+  return { grade: "F", tone: "text-destructive" };
+}
+
+// The building's posted LL33 grade, read straight from its latest LL84 ENERGY
+// STAR score. An unscored building posts an "N" until a benchmarking score is
+// on file.
+function EnergyGradeCard({ score }: { score: number | undefined }) {
+  const { grade, tone } = energyGradeFor(score);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Energy grade</CardTitle>
+        <p className="text-sm text-muted-foreground">
+          The letter grade this building must post near every public entrance, set by its
+          latest LL84 ENERGY STAR score.
+        </p>
+      </CardHeader>
+      <CardContent>
+        <div className="flex items-center gap-4">
+          <span className={`text-6xl font-bold tabular-nums ${tone}`}>{grade}</span>
+          <div className="text-sm text-muted-foreground">
+            {score === undefined ? (
+              <p>
+                No ENERGY STAR score on file yet — the grade is{" "}
+                <span className="font-medium">N</span> until a benchmarking score is
+                reported.
+              </p>
+            ) : (
+              <p>
+                ENERGY STAR score{" "}
+                <span className="font-medium text-foreground tabular-nums">{score}</span> out
+                of 100.
+              </p>
+            )}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// A horizontal exposure bar per law: bar length is the dollar exposure, bar
+// color is the filing status (same palette as the per-law ledger dots).
 function ExposureByLaw({ rows }: { rows: LawExposureRow[] }) {
   const max = Math.max(1, ...rows.map(row => row.exposureUsd ?? 0));
 

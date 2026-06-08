@@ -337,3 +337,26 @@ export function lawById(id: string): Law | undefined {
 export function daysUntil(deadline: Date, asOf: Date): number {
   return (deadline.getTime() - asOf.getTime()) / MS_PER_DAY;
 }
+
+// The LL33 letter grade for an ENERGY STAR score. Thresholds are the statutory
+// bands of LL33/LL95 (Admin Code 28-309.12.2): A 85+, B 70-84, C 55-69,
+// D 20-54, F under 20. A building with no score (not ENERGY STAR eligible)
+// posts an "N". Pass null for an unscored building.
+export function energyGradeForScore(score: number | null | undefined): string {
+  if (score === null || score === undefined) {
+    return "N";
+  }
+  if (score >= 85) {
+    return "A";
+  }
+  if (score >= 70) {
+    return "B";
+  }
+  if (score >= 55) {
+    return "C";
+  }
+  if (score >= 20) {
+    return "D";
+  }
+  return "F";
+}

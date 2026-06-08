@@ -8,6 +8,7 @@
 // testable. Where the city publishes no dataset to confirm a filing, onRecord
 // is null and we say the status is unknown rather than guess it satisfied.
 
+import { energyGradeForScore } from "../laws.ts";
 import type { BuildingFacts } from "./types.ts";
 import type { ComplianceStatus } from "./obligations.ts";
 
@@ -126,19 +127,27 @@ export function ll88FilingStatus(_facts: BuildingFacts, asOf: Date): FilingStatu
 // ENERGY STAR score, posted near every public entrance. Posting is an annual
 // duty tied to the benchmarking cycle; no dataset confirms the physical label
 // is up, so onRecord stays null.
-export function ll33FilingStatus(_facts: BuildingFacts, asOf: Date): FilingStatus {
+export function ll33FilingStatus(facts: BuildingFacts, asOf: Date): FilingStatus {
   const dueDate = nextAnnualDeadline(asOf, 10, 31);
+  const score = facts.infrastructureProfile?.energyStarScore ?? null;
+  const grade = energyGradeForScore(score);
+
+  const gradeText =
+    score === null
+      ? "No ENERGY STAR score on the latest LL84 filing — this building posts an N grade."
+      : `Latest LL84 ENERGY STAR score ${score} sets a ${grade} grade.`;
 
   return {
     lawId: "ll33",
     title: "Post the building energy efficiency grade",
     dueDate: toIso(dueDate),
-    cycle: "Annual — display the A-F energy label within 30 days of issuance",
+    cycle: `Annual — display the A-F energy label within 30 days of issuance. ${gradeText}`,
     onRecord: null,
     status: "due",
     action:
-      "Post the current energy efficiency label (letter grade and ENERGY STAR score) " +
-      "near every public entrance; the grade is set by the LL84 benchmarking score.",
+      score === null
+        ? "Post the energy label near every public entrance; with no ENERGY STAR score the grade is N until a benchmarking score is on file."
+        : `Post the energy label (grade ${grade}, score ${score}) near every public entrance.`,
     basis:
       "LL33 of 2018 (amended by LL95) / Admin Code 28-309.12.2; grade thresholds " +
       "A 85+, B 70-84, C 55-69, D 20-54, F under 20, N when not score-eligible. " +

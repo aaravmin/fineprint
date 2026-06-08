@@ -471,8 +471,9 @@ export default function Home() {
                   variants={rise}
                   className="font-heading max-w-2xl text-3xl font-bold leading-snug tracking-tight sm:text-4xl"
                 >
-                  Compute what&apos;s computable. Track what&apos;s trackable.{" "}
-                  <span className="text-destructive">Never fake a number.</span>
+                  Your LL97 fine, figured from real emissions. Every other deadline, dated to
+                  the day.{" "}
+                  <span className="text-destructive">Never a made-up number.</span>
                 </motion.h3>
                 {/* The statute ledger: the product's subject matter IS the design.
                     Set like actual fine print: rule lines, citations, dollar stakes. */}
