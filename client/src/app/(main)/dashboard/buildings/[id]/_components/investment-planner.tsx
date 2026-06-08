@@ -137,9 +137,7 @@ export function InvestmentPlanner({
                 min={0}
                 step={STEP}
                 value={budgetInput}
-                onChange={event =>
-                  setBudgetInput(snap(Number(event.target.value), Number.MAX_SAFE_INTEGER))
-                }
+                onChange={event => setBudgetInput(Number(event.target.value))}
                 className="w-40 text-right tabular-nums"
               />
             </div>
