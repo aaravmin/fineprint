@@ -189,6 +189,10 @@ export interface InfrastructureProfile {
   boilerCondition: string | null; // "defects_on_record" | "no_defects_on_record"
   recentHvacWork: boolean;
   efficiencyTier: string | null; // "high" | "medium" | "low" from ENERGY STAR
+  // The ENERGY STAR score itself (0-100) from the latest LL84 filing, which
+  // sets the building's public LL33 letter grade. Null when the filing carries
+  // no score (a use type ENERGY STAR cannot rate).
+  energyStarScore: number | null;
 }
 
 // The orchestrator's answer: everything Fineprint knows about one building,

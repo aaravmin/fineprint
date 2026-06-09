@@ -22,6 +22,10 @@ export default __t.row({
   usesJson: __t.option(__t.string()).name("uses_json"),
   ll97Covered: __t.option(__t.bool()).name("ll_97_covered"),
   provenanceJson: __t.option(__t.string()).name("provenance_json"),
+  numFloors: __t.option(__t.u32()).name("num_floors"),
+  unitsResidential: __t.option(__t.u32()).name("units_residential"),
+  communityDistrict: __t.option(__t.u32()).name("community_district"),
+  energyStarScore: __t.option(__t.u32()).name("energy_star_score"),
   compliancePlanJson: __t.option(__t.string()).name("compliance_plan_json"),
   createdAt: __t.timestamp().name("created_at"),
 });

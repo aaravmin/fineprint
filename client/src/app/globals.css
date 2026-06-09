@@ -311,3 +311,25 @@ html {
 .disable-transitions * {
   transition: none !important;
 }
+
+/* Print / Save-as-PDF: strip the app chrome and any control marked
+   .print-hide so a Compliance export prints as a clean standalone report. */
+@media print {
+  [data-slot="sidebar"],
+  [data-slot="sidebar-rail"],
+  [data-slot="sidebar-trigger"],
+  [data-slot="sidebar-inset"] > header,
+  .print-hide {
+    display: none !important;
+  }
+
+  [data-slot="sidebar-inset"] {
+    margin: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  body {
+    background: white !important;
+  }
+}

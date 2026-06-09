@@ -331,7 +331,7 @@ export default function Home() {
                     <span className="whitespace-nowrap text-lg font-thin tracking-wide text-foreground md:text-2xl">
                       ANNUAL RISK
                     </span>
-                    <span className="inline-grid font-heading text-2xl font-bold italic text-destructive tabular-nums md:text-3xl lg:text-4xl">
+                    <span className="inline-grid font-heading text-2xl font-bold italic text-destructive tabular-nums [&_*]:whitespace-nowrap [&_.flex-wrap]:!flex-nowrap md:text-3xl lg:text-4xl">
                       {HERO_FINE_EXPOSURES.map(exposure => (
                         <span
                           key={exposure}
@@ -471,8 +471,9 @@ export default function Home() {
                   variants={rise}
                   className="font-heading max-w-2xl text-3xl font-bold leading-snug tracking-tight sm:text-4xl"
                 >
-                  Compute what&apos;s computable. Track what&apos;s trackable.{" "}
-                  <span className="text-destructive">Never fake a number.</span>
+                  Your LL97 fine, figured from real emissions. Every other deadline, dated to
+                  the day.{" "}
+                  <span className="text-destructive">Never a made-up number.</span>
                 </motion.h3>
                 {/* The statute ledger: the product's subject matter IS the design.
                     Set like actual fine print: rule lines, citations, dollar stakes. */}

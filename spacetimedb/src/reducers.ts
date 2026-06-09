@@ -2,7 +2,7 @@ import { Identity, ScheduleAt, Timestamp } from "spacetimedb";
 import { t } from "spacetimedb/server";
 import spacetimedb, { reaperTick } from "./schema";
 import { reaperRef } from "./reaper-ref";
-import { applicableLaws, LAWS, type Law } from "./laws";
+import { applicableLaws, LAWS, type BuildingProfile, type Law } from "./laws";
 
 const HEARTBEAT_STALE_MS = 15_000; // 3 missed 5s heartbeats = dead
 const REAP_INTERVAL_MICROS = 5_000_000n; // 5s
@@ -32,6 +32,17 @@ function logEvent(
 
 function addMs(now: Timestamp, ms: number): Timestamp {
   return Timestamp.fromDate(new Date(now.toDate().getTime() + ms));
+}
+
+// The task's deadline is the law's real next statutory deadline. When the cycle
+// can't be dated from what intake resolved (a missing tax block or community
+// district), fall back to a one-year review window rather than inventing a date.
+function deadlineFor(law: Law, now: Timestamp, profile: BuildingProfile): Timestamp {
+  const next = law.nextDeadline(now.toDate(), profile);
+  if (next === null) {
+    return addMs(now, 365 * 86_400_000);
+  }
+  return Timestamp.fromDate(next);
 }
 
 function workerBySender(ctx: any) {
@@ -98,13 +109,19 @@ export const add_building = spacetimedb.reducer(
       usesJson: undefined,
       ll97Covered: undefined,
       provenanceJson: undefined,
+      numFloors: undefined,
+      unitsResidential: undefined,
+      communityDistrict: undefined,
+      energyStarScore: undefined,
       compliancePlanJson: undefined,
       createdAt: ctx.timestamp,
     });
 
-    const laws = applicableLaws(sqft, isAffordable);
+    const profile: BuildingProfile = { sqft, isAffordable };
+
+    const laws = applicableLaws(profile);
     for (const law of laws) {
-      const fine = law.fineEstimateUsd(sqft, isAffordable);
+      const fine = law.penaltyUsd(profile);
       ctx.db.task.insert({
         id: 0n,
         owner: ctx.sender,
@@ -114,7 +131,7 @@ export const add_building = spacetimedb.reducer(
         kind: law.kind,
         title: `${law.name} — ${address}`,
         status: "open",
-        deadline: addMs(ctx.timestamp, law.deadlineDays * 86_400_000),
+        deadline: deadlineFor(law, ctx.timestamp, profile),
         slaBreached: false,
         fineEstimateUsd: fine === null ? undefined : fine,
         claimedBy: undefined,
@@ -194,6 +211,13 @@ export const ingest_building = spacetimedb.reducer(
     ll97AnnualFineUsd: t.option(t.u32()),
     // Serialized CompliancePlan from the data layer, same can't-import logic.
     compliancePlanJson: t.option(t.string()),
+    // Real building characteristics from PLUTO/LL84 that the law registry uses
+    // for applicability and statutory cycle dates. Absent when intake could not
+    // resolve them, and the registry falls back to its floor-area proxies.
+    numFloors: t.option(t.u32()),
+    unitsResidential: t.option(t.u32()),
+    communityDistrict: t.option(t.u32()),
+    energyStarScore: t.option(t.u32()),
   },
   (ctx, args) => {
     // Direct calls (scripts, CLI) ingest under the caller's own account.
@@ -212,6 +236,10 @@ interface IngestArgs {
   provenanceJson: string;
   ll97AnnualFineUsd: number | undefined;
   compliancePlanJson: string | undefined;
+  numFloors: number | undefined;
+  unitsResidential: number | undefined;
+  communityDistrict: number | undefined;
+  energyStarScore: number | undefined;
 }
 
 // The one place a building comes to exist: called by the ingest_building
@@ -222,16 +250,27 @@ function ingestFromArgs(ctx: any, args: IngestArgs, owner: Identity) {
   if (args.address.trim() === "") throw new Error("address cannot be empty");
   if (args.bbl.trim() === "") throw new Error("bbl cannot be empty");
 
+  const profile: BuildingProfile = {
+    sqft: args.sqft,
+    isAffordable: args.isArticle321,
+    bbl: args.bbl,
+    numFloors: args.numFloors,
+    unitsResidential: args.unitsResidential,
+    communityDistrict: args.communityDistrict,
+    energyStarScore: args.energyStarScore,
+  };
+
   const coveredLawIds: string[] = JSON.parse(args.coveredLawIdsJson);
-  const laws =
+  const laws = (
     coveredLawIds.length > 0
       ? LAWS.filter(law => coveredLawIds.includes(law.id))
-      : applicableLaws(args.sqft, args.isArticle321);
+      : applicableLaws(profile)
+  ).filter(law => law.kind !== "pace_financing");
 
   const spawnTask = (law: Law, buildingId: bigint) => {
     const isLl97Law = law.id === "ll97" || law.id === "art321";
     const engineFine = isLl97Law ? args.ll97AnnualFineUsd : undefined;
-    const stubFine = law.fineEstimateUsd(args.sqft, args.isArticle321);
+    const stubFine = law.penaltyUsd(profile);
 
     ctx.db.task.insert({
       id: 0n,
@@ -242,7 +281,7 @@ function ingestFromArgs(ctx: any, args: IngestArgs, owner: Identity) {
       kind: law.kind,
       title: `${law.name} — ${args.address}`,
       status: "open",
-      deadline: addMs(ctx.timestamp, law.deadlineDays * 86_400_000),
+      deadline: deadlineFor(law, ctx.timestamp, profile),
       slaBreached: false,
       fineEstimateUsd: engineFine ?? (stubFine === null ? undefined : stubFine),
       claimedBy: undefined,
@@ -265,6 +304,10 @@ function ingestFromArgs(ctx: any, args: IngestArgs, owner: Identity) {
       usesJson: args.usesJson,
       ll97Covered: deriveLl97Covered(args.coveredLawIdsJson),
       provenanceJson: args.provenanceJson,
+      numFloors: args.numFloors,
+      unitsResidential: args.unitsResidential,
+      communityDistrict: args.communityDistrict,
+      energyStarScore: args.energyStarScore,
       compliancePlanJson: args.compliancePlanJson,
     });
 
@@ -320,6 +363,10 @@ function ingestFromArgs(ctx: any, args: IngestArgs, owner: Identity) {
     usesJson: args.usesJson,
     ll97Covered: deriveLl97Covered(args.coveredLawIdsJson),
     provenanceJson: args.provenanceJson,
+    numFloors: args.numFloors,
+    unitsResidential: args.unitsResidential,
+    communityDistrict: args.communityDistrict,
+    energyStarScore: args.energyStarScore,
     compliancePlanJson: args.compliancePlanJson,
     createdAt: ctx.timestamp,
   });

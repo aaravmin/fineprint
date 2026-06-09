@@ -19,18 +19,6 @@ import { fmtUsd } from "@/lib/engine";
 import { withAck } from "@/lib/reducer-call";
 import { reducers, tables } from "@/module_bindings/index";
 
-const STATUS_VARIANT: Record<
-  string,
-  "default" | "secondary" | "destructive" | "outline"
-> = {
-  open: "secondary",
-  claimed: "outline",
-  in_review: "outline",
-  approved: "default",
-  rejected: "destructive",
-  done: "default",
-};
-
 // Same dot-and-word treatment as the building page's compliance ledger.
 const STATUS_DOT: Record<string, string> = {
   open: "bg-muted-foreground/50",
@@ -108,6 +96,18 @@ export function TasksClient() {
 
   const activeStatuses = statusFilter.map(option => option.value);
 
+  function toggleStatus(status: string) {
+    setStatusFilter(current => {
+      const alreadyActive = current.some(option => option.value === status);
+      if (alreadyActive) {
+        return current.filter(option => option.value !== status);
+      }
+
+      const option = STATUS_OPTIONS.find(candidate => candidate.value === status);
+      return option ? [...current, option] : current;
+    });
+  }
+
   const filtered =
     activeStatuses.length === 0
       ? tasks
@@ -148,14 +148,24 @@ export function TasksClient() {
       </div>
 
       <div className="flex flex-wrap gap-3">
-        {Object.entries(counts).map(([status, count]) => (
-          <Card key={status} className="flex items-center gap-2 px-4 py-3">
-            <Badge variant={STATUS_VARIANT[status] ?? "secondary"}>
-              {status.replace("_", " ")}
-            </Badge>
-            <span className="font-semibold">{count}</span>
-          </Card>
-        ))}
+        {Object.entries(counts).map(([status, count]) => {
+          const isActive = activeStatuses.includes(status);
+
+          return (
+            <Card
+              key={status}
+              role="button"
+              aria-pressed={isActive}
+              onClick={() => toggleStatus(status)}
+              className="flex cursor-pointer items-center gap-2 px-4 py-3 transition-colors hover:bg-muted/40"
+            >
+              <Badge variant={isActive ? "default" : "outline"}>
+                {status.replace("_", " ")}
+              </Badge>
+              <span className="font-semibold">{count}</span>
+            </Card>
+          );
+        })}
       </div>
 
       <Card>

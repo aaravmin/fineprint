@@ -28,6 +28,7 @@ const coveredOffice: BuildingFacts = {
     boilerCondition: null,
     recentHvacWork: false,
     efficiencyTier: "low",
+    energyStarScore: 30,
   },
   openViolations: [],
   provenance: [],

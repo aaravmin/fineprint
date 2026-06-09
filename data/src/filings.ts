@@ -8,6 +8,7 @@
 // testable. Where the city publishes no dataset to confirm a filing, onRecord
 // is null and we say the status is unknown rather than guess it satisfied.
 
+import { energyGradeForScore } from "../laws.ts";
 import type { BuildingFacts } from "./types.ts";
 import type { ComplianceStatus } from "./obligations.ts";
 
@@ -119,6 +120,38 @@ export function ll88FilingStatus(_facts: BuildingFacts, asOf: Date): FilingStatu
       "Confirm the lighting meets the NYC Energy Conservation Code and large tenant spaces are submetered, then file the LL88 report. The LED lighting retrofit in the LL97 plan also satisfies this upgrade.",
     basis:
       "LL88 / Admin Code 28-310 (lighting) and 28-311 (submetering); compliance evidence is not available in city data",
+  };
+}
+
+// LL33 — the building energy efficiency grade (A-F) derived from the LL84
+// ENERGY STAR score, posted near every public entrance. Posting is an annual
+// duty tied to the benchmarking cycle; no dataset confirms the physical label
+// is up, so onRecord stays null.
+export function ll33FilingStatus(facts: BuildingFacts, asOf: Date): FilingStatus {
+  const dueDate = nextAnnualDeadline(asOf, 10, 31);
+  const score = facts.infrastructureProfile?.energyStarScore ?? null;
+  const grade = energyGradeForScore(score);
+
+  const gradeText =
+    score === null
+      ? "No ENERGY STAR score on the latest LL84 filing — this building posts an N grade."
+      : `Latest LL84 ENERGY STAR score ${score} sets a ${grade} grade.`;
+
+  return {
+    lawId: "ll33",
+    title: "Post the building energy efficiency grade",
+    dueDate: toIso(dueDate),
+    cycle: `Annual — display the A-F energy label within 30 days of issuance. ${gradeText}`,
+    onRecord: null,
+    status: "due",
+    action:
+      score === null
+        ? "Post the energy label near every public entrance; with no ENERGY STAR score the grade is N until a benchmarking score is on file."
+        : `Post the energy label (grade ${grade}, score ${score}) near every public entrance.`,
+    basis:
+      "LL33 of 2018 (amended by LL95) / Admin Code 28-309.12.2; grade thresholds " +
+      "A 85+, B 70-84, C 55-69, D 20-54, F under 20, N when not score-eligible. " +
+      "No dataset confirms the label is posted",
   };
 }
 

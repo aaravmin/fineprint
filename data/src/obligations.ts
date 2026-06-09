@@ -14,18 +14,35 @@
 // become thin declarations here; the shared math lives in the engine.
 
 import { computeAllPeriods, type FineResult } from "../../engine/src/index.ts";
-import { LAWS } from "../laws.ts";
+import { LAWS, type BuildingProfile } from "../laws.ts";
 import { toEngineInput } from "./engineBridge.ts";
 import {
   ll84FilingStatus,
   ll87FilingStatus,
   ll88FilingStatus,
+  ll33FilingStatus,
   ll11FilingStatus,
   ll152FilingStatus,
   ll55FilingStatus,
   type FilingStatus,
 } from "./filings.ts";
 import type { BuildingFacts } from "./types.ts";
+
+// The registry reasons over a BuildingProfile of real characteristics; assemble
+// one from the resolved facts so applicability and penalty math see the same
+// PLUTO-backed signals the analyzers below use.
+function profileFromFacts(facts: BuildingFacts): BuildingProfile {
+  const pluto = facts.plutoCharacteristics;
+  return {
+    sqft: facts.grossFloorAreaSqft ?? 0,
+    isAffordable: facts.isArticle321 ?? false,
+    bbl: facts.bbl,
+    numFloors: pluto?.numFloors ?? undefined,
+    unitsResidential: pluto?.unitsResidential ?? undefined,
+    communityDistrict: pluto?.communityDistrict ?? undefined,
+    buildingClass: pluto?.buildingClass ?? undefined,
+  };
+}
 
 // Where the building stands on one obligation. "at_risk" means a penalty is
 // accruing now; "due" means action is needed before a future deadline or cap;
@@ -224,9 +241,7 @@ function proceduralObligation(
   facts: BuildingFacts,
 ): ProceduralObligation {
   const law = LAWS.find(entry => entry.id === filing.lawId);
-  const penaltyUsd = law
-    ? law.fineEstimateUsd(facts.grossFloorAreaSqft ?? 0, facts.isArticle321 ?? false)
-    : null;
+  const penaltyUsd = law ? law.penaltyUsd(profileFromFacts(facts)) : null;
 
   const findings = [
     filing.cycle + ".",
@@ -271,6 +286,14 @@ const ll88Analyzer = proceduralAnalyzer(
   ll88FilingStatus,
 );
 
+// LL33 — the public energy grade rides on the same 25,000 sqft benchmarking
+// floor as LL84, since the grade is derived from the LL84 ENERGY STAR score.
+const ll33Analyzer = proceduralAnalyzer(
+  "ll33",
+  facts => (facts.grossFloorAreaSqft ?? 0) >= 25_000,
+  ll33FilingStatus,
+);
+
 // FISP turns on building height, not floor area. PLUTO's floor count is
 // authoritative when present; the 60k-sqft registry proxy only fills in when
 // the floor count is unknown, so a confirmed-short building never gets FISP.
@@ -307,6 +330,7 @@ export const LAW_ANALYZERS: LawAnalyzer[] = [
   ll84Analyzer,
   ll87Analyzer,
   ll88Analyzer,
+  ll33Analyzer,
   ll11Analyzer,
   ll152Analyzer,
   ll55Analyzer,

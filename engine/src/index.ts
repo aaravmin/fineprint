@@ -215,9 +215,13 @@ function roundTco2e(value: number): number {
 export {
   optimizeRetrofit,
   planForBudget,
+  planFromFunding,
+  fullCostFor,
   DEFAULT_MEASURES,
   type RetrofitMeasure,
   type RetrofitPlan,
+  type FundedMeasure,
+  type FundedPlan,
   type MaccPoint,
   type RetrofitAssessment,
 } from "./retrofit.ts";

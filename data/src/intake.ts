@@ -35,6 +35,10 @@ export interface IntakeResult {
     provenanceJson: string;
     ll97AnnualFineUsd: number | undefined;
     compliancePlanJson: string;
+    numFloors: number | undefined;
+    unitsResidential: number | undefined;
+    communityDistrict: number | undefined;
+    energyStarScore: number | undefined;
   };
   summary: string;
 }
@@ -60,7 +64,9 @@ export async function prepareIntake(
 
   const sizeApplicableLawIds =
     knownSqft > 0
-      ? applicableLaws(knownSqft, facts.isArticle321 ?? false).map(law => law.id)
+      ? applicableLaws({ sqft: knownSqft, isAffordable: facts.isArticle321 ?? false }).map(
+          law => law.id,
+        )
       : [];
 
   const ll97PathwayLawIds = cbl
@@ -106,6 +112,10 @@ export async function prepareIntake(
       provenanceJson: JSON.stringify(facts.provenance),
       ll97AnnualFineUsd,
       compliancePlanJson: JSON.stringify(compliancePlan),
+      numFloors: facts.plutoCharacteristics?.numFloors ?? undefined,
+      unitsResidential: facts.plutoCharacteristics?.unitsResidential ?? undefined,
+      communityDistrict: facts.plutoCharacteristics?.communityDistrict ?? undefined,
+      energyStarScore: facts.infrastructureProfile?.energyStarScore ?? undefined,
     },
     summary: intakeSummary(facts, coveredLawIds, ll97AnnualFineUsd),
   };

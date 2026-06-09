@@ -1,11 +1,29 @@
 import { describe, expect, test } from "vitest";
 import type { CblEntry } from "../src/coveredBuildings.ts";
 import { prepareIntake } from "../src/intake.ts";
-import type { BuildingFacts } from "../src/types.ts";
+import type { BuildingFacts, PlutoCharacteristics } from "../src/types.ts";
 
 // prepareIntake is the shared brain of building intake: one address in,
 // ready-to-send ingest_building reducer args plus a human-readable summary
 // out. The ingest script and the agent workers both call it.
+//
+// PLUTO is what decides the height- and residential-keyed laws (LL11 on
+// stories, LL55 on residential units), so the fixtures carry it. 350 5 Avenue
+// is a 102-floor commercial office tower with no apartments.
+const esbPluto: PlutoCharacteristics = {
+  bbl: "1008350041",
+  numFloors: 102,
+  buildingClass: "O4",
+  bldgAreaSqft: 2_852_257,
+  unitsResidential: 0,
+  unitsTotal: 1000,
+  yearBuilt: 1931,
+  landUse: "05",
+  ownerName: "EMPIRE STATE REALTY OP LP",
+  communityDistrict: 105,
+  raw: {},
+};
+
 const esbFacts: BuildingFacts = {
   bbl: "1008350041",
   bin: "1015862",
@@ -15,7 +33,7 @@ const esbFacts: BuildingFacts = {
   annualEmissionsTco2e: 12_096.78,
   isLl97Covered: true,
   isArticle321: false,
-  plutoCharacteristics: null,
+  plutoCharacteristics: esbPluto,
   openViolations: [],
   provenance: [{ field: "bbl", source: "NYC GeoSearch" }],
 };
@@ -52,6 +70,7 @@ describe("prepareIntake", () => {
       "ll87",
       "ll11",
       "ll88",
+      "ll33",
       "ll152",
     ]);
     expect(JSON.parse(intake.ingestArgs.usesJson)).toHaveLength(1);
@@ -68,7 +87,13 @@ describe("prepareIntake", () => {
     const intake = await prepareIntake(
       "39 Whitehall Street, Manhattan",
       fakeDeps({
-        lookupBuilding: async () => ({ ...esbFacts, isArticle321: true }),
+        lookupBuilding: async () => ({
+          ...esbFacts,
+          isArticle321: true,
+          // A real affordable building is residential, so PLUTO shows units —
+          // that is what spawns the allergen law.
+          plutoCharacteristics: { ...esbPluto, unitsResidential: 200 },
+        }),
         getCblEntry: () => ({ ...cblEntry, article321: true }),
       }),
     );
@@ -76,7 +101,7 @@ describe("prepareIntake", () => {
     const lawIds = JSON.parse(intake.ingestArgs.coveredLawIdsJson);
     expect(lawIds).toContain("art321");
     expect(lawIds).not.toContain("ll97");
-    // Article 321 means rent-regulated residential — the allergen law rides along.
+    // Residential units carry the allergen law along.
     expect(lawIds).toContain("ll55");
   });
 
@@ -85,7 +110,7 @@ describe("prepareIntake", () => {
 
     expect(intake.summary).toMatch(/1008350041/);
     expect(intake.summary).toMatch(/2,852,257/);
-    expect(intake.summary).toMatch(/ll97, ll84, ll87, ll11, ll88, ll152/);
+    expect(intake.summary).toMatch(/ll97, ll84, ll87, ll11, ll88, ll33, ll152/);
     expect(intake.summary).toMatch(/NYC GeoSearch/);
   });
 
@@ -99,6 +124,7 @@ describe("prepareIntake", () => {
           occupancyGroups: [],
           annualEmissionsTco2e: null,
           isLl97Covered: false,
+          plutoCharacteristics: null,
           provenance: [],
         }),
         getCblEntry: () => null,
@@ -122,16 +148,31 @@ describe("prepareIntake", () => {
   });
 });
 
-// Coverage is what the reported bug was about: small buildings were collapsing
-// to LL152 alone and LL11 never appeared. These pin the size-threshold logic
-// (the registry's floor-area cutoffs) against the CBL's narrower authority.
-describe("prepareIntake coverage by building size", () => {
-  function buildingOf(sqft: number, isArticle321 = false): BuildingFacts {
+// Coverage is what the reported bug was about: small buildings collapsed to
+// LL152 alone, LL11 never appeared, and residential laws never fired. These pin
+// the corrected applicability — floor area for the energy laws, stories for
+// LL11, residential units for LL55, and the CBL for the LL97 pathway.
+describe("prepareIntake coverage", () => {
+  function buildingOf(
+    sqft: number,
+    opts: {
+      numFloors?: number;
+      unitsResidential?: number;
+      isLl97Covered?: boolean;
+      isArticle321?: boolean;
+    } = {},
+  ): BuildingFacts {
     return {
       ...esbFacts,
       grossFloorAreaSqft: sqft,
       occupancyGroups: [{ group: "Office", sqft }],
-      isArticle321,
+      isLl97Covered: opts.isLl97Covered ?? false,
+      isArticle321: opts.isArticle321 ?? false,
+      plutoCharacteristics: {
+        ...esbPluto,
+        numFloors: opts.numFloors ?? 3,
+        unitsResidential: opts.unitsResidential ?? 0,
+      },
     };
   }
 
@@ -146,13 +187,13 @@ describe("prepareIntake coverage by building size", () => {
     return new Set<string>(JSON.parse(intake.ingestArgs.coveredLawIdsJson));
   }
 
-  test("an under-25k building is covered by LL152 alone", async () => {
+  test("an under-25k commercial building is covered by LL152 alone", async () => {
     expect(await coverageFor(buildingOf(13_194))).toEqual(new Set(["ll152"]));
   });
 
-  test("the 25k threshold is inclusive: LL84, LL88, LL97, LL152 switch on", async () => {
+  test("the 25k threshold is inclusive for the floor-area laws", async () => {
     expect(await coverageFor(buildingOf(25_000))).toEqual(
-      new Set(["ll97", "ll84", "ll88", "ll152"]),
+      new Set(["ll97", "ll84", "ll88", "ll33", "ll152"]),
     );
     // One square foot short stays LL152-only — the boundary is exact.
     expect(await coverageFor(buildingOf(24_999))).toEqual(new Set(["ll152"]));
@@ -160,12 +201,24 @@ describe("prepareIntake coverage by building size", () => {
 
   test("crossing 50k adds the LL87 audit obligation", async () => {
     expect(await coverageFor(buildingOf(50_000))).toEqual(
-      new Set(["ll97", "ll84", "ll87", "ll88", "ll152"]),
+      new Set(["ll97", "ll84", "ll87", "ll88", "ll33", "ll152"]),
     );
   });
 
-  test("crossing 60k adds the LL11 facade obligation that used to never spawn", async () => {
-    expect(await coverageFor(buildingOf(60_000))).toContain("ll11");
+  test("LL11 turns on stories, not floor area", async () => {
+    // A tall but small building gets the facade obligation a 60k cutoff missed.
+    expect(await coverageFor(buildingOf(30_000, { numFloors: 7 }))).toContain("ll11");
+    // Six stories is the statutory floor — at six it does not apply.
+    expect(await coverageFor(buildingOf(30_000, { numFloors: 6 }))).not.toContain("ll11");
+  });
+
+  test("LL55 turns on residential units, not the affordability flag alone", async () => {
+    expect(await coverageFor(buildingOf(40_000, { unitsResidential: 50 }))).toContain(
+      "ll55",
+    );
+    expect(await coverageFor(buildingOf(40_000, { unitsResidential: 0 }))).not.toContain(
+      "ll55",
+    );
   });
 
   test("the CBL is authoritative for LL97: a large building it excludes gets no LL97", async () => {
@@ -180,15 +233,23 @@ describe("prepareIntake coverage by building size", () => {
       source: "test",
     });
 
-    const coverage = await coverageFor(buildingOf(100_000), notLl97Covered);
+    const coverage = await coverageFor(
+      buildingOf(100_000, { numFloors: 10 }),
+      notLl97Covered,
+    );
 
     expect(coverage.has("ll97")).toBe(false);
-    // The size-based obligations still apply regardless of the LL97 flag.
-    expect(coverage).toEqual(new Set(["ll84", "ll87", "ll11", "ll88", "ll152"]));
+    // The size- and height-based obligations still apply regardless of LL97.
+    expect(coverage).toEqual(new Set(["ll84", "ll87", "ll88", "ll33", "ll11", "ll152"]));
   });
 
-  test("an affordable building maps to art321 and the allergen law, never LL97", async () => {
-    const coverage = await coverageFor(buildingOf(100_000, true));
+  test("an affordable residential building maps to art321 and the allergen law", async () => {
+    const article321Cbl = (): CblEntry => ({ ...cblEntry, ll97: false, article321: true });
+
+    const coverage = await coverageFor(
+      buildingOf(100_000, { numFloors: 20, unitsResidential: 200, isArticle321: true }),
+      article321Cbl,
+    );
 
     expect(coverage.has("art321")).toBe(true);
     expect(coverage.has("ll55")).toBe(true);

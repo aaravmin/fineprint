@@ -21,20 +21,22 @@ import { reducers, tables } from "@/module_bindings/index";
 import type { Task } from "@/module_bindings/types";
 
 // Mirrors the canonical registry in spacetimedb/src/laws.ts — task lawId values.
-const LAW_REGISTRY = [
+export const LAW_REGISTRY = [
   { id: "ll97", short: "LL97", name: "Building Emissions Cap" },
   { id: "art321", short: "Art 321", name: "Affordable-Housing Emissions Pathway" },
   { id: "ll84", short: "LL84", name: "Energy & Water Benchmarking" },
   { id: "ll87", short: "LL87", name: "Energy Audit & Retro-commissioning" },
   { id: "ll11", short: "LL11", name: "Facade Inspection (FISP)" },
   { id: "ll88", short: "LL88", name: "Lighting Upgrades & Submetering" },
+  { id: "ll33", short: "LL33", name: "Building Energy Grade" },
   { id: "ll152", short: "LL152", name: "Gas Piping Inspection & Certification" },
   { id: "ll55", short: "LL55", name: "Indoor Allergen Hazards" },
+  { id: "ll96", short: "LL96", name: "PACE Clean Energy Financing" },
 ];
 
 // Status reads as a dot + word, one fixed-width column, so every row lines
 // up no matter the state. Dot carries the color; text stays quiet.
-const STATUS_DOT: Record<string, string> = {
+export const STATUS_DOT: Record<string, string> = {
   open: "bg-muted-foreground/50",
   claimed: "bg-foreground/70",
   in_review: "bg-amber-500",
@@ -187,7 +189,13 @@ function DraftBody({ body }: { body: string }) {
   );
 }
 
-export function ComplianceSection({ buildingId }: { buildingId: bigint }) {
+export function ComplianceSection({
+  buildingId,
+  onlyLawId,
+}: {
+  buildingId: bigint;
+  onlyLawId?: string;
+}) {
   const [tasks] = useTable(tables.task);
   const [submissions] = useTable(tables.submission);
   const [workers] = useTable(tables.worker);
@@ -198,6 +206,12 @@ export function ComplianceSection({ buildingId }: { buildingId: bigint }) {
   const reduceMotion = useReducedMotion();
 
   const buildingTasks = tasks.filter(task => task.buildingId === buildingId);
+  // LL96 (PACE financing) is an opportunity, not an obligation — it spawns no
+  // task, so it never belongs in the obligation ledger where a missing task
+  // reads as non-compliance. Its own tab surfaces it on its own terms.
+  const laws = (onlyLawId ? LAW_REGISTRY.filter(law => law.id === onlyLawId) : LAW_REGISTRY).filter(
+    law => law.id !== "ll96",
+  );
 
   function review(task: Task, verdict: "approve" | "reject") {
     setPendingTaskId(task.id);
@@ -234,7 +248,7 @@ export function ComplianceSection({ buildingId }: { buildingId: bigint }) {
       </CardHeader>
       <CardContent className="p-0">
         <Accordion type="multiple" className="w-full">
-          {LAW_REGISTRY.map((law, index) => {
+          {laws.map((law, index) => {
             const lawTask = buildingTasks.find(task => task.lawId === law.id);
             const latestSubmission = lawTask
               ? [...submissions]
