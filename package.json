@@ -18,6 +18,7 @@
     "generate": "spacetime generate --lang typescript --out-dir client/src/module_bindings --module-path spacetimedb && spacetime generate --lang typescript --out-dir agents/src/module_bindings --module-path spacetimedb",
     "worker": "npm run worker --workspace agents",
     "reviewer": "npm run reviewer --workspace agents",
+    "fetch:remdb": "tsx data/scripts/fetch-remdb.ts",
     "dashboard": "npm run dev --workspace client",
     "worker:emissions": "WORKER_KINDS=emissions_fine_analysis,prescriptive_measures_plan npm run worker",
     "worker:filings": "WORKER_KINDS=benchmarking_filing,audit_filing,lighting_submetering_plan npm run worker",
