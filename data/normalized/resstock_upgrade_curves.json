@@ -1,0 +1,903 @@
+[
+  {
+    "upgrade_id": 1,
+    "upgrade_name": "Natural Gas Furnace 95% AFUE for All Dwellings with Ducts",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 7099,
+    "annual_energy_savings_kwh": {
+      "p25": 410.74,
+      "median": 1647.35,
+      "p75": 4883.15
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": 44.11,
+      "median": 213.25,
+      "p75": 670.14
+    },
+    "affected_end_uses": [
+      "heating"
+    ],
+    "applicable_building_types": [
+      "Mobile Home",
+      "Multi-Family with 2 - 4 Units",
+      "Multi-Family with 5+ Units",
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  },
+  {
+    "upgrade_id": 2,
+    "upgrade_name": "Propane or Fuel Oil Furnace 95% AFUE",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 1560,
+    "annual_energy_savings_kwh": {
+      "p25": 1146.42,
+      "median": 2421.79,
+      "p75": 3873.15
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": 112.65,
+      "median": 237.19,
+      "p75": 380.63
+    },
+    "affected_end_uses": [
+      "heating"
+    ],
+    "applicable_building_types": [
+      "Mobile Home",
+      "Multi-Family with 2 - 4 Units",
+      "Multi-Family with 5+ Units",
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  },
+  {
+    "upgrade_id": 3,
+    "upgrade_name": "Minimum Efficiency Boilers, Furnaces, and Air Conditioners Circa 2025",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 7388,
+    "annual_energy_savings_kwh": {
+      "p25": 0,
+      "median": 173.21,
+      "p75": 669.45
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": 0,
+      "median": 31.44,
+      "p75": 91.74
+    },
+    "affected_end_uses": [
+      "heating",
+      "cooling"
+    ],
+    "applicable_building_types": [
+      "Mobile Home",
+      "Multi-Family with 2 - 4 Units",
+      "Multi-Family with 5+ Units",
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  },
+  {
+    "upgrade_id": 4,
+    "upgrade_name": "Typical Cold Climate Ducted Air Source Heat Pump with Detailed Performance Data",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 7388,
+    "annual_energy_savings_kwh": {
+      "p25": 4495.34,
+      "median": 12825.23,
+      "p75": 24194.92
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": -128.88,
+      "median": 97.6,
+      "p75": 506.05
+    },
+    "affected_end_uses": [
+      "heating"
+    ],
+    "applicable_building_types": [
+      "Mobile Home",
+      "Multi-Family with 2 - 4 Units",
+      "Multi-Family with 5+ Units",
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  },
+  {
+    "upgrade_id": 5,
+    "upgrade_name": "Dual Fuel Heating System",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 5360,
+    "annual_energy_savings_kwh": {
+      "p25": 1930.46,
+      "median": 6199.33,
+      "p75": 12718.48
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": -216.45,
+      "median": 8.32,
+      "p75": 167.74
+    },
+    "affected_end_uses": [
+      "heating"
+    ],
+    "applicable_building_types": [
+      "Mobile Home",
+      "Multi-Family with 2 - 4 Units",
+      "Multi-Family with 5+ Units",
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  },
+  {
+    "upgrade_id": 6,
+    "upgrade_name": "Single-Speed Geothermal Heat Pump with Thermally Enhanced Grout and Pipes",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 7198,
+    "annual_energy_savings_kwh": {
+      "p25": 3286.79,
+      "median": 10875.57,
+      "p75": 21099.58
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": -492.03,
+      "median": -27.22,
+      "p75": 256.17
+    },
+    "affected_end_uses": [
+      "heating"
+    ],
+    "applicable_building_types": [
+      "Mobile Home",
+      "Multi-Family with 2 - 4 Units",
+      "Multi-Family with 5+ Units",
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  },
+  {
+    "upgrade_id": 7,
+    "upgrade_name": "Dual-Speed Geothermal Heat Pump with Thermally Enhanced Grout and Pipes",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 7198,
+    "annual_energy_savings_kwh": {
+      "p25": 4159.56,
+      "median": 13060.13,
+      "p75": 24857.56
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": -11.96,
+      "median": 155.44,
+      "p75": 587.22
+    },
+    "affected_end_uses": [
+      "heating"
+    ],
+    "applicable_building_types": [
+      "Mobile Home",
+      "Multi-Family with 2 - 4 Units",
+      "Multi-Family with 5+ Units",
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  },
+  {
+    "upgrade_id": 8,
+    "upgrade_name": "Variable-Speed Geothermal Heat Pump with Thermally Enhanced Grout and Pipes",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 7163,
+    "annual_energy_savings_kwh": {
+      "p25": 4905.86,
+      "median": 14410.89,
+      "p75": 26940.27
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": 139.08,
+      "median": 386.83,
+      "p75": 945.21
+    },
+    "affected_end_uses": [
+      "heating",
+      "cooling"
+    ],
+    "applicable_building_types": [
+      "Mobile Home",
+      "Multi-Family with 2 - 4 Units",
+      "Multi-Family with 5+ Units",
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  },
+  {
+    "upgrade_id": 9,
+    "upgrade_name": "Heat Pumps Water Heater",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 19782,
+    "annual_energy_savings_kwh": {
+      "p25": 1352.89,
+      "median": 2193.34,
+      "p75": 3343.57
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": 48.65,
+      "median": 99.71,
+      "p75": 213.12
+    },
+    "affected_end_uses": [
+      "hot water",
+      "heating"
+    ],
+    "applicable_building_types": [
+      "Mobile Home",
+      "Multi-Family with 2 - 4 Units",
+      "Multi-Family with 5+ Units",
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  },
+  {
+    "upgrade_id": 10,
+    "upgrade_name": "High Efficiency Natural Gas Tankless Water Heater",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 15546,
+    "annual_energy_savings_kwh": {
+      "p25": 952.48,
+      "median": 1547.71,
+      "p75": 1863.86
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": 76.62,
+      "median": 94.9,
+      "p75": 191.74
+    },
+    "affected_end_uses": [
+      "hot water",
+      "heating"
+    ],
+    "applicable_building_types": [
+      "Mobile Home",
+      "Multi-Family with 2 - 4 Units",
+      "Multi-Family with 5+ Units",
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  },
+  {
+    "upgrade_id": 11,
+    "upgrade_name": "Air Sealing",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 19442,
+    "annual_energy_savings_kwh": {
+      "p25": 686.74,
+      "median": 2302.95,
+      "p75": 6397.59
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": 52.14,
+      "median": 167.03,
+      "p75": 446.51
+    },
+    "affected_end_uses": [
+      "heating"
+    ],
+    "applicable_building_types": [
+      "Mobile Home",
+      "Multi-Family with 2 - 4 Units",
+      "Multi-Family with 5+ Units",
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  },
+  {
+    "upgrade_id": 12,
+    "upgrade_name": "Attic Floor Insulation for Unfinished Attics",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 3703,
+    "annual_energy_savings_kwh": {
+      "p25": 411.47,
+      "median": 916.73,
+      "p75": 1997.57
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": 30.05,
+      "median": 67.39,
+      "p75": 147.59
+    },
+    "affected_end_uses": [
+      "heating"
+    ],
+    "applicable_building_types": [
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  },
+  {
+    "upgrade_id": 13,
+    "upgrade_name": "Duct Sealing and Insulation",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 4065,
+    "annual_energy_savings_kwh": {
+      "p25": 1630.06,
+      "median": 4361.78,
+      "p75": 7815.33
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": 148.99,
+      "median": 315.8,
+      "p75": 590.41
+    },
+    "affected_end_uses": [
+      "heating",
+      "cooling"
+    ],
+    "applicable_building_types": [
+      "Multi-Family with 2 - 4 Units",
+      "Multi-Family with 5+ Units",
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  },
+  {
+    "upgrade_id": 14,
+    "upgrade_name": "Drill and Fill Wall Insulation with Air Sealing",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 19561,
+    "annual_energy_savings_kwh": {
+      "p25": 955.7,
+      "median": 3250.74,
+      "p75": 9525.98
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": 73.56,
+      "median": 234.45,
+      "p75": 651.66
+    },
+    "affected_end_uses": [
+      "heating"
+    ],
+    "applicable_building_types": [
+      "Mobile Home",
+      "Multi-Family with 2 - 4 Units",
+      "Multi-Family with 5+ Units",
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  },
+  {
+    "upgrade_id": 15,
+    "upgrade_name": "Air Sealing + Attic Floor Insulation + Duct sealing",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 19646,
+    "annual_energy_savings_kwh": {
+      "p25": 718.1,
+      "median": 2567.16,
+      "p75": 7934.24
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": 55.25,
+      "median": 187.32,
+      "p75": 561.3
+    },
+    "affected_end_uses": [
+      "heating"
+    ],
+    "applicable_building_types": [
+      "Mobile Home",
+      "Multi-Family with 2 - 4 Units",
+      "Multi-Family with 5+ Units",
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  },
+  {
+    "upgrade_id": 16,
+    "upgrade_name": "Air Sealing + Attic Floor Insulation + Duct sealing + Drill and Fill Wall Insulation",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 19698,
+    "annual_energy_savings_kwh": {
+      "p25": 1005.97,
+      "median": 3455.6,
+      "p75": 10675.48
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": 77.28,
+      "median": 252.31,
+      "p75": 740
+    },
+    "affected_end_uses": [
+      "heating"
+    ],
+    "applicable_building_types": [
+      "Mobile Home",
+      "Multi-Family with 2 - 4 Units",
+      "Multi-Family with 5+ Units",
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  },
+  {
+    "upgrade_id": 17,
+    "upgrade_name": "EnergyStar Windows",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 19869,
+    "annual_energy_savings_kwh": {
+      "p25": 636.26,
+      "median": 1551.52,
+      "p75": 3062.89
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": 48.77,
+      "median": 110.02,
+      "p75": 221.2
+    },
+    "affected_end_uses": [
+      "heating"
+    ],
+    "applicable_building_types": [
+      "Mobile Home",
+      "Multi-Family with 2 - 4 Units",
+      "Multi-Family with 5+ Units",
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  },
+  {
+    "upgrade_id": 18,
+    "upgrade_name": "Package - Dual-Speed Geothermal Heat Pump with Thermally Enhanced Grout and Pipes with Air Sealing with Attic Floor Insulation with Duct Sealing",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 7198,
+    "annual_energy_savings_kwh": {
+      "p25": 4963.52,
+      "median": 15466.53,
+      "p75": 29462.29
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": 220.86,
+      "median": 645.12,
+      "p75": 1460.1
+    },
+    "affected_end_uses": [
+      "heating"
+    ],
+    "applicable_building_types": [
+      "Mobile Home",
+      "Multi-Family with 2 - 4 Units",
+      "Multi-Family with 5+ Units",
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  },
+  {
+    "upgrade_id": 19,
+    "upgrade_name": "Electric Vehicle Adoption with Level 1 Charging",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 17871,
+    "annual_energy_savings_kwh": {
+      "p25": -2847.63,
+      "median": -1420.81,
+      "p75": -318.42
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": -563.54,
+      "median": -280.55,
+      "p75": -63
+    },
+    "affected_end_uses": [
+      "EV charging"
+    ],
+    "applicable_building_types": [
+      "Mobile Home",
+      "Multi-Family with 2 - 4 Units",
+      "Multi-Family with 5+ Units",
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  },
+  {
+    "upgrade_id": 20,
+    "upgrade_name": "Electric Vehicle Adoption with Level 2 Charging",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 17997,
+    "annual_energy_savings_kwh": {
+      "p25": -2844.84,
+      "median": -1380.95,
+      "p75": -315.64
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": -563.01,
+      "median": -272.73,
+      "p75": -62.31
+    },
+    "affected_end_uses": [
+      "EV charging"
+    ],
+    "applicable_building_types": [
+      "Mobile Home",
+      "Multi-Family with 2 - 4 Units",
+      "Multi-Family with 5+ Units",
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  },
+  {
+    "upgrade_id": 21,
+    "upgrade_name": "Efficient Electric Vehicle Adoption with Level 2 Charging",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 17997,
+    "annual_energy_savings_kwh": {
+      "p25": -2473.81,
+      "median": -1201.01,
+      "p75": -274.31
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": -489.61,
+      "median": -237.03,
+      "p75": -54.17
+    },
+    "affected_end_uses": [
+      "EV charging"
+    ],
+    "applicable_building_types": [
+      "Mobile Home",
+      "Multi-Family with 2 - 4 Units",
+      "Multi-Family with 5+ Units",
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  },
+  {
+    "upgrade_id": 22,
+    "upgrade_name": "Electric Vehicle Adoption with Level 2 Charging and Demand Flexibility",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 17997,
+    "annual_energy_savings_kwh": {
+      "p25": -2844.84,
+      "median": -1381.24,
+      "p75": -315.64
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": -562.96,
+      "median": -272.67,
+      "p75": -62.31
+    },
+    "affected_end_uses": [
+      "EV charging"
+    ],
+    "applicable_building_types": [
+      "Mobile Home",
+      "Multi-Family with 2 - 4 Units",
+      "Multi-Family with 5+ Units",
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  },
+  {
+    "upgrade_id": 23,
+    "upgrade_name": "Efficient Electric Vehicle Adoption with Level 2 Charging and Demand Flexibility",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 17997,
+    "annual_energy_savings_kwh": {
+      "p25": -2473.81,
+      "median": -1201.01,
+      "p75": -274.31
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": -489.61,
+      "median": -237.03,
+      "p75": -54.17
+    },
+    "affected_end_uses": [
+      "EV charging"
+    ],
+    "applicable_building_types": [
+      "Mobile Home",
+      "Multi-Family with 2 - 4 Units",
+      "Multi-Family with 5+ Units",
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  },
+  {
+    "upgrade_id": 24,
+    "upgrade_name": "HVAC Demand Flexibility - On-peak Load Shedding, 2F Offset",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 19766,
+    "annual_energy_savings_kwh": {
+      "p25": 81.77,
+      "median": 185.22,
+      "p75": 399.75
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": 8.01,
+      "median": 16.2,
+      "p75": 32.81
+    },
+    "affected_end_uses": [
+      "heating",
+      "cooling"
+    ],
+    "applicable_building_types": [
+      "Mobile Home",
+      "Multi-Family with 2 - 4 Units",
+      "Multi-Family with 5+ Units",
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  },
+  {
+    "upgrade_id": 25,
+    "upgrade_name": "HVAC Demand Flexibility - Pre-peak Load Shifting, 2F Offset, 4hr Pre-peak Duration",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 19766,
+    "annual_energy_savings_kwh": {
+      "p25": -521.3,
+      "median": -271.09,
+      "p75": -118.4
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": -41.35,
+      "median": -21.31,
+      "p75": -9.44
+    },
+    "affected_end_uses": [
+      "heating",
+      "cooling"
+    ],
+    "applicable_building_types": [
+      "Mobile Home",
+      "Multi-Family with 2 - 4 Units",
+      "Multi-Family with 5+ Units",
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  },
+  {
+    "upgrade_id": 26,
+    "upgrade_name": "HVAC Demand Flexibility - On-peak Load Shedding, 4F Offset",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 19766,
+    "annual_energy_savings_kwh": {
+      "p25": 127.49,
+      "median": 320.03,
+      "p75": 689.3
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": 13.19,
+      "median": 27.48,
+      "p75": 56.65
+    },
+    "affected_end_uses": [
+      "heating",
+      "cooling"
+    ],
+    "applicable_building_types": [
+      "Mobile Home",
+      "Multi-Family with 2 - 4 Units",
+      "Multi-Family with 5+ Units",
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  },
+  {
+    "upgrade_id": 27,
+    "upgrade_name": "HVAC Demand Flexibility - Pre-peak Load Shifting, 4F Offset, 4hr Pre-peak Duration",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 19766,
+    "annual_energy_savings_kwh": {
+      "p25": -1092.86,
+      "median": -530.46,
+      "p75": -240.9
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": -84,
+      "median": -42.59,
+      "p75": -19.77
+    },
+    "affected_end_uses": [
+      "heating"
+    ],
+    "applicable_building_types": [
+      "Mobile Home",
+      "Multi-Family with 2 - 4 Units",
+      "Multi-Family with 5+ Units",
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  },
+  {
+    "upgrade_id": 28,
+    "upgrade_name": "HVAC Demand Flexibility - Pre-peak Load Shifting, 2F Offset, 1hr Pre-peak Duration",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 19766,
+    "annual_energy_savings_kwh": {
+      "p25": -230.35,
+      "median": -111.37,
+      "p75": -26.67
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": -18.13,
+      "median": -8.26,
+      "p75": -1.73
+    },
+    "affected_end_uses": [
+      "heating"
+    ],
+    "applicable_building_types": [
+      "Mobile Home",
+      "Multi-Family with 2 - 4 Units",
+      "Multi-Family with 5+ Units",
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  },
+  {
+    "upgrade_id": 29,
+    "upgrade_name": "General Air Sealing",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 18295,
+    "annual_energy_savings_kwh": {
+      "p25": 269.04,
+      "median": 834.96,
+      "p75": 2246.68
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": 20.5,
+      "median": 59.41,
+      "p75": 155.53
+    },
+    "affected_end_uses": [
+      "heating"
+    ],
+    "applicable_building_types": [
+      "Mobile Home",
+      "Multi-Family with 2 - 4 Units",
+      "Multi-Family with 5+ Units",
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  },
+  {
+    "upgrade_id": 30,
+    "upgrade_name": "General Air Sealing, Attic Floor Insulation, and Duct Sealing",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 18925,
+    "annual_energy_savings_kwh": {
+      "p25": 289.85,
+      "median": 958.93,
+      "p75": 3428.05
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": 22.04,
+      "median": 68.63,
+      "p75": 247.36
+    },
+    "affected_end_uses": [
+      "heating"
+    ],
+    "applicable_building_types": [
+      "Mobile Home",
+      "Multi-Family with 2 - 4 Units",
+      "Multi-Family with 5+ Units",
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  },
+  {
+    "upgrade_id": 31,
+    "upgrade_name": "Dual-Speed Geothermal Heat Pump with Thermally Enhanced Grout and Pipes, General Air Sealing, Attic Floor Insulation, and Duct Sealing",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 7198,
+    "annual_energy_savings_kwh": {
+      "p25": 4547.22,
+      "median": 14418.51,
+      "p75": 27641.07
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": 123.28,
+      "median": 413.42,
+      "p75": 1064.49
+    },
+    "affected_end_uses": [
+      "heating"
+    ],
+    "applicable_building_types": [
+      "Mobile Home",
+      "Multi-Family with 2 - 4 Units",
+      "Multi-Family with 5+ Units",
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  },
+  {
+    "upgrade_id": 32,
+    "upgrade_name": "Variable-Speed Geothermal Heat Pump with Thermally Enhanced Grout and Pipes, General Air Sealing, Attic Floor Insulation, and Duct Sealing",
+    "source": "NREL ResStock End-Use Savings Shapes, New York, ASHRAE climate zone 4A",
+    "climate_zone": "4A",
+    "buildings_applicable": 7198,
+    "annual_energy_savings_kwh": {
+      "p25": 5259.23,
+      "median": 15753.3,
+      "p75": 29477.82
+    },
+    "annual_utility_cost_savings_usd": {
+      "p25": 270.5,
+      "median": 673.63,
+      "p75": 1421.73
+    },
+    "affected_end_uses": [
+      "heating",
+      "cooling"
+    ],
+    "applicable_building_types": [
+      "Mobile Home",
+      "Multi-Family with 2 - 4 Units",
+      "Multi-Family with 5+ Units",
+      "Single-Family Attached",
+      "Single-Family Detached"
+    ],
+    "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
+  }
+]
