@@ -33,6 +33,7 @@ Thumbs.db
 data/nrel/resstock/*.csv.gz
 data/nrel/resstock/*.xlsx
 data/nyc_cost_sources/*.pdf
+data/remdb/*.xlsx
 
 # next.js build output
 .next/

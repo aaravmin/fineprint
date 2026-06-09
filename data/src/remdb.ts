@@ -1,84 +1,106 @@
-// REMDB fetcher: pulls residential efficiency measures from the OpenEI measures
-// service and normalizes them into the shared NormalizedMeasure schema.
+// REMDB normalizer: turns the NREL Residential Efficiency Measures Database
+// "Machine Read" sheet into shared NormalizedMeasure records.
 //
-// Two hard rules from the roadmap shape this module. The API key comes from the
-// environment (OPENEI_API_KEY), never hardcoded. And the normalizer maps only
-// the fields a response actually carries, leaving everything else null — it
-// never fabricates a cost, saving, or lifetime. Every raw key the response
-// exposes is recorded in the report, so the field mapping below can be confirmed
-// against the live schema rather than trusted blind.
+// REMDB has no JSON API — it ships as an .xlsx (data.openei.org/submissions/8336),
+// so no OpenEI key is needed; the file is a public download. The "Machine Read"
+// sheet is a price-regression model, not a cost table: installed cost is
+//   (coef1 x metric1 + coef2 x metric2 + intercept) x install_multiplier + install_adder
+// with separate Low / Mid / High coefficient and intercept columns. We evaluate
+// that model at the midpoint of each performance metric's stated valid range to
+// get one representative installed retrofit cost per measure, and record the
+// exact evaluation point and source row in notes. Costs are REMDB's own model
+// applied at a documented sizing — nothing is invented, and savings stay null
+// because this sheet carries none (ResStock supplies savings downstream).
 
-import { fetchJson } from "./http.ts";
 import {
   emptyMeasure,
   MEASURE_FIELDS,
   type NormalizedMeasure,
 } from "./normalized/measureSchema.ts";
 
-export const OPENEI_MEASURES_ENDPOINT =
-  "https://api.openei.org/services/v1/measures.json";
+export const REMDB_XLSX_URL =
+  "https://data.openei.org/files/8336/REMDB_2024.12.23.xlsx";
+export const REMDB_XLSX_FILENAME = "REMDB_2024.12.23.xlsx";
+export const REMDB_SHEET = "Machine Read";
 
-export interface RemdbFetchReport {
-  keyFound: boolean;
-  endpoint: string;
-  rawMeasureCount: number;
+// Column layout of the "Machine Read" sheet (header is row index 1; data starts
+// at row index 2). Indices are fixed by the published file's structure.
+const COL = {
+  name: 0,
+  className: 1,
+  outputUnits: 3,
+  m1CoefLow: 4,
+  m1CoefMid: 5,
+  m1CoefHigh: 6,
+  m1Metric: 7,
+  m1Unit: 8,
+  m1Lower: 9,
+  m1Upper: 10,
+  m2CoefLow: 11,
+  m2CoefMid: 12,
+  m2CoefHigh: 13,
+  m2Metric: 14,
+  m2Unit: 15,
+  m2Lower: 16,
+  m2Upper: 17,
+  intLow: 18,
+  intMid: 19,
+  intHigh: 20,
+  installMultRetrofit: 22,
+  installAdderRetrofit: 24,
+  lifetime: 26,
+  dataSources: 28,
+  qualitativeRank: 29,
+  rowNotes: 30,
+} as const;
+
+// REMDB uses 999 in the Lifetime column as a sentinel for "effectively the life
+// of the building", not a literal 999-year service life — so it becomes null.
+const LIFETIME_SENTINEL = 999;
+
+export interface RemdbParseReport {
+  sourceFile: string;
+  sourceUrl: string;
+  sheet: string;
+  rawRowCount: number;
   normalizedMeasureCount: number;
-  rawKeysSeen: string[];
+  columnsSeen: string[];
   mappedFields: string[];
   missingFields: string[];
   errors: string[];
   assumptions: string[];
 }
 
-export interface RemdbFetchOutput {
+export interface RemdbParseOutput {
   measures: NormalizedMeasure[];
-  report: RemdbFetchReport;
+  report: RemdbParseReport;
 }
 
-type RawMeasure = Record<string, unknown>;
-type JsonFetcher = <T>(url: string, options: { service: string }) => Promise<T>;
+type Cell = unknown;
+type Row = Cell[];
 
-// Candidate source keys per schema field, tried in order. REMDB's exact column
-// names are not publicly documented, so these are confirmed against the live
-// response (the report lists every raw key seen). A field with no matching key
-// stays null — a guessed name simply never matches, so nothing is invented.
-const NUMBER_SOURCES: Partial<Record<keyof NormalizedMeasure, string[]>> = {
-  cost_low: ["cost_low", "low_cost", "min_cost", "cost_min"],
-  cost_mid: ["cost", "cost_mid", "mid_cost", "median_cost", "cost_median"],
-  cost_high: ["cost_high", "high_cost", "max_cost", "cost_max"],
-  energy_savings: ["energy_savings", "savings", "annual_savings", "savings_pct"],
-  carbon_savings: ["carbon_savings", "co2_savings", "emissions_savings"],
-  lifetime_years: ["lifetime", "lifetime_years", "useful_life", "life", "lifespan"],
-};
-
-const STRING_SOURCES: Partial<Record<keyof NormalizedMeasure, string[]>> = {
-  measure_name: ["name", "measure", "measure_name", "title"],
-  category: ["group", "category", "group_name", "type", "measure_group"],
-  cost_unit: ["cost_units", "cost_unit", "units", "unit"],
-  notes: ["description", "notes", "comment", "definition"],
-};
-
-function pickNumber(raw: RawMeasure, keys: string[]): number | null {
-  for (const key of keys) {
-    const value = raw[key];
-    if (typeof value === "number" && Number.isFinite(value)) {
-      return value;
-    }
-    if (typeof value === "string" && value.trim() !== "" && Number.isFinite(Number(value))) {
-      return Number(value);
-    }
+function num(cell: Cell): number | null {
+  if (typeof cell === "number" && Number.isFinite(cell)) {
+    return cell;
+  }
+  if (typeof cell === "string" && cell.trim() !== "" && Number.isFinite(Number(cell))) {
+    return Number(cell);
   }
   return null;
 }
 
-function pickString(raw: RawMeasure, keys: string[]): string | null {
-  for (const key of keys) {
-    const value = raw[key];
-    if (typeof value === "string" && value.trim() !== "") {
-      return value.trim();
-    }
+function str(cell: Cell): string | null {
+  if (typeof cell === "string" && cell.trim() !== "") {
+    return cell.trim();
+  }
+  if (typeof cell === "number") {
+    return String(cell);
   }
   return null;
+}
+
+function round2(value: number): number {
+  return Math.round(value * 100) / 100;
 }
 
 function slugify(text: string): string {
@@ -88,57 +110,129 @@ function slugify(text: string): string {
     .replace(/^_+|_+$/g, "");
 }
 
-// One raw REMDB record to one NormalizedMeasure. Identity and source provenance
-// are always set; data fields are set only where a source key matched. The
-// residential/commercial flags and confidence are source-level facts about
-// REMDB (the national *residential* measures database), not per-measure guesses.
-function normalizeRemdbMeasure(raw: RawMeasure, index: number): NormalizedMeasure {
-  const name = pickString(raw, STRING_SOURCES.measure_name ?? []) ?? `REMDB measure ${index + 1}`;
-  const rawId = pickString(raw, ["id", "measure_id", "uuid"]);
-  const measure = emptyMeasure(rawId ?? `remdb:${slugify(name)}`, name);
+// Midpoint of a metric's valid range. null when the range is absent (an "N/A"
+// metric), so the term drops out rather than guessing a value.
+function midpoint(lower: number | null, upper: number | null): number | null {
+  if (lower === null && upper === null) {
+    return null;
+  }
+  return ((lower ?? upper!) + (upper ?? lower!)) / 2;
+}
 
-  measure.category = pickString(raw, STRING_SOURCES.category ?? []);
-  measure.cost_unit = pickString(raw, STRING_SOURCES.cost_unit ?? []);
-  measure.notes = pickString(raw, STRING_SOURCES.notes ?? []);
+// One installed-cost estimate (Low, Mid, or High) at the metric midpoints. Null
+// when the row carries no coefficient or intercept at all for that level (so we
+// never report a fabricated zero), or when the model evaluates below zero.
+function installedCost(
+  coef1: number | null,
+  coef2: number | null,
+  intercept: number | null,
+  m1: number | null,
+  m2: number | null,
+  installMult: number,
+  installAdder: number,
+): number | null {
+  if (coef1 === null && coef2 === null && intercept === null) {
+    return null;
+  }
+  const retail = (coef1 ?? 0) * (m1 ?? 0) + (coef2 ?? 0) * (m2 ?? 0) + (intercept ?? 0);
+  const installed = retail * installMult + installAdder;
+  return installed < 0 ? null : round2(installed);
+}
 
-  measure.cost_low = pickNumber(raw, NUMBER_SOURCES.cost_low ?? []);
-  measure.cost_mid = pickNumber(raw, NUMBER_SOURCES.cost_mid ?? []);
-  measure.cost_high = pickNumber(raw, NUMBER_SOURCES.cost_high ?? []);
-  measure.energy_savings = pickNumber(raw, NUMBER_SOURCES.energy_savings ?? []);
-  measure.carbon_savings = pickNumber(raw, NUMBER_SOURCES.carbon_savings ?? []);
-  measure.lifetime_years = pickNumber(raw, NUMBER_SOURCES.lifetime_years ?? []);
+function normalizeRow(row: Row, sheetRowNumber: number): NormalizedMeasure | null {
+  const name = str(row[COL.name]);
+  if (name === null) {
+    return null;
+  }
+  const className = str(row[COL.className]);
+  const measureName = className ? `${name} — ${className}` : name;
+  const slug = slugify(className ? `${name} ${className}` : name);
 
-  // Source-level facts about REMDB, not invented per-measure values.
-  measure.building_type = "residential";
+  const measure = emptyMeasure(`remdb:${slug}`, measureName);
+
+  const m1 = midpoint(num(row[COL.m1Lower]), num(row[COL.m1Upper]));
+  const m2 = midpoint(num(row[COL.m2Lower]), num(row[COL.m2Upper]));
+  const installMult = num(row[COL.installMultRetrofit]) ?? 1;
+  const installAdder = num(row[COL.installAdderRetrofit]) ?? 0;
+
+  measure.cost_low = installedCost(
+    num(row[COL.m1CoefLow]), num(row[COL.m2CoefLow]), num(row[COL.intLow]),
+    m1, m2, installMult, installAdder,
+  );
+  measure.cost_mid = installedCost(
+    num(row[COL.m1CoefMid]), num(row[COL.m2CoefMid]), num(row[COL.intMid]),
+    m1, m2, installMult, installAdder,
+  );
+  measure.cost_high = installedCost(
+    num(row[COL.m1CoefHigh]), num(row[COL.m2CoefHigh]), num(row[COL.intHigh]),
+    m1, m2, installMult, installAdder,
+  );
+  measure.cost_unit = str(row[COL.outputUnits]);
+
+  const rawLifetime = num(row[COL.lifetime]);
+  measure.lifetime_years =
+    rawLifetime === null || rawLifetime === LIFETIME_SENTINEL ? null : round2(rawLifetime);
+
+  // Source-level facts about REMDB (the national *residential* database). We
+  // assert residential, but leave commercial unknown rather than claim it.
+  measure.category = name;
   measure.applies_to_residential = true;
-  measure.applies_to_commercial = false;
-  measure.source_name = "REMDB (OpenEI National Residential Efficiency Measures Database)";
-  measure.source_file = OPENEI_MEASURES_ENDPOINT;
+  measure.applies_to_commercial = null;
+  measure.source_name =
+    "NREL Residential Efficiency Measures Database (REMDB), machine-readable release 2024-12-23";
+  measure.source_file = REMDB_XLSX_FILENAME;
+  measure.source_page = `${REMDB_SHEET} row ${sheetRowNumber}`;
   measure.confidence_level = "medium";
+  measure.notes = buildNotes(row, m1, m2, installMult, installAdder, rawLifetime);
 
   return measure;
 }
 
-// Pull the measure array out of whatever envelope OpenEI returns: a bare array,
-// or an object keyed by measures / items / result / data.
-function extractRawMeasures(payload: unknown): RawMeasure[] {
-  if (Array.isArray(payload)) {
-    return payload as RawMeasure[];
+function buildNotes(
+  row: Row,
+  m1: number | null,
+  m2: number | null,
+  installMult: number,
+  installAdder: number,
+  rawLifetime: number | null,
+): string {
+  const m1Metric = str(row[COL.m1Metric]);
+  const m1Unit = str(row[COL.m1Unit]);
+  const m2Metric = str(row[COL.m2Metric]);
+  const m2Unit = str(row[COL.m2Unit]);
+
+  const evalPoints: string[] = [];
+  if (m1 !== null && m1Metric && m1Metric !== "N/A") {
+    evalPoints.push(`${m1Metric} = ${round2(m1)} ${m1Unit ?? ""}`.trim());
   }
-  if (payload && typeof payload === "object") {
-    for (const key of ["measures", "items", "result", "results", "data"]) {
-      const value = (payload as Record<string, unknown>)[key];
-      if (Array.isArray(value)) {
-        return value as RawMeasure[];
-      }
-    }
+  if (m2 !== null && m2Metric && m2Metric !== "N/A") {
+    evalPoints.push(`${m2Metric} = ${round2(m2)} ${m2Unit ?? ""}`.trim());
   }
-  return [];
+
+  const parts = [
+    "Installed retrofit cost from REMDB's price regression, evaluated at the midpoint of each metric's valid range" +
+      (evalPoints.length > 0 ? ` (${evalPoints.join("; ")})` : "") +
+      `, with retrofit install multiplier ${installMult} and adder ${installAdder}.`,
+  ];
+
+  const dataSources = str(row[COL.dataSources]);
+  if (dataSources) {
+    parts.push(`REMDB data sources: ${dataSources}.`);
+  }
+  const rank = str(row[COL.qualitativeRank]);
+  if (rank) {
+    parts.push(`Qualitative rank: ${rank}.`);
+  }
+  if (rawLifetime === LIFETIME_SENTINEL) {
+    parts.push("Lifetime 999 in source is a 'life of building' sentinel, recorded as null.");
+  }
+  const rowNotes = str(row[COL.rowNotes]);
+  if (rowNotes) {
+    parts.push(`REMDB note: ${rowNotes}`);
+  }
+  return parts.join(" ");
 }
 
-// The schema fields the normalizer can actually fill from a source (identity and
-// provenance are always set; the rest depend on the data). Splits the schema
-// into "mapped at least once" vs "always null across every measure".
 function summarizeFieldCoverage(measures: NormalizedMeasure[]): {
   mapped: string[];
   missing: string[];
@@ -155,100 +249,51 @@ function summarizeFieldCoverage(measures: NormalizedMeasure[]): {
   return { mapped: [...mapped], missing };
 }
 
-export async function fetchRemdbMeasures(
-  apiKey: string | undefined,
-  fetcher: JsonFetcher = fetchJson,
-): Promise<RemdbFetchOutput> {
-  const errors: string[] = [];
-  const assumptions: string[] = [
-    "REMDB is the national *residential* measures database, so every measure is tagged residential with medium confidence.",
-    "OpenEI does not publicly document the measures response schema; field mapping is best-effort and confirmed against the raw keys recorded below.",
-  ];
+// Normalize the full "Machine Read" sheet, given its rows as a 2D array (row 0 is
+// the group banner, row 1 the column headers, data from row 2). Pure: the caller
+// reads the workbook and writes the outputs, so this stays testable offline.
+export function normalizeRemdbSheet(rows: Row[]): RemdbParseOutput {
+  const header = (rows[1] ?? []).map(cell => str(cell) ?? "");
+  const dataRows = rows.slice(2);
 
-  if (!apiKey || apiKey.trim() === "") {
-    return {
-      measures: [],
-      report: {
-        keyFound: false,
-        endpoint: OPENEI_MEASURES_ENDPOINT,
-        rawMeasureCount: 0,
-        normalizedMeasureCount: 0,
-        rawKeysSeen: [],
-        mappedFields: [],
-        missingFields: [...MEASURE_FIELDS],
-        errors: ["OPENEI_API_KEY not found in the environment; no request was made."],
-        assumptions,
-      },
-    };
-  }
+  const measures: NormalizedMeasure[] = [];
+  const seenIds = new Map<string, number>();
 
-  const url = `${OPENEI_MEASURES_ENDPOINT}?version=latest&format=json&api_key=${encodeURIComponent(apiKey)}`;
+  dataRows.forEach((row, index) => {
+    const measure = normalizeRow(row, index + 3); // +3: 1-based, past the two header rows
+    if (measure === null) {
+      return;
+    }
+    // Disambiguate the rare duplicate Name + Class so every id stays unique.
+    const count = seenIds.get(measure.measure_id) ?? 0;
+    seenIds.set(measure.measure_id, count + 1);
+    if (count > 0) {
+      measure.measure_id = `${measure.measure_id}_${count + 1}`;
+    }
+    measures.push(measure);
+  });
 
-  let payload: unknown;
-  try {
-    payload = await fetcher<unknown>(url, { service: "REMDB" });
-  } catch (error) {
-    return {
-      measures: [],
-      report: {
-        keyFound: true,
-        endpoint: OPENEI_MEASURES_ENDPOINT,
-        rawMeasureCount: 0,
-        normalizedMeasureCount: 0,
-        rawKeysSeen: [],
-        mappedFields: [],
-        missingFields: [...MEASURE_FIELDS],
-        errors: [`REMDB request failed: ${(error as Error).message}`],
-        assumptions,
-      },
-    };
-  }
-
-  // OpenEI returns an error object (not an HTTP error) for a bad key or request.
-  if (payload && typeof payload === "object" && "error" in (payload as Record<string, unknown>)) {
-    const apiError = JSON.stringify((payload as Record<string, unknown>).error);
-    return {
-      measures: [],
-      report: {
-        keyFound: true,
-        endpoint: OPENEI_MEASURES_ENDPOINT,
-        rawMeasureCount: 0,
-        normalizedMeasureCount: 0,
-        rawKeysSeen: [],
-        mappedFields: [],
-        missingFields: [...MEASURE_FIELDS],
-        errors: [`OpenEI returned an error: ${apiError}`],
-        assumptions,
-      },
-    };
-  }
-
-  const rawMeasures = extractRawMeasures(payload);
-  const rawKeysSeen = [
-    ...new Set(rawMeasures.flatMap(measure => Object.keys(measure))),
-  ].sort();
-
-  if (rawMeasures.length === 0) {
-    errors.push(
-      "Response carried no recognizable measure array (checked the top level and measures/items/result/results/data).",
-    );
-  }
-
-  const measures = rawMeasures.map((raw, index) => normalizeRemdbMeasure(raw, index));
   const { mapped, missing } = summarizeFieldCoverage(measures);
 
   return {
     measures,
     report: {
-      keyFound: true,
-      endpoint: OPENEI_MEASURES_ENDPOINT,
-      rawMeasureCount: rawMeasures.length,
+      sourceFile: REMDB_XLSX_FILENAME,
+      sourceUrl: REMDB_XLSX_URL,
+      sheet: REMDB_SHEET,
+      rawRowCount: dataRows.length,
       normalizedMeasureCount: measures.length,
-      rawKeysSeen,
+      columnsSeen: header.filter(name => name !== ""),
       mappedFields: mapped,
       missingFields: missing,
-      errors,
-      assumptions,
+      errors: [],
+      assumptions: [
+        "REMDB has no JSON API; this reads the public REMDB 2024 .xlsx (data.openei.org/submissions/8336). No OpenEI key is needed.",
+        "Cost is REMDB's own price regression evaluated at the midpoint of each performance metric's valid range, using the retrofit install multiplier and adder; the exact point is recorded per measure in notes.",
+        "Low/Mid/High costs come from REMDB's Low/Mid/High coefficient and intercept columns at that same midpoint sizing.",
+        "REMDB is the national residential database, so applies_to_residential is true and applies_to_commercial is left null (unknown), not false.",
+        "This sheet carries cost only; all savings fields stay null (ResStock supplies residential savings in a later phase).",
+      ],
     },
   };
 }
