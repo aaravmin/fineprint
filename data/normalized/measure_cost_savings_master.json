@@ -1,0 +1,1077 @@
+[
+  {
+    "measure_id": "master:air_source_heat_pump",
+    "measure_name": "Air-source heat pump (cold climate)",
+    "category": "Heating & cooling",
+    "building_type": null,
+    "applies_to_residential": true,
+    "applies_to_commercial": null,
+    "cost_low": 13000,
+    "cost_mid": null,
+    "cost_high": 20000,
+    "cost_unit": "2022 USD, total per single-family home",
+    "energy_savings": null,
+    "carbon_savings": null,
+    "annual_energy_savings_low": 4495.34,
+    "annual_energy_savings_mid": 12825.23,
+    "annual_energy_savings_high": 24194.92,
+    "annual_utility_savings_low": -128.88,
+    "annual_utility_savings_mid": 97.6,
+    "annual_utility_savings_high": 506.05,
+    "lifetime_years": null,
+    "source_name": "NYC retrofit cost PDFs (NYSERDA / Urban Green)",
+    "source_file": "NY-Building-Electrification-Cost-Full-Report-June2022.pdf",
+    "source_page": 10,
+    "confidence_level": "high",
+    "notes": "Cost is the single-family heat-pump/AC line; savings from the cold-climate ducted ASHP upgrade. Cost source: NYC PDF (1 row). Savings source: ResStock upgrade 4 (energy + utility, 7388 dwellings).",
+    "supports_law_ids": [
+      "ll97",
+      "ll87"
+    ],
+    "sources": [
+      {
+        "role": "cost",
+        "source": "nyc_pdf",
+        "ref": "NY-Building-Electrification-Cost-Full-Report-June2022.pdf p.10 — Residential — single family",
+        "original": {
+          "cost_low": 13000,
+          "cost_mid": null,
+          "cost_high": 20000,
+          "cost_unit": "2022 USD, total per single-family home"
+        }
+      },
+      {
+        "role": "savings",
+        "source": "resstock",
+        "ref": "ResStock upgrade 4: Typical Cold Climate Ducted Air Source Heat Pump with Detailed Performance Data",
+        "original": {
+          "buildings_applicable": 7388,
+          "annual_energy_savings_kwh": {
+            "p25": 4495.34,
+            "median": 12825.23,
+            "p75": 24194.92
+          },
+          "annual_utility_cost_savings_usd": {
+            "p25": -128.88,
+            "median": 97.6,
+            "p75": 506.05
+          },
+          "affected_end_uses": [
+            "heating"
+          ]
+        }
+      }
+    ],
+    "cost_source": "nyc_pdf",
+    "savings_source": "resstock"
+  },
+  {
+    "measure_id": "master:ground_source_heat_pump",
+    "measure_name": "Ground-source (geothermal) heat pump",
+    "category": "Heating & cooling",
+    "building_type": null,
+    "applies_to_residential": true,
+    "applies_to_commercial": null,
+    "cost_low": 24000,
+    "cost_mid": null,
+    "cost_high": 38800,
+    "cost_unit": "2022 USD, total per single-family home",
+    "energy_savings": null,
+    "carbon_savings": null,
+    "annual_energy_savings_low": 4159.56,
+    "annual_energy_savings_mid": 13060.13,
+    "annual_energy_savings_high": 24857.56,
+    "annual_utility_savings_low": -11.96,
+    "annual_utility_savings_mid": 155.44,
+    "annual_utility_savings_high": 587.22,
+    "lifetime_years": null,
+    "source_name": "NYC retrofit cost PDFs (NYSERDA / Urban Green)",
+    "source_file": "NY-Building-Electrification-Cost-Full-Report-June2022.pdf",
+    "source_page": 10,
+    "confidence_level": "high",
+    "notes": "Savings from the dual-speed geothermal upgrade (representative of ResStock geothermal variants 6/7/8). Cost source: NYC PDF (1 row). Savings source: ResStock upgrade 7 (energy + utility, 7198 dwellings).",
+    "supports_law_ids": [
+      "ll97",
+      "ll87"
+    ],
+    "sources": [
+      {
+        "role": "cost",
+        "source": "nyc_pdf",
+        "ref": "NY-Building-Electrification-Cost-Full-Report-June2022.pdf p.10 — Residential — single family",
+        "original": {
+          "cost_low": 24000,
+          "cost_mid": null,
+          "cost_high": 38800,
+          "cost_unit": "2022 USD, total per single-family home"
+        }
+      },
+      {
+        "role": "savings",
+        "source": "resstock",
+        "ref": "ResStock upgrade 7: Dual-Speed Geothermal Heat Pump with Thermally Enhanced Grout and Pipes",
+        "original": {
+          "buildings_applicable": 7198,
+          "annual_energy_savings_kwh": {
+            "p25": 4159.56,
+            "median": 13060.13,
+            "p75": 24857.56
+          },
+          "annual_utility_cost_savings_usd": {
+            "p25": -11.96,
+            "median": 155.44,
+            "p75": 587.22
+          },
+          "affected_end_uses": [
+            "heating"
+          ]
+        }
+      }
+    ],
+    "cost_source": "nyc_pdf",
+    "savings_source": "resstock"
+  },
+  {
+    "measure_id": "master:heat_pump_water_heater",
+    "measure_name": "Heat-pump water heater",
+    "category": "Water heating",
+    "building_type": null,
+    "applies_to_residential": true,
+    "applies_to_commercial": null,
+    "cost_low": 900,
+    "cost_mid": null,
+    "cost_high": 4000,
+    "cost_unit": "2022 USD, total per single-family home",
+    "energy_savings": null,
+    "carbon_savings": null,
+    "annual_energy_savings_low": 1352.89,
+    "annual_energy_savings_mid": 2193.34,
+    "annual_energy_savings_high": 3343.57,
+    "annual_utility_savings_low": 48.65,
+    "annual_utility_savings_mid": 99.71,
+    "annual_utility_savings_high": 213.12,
+    "lifetime_years": null,
+    "source_name": "NYC retrofit cost PDFs (NYSERDA / Urban Green)",
+    "source_file": "NY-Building-Electrification-Cost-Full-Report-June2022.pdf",
+    "source_page": 11,
+    "confidence_level": "high",
+    "notes": "Cost source: NYC PDF (1 row). Savings source: ResStock upgrade 9 (energy + utility, 19782 dwellings).",
+    "supports_law_ids": [
+      "ll97"
+    ],
+    "sources": [
+      {
+        "role": "cost",
+        "source": "nyc_pdf",
+        "ref": "NY-Building-Electrification-Cost-Full-Report-June2022.pdf p.11 — Residential — single family",
+        "original": {
+          "cost_low": 900,
+          "cost_mid": null,
+          "cost_high": 4000,
+          "cost_unit": "2022 USD, total per single-family home"
+        }
+      },
+      {
+        "role": "savings",
+        "source": "resstock",
+        "ref": "ResStock upgrade 9: Heat Pumps Water Heater",
+        "original": {
+          "buildings_applicable": 19782,
+          "annual_energy_savings_kwh": {
+            "p25": 1352.89,
+            "median": 2193.34,
+            "p75": 3343.57
+          },
+          "annual_utility_cost_savings_usd": {
+            "p25": 48.65,
+            "median": 99.71,
+            "p75": 213.12
+          },
+          "affected_end_uses": [
+            "hot water",
+            "heating"
+          ]
+        }
+      }
+    ],
+    "cost_source": "nyc_pdf",
+    "savings_source": "resstock"
+  },
+  {
+    "measure_id": "master:gas_tankless_water_heater",
+    "measure_name": "High-efficiency gas tankless water heater",
+    "category": "Water heating",
+    "building_type": null,
+    "applies_to_residential": true,
+    "applies_to_commercial": null,
+    "cost_low": 1899.26,
+    "cost_mid": 2245.71,
+    "cost_high": 2794.14,
+    "cost_unit": "2023$",
+    "energy_savings": null,
+    "carbon_savings": null,
+    "annual_energy_savings_low": 952.48,
+    "annual_energy_savings_mid": 1547.71,
+    "annual_energy_savings_high": 1863.86,
+    "annual_utility_savings_low": 76.62,
+    "annual_utility_savings_mid": 94.9,
+    "annual_utility_savings_high": 191.74,
+    "lifetime_years": 20,
+    "source_name": "NREL Residential Efficiency Measures Database (REMDB), machine-readable release 2024-12-23",
+    "source_file": "REMDB_2024.12.23.xlsx",
+    "source_page": "Machine Read row 124",
+    "confidence_level": "medium",
+    "notes": "Efficiency measure, not electrification; cost from REMDB (no NYC-specific figure). Cost source: REMDB (1 row); no NYC-specific cost. Savings source: ResStock upgrade 10 (energy + utility, 15546 dwellings).",
+    "supports_law_ids": [
+      "ll97"
+    ],
+    "sources": [
+      {
+        "role": "cost",
+        "source": "remdb",
+        "ref": "remdb:water_heater_gas_inst",
+        "original": {
+          "cost_low": 1899.26,
+          "cost_mid": 2245.71,
+          "cost_high": 2794.14,
+          "cost_unit": "2023$",
+          "lifetime_years": 20
+        }
+      },
+      {
+        "role": "savings",
+        "source": "resstock",
+        "ref": "ResStock upgrade 10: High Efficiency Natural Gas Tankless Water Heater",
+        "original": {
+          "buildings_applicable": 15546,
+          "annual_energy_savings_kwh": {
+            "p25": 952.48,
+            "median": 1547.71,
+            "p75": 1863.86
+          },
+          "annual_utility_cost_savings_usd": {
+            "p25": 76.62,
+            "median": 94.9,
+            "p75": 191.74
+          },
+          "affected_end_uses": [
+            "hot water",
+            "heating"
+          ]
+        }
+      }
+    ],
+    "cost_source": "remdb",
+    "savings_source": "resstock"
+  },
+  {
+    "measure_id": "master:gas_furnace_95_afue",
+    "measure_name": "95% AFUE natural gas furnace",
+    "category": "Heating & cooling",
+    "building_type": null,
+    "applies_to_residential": true,
+    "applies_to_commercial": null,
+    "cost_low": 3579.51,
+    "cost_mid": 3866.03,
+    "cost_high": 4640.11,
+    "cost_unit": "2023$",
+    "energy_savings": null,
+    "carbon_savings": null,
+    "annual_energy_savings_low": 410.74,
+    "annual_energy_savings_mid": 1647.35,
+    "annual_energy_savings_high": 4883.15,
+    "annual_utility_savings_low": 44.11,
+    "annual_utility_savings_mid": 213.25,
+    "annual_utility_savings_high": 670.14,
+    "lifetime_years": 21.4,
+    "source_name": "NREL Residential Efficiency Measures Database (REMDB), machine-readable release 2024-12-23",
+    "source_file": "REMDB_2024.12.23.xlsx",
+    "source_page": "Machine Read row 74",
+    "confidence_level": "medium",
+    "notes": "Efficiency upgrade for gas-heated homes with ducts. Cost source: REMDB (1 row); no NYC-specific cost. Savings source: ResStock upgrade 1 (energy + utility, 7099 dwellings).",
+    "supports_law_ids": [
+      "ll97"
+    ],
+    "sources": [
+      {
+        "role": "cost",
+        "source": "remdb",
+        "ref": "remdb:furnaces_gas_furnace",
+        "original": {
+          "cost_low": 3579.51,
+          "cost_mid": 3866.03,
+          "cost_high": 4640.11,
+          "cost_unit": "2023$",
+          "lifetime_years": 21.4
+        }
+      },
+      {
+        "role": "savings",
+        "source": "resstock",
+        "ref": "ResStock upgrade 1: Natural Gas Furnace 95% AFUE for All Dwellings with Ducts",
+        "original": {
+          "buildings_applicable": 7099,
+          "annual_energy_savings_kwh": {
+            "p25": 410.74,
+            "median": 1647.35,
+            "p75": 4883.15
+          },
+          "annual_utility_cost_savings_usd": {
+            "p25": 44.11,
+            "median": 213.25,
+            "p75": 670.14
+          },
+          "affected_end_uses": [
+            "heating"
+          ]
+        }
+      }
+    ],
+    "cost_source": "remdb",
+    "savings_source": "resstock"
+  },
+  {
+    "measure_id": "master:air_sealing",
+    "measure_name": "Envelope air sealing",
+    "category": "Envelope",
+    "building_type": null,
+    "applies_to_residential": true,
+    "applies_to_commercial": null,
+    "cost_low": 0.24,
+    "cost_mid": 0.645,
+    "cost_high": 1.39,
+    "cost_unit": "2023$/sqft",
+    "energy_savings": null,
+    "carbon_savings": null,
+    "annual_energy_savings_low": 686.74,
+    "annual_energy_savings_mid": 2302.95,
+    "annual_energy_savings_high": 6397.59,
+    "annual_utility_savings_low": 52.14,
+    "annual_utility_savings_mid": 167.03,
+    "annual_utility_savings_high": 446.51,
+    "lifetime_years": null,
+    "source_name": "NREL Residential Efficiency Measures Database (REMDB), machine-readable release 2024-12-23",
+    "source_file": "REMDB_2024.12.23.xlsx",
+    "source_page": "Machine Read row 5",
+    "confidence_level": "medium",
+    "notes": "Cost aggregates REMDB's <40% and >40% leakage-reduction rows ($/sqft). Cost source: REMDB (2 rows); no NYC-specific cost. Savings source: ResStock upgrade 11 (energy + utility, 19442 dwellings).",
+    "supports_law_ids": [
+      "ll97",
+      "ll87"
+    ],
+    "sources": [
+      {
+        "role": "cost",
+        "source": "remdb",
+        "ref": "remdb:air_sealing_40_reduction",
+        "original": {
+          "cost_low": 0.24,
+          "cost_mid": 0.42,
+          "cost_high": 0.74,
+          "cost_unit": "2023$/sqft",
+          "lifetime_years": null
+        }
+      },
+      {
+        "role": "cost",
+        "source": "remdb",
+        "ref": "remdb:air_sealing_40_reduction_2",
+        "original": {
+          "cost_low": 0.32,
+          "cost_mid": 0.87,
+          "cost_high": 1.39,
+          "cost_unit": "2023$/sqft",
+          "lifetime_years": null
+        }
+      },
+      {
+        "role": "savings",
+        "source": "resstock",
+        "ref": "ResStock upgrade 11: Air Sealing",
+        "original": {
+          "buildings_applicable": 19442,
+          "annual_energy_savings_kwh": {
+            "p25": 686.74,
+            "median": 2302.95,
+            "p75": 6397.59
+          },
+          "annual_utility_cost_savings_usd": {
+            "p25": 52.14,
+            "median": 167.03,
+            "p75": 446.51
+          },
+          "affected_end_uses": [
+            "heating"
+          ]
+        }
+      }
+    ],
+    "cost_source": "remdb",
+    "savings_source": "resstock"
+  },
+  {
+    "measure_id": "master:attic_floor_insulation",
+    "measure_name": "Attic floor insulation",
+    "category": "Envelope",
+    "building_type": null,
+    "applies_to_residential": true,
+    "applies_to_commercial": null,
+    "cost_low": 0.65,
+    "cost_mid": 1.08,
+    "cost_high": 1.65,
+    "cost_unit": "2023$/sqft",
+    "energy_savings": null,
+    "carbon_savings": null,
+    "annual_energy_savings_low": 411.47,
+    "annual_energy_savings_mid": 916.73,
+    "annual_energy_savings_high": 1997.57,
+    "annual_utility_savings_low": 30.05,
+    "annual_utility_savings_mid": 67.39,
+    "annual_utility_savings_high": 147.59,
+    "lifetime_years": null,
+    "source_name": "NREL Residential Efficiency Measures Database (REMDB), machine-readable release 2024-12-23",
+    "source_file": "REMDB_2024.12.23.xlsx",
+    "source_page": "Machine Read row 100",
+    "confidence_level": "medium",
+    "notes": "Cost from REMDB loose-fill attic ceiling insulation. Cost source: REMDB (1 row); no NYC-specific cost. Savings source: ResStock upgrade 12 (energy + utility, 3703 dwellings).",
+    "supports_law_ids": [
+      "ll97"
+    ],
+    "sources": [
+      {
+        "role": "cost",
+        "source": "remdb",
+        "ref": "remdb:unfinished_attic_ceiling_loose_fill",
+        "original": {
+          "cost_low": 0.65,
+          "cost_mid": 1.08,
+          "cost_high": 1.65,
+          "cost_unit": "2023$/sqft",
+          "lifetime_years": null
+        }
+      },
+      {
+        "role": "savings",
+        "source": "resstock",
+        "ref": "ResStock upgrade 12: Attic Floor Insulation for Unfinished Attics",
+        "original": {
+          "buildings_applicable": 3703,
+          "annual_energy_savings_kwh": {
+            "p25": 411.47,
+            "median": 916.73,
+            "p75": 1997.57
+          },
+          "annual_utility_cost_savings_usd": {
+            "p25": 30.05,
+            "median": 67.39,
+            "p75": 147.59
+          },
+          "affected_end_uses": [
+            "heating"
+          ]
+        }
+      }
+    ],
+    "cost_source": "remdb",
+    "savings_source": "resstock"
+  },
+  {
+    "measure_id": "master:duct_sealing_insulation",
+    "measure_name": "Duct sealing and insulation",
+    "category": "Heating & cooling",
+    "building_type": null,
+    "applies_to_residential": true,
+    "applies_to_commercial": null,
+    "cost_low": 0.27,
+    "cost_mid": 3.835,
+    "cost_high": 9.56,
+    "cost_unit": "2023$/sqft",
+    "energy_savings": null,
+    "carbon_savings": null,
+    "annual_energy_savings_low": 1630.06,
+    "annual_energy_savings_mid": 4361.78,
+    "annual_energy_savings_high": 7815.33,
+    "annual_utility_savings_low": 148.99,
+    "annual_utility_savings_mid": 315.8,
+    "annual_utility_savings_high": 590.41,
+    "lifetime_years": null,
+    "source_name": "NREL Residential Efficiency Measures Database (REMDB), machine-readable release 2024-12-23",
+    "source_file": "REMDB_2024.12.23.xlsx",
+    "source_page": "Machine Read row 48",
+    "confidence_level": "medium",
+    "notes": "Cost aggregates REMDB duct sealing and duct insulation. Cost source: REMDB (2 rows); no NYC-specific cost. Savings source: ResStock upgrade 13 (energy + utility, 4065 dwellings).",
+    "supports_law_ids": [
+      "ll97"
+    ],
+    "sources": [
+      {
+        "role": "cost",
+        "source": "remdb",
+        "ref": "remdb:duct_duct_sealing",
+        "original": {
+          "cost_low": 0.27,
+          "cost_mid": 0.52,
+          "cost_high": 1.09,
+          "cost_unit": "2023$/sqft",
+          "lifetime_years": null
+        }
+      },
+      {
+        "role": "cost",
+        "source": "remdb",
+        "ref": "remdb:duct_duct_insulation",
+        "original": {
+          "cost_low": 5.1,
+          "cost_mid": 7.15,
+          "cost_high": 9.56,
+          "cost_unit": "2023$/sqft",
+          "lifetime_years": null
+        }
+      },
+      {
+        "role": "savings",
+        "source": "resstock",
+        "ref": "ResStock upgrade 13: Duct Sealing and Insulation",
+        "original": {
+          "buildings_applicable": 4065,
+          "annual_energy_savings_kwh": {
+            "p25": 1630.06,
+            "median": 4361.78,
+            "p75": 7815.33
+          },
+          "annual_utility_cost_savings_usd": {
+            "p25": 148.99,
+            "median": 315.8,
+            "p75": 590.41
+          },
+          "affected_end_uses": [
+            "heating",
+            "cooling"
+          ]
+        }
+      }
+    ],
+    "cost_source": "remdb",
+    "savings_source": "resstock"
+  },
+  {
+    "measure_id": "master:wall_insulation_drill_fill",
+    "measure_name": "Drill-and-fill wall insulation",
+    "category": "Envelope",
+    "building_type": null,
+    "applies_to_residential": true,
+    "applies_to_commercial": null,
+    "cost_low": null,
+    "cost_mid": null,
+    "cost_high": null,
+    "cost_unit": null,
+    "energy_savings": null,
+    "carbon_savings": null,
+    "annual_energy_savings_low": 955.7,
+    "annual_energy_savings_mid": 3250.74,
+    "annual_energy_savings_high": 9525.98,
+    "annual_utility_savings_low": 73.56,
+    "annual_utility_savings_mid": 234.45,
+    "annual_utility_savings_high": 651.66,
+    "lifetime_years": null,
+    "source_name": null,
+    "source_file": null,
+    "source_page": null,
+    "confidence_level": "medium",
+    "notes": "No cost source: REMDB has no cavity drill-and-fill row and the NYC PDFs have none, so cost stays null. Savings only. Cost source: none (no cost source). Savings source: ResStock upgrade 14 (energy + utility, 19561 dwellings).",
+    "supports_law_ids": [
+      "ll97"
+    ],
+    "sources": [
+      {
+        "role": "savings",
+        "source": "resstock",
+        "ref": "ResStock upgrade 14: Drill and Fill Wall Insulation with Air Sealing",
+        "original": {
+          "buildings_applicable": 19561,
+          "annual_energy_savings_kwh": {
+            "p25": 955.7,
+            "median": 3250.74,
+            "p75": 9525.98
+          },
+          "annual_utility_cost_savings_usd": {
+            "p25": 73.56,
+            "median": 234.45,
+            "p75": 651.66
+          },
+          "affected_end_uses": [
+            "heating"
+          ]
+        }
+      }
+    ],
+    "cost_source": null,
+    "savings_source": "resstock"
+  },
+  {
+    "measure_id": "master:energy_star_windows",
+    "measure_name": "ENERGY STAR window replacement",
+    "category": "Envelope",
+    "building_type": null,
+    "applies_to_residential": true,
+    "applies_to_commercial": null,
+    "cost_low": 10.97,
+    "cost_mid": 90.51,
+    "cost_high": 671.55,
+    "cost_unit": "2023$/sqft",
+    "energy_savings": null,
+    "carbon_savings": null,
+    "annual_energy_savings_low": 636.26,
+    "annual_energy_savings_mid": 1551.52,
+    "annual_energy_savings_high": 3062.89,
+    "annual_utility_savings_low": 48.77,
+    "annual_utility_savings_mid": 110.02,
+    "annual_utility_savings_high": 221.2,
+    "lifetime_years": 20,
+    "source_name": "NREL Residential Efficiency Measures Database (REMDB), machine-readable release 2024-12-23",
+    "source_file": "REMDB_2024.12.23.xlsx",
+    "source_page": "Machine Read row 126",
+    "confidence_level": "medium",
+    "notes": "Cost aggregates REMDB vinyl, metal, and storm window rows. Cost source: REMDB (3 rows); no NYC-specific cost. Savings source: ResStock upgrade 17 (energy + utility, 19869 dwellings).",
+    "supports_law_ids": [
+      "ll97"
+    ],
+    "sources": [
+      {
+        "role": "cost",
+        "source": "remdb",
+        "ref": "remdb:window_vinyl",
+        "original": {
+          "cost_low": 41.74,
+          "cost_mid": 90.51,
+          "cost_high": 189.58,
+          "cost_unit": "2023$/sqft",
+          "lifetime_years": 20
+        }
+      },
+      {
+        "role": "cost",
+        "source": "remdb",
+        "ref": "remdb:window_metal",
+        "original": {
+          "cost_low": 187.46,
+          "cost_mid": 345.5,
+          "cost_high": 671.55,
+          "cost_unit": "2023$/sqft",
+          "lifetime_years": 20
+        }
+      },
+      {
+        "role": "cost",
+        "source": "remdb",
+        "ref": "remdb:window_storm",
+        "original": {
+          "cost_low": 10.97,
+          "cost_mid": 25.73,
+          "cost_high": 32.45,
+          "cost_unit": "2023$/sqft",
+          "lifetime_years": 20
+        }
+      },
+      {
+        "role": "savings",
+        "source": "resstock",
+        "ref": "ResStock upgrade 17: EnergyStar Windows",
+        "original": {
+          "buildings_applicable": 19869,
+          "annual_energy_savings_kwh": {
+            "p25": 636.26,
+            "median": 1551.52,
+            "p75": 3062.89
+          },
+          "annual_utility_cost_savings_usd": {
+            "p25": 48.77,
+            "median": 110.02,
+            "p75": 221.2
+          },
+          "affected_end_uses": [
+            "heating"
+          ]
+        }
+      }
+    ],
+    "cost_source": "remdb",
+    "savings_source": "resstock"
+  },
+  {
+    "measure_id": "master:steam_distribution_improvements",
+    "measure_name": "Steam distribution improvements package",
+    "category": "Heating & cooling",
+    "building_type": null,
+    "applies_to_residential": true,
+    "applies_to_commercial": true,
+    "cost_low": 6000,
+    "cost_mid": 56000,
+    "cost_high": 186000,
+    "cost_unit": "2019 USD, total capital cost per building",
+    "energy_savings": null,
+    "carbon_savings": null,
+    "annual_energy_savings_low": null,
+    "annual_energy_savings_mid": null,
+    "annual_energy_savings_high": null,
+    "annual_utility_savings_low": null,
+    "annual_utility_savings_mid": null,
+    "annual_utility_savings_high": null,
+    "lifetime_years": null,
+    "source_name": "NYC retrofit cost PDFs (NYSERDA / Urban Green)",
+    "source_file": "2019.02.12_demystifying_steam_report.pdf",
+    "source_page": 28,
+    "confidence_level": "high",
+    "notes": "Cost spans the NYC PDF's building-size cases (per building). No ResStock savings (commercial/steam is outside the residential ResStock set). Cost source: NYC PDF (9 rows). Savings source: none (no residential ResStock curve).",
+    "supports_law_ids": [
+      "ll97",
+      "ll87"
+    ],
+    "sources": [
+      {
+        "role": "cost",
+        "source": "nyc_pdf",
+        "ref": "2019.02.12_demystifying_steam_report.pdf p.28 — Residential one-pipe steam (~5,000 ft²)",
+        "original": {
+          "cost_low": null,
+          "cost_mid": 6000,
+          "cost_high": null,
+          "cost_unit": "2019 USD, total capital cost per building"
+        }
+      },
+      {
+        "role": "cost",
+        "source": "nyc_pdf",
+        "ref": "2019.02.12_demystifying_steam_report.pdf p.28 — Residential one-pipe steam (~50,000 ft²)",
+        "original": {
+          "cost_low": null,
+          "cost_mid": 40250,
+          "cost_high": null,
+          "cost_unit": "2019 USD, total capital cost per building"
+        }
+      },
+      {
+        "role": "cost",
+        "source": "nyc_pdf",
+        "ref": "2019.02.12_demystifying_steam_report.pdf p.28 — Residential one-pipe steam (~200,000 ft²)",
+        "original": {
+          "cost_low": null,
+          "cost_mid": 96000,
+          "cost_high": null,
+          "cost_unit": "2019 USD, total capital cost per building"
+        }
+      },
+      {
+        "role": "cost",
+        "source": "nyc_pdf",
+        "ref": "2019.02.12_demystifying_steam_report.pdf p.28 — Residential two-pipe steam (~5,000 ft²)",
+        "original": {
+          "cost_low": null,
+          "cost_mid": 6000,
+          "cost_high": null,
+          "cost_unit": "2019 USD, total capital cost per building"
+        }
+      },
+      {
+        "role": "cost",
+        "source": "nyc_pdf",
+        "ref": "2019.02.12_demystifying_steam_report.pdf p.28 — Residential two-pipe steam (~50,000 ft²)",
+        "original": {
+          "cost_low": null,
+          "cost_mid": 56000,
+          "cost_high": null,
+          "cost_unit": "2019 USD, total capital cost per building"
+        }
+      },
+      {
+        "role": "cost",
+        "source": "nyc_pdf",
+        "ref": "2019.02.12_demystifying_steam_report.pdf p.28 — Residential two-pipe steam (~200,000 ft²)",
+        "original": {
+          "cost_low": null,
+          "cost_mid": 152000,
+          "cost_high": null,
+          "cost_unit": "2019 USD, total capital cost per building"
+        }
+      },
+      {
+        "role": "cost",
+        "source": "nyc_pdf",
+        "ref": "2019.02.12_demystifying_steam_report.pdf p.28 — Commercial two-pipe steam (~20,000 ft²)",
+        "original": {
+          "cost_low": null,
+          "cost_mid": 9750,
+          "cost_high": null,
+          "cost_unit": "2019 USD, total capital cost per building"
+        }
+      },
+      {
+        "role": "cost",
+        "source": "nyc_pdf",
+        "ref": "2019.02.12_demystifying_steam_report.pdf p.28 — Commercial two-pipe steam (~90,000 ft²)",
+        "original": {
+          "cost_low": null,
+          "cost_mid": 97500,
+          "cost_high": null,
+          "cost_unit": "2019 USD, total capital cost per building"
+        }
+      },
+      {
+        "role": "cost",
+        "source": "nyc_pdf",
+        "ref": "2019.02.12_demystifying_steam_report.pdf p.28 — Commercial two-pipe steam (~250,000 ft²)",
+        "original": {
+          "cost_low": null,
+          "cost_mid": 186000,
+          "cost_high": null,
+          "cost_unit": "2019 USD, total capital cost per building"
+        }
+      }
+    ],
+    "cost_source": "nyc_pdf",
+    "savings_source": null
+  },
+  {
+    "measure_id": "master:steam_boiler_right_sizing",
+    "measure_name": "Right-sized steam boiler replacement",
+    "category": "Heating & cooling",
+    "building_type": null,
+    "applies_to_residential": true,
+    "applies_to_commercial": true,
+    "cost_low": -43250,
+    "cost_mid": -12000,
+    "cost_high": -11500,
+    "cost_unit": "2019 USD, incremental capital cost per building vs like-for-like boiler",
+    "energy_savings": null,
+    "carbon_savings": null,
+    "annual_energy_savings_low": null,
+    "annual_energy_savings_mid": null,
+    "annual_energy_savings_high": null,
+    "annual_utility_savings_low": null,
+    "annual_utility_savings_mid": null,
+    "annual_utility_savings_high": null,
+    "lifetime_years": null,
+    "source_name": "NYC retrofit cost PDFs (NYSERDA / Urban Green)",
+    "source_file": "2019.02.12_demystifying_steam_report.pdf",
+    "source_page": 29,
+    "confidence_level": "high",
+    "notes": "Incremental cost vs like-for-like replacement (often negative). No ResStock savings. Cost source: NYC PDF (9 rows). Savings source: none (no residential ResStock curve).",
+    "supports_law_ids": [
+      "ll97"
+    ],
+    "sources": [
+      {
+        "role": "cost",
+        "source": "nyc_pdf",
+        "ref": "2019.02.12_demystifying_steam_report.pdf p.29 — Residential one-pipe steam (~5,000 ft²)",
+        "original": {
+          "cost_low": null,
+          "cost_mid": -5750,
+          "cost_high": null,
+          "cost_unit": "2019 USD, incremental capital cost per building vs like-for-like boiler"
+        }
+      },
+      {
+        "role": "cost",
+        "source": "nyc_pdf",
+        "ref": "2019.02.12_demystifying_steam_report.pdf p.29 — Residential one-pipe steam (~50,000 ft²)",
+        "original": {
+          "cost_low": -12500,
+          "cost_mid": -12000,
+          "cost_high": -11500,
+          "cost_unit": "2019 USD, incremental capital cost per building vs like-for-like boiler"
+        }
+      },
+      {
+        "role": "cost",
+        "source": "nyc_pdf",
+        "ref": "2019.02.12_demystifying_steam_report.pdf p.29 — Residential one-pipe steam (~200,000 ft²)",
+        "original": {
+          "cost_low": -43250,
+          "cost_mid": -39250,
+          "cost_high": -35250,
+          "cost_unit": "2019 USD, incremental capital cost per building vs like-for-like boiler"
+        }
+      },
+      {
+        "role": "cost",
+        "source": "nyc_pdf",
+        "ref": "2019.02.12_demystifying_steam_report.pdf p.29 — Residential two-pipe steam (~5,000 ft²)",
+        "original": {
+          "cost_low": null,
+          "cost_mid": -5750,
+          "cost_high": null,
+          "cost_unit": "2019 USD, incremental capital cost per building vs like-for-like boiler"
+        }
+      },
+      {
+        "role": "cost",
+        "source": "nyc_pdf",
+        "ref": "2019.02.12_demystifying_steam_report.pdf p.29 — Residential two-pipe steam (~50,000 ft²)",
+        "original": {
+          "cost_low": -12500,
+          "cost_mid": -12000,
+          "cost_high": -11500,
+          "cost_unit": "2019 USD, incremental capital cost per building vs like-for-like boiler"
+        }
+      },
+      {
+        "role": "cost",
+        "source": "nyc_pdf",
+        "ref": "2019.02.12_demystifying_steam_report.pdf p.29 — Residential two-pipe steam (~200,000 ft²)",
+        "original": {
+          "cost_low": -43250,
+          "cost_mid": -39250,
+          "cost_high": -35250,
+          "cost_unit": "2019 USD, incremental capital cost per building vs like-for-like boiler"
+        }
+      },
+      {
+        "role": "cost",
+        "source": "nyc_pdf",
+        "ref": "2019.02.12_demystifying_steam_report.pdf p.29 — Commercial two-pipe steam (~20,000 ft²)",
+        "original": {
+          "cost_low": null,
+          "cost_mid": 500,
+          "cost_high": null,
+          "cost_unit": "2019 USD, incremental capital cost per building vs like-for-like boiler"
+        }
+      },
+      {
+        "role": "cost",
+        "source": "nyc_pdf",
+        "ref": "2019.02.12_demystifying_steam_report.pdf p.29 — Commercial two-pipe steam (~90,000 ft²)",
+        "original": {
+          "cost_low": -12500,
+          "cost_mid": -12000,
+          "cost_high": -11500,
+          "cost_unit": "2019 USD, incremental capital cost per building vs like-for-like boiler"
+        }
+      },
+      {
+        "role": "cost",
+        "source": "nyc_pdf",
+        "ref": "2019.02.12_demystifying_steam_report.pdf p.29 — Commercial two-pipe steam (~250,000 ft²)",
+        "original": {
+          "cost_low": -43250,
+          "cost_mid": -39250,
+          "cost_high": -35250,
+          "cost_unit": "2019 USD, incremental capital cost per building vs like-for-like boiler"
+        }
+      }
+    ],
+    "cost_source": "nyc_pdf",
+    "savings_source": null
+  },
+  {
+    "measure_id": "master:office_shell_upgrade",
+    "measure_name": "Office building envelope (shell) upgrade",
+    "category": "Envelope",
+    "building_type": null,
+    "applies_to_residential": false,
+    "applies_to_commercial": true,
+    "cost_low": 16,
+    "cost_mid": 22,
+    "cost_high": 28,
+    "cost_unit": "2021 USD per ft² gross floor area",
+    "energy_savings": null,
+    "carbon_savings": null,
+    "annual_energy_savings_low": null,
+    "annual_energy_savings_mid": null,
+    "annual_energy_savings_high": null,
+    "annual_utility_savings_low": null,
+    "annual_utility_savings_mid": null,
+    "annual_utility_savings_high": null,
+    "lifetime_years": null,
+    "source_name": "NYC retrofit cost PDFs (NYSERDA / Urban Green)",
+    "source_file": "NY-Building-Electrification-Cost-Full-Report-June2022.pdf",
+    "source_page": 14,
+    "confidence_level": "high",
+    "notes": "Cost spans basic and deep shell ($/ft²). Commercial; no residential ResStock savings. Cost source: NYC PDF (2 rows). Savings source: none (no residential ResStock curve).",
+    "supports_law_ids": [
+      "ll97",
+      "ll87"
+    ],
+    "sources": [
+      {
+        "role": "cost",
+        "source": "nyc_pdf",
+        "ref": "NY-Building-Electrification-Cost-Full-Report-June2022.pdf p.14 — Commercial — office",
+        "original": {
+          "cost_low": null,
+          "cost_mid": 16,
+          "cost_high": null,
+          "cost_unit": "2021 USD per ft² gross floor area"
+        }
+      },
+      {
+        "role": "cost",
+        "source": "nyc_pdf",
+        "ref": "NY-Building-Electrification-Cost-Full-Report-June2022.pdf p.14 — Commercial — office",
+        "original": {
+          "cost_low": null,
+          "cost_mid": 28,
+          "cost_high": null,
+          "cost_unit": "2021 USD per ft² gross floor area"
+        }
+      }
+    ],
+    "cost_source": "nyc_pdf",
+    "savings_source": null
+  },
+  {
+    "measure_id": "master:radiator_vent_control",
+    "measure_name": "Radiator vent heat-loss control",
+    "category": "Heating & cooling",
+    "building_type": null,
+    "applies_to_residential": true,
+    "applies_to_commercial": true,
+    "cost_low": 500,
+    "cost_mid": null,
+    "cost_high": 15000,
+    "cost_unit": "USD per building",
+    "energy_savings": null,
+    "carbon_savings": null,
+    "annual_energy_savings_low": null,
+    "annual_energy_savings_mid": null,
+    "annual_energy_savings_high": null,
+    "annual_utility_savings_low": null,
+    "annual_utility_savings_mid": null,
+    "annual_utility_savings_high": null,
+    "lifetime_years": null,
+    "source_name": "NYC retrofit cost PDFs (NYSERDA / Urban Green)",
+    "source_file": "spending-through-the-roof.pdf",
+    "source_page": 17,
+    "confidence_level": "high",
+    "notes": "Cost spans the storm-glass and mechanical-damper options (per building). Cost source: NYC PDF (2 rows). Savings source: none (no residential ResStock curve).",
+    "supports_law_ids": [
+      "ll97"
+    ],
+    "sources": [
+      {
+        "role": "cost",
+        "source": "nyc_pdf",
+        "ref": "spending-through-the-roof.pdf p.17 — Multifamily steam-heated (any size)",
+        "original": {
+          "cost_low": 500,
+          "cost_mid": null,
+          "cost_high": 2000,
+          "cost_unit": "USD per building"
+        }
+      },
+      {
+        "role": "cost",
+        "source": "nyc_pdf",
+        "ref": "spending-through-the-roof.pdf p.17 — Multifamily steam-heated (any size)",
+        "original": {
+          "cost_low": 5000,
+          "cost_mid": null,
+          "cost_high": 15000,
+          "cost_unit": "USD per building"
+        }
+      }
+    ],
+    "cost_source": "nyc_pdf",
+    "savings_source": null
+  }
+]
