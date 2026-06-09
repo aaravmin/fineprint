@@ -29,6 +29,11 @@ Thumbs.db
 .idea/
 *.swp
 
+# large downloaded retrofit-data inputs (pipeline reads them locally; not committed)
+data/nrel/resstock/*.csv.gz
+data/nrel/resstock/*.xlsx
+data/nyc_cost_sources/*.pdf
+
 # next.js build output
 .next/
 client/.agents/
