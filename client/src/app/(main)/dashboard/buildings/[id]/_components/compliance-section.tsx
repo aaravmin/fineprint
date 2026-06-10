@@ -16,23 +16,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { fmtUsd } from "@/lib/engine";
+import { LAW_REGISTRY } from "@/lib/laws/lawRegistry";
 import { withAck } from "@/lib/reducer-call";
 import { reducers, tables } from "@/module_bindings/index";
 import type { Task } from "@/module_bindings/types";
-
-// Mirrors the canonical registry in spacetimedb/src/laws.ts — task lawId values.
-export const LAW_REGISTRY = [
-  { id: "ll97", short: "LL97", name: "Building Emissions Cap" },
-  { id: "art321", short: "Art 321", name: "Affordable-Housing Emissions Pathway" },
-  { id: "ll84", short: "LL84", name: "Energy & Water Benchmarking" },
-  { id: "ll87", short: "LL87", name: "Energy Audit & Retro-commissioning" },
-  { id: "ll11", short: "LL11", name: "Facade Inspection (FISP)" },
-  { id: "ll88", short: "LL88", name: "Lighting Upgrades & Submetering" },
-  { id: "ll33", short: "LL33", name: "Building Energy Grade" },
-  { id: "ll152", short: "LL152", name: "Gas Piping Inspection & Certification" },
-  { id: "ll55", short: "LL55", name: "Indoor Allergen Hazards" },
-  { id: "ll96", short: "LL96", name: "PACE Clean Energy Financing" },
-];
 
 // Status reads as a dot + word, one fixed-width column, so every row lines
 // up no matter the state. Dot carries the color; text stays quiet.
@@ -209,9 +196,9 @@ export function ComplianceSection({
   // LL96 (PACE financing) is an opportunity, not an obligation — it spawns no
   // task, so it never belongs in the obligation ledger where a missing task
   // reads as non-compliance. Its own tab surfaces it on its own terms.
-  const laws = (onlyLawId ? LAW_REGISTRY.filter(law => law.id === onlyLawId) : LAW_REGISTRY).filter(
-    law => law.id !== "ll96",
-  );
+  const laws = (
+    onlyLawId ? LAW_REGISTRY.filter(law => law.law_id === onlyLawId) : LAW_REGISTRY
+  ).filter(law => law.law_id !== "ll96");
 
   function review(task: Task, verdict: "approve" | "reject") {
     setPendingTaskId(task.id);
@@ -249,7 +236,7 @@ export function ComplianceSection({
       <CardContent className="p-0">
         <Accordion type="multiple" className="w-full">
           {laws.map((law, index) => {
-            const lawTask = buildingTasks.find(task => task.lawId === law.id);
+            const lawTask = buildingTasks.find(task => task.lawId === law.law_id);
             const latestSubmission = lawTask
               ? [...submissions]
                   .filter(submission => submission.taskId === lawTask.id)
@@ -262,11 +249,11 @@ export function ComplianceSection({
             const row = (
               <div className="grid w-full grid-cols-[4.5rem_1fr_auto] items-center gap-3 @md/main:grid-cols-[4.5rem_1fr_7rem_8rem]">
                 <span className="font-mono text-xs font-medium text-muted-foreground">
-                  {law.short}
+                  {law.short_name}
                 </span>
 
                 <span className="flex min-w-0 items-center gap-2 text-sm font-medium">
-                  <span className="truncate">{law.name}</span>
+                  <span className="truncate">{law.display_name}</span>
                   {lawTask?.slaBreached && (
                     <Badge variant="destructive" className="shrink-0 text-[10px]">
                       SLA breached
@@ -297,7 +284,7 @@ export function ComplianceSection({
 
             return (
               <motion.div
-                key={law.id}
+                key={law.law_id}
                 initial={reduceMotion ? false : { opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{
@@ -308,7 +295,7 @@ export function ComplianceSection({
               >
                 {lawTask ? (
                   <AccordionItem
-                    value={law.id}
+                    value={law.law_id}
                     className="group border-b last:border-b-0"
                   >
                     <AccordionTrigger className="items-center px-6 py-3.5 transition-colors duration-200 hover:bg-muted/40 hover:no-underline">

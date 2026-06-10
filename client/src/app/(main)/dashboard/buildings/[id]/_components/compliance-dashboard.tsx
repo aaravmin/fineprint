@@ -23,52 +23,36 @@ import {
   slugForBuilding,
   type LawExposureRow,
 } from "@/lib/export-compliance";
+import { LAW_REGISTRY, lawsInOrder } from "@/lib/laws/lawRegistry";
 import { projectionFor } from "@/lib/law-projections";
 import { tables } from "@/module_bindings/index";
 import type { Building } from "@/module_bindings/types";
 
-import { ComplianceSection, LAW_REGISTRY, STATUS_DOT } from "./compliance-section";
+import { ComplianceSection, STATUS_DOT } from "./compliance-section";
 import { FineTimeline } from "./fine-timeline";
 import { InvestmentPlanner } from "./investment-planner";
 import { LawPanel } from "./law-panel";
 
-type LawScope =
-  | "all"
-  | "ll97"
-  | "ll84"
-  | "ll87"
-  | "ll11"
-  | "ll88"
-  | "ll33"
-  | "ll152"
-  | "ll55"
-  | "ll96";
+// A scope is "all" or any registry law_id. Tabs and tracked scopes are derived
+// from the canonical registry, so a new law shows up here automatically.
+type LawScope = string;
 
 // Article 321 rides inside the LL97 tab (same emissions pathway), so it gets no
 // pill of its own here. Every other registry law is a focused tab.
 const LAW_TABS: { id: LawScope; label: string }[] = [
   { id: "all", label: "All laws" },
-  { id: "ll97", label: "LL97" },
-  { id: "ll84", label: "LL84" },
-  { id: "ll87", label: "LL87" },
-  { id: "ll11", label: "LL11" },
-  { id: "ll88", label: "LL88" },
-  { id: "ll33", label: "LL33" },
-  { id: "ll152", label: "LL152" },
-  { id: "ll55", label: "LL55" },
-  { id: "ll96", label: "LL96" },
+  ...lawsInOrder()
+    .filter(law => law.law_id !== "art321")
+    .map(law => ({ id: law.law_id, label: law.short_name })),
 ];
 
-const TRACKED_SCOPES = new Set<LawScope>([
-  "ll84",
-  "ll87",
-  "ll11",
-  "ll88",
-  "ll33",
-  "ll152",
-  "ll55",
-  "ll96",
-]);
+// LL97 has its own emissions-and-fines view; every other registry law (besides
+// the art321 pathway folded into LL97) is a filing/inspection tracked on its tab.
+const TRACKED_SCOPES = new Set<LawScope>(
+  lawsInOrder()
+    .filter(law => law.law_id !== "ll97" && law.law_id !== "art321")
+    .map(law => law.law_id),
+);
 
 // The whole building compliance view, behind a law toggle, reused by both the
 // single-building page and the Buildings selector. Funding state lives here so
@@ -97,13 +81,13 @@ export function ComplianceDashboard({ building }: { building: Building }) {
 
   const buildingTasks = tasks.filter(task => task.buildingId === building.id);
   const lawRows: LawExposureRow[] = LAW_REGISTRY.filter(
-    law => law.id !== "art321" && law.id !== "ll96",
+    law => law.law_id !== "art321" && law.law_id !== "ll96",
   ).map(
     law => {
-      const task = buildingTasks.find(candidate => candidate.lawId === law.id);
+      const task = buildingTasks.find(candidate => candidate.lawId === law.law_id);
       return {
-        short: law.short,
-        name: law.name,
+        short: law.short_name,
+        name: law.display_name,
         status: task?.status ?? "missing",
         exposureUsd: task?.fineEstimateUsd,
       };
@@ -200,7 +184,7 @@ export function ComplianceDashboard({ building }: { building: Building }) {
 
       {TRACKED_SCOPES.has(scope) &&
         (() => {
-          const law = LAW_REGISTRY.find(entry => entry.id === scope);
+          const law = LAW_REGISTRY.find(entry => entry.law_id === scope);
           const projection = projectionFor(scope);
           const task = buildingTasks.find(candidate => candidate.lawId === scope);
 
@@ -208,7 +192,7 @@ export function ComplianceDashboard({ building }: { building: Building }) {
             <>
               {scope === "ll33" && <EnergyGradeCard score={building.energyStarScore} />}
               {law && projection && (
-                <LawPanel lawName={law.name} projection={projection} task={task} />
+                <LawPanel lawName={law.display_name} projection={projection} task={task} />
               )}
               {scope !== "ll96" && (
                 <ComplianceSection buildingId={building.id} onlyLawId={scope} />

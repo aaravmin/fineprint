@@ -22,6 +22,7 @@
     "extract:nyc-pdfs": "tsx data/scripts/extract-nyc-pdfs.ts",
     "parse:resstock": "tsx data/scripts/parse-resstock.ts",
     "merge:measures": "tsx data/scripts/merge-measures.ts",
+    "audit:laws": "tsx scripts/audit-law-dashboard.ts",
     "dashboard": "npm run dev --workspace client",
     "worker:emissions": "WORKER_KINDS=emissions_fine_analysis,prescriptive_measures_plan npm run worker",
     "worker:filings": "WORKER_KINDS=benchmarking_filing,audit_filing,lighting_submetering_plan npm run worker",
