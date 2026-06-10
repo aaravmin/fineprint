@@ -31,15 +31,12 @@ export function LawFindingCard({ finding }: { finding: ReportFinding }) {
         </Badge>
       </div>
 
-      {finding.applicability && field("Applicability", finding.applicability)}
       {field("Requirement", finding.requirement)}
       {field(
         "Next deadline",
         finding.next_deadline ?? finding.cadence ?? "Not dated from available records",
       )}
       {field("Estimated exposure", finding.estimated_exposure)}
-      {finding.source_data_used.length > 0 &&
-        field("Source data used", finding.source_data_used.join(", "))}
       {finding.missing_data.length > 0 && (
         <div className="grid grid-cols-[8.5rem_1fr] gap-2 text-sm">
           <span className="text-xs font-medium text-muted-foreground">Missing data</span>

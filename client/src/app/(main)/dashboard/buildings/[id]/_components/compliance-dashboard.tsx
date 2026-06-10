@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 
-import { BookOpenCheck, Download, Flame, Leaf, Printer, Ruler } from "lucide-react";
+import { Download, Flame, Leaf, Printer, Ruler } from "lucide-react";
 import { useTable } from "spacetimedb/react";
 
 import { Badge } from "@/components/ui/badge";
@@ -31,7 +31,7 @@ import type { Building } from "@/module_bindings/types";
 import { ComplianceBinder } from "@/components/compliance/ComplianceBinder";
 import { ComplianceReport } from "@/components/dashboard/ComplianceReport";
 
-import { ComplianceSection, STATUS_DOT } from "./compliance-section";
+import { ComplianceSection } from "./compliance-section";
 import { FineTimeline } from "./fine-timeline";
 import { InvestmentPlanner } from "./investment-planner";
 import { LawPanel } from "./law-panel";
@@ -137,24 +137,12 @@ export function ComplianceDashboard({ building }: { building: Building }) {
 
       {scope === "all" && (
         <>
-          <Card>
-            <CardHeader>
-              <CardTitle>Exposure by law</CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Estimated annual exposure per filing law. A figure turns red and
-                &ldquo;Overdue&rdquo; once the deadline has passed.
-              </p>
-            </CardHeader>
-            <CardContent>
-              <ExposureByLaw rows={lawRows} />
-            </CardContent>
-          </Card>
-
+          {/* The consolidated compliance report (snapshot, per-law findings,
+              recommendations, action plan, sources) is the to-the-point
+              overview; the binder is the proof/evidence record. Per-law detail
+              and the obligation ledger live on each law's own tab. */}
           <ComplianceReport building={building} assessment={assessment} />
-          <CompliancePlanCard planJson={building.compliancePlanJson} />
-          <ComplianceSection buildingId={building.id} />
           <ComplianceBinder building={building} />
-          <ProvenanceFootnotes provenanceJson={building.provenanceJson} />
         </>
       )}
 
@@ -265,47 +253,6 @@ function EnergyGradeCard({ score }: { score: number | undefined }) {
         </div>
       </CardContent>
     </Card>
-  );
-}
-
-// Estimated annual exposure per filing law, as a plain number table. The figure
-// is the penalty the building would face if the obligation goes unmet; it reads
-// muted until the law is actually overdue, when it turns into a live red figure
-// with an "Overdue" tag. No bars — the numbers carry the meaning.
-function ExposureByLaw({ rows }: { rows: LawExposureRow[] }) {
-  return (
-    <div className="divide-y text-sm">
-      {rows.map(row => {
-        const value = row.exposureUsd ?? 0;
-
-        return (
-          <div
-            key={row.short}
-            className="grid grid-cols-[4.5rem_1fr_auto] items-center gap-3 py-2"
-          >
-            <span className="flex items-center gap-1.5 font-mono text-xs text-muted-foreground">
-              <span
-                className={`size-1.5 rounded-full ${STATUS_DOT[row.status] ?? "bg-muted-foreground/40"}`}
-              />
-              {row.short}
-            </span>
-
-            <span className="min-w-0 truncate text-muted-foreground">{row.name}</span>
-
-            <span className="flex items-center justify-end gap-2 tabular-nums">
-              {row.overdue && (
-                <span className="rounded-sm bg-destructive/10 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-destructive">
-                  Overdue
-                </span>
-              )}
-              <span className={row.overdue ? "font-semibold text-destructive" : "text-muted-foreground"}>
-                {value > 0 ? `${fmtUsd(value)}/yr` : "—"}
-              </span>
-            </span>
-          </div>
-        );
-      })}
-    </div>
   );
 }
 
@@ -500,162 +447,3 @@ const HANDLING_VARIANT: Record<
   already_compliant: "secondary",
   needs_attention: "destructive",
 };
-
-// The data layer's whole-building plan, serialized at intake. Every obligation
-// appears exactly once; a measure that retires several laws is shown once with
-// its cross-credits.
-function CompliancePlanCard({ planJson }: { planJson: string | undefined }) {
-  if (!planJson) {
-    return null;
-  }
-
-  let plan: StoredCompliancePlan;
-  try {
-    plan = JSON.parse(planJson);
-  } catch {
-    return null;
-  }
-
-  return (
-    <Card>
-      <CardHeader>
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <CardTitle>Compliance plan</CardTitle>
-          <div className="flex items-center gap-2">
-            {plan.pathway && (
-              <Badge variant="outline">
-                {plan.pathway === "article321"
-                  ? "Article 321 pathway"
-                  : "Standard pathway"}
-              </Badge>
-            )}
-            {plan.totalCapexUsd > 0 && (
-              <Badge variant="secondary" className="tabular-nums">
-                {fmtUsd(plan.totalCapexUsd)} capex
-              </Badge>
-            )}
-          </div>
-        </div>
-        <p className="text-sm text-muted-foreground">
-          One plan covering every law — each obligation disposed of exactly once.
-        </p>
-      </CardHeader>
-      <CardContent className="space-y-5">
-        {plan.measures.length > 0 && (
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              Chosen measures
-            </p>
-            <div className="mt-2 divide-y rounded-xl border">
-              {plan.measures.map(measure => (
-                <div
-                  key={measure.id}
-                  className="flex flex-wrap items-center justify-between gap-2 px-4 py-3"
-                >
-                  <span className="text-sm font-medium">{measure.name}</span>
-                  <span className="flex items-center gap-2">
-                    {measure.alsoSatisfies.map(lawId => (
-                      <Badge key={lawId} variant="outline" className="text-xs">
-                        also clears {lawId.toUpperCase()}
-                      </Badge>
-                    ))}
-                    <span className="text-sm text-muted-foreground tabular-nums">
-                      {fmtUsd(measure.capexUsd)}
-                    </span>
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Dispositions
-          </p>
-          <div className="mt-2 divide-y rounded-xl border">
-            {plan.dispositions.map(disposition => (
-              <div key={disposition.lawId} className="px-4 py-3">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-sm font-medium">{disposition.lawName}</span>
-                  <Badge
-                    variant={HANDLING_VARIANT[disposition.handledBy] ?? "secondary"}
-                    className="text-xs"
-                  >
-                    {HANDLING_LABEL[disposition.handledBy] ?? disposition.handledBy}
-                  </Badge>
-                  <span className="text-xs text-muted-foreground">
-                    {disposition.kind} / {disposition.status.replace("_", " ")}
-                  </span>
-                </div>
-                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                  {disposition.detail}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {plan.crossCredits.length > 0 && (
-          <div className="rounded-xl bg-secondary px-4 py-3">
-            {plan.crossCredits.map(credit => (
-              <p key={credit} className="flex items-start gap-2 text-xs text-foreground/80">
-                <BookOpenCheck className="mt-0.5 size-3.5 shrink-0" />
-                {credit}
-              </p>
-            ))}
-          </div>
-        )}
-
-        {plan.notes.length > 0 && (
-          <p className="border-t pt-3 text-xs leading-relaxed text-muted-foreground">
-            {plan.notes.join(" ")}
-          </p>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
-
-interface ProvenanceNote {
-  field: string;
-  source: string;
-  detail?: string;
-}
-
-// Every fact's source, as footnotes — the honesty contract made visible.
-function ProvenanceFootnotes({ provenanceJson }: { provenanceJson: string | undefined }) {
-  if (!provenanceJson) {
-    return null;
-  }
-
-  let notes: ProvenanceNote[];
-  try {
-    notes = JSON.parse(provenanceJson);
-  } catch {
-    return null;
-  }
-  if (!Array.isArray(notes) || notes.length === 0) {
-    return null;
-  }
-
-  return (
-    <div className="px-1">
-      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-        Sources
-      </p>
-      <ul className="mt-2 space-y-1">
-        {notes.map((note, index) => (
-          <li
-            key={`${note.field}-${index}`}
-            className="text-[11px] leading-relaxed text-muted-foreground/80"
-          >
-            <span className="font-medium text-muted-foreground">{note.field}</span> —{" "}
-            {note.source}
-            {note.detail ? `: ${note.detail}` : ""}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
