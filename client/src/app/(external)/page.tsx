@@ -229,14 +229,6 @@ export default function Home() {
                           </Link>
                         </SheetClose>
                       ))}
-                      <SheetClose asChild>
-                        <Link
-                          href={DASH}
-                          className="fp-press mt-3 inline-flex justify-center rounded-full bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-                        >
-                          Open dashboard
-                        </Link>
-                      </SheetClose>
                     </div>
                   </SheetContent>
                 </Sheet>

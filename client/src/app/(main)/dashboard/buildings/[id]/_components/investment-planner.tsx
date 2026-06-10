@@ -133,11 +133,12 @@ export function InvestmentPlanner({
               <span className="text-sm text-muted-foreground">$</span>
               <Input
                 id="budget"
-                type="number"
-                min={0}
-                step={STEP}
-                value={budgetInput}
-                onChange={event => setBudgetInput(Number(event.target.value))}
+                type="text"
+                inputMode="numeric"
+                value={budgetInput.toLocaleString("en-US")}
+                onChange={event =>
+                  setBudgetInput(Number(event.target.value.replace(/[^0-9]/g, "")))
+                }
                 className="w-40 text-right tabular-nums"
               />
             </div>
@@ -180,13 +181,15 @@ export function InvestmentPlanner({
                 <div className="flex items-center gap-1">
                   <span className="text-xs text-muted-foreground">$</span>
                   <Input
-                    type="number"
-                    min={0}
-                    max={measure.fullCostUsd}
-                    step={STEP}
-                    value={measure.fundedUsd}
+                    type="text"
+                    inputMode="numeric"
+                    value={measure.fundedUsd.toLocaleString("en-US")}
                     onChange={event =>
-                      setMeasure(measure.id, Number(event.target.value), measure.fullCostUsd)
+                      setMeasure(
+                        measure.id,
+                        Number(event.target.value.replace(/[^0-9]/g, "")),
+                        measure.fullCostUsd,
+                      )
                     }
                     className="w-32 text-right tabular-nums"
                   />

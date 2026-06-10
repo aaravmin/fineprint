@@ -1,8 +1,18 @@
 {
+  "$schema": "https://fineprint.app/schema/compliance-export/v1.json",
+  "schema_version": "fineprint.compliance-export/v1",
+  "jurisdiction": "NYC",
+  "generated_at": "1970-01-01T00:00:00.000Z",
+  "building_identifiers": {
+    "bbl": "1008350041",
+    "bin": "1083900"
+  },
+  "document_type": "compliance_binder",
   "building_summary": {
     "id": "sample",
     "address": "350 Sample Ave, Manhattan",
     "bbl": "1008350041",
+    "bin": "1083900",
     "sqft": 250000,
     "buildingType": "Office",
     "yearBuilt": null,
@@ -198,18 +208,51 @@
       "kind": "obligation_created",
       "summary": "Binder set up",
       "lawId": "ll97",
-      "at": "2026-06-10T00:28:28.670Z"
+      "at": "2026-06-10T05:58:15.514Z"
     }
   ],
-  "source_appendix": [
-    "Law applicability, deadlines, and penalty estimates: Fineprint law registry (NYC Admin Code citations per law).",
-    "Building characteristics: NYC PLUTO and LL84 benchmarking disclosure.",
-    "Evidence checklists: each law's statutory filing; uncertain items are marked recommended, not required."
+  "source_citations": [
+    {
+      "dataset": "NYC PLUTO (tax-lot characteristics)",
+      "identifier": "1008350041",
+      "as_of": "latest available release",
+      "fields": [
+        "building_summary.sqft",
+        "applicability (stories, units, community district)"
+      ]
+    },
+    {
+      "dataset": "NYC LL84 Energy & Water Benchmarking disclosure",
+      "identifier": "1008350041",
+      "as_of": "latest filing on record",
+      "fields": [
+        "annual emissions",
+        "ENERGY STAR score (LL33 grade)"
+      ]
+    },
+    {
+      "dataset": "NYC Local Law 97 emissions limits (Admin Code 28-320)",
+      "identifier": null,
+      "as_of": "2024-2029 / 2030-2034 / 2035-2039 compliance periods",
+      "fields": [
+        "LL97 cap",
+        "estimated_exposure"
+      ]
+    },
+    {
+      "dataset": "Fineprint law registry",
+      "identifier": "fineprint.compliance-export/v1",
+      "as_of": "compiled with this export",
+      "fields": [
+        "law applicability",
+        "statutory deadlines",
+        "penalty rates"
+      ]
+    }
   ],
   "assumptions_and_limitations": [
     "This binder is an owner record, not a legal determination or a filed report.",
     "Penalty and deadline figures are estimates from available records; professional verification is recommended before filing or capital decisions.",
     "Evidence-to-checklist matching is best-effort by file name; confirm each item against the actual document."
-  ],
-  "generated_at": "1970-01-01T00:00:00.000Z"
+  ]
 }
