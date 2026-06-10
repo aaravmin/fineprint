@@ -209,3 +209,66 @@ export function lawsInOrder(onlyEnabled = true): LawRegistryEntry[] {
     (a, b) => a.sort_order - b.sort_order,
   );
 }
+
+// Evidence checklist per law (Phase 7.6). `required` is proof the law's own
+// filing plainly calls for (a filed report, a certification); `recommended` is
+// supporting proof an owner should keep but that isn't strictly mandated. When
+// the exact required proof is uncertain it is listed as recommended, never
+// invented as required.
+export interface LawEvidence {
+  required: string[];
+  recommended: string[];
+}
+
+export const LAW_EVIDENCE: Record<string, LawEvidence> = {
+  ll97: {
+    required: ["LL97 emissions report (BEAM filing)", "LL84 benchmarking data"],
+    recommended: [
+      "Compliance/penalty calculation",
+      "Decarbonization or good-faith-effort plan",
+      "Professional review notes",
+    ],
+  },
+  art321: {
+    required: ["Article 321 certification of compliance (DOB)"],
+    recommended: ["Prescribed-measures documentation (28-321.2.2)", "Emissions calculation vs 2030 limit"],
+  },
+  ll84: {
+    required: ["Benchmarking submission confirmation", "Reported energy and water data"],
+    recommended: ["ENERGY STAR Portfolio Manager report", "Filing confirmation receipt"],
+  },
+  ll87: {
+    required: ["Energy efficiency report (EER) filing confirmation", "ASHRAE Level II energy audit report"],
+    recommended: ["Retro-commissioning report", "Approved-auditor certification"],
+  },
+  ll88: {
+    required: ["LL88 lighting/submetering compliance filing"],
+    recommended: ["Lighting upgrade documentation", "Submetering documentation", "Contractor invoice"],
+  },
+  ll11: {
+    required: ["QEWI facade safety report (FISP) filing confirmation"],
+    recommended: ["Inspection photos", "Repair documentation", "Scaffold/sidewalk-shed permits if applicable"],
+  },
+  ll33: {
+    required: ["Photo of the posted energy label near a public entrance"],
+    recommended: ["ENERGY STAR score record (from LL84)"],
+  },
+  ll152: {
+    required: ["Gas piping inspection report (GPS1)", "Licensed Master Plumber certification", "DOB submission confirmation"],
+    recommended: ["Correction documentation (GPS2) if repairs were required"],
+  },
+  ll96: {
+    // PACE is an opportunity, not an obligation — no proof is mandated.
+    required: [],
+    recommended: ["PACE financing application", "Lender term sheet"],
+  },
+  ll55: {
+    // No DOB filing exists; enforcement is HPD violations, so nothing is required.
+    required: [],
+    recommended: ["Annual unit inspection records", "Remediation records", "Tenant allergen notice with lease"],
+  },
+};
+
+export function evidenceForLaw(lawId: string): LawEvidence {
+  return LAW_EVIDENCE[lawId] ?? { required: [], recommended: [] };
+}

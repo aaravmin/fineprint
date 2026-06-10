@@ -1,0 +1,215 @@
+{
+  "building_summary": {
+    "id": "sample",
+    "address": "350 Sample Ave, Manhattan",
+    "bbl": "1008350041",
+    "sqft": 250000,
+    "buildingType": "Office",
+    "yearBuilt": null,
+    "primaryUse": "Office",
+    "source_note": "Building facts from NYC public records (PLUTO, LL84 disclosure, DOB) where available."
+  },
+  "compliance_snapshot": {
+    "obligations_total": 8,
+    "open_items": 8,
+    "settled_items": 0,
+    "obligations_missing_required_evidence": 7,
+    "nearest_due_date": null
+  },
+  "law_by_law_obligations": [
+    {
+      "law_id": "ll97",
+      "law": "Building Emissions Cap",
+      "short": "LL97",
+      "status": "not_started",
+      "due_date": null,
+      "responsible_party": "",
+      "assigned_vendor": null,
+      "filing_reference_number": "",
+      "evidence_on_file": [],
+      "missing_required_evidence": [
+        "LL97 emissions report (BEAM filing)",
+        "LL84 benchmarking data"
+      ],
+      "recommended_evidence_not_on_file": [
+        "Compliance/penalty calculation",
+        "Decarbonization or good-faith-effort plan",
+        "Professional review notes"
+      ],
+      "completion_date": null,
+      "notes": ""
+    },
+    {
+      "law_id": "ll84",
+      "law": "Energy & Water Benchmarking",
+      "short": "LL84",
+      "status": "not_started",
+      "due_date": null,
+      "responsible_party": "",
+      "assigned_vendor": null,
+      "filing_reference_number": "",
+      "evidence_on_file": [],
+      "missing_required_evidence": [
+        "Benchmarking submission confirmation",
+        "Reported energy and water data"
+      ],
+      "recommended_evidence_not_on_file": [
+        "ENERGY STAR Portfolio Manager report",
+        "Filing confirmation receipt"
+      ],
+      "completion_date": null,
+      "notes": ""
+    },
+    {
+      "law_id": "ll87",
+      "law": "Energy Audit & Retro-commissioning",
+      "short": "LL87",
+      "status": "not_started",
+      "due_date": null,
+      "responsible_party": "",
+      "assigned_vendor": null,
+      "filing_reference_number": "",
+      "evidence_on_file": [],
+      "missing_required_evidence": [
+        "Energy efficiency report (EER) filing confirmation",
+        "ASHRAE Level II energy audit report"
+      ],
+      "recommended_evidence_not_on_file": [
+        "Retro-commissioning report",
+        "Approved-auditor certification"
+      ],
+      "completion_date": null,
+      "notes": ""
+    },
+    {
+      "law_id": "ll11",
+      "law": "Facade Inspection (FISP)",
+      "short": "LL11",
+      "status": "not_started",
+      "due_date": null,
+      "responsible_party": "",
+      "assigned_vendor": null,
+      "filing_reference_number": "",
+      "evidence_on_file": [],
+      "missing_required_evidence": [
+        "QEWI facade safety report (FISP) filing confirmation"
+      ],
+      "recommended_evidence_not_on_file": [
+        "Inspection photos",
+        "Repair documentation",
+        "Scaffold/sidewalk-shed permits if applicable"
+      ],
+      "completion_date": null,
+      "notes": ""
+    },
+    {
+      "law_id": "ll88",
+      "law": "Lighting Upgrades & Submetering",
+      "short": "LL88",
+      "status": "not_started",
+      "due_date": null,
+      "responsible_party": "",
+      "assigned_vendor": null,
+      "filing_reference_number": "",
+      "evidence_on_file": [],
+      "missing_required_evidence": [
+        "LL88 lighting/submetering compliance filing"
+      ],
+      "recommended_evidence_not_on_file": [
+        "Lighting upgrade documentation",
+        "Submetering documentation",
+        "Contractor invoice"
+      ],
+      "completion_date": null,
+      "notes": ""
+    },
+    {
+      "law_id": "ll33",
+      "law": "Building Energy Grade",
+      "short": "LL33",
+      "status": "not_started",
+      "due_date": null,
+      "responsible_party": "",
+      "assigned_vendor": null,
+      "filing_reference_number": "",
+      "evidence_on_file": [],
+      "missing_required_evidence": [
+        "Photo of the posted energy label near a public entrance"
+      ],
+      "recommended_evidence_not_on_file": [
+        "ENERGY STAR score record (from LL84)"
+      ],
+      "completion_date": null,
+      "notes": ""
+    },
+    {
+      "law_id": "ll152",
+      "law": "Gas Piping Inspection & Certification",
+      "short": "LL152",
+      "status": "not_started",
+      "due_date": null,
+      "responsible_party": "",
+      "assigned_vendor": null,
+      "filing_reference_number": "",
+      "evidence_on_file": [],
+      "missing_required_evidence": [
+        "Gas piping inspection report (GPS1)",
+        "Licensed Master Plumber certification",
+        "DOB submission confirmation"
+      ],
+      "recommended_evidence_not_on_file": [
+        "Correction documentation (GPS2) if repairs were required"
+      ],
+      "completion_date": null,
+      "notes": ""
+    },
+    {
+      "law_id": "ll55",
+      "law": "Indoor Allergen Hazards",
+      "short": "LL55",
+      "status": "not_started",
+      "due_date": null,
+      "responsible_party": "",
+      "assigned_vendor": null,
+      "filing_reference_number": "",
+      "evidence_on_file": [],
+      "missing_required_evidence": [],
+      "recommended_evidence_not_on_file": [
+        "Annual unit inspection records",
+        "Remediation records",
+        "Tenant allergen notice with lease"
+      ],
+      "completion_date": null,
+      "notes": ""
+    }
+  ],
+  "open_items": [
+    "LL97: not started — missing LL97 emissions report (BEAM filing), LL84 benchmarking data",
+    "LL84: not started — missing Benchmarking submission confirmation, Reported energy and water data",
+    "LL87: not started — missing Energy efficiency report (EER) filing confirmation, ASHRAE Level II energy audit report",
+    "LL11: not started — missing QEWI facade safety report (FISP) filing confirmation",
+    "LL88: not started — missing LL88 lighting/submetering compliance filing",
+    "LL33: not started — missing Photo of the posted energy label near a public entrance",
+    "LL152: not started — missing Gas piping inspection report (GPS1), Licensed Master Plumber certification, DOB submission confirmation",
+    "LL55: not started"
+  ],
+  "compliance_history": [
+    {
+      "kind": "obligation_created",
+      "summary": "Binder set up",
+      "lawId": "ll97",
+      "at": "2026-06-10T00:28:28.670Z"
+    }
+  ],
+  "source_appendix": [
+    "Law applicability, deadlines, and penalty estimates: Fineprint law registry (NYC Admin Code citations per law).",
+    "Building characteristics: NYC PLUTO and LL84 benchmarking disclosure.",
+    "Evidence checklists: each law's statutory filing; uncertain items are marked recommended, not required."
+  ],
+  "assumptions_and_limitations": [
+    "This binder is an owner record, not a legal determination or a filed report.",
+    "Penalty and deadline figures are estimates from available records; professional verification is recommended before filing or capital decisions.",
+    "Evidence-to-checklist matching is best-effort by file name; confirm each item against the actual document."
+  ],
+  "generated_at": "1970-01-01T00:00:00.000Z"
+}

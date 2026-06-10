@@ -832,5 +832,239 @@ export const reap = spacetimedb.reducer({ arg: reaperTick.rowType }, (ctx, _args
   }
 });
 
+// --- Compliance binder (customer-facing) -----------------------------------
+// The owner's record: obligations per law, the proof filed against each, the
+// vendor responsible, and a plain-language history. Every binder write also
+// appends a binder_event — the owner's history, kept apart from the internal
+// `event` audit log.
+
+const OBLIGATION_STATUSES = [
+  "not_started", "in_progress", "submitted", "filed", "completed",
+  "overdue", "blocked", "not_applicable", "missing_data",
+];
+const VERIFICATION_STATUSES = [
+  "unreviewed", "accepted", "needs_review", "rejected", "expired", "missing",
+];
+const VENDOR_ROLES = [
+  "QEWI", "LMP", "energy_auditor", "retro_commissioning_agent", "contractor",
+  "engineer", "architect", "expeditor", "property_manager", "elevator_vendor",
+  "sprinkler_vendor", "general_vendor", "other",
+];
+
+function logBinderEvent(
+  ctx: any,
+  buildingId: bigint,
+  obligationId: bigint | undefined,
+  lawId: string,
+  kind: string,
+  summary: string,
+) {
+  ctx.db.binderEvent.insert({
+    id: 0n,
+    owner: ctx.sender,
+    fleetScope: 0,
+    buildingId,
+    obligationId,
+    lawId,
+    kind,
+    summary,
+    at: ctx.timestamp,
+  });
+}
+
+// One obligation per law that binds a building, created from the same
+// applicability the tasks use. Idempotent: a law that already has an obligation
+// is skipped, so re-running only backfills new ones.
+export const seed_obligations = spacetimedb.reducer(
+  { buildingId: t.u64() },
+  (ctx, { buildingId }) => {
+    const building = ctx.db.building.id.find(buildingId);
+    if (!building || !building.owner.isEqual(ctx.sender)) {
+      throw new Error(`no building with id ${buildingId}`);
+    }
+
+    const profile: BuildingProfile = {
+      sqft: building.sqft,
+      isAffordable: building.isAffordable,
+      bbl: building.bbl,
+      numFloors: building.numFloors,
+      unitsResidential: building.unitsResidential,
+      communityDistrict: building.communityDistrict,
+      energyStarScore: building.energyStarScore,
+    };
+
+    const alreadyHave = new Set(
+      [...ctx.db.obligation.iter()]
+        .filter(row => row.buildingId === buildingId && row.owner.isEqual(ctx.sender))
+        .map(row => row.lawId),
+    );
+
+    let created = 0;
+    for (const law of applicableLaws(profile)) {
+      if (alreadyHave.has(law.id)) {
+        continue;
+      }
+      const next = law.nextDeadline(ctx.timestamp.toDate(), profile);
+      const newObligation = ctx.db.obligation.insert({
+        id: 0n,
+        owner: ctx.sender,
+        fleetScope: 0,
+        buildingId,
+        lawId: law.id,
+        title: law.name,
+        status: "not_started",
+        dueDate: next === null ? undefined : Timestamp.fromDate(next),
+        responsibleParty: "",
+        vendorId: undefined,
+        filingReferenceNumber: "",
+        notes: "",
+        createdAt: ctx.timestamp,
+        updatedAt: ctx.timestamp,
+        completedAt: undefined,
+      });
+      logBinderEvent(ctx, buildingId, newObligation.id, law.id, "obligation_created", `Obligation opened: ${law.name}`);
+      created++;
+    }
+
+    logEvent(ctx, "binder_seeded", `${created} obligations seeded for building ${buildingId}`);
+  },
+);
+
+export const add_vendor = spacetimedb.reducer(
+  {
+    name: t.string(), company: t.string(), roleType: t.string(), email: t.string(),
+    phone: t.string(), licenseNumber: t.string(), licenseType: t.string(), notes: t.string(),
+  },
+  (ctx, args) => {
+    if (args.name.trim() === "") {
+      throw new Error("vendor name cannot be empty");
+    }
+    if (!VENDOR_ROLES.includes(args.roleType)) {
+      throw new Error(`unknown vendor role "${args.roleType}"`);
+    }
+    ctx.db.vendor.insert({
+      id: 0n,
+      owner: ctx.sender,
+      fleetScope: 0,
+      ...args,
+      createdAt: ctx.timestamp,
+    });
+  },
+);
+
+export const assign_vendor = spacetimedb.reducer(
+  { obligationId: t.u64(), vendorId: t.u64() },
+  (ctx, { obligationId, vendorId }) => {
+    const obligation = ctx.db.obligation.id.find(obligationId);
+    if (!obligation || !obligation.owner.isEqual(ctx.sender)) {
+      throw new Error("no such obligation");
+    }
+    const vendor = ctx.db.vendor.id.find(vendorId);
+    if (!vendor || !vendor.owner.isEqual(ctx.sender)) {
+      throw new Error("no such vendor");
+    }
+
+    ctx.db.obligation.id.update({ ...obligation, vendorId, updatedAt: ctx.timestamp });
+
+    const role = vendor.roleType.replace(/_/g, " ");
+    const who = vendor.company ? `${vendor.name} (${vendor.company})` : vendor.name;
+    logBinderEvent(ctx, obligation.buildingId, obligation.id, obligation.lawId, "vendor_assigned", `Assigned ${who} as ${role}`);
+  },
+);
+
+export const set_obligation_status = spacetimedb.reducer(
+  { obligationId: t.u64(), status: t.string() },
+  (ctx, { obligationId, status }) => {
+    if (!OBLIGATION_STATUSES.includes(status)) {
+      throw new Error(`unknown obligation status "${status}"`);
+    }
+    const obligation = ctx.db.obligation.id.find(obligationId);
+    if (!obligation || !obligation.owner.isEqual(ctx.sender)) {
+      throw new Error("no such obligation");
+    }
+
+    ctx.db.obligation.id.update({
+      ...obligation,
+      status,
+      completedAt: status === "completed" ? ctx.timestamp : obligation.completedAt,
+      updatedAt: ctx.timestamp,
+    });
+
+    logBinderEvent(ctx, obligation.buildingId, obligation.id, obligation.lawId, "status_changed", `Status set to ${status.replace(/_/g, " ")}`);
+  },
+);
+
+export const add_evidence = spacetimedb.reducer(
+  {
+    obligationId: t.u64(), fileName: t.string(), fileType: t.string(),
+    fileUrlOrKey: t.string(), uploadedBy: t.string(), issuer: t.string(),
+    filingReferenceNumber: t.string(), notes: t.string(),
+  },
+  (ctx, args) => {
+    if (args.fileName.trim() === "") {
+      throw new Error("evidence needs a file name");
+    }
+    const obligation = ctx.db.obligation.id.find(args.obligationId);
+    if (!obligation || !obligation.owner.isEqual(ctx.sender)) {
+      throw new Error("no such obligation");
+    }
+
+    ctx.db.evidence.insert({
+      id: 0n,
+      owner: ctx.sender,
+      fleetScope: 0,
+      obligationId: obligation.id,
+      buildingId: obligation.buildingId,
+      lawId: obligation.lawId,
+      fileName: args.fileName,
+      fileType: args.fileType,
+      fileUrlOrKey: args.fileUrlOrKey,
+      uploadedBy: args.uploadedBy,
+      uploadedAt: ctx.timestamp,
+      documentDate: undefined,
+      expirationDate: undefined,
+      issuer: args.issuer,
+      vendorId: obligation.vendorId,
+      filingReferenceNumber: args.filingReferenceNumber,
+      verificationStatus: "unreviewed",
+      notes: args.notes,
+    });
+
+    logBinderEvent(ctx, obligation.buildingId, obligation.id, obligation.lawId, "evidence_uploaded", `Proof filed: ${args.fileName}`);
+  },
+);
+
+export const set_evidence_verification = spacetimedb.reducer(
+  { evidenceId: t.u64(), status: t.string() },
+  (ctx, { evidenceId, status }) => {
+    if (!VERIFICATION_STATUSES.includes(status)) {
+      throw new Error(`unknown verification status "${status}"`);
+    }
+    const evidence = ctx.db.evidence.id.find(evidenceId);
+    if (!evidence || !evidence.owner.isEqual(ctx.sender)) {
+      throw new Error("no such evidence");
+    }
+
+    ctx.db.evidence.id.update({ ...evidence, verificationStatus: status });
+    logBinderEvent(ctx, evidence.buildingId, evidence.obligationId, evidence.lawId, "evidence_reviewed", `Proof "${evidence.fileName}" marked ${status.replace(/_/g, " ")}`);
+  },
+);
+
+export const add_binder_note = spacetimedb.reducer(
+  { obligationId: t.u64(), note: t.string() },
+  (ctx, { obligationId, note }) => {
+    if (note.trim() === "") {
+      throw new Error("note cannot be empty");
+    }
+    const obligation = ctx.db.obligation.id.find(obligationId);
+    if (!obligation || !obligation.owner.isEqual(ctx.sender)) {
+      throw new Error("no such obligation");
+    }
+
+    ctx.db.obligation.id.update({ ...obligation, notes: note, updatedAt: ctx.timestamp });
+    logBinderEvent(ctx, obligation.buildingId, obligation.id, obligation.lawId, "note_added", note);
+  },
+);
+
 // Hand the reducer to the schema's scheduled table (see reaper-ref.ts).
 reaperRef.reap = reap;

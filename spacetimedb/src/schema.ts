@@ -151,6 +151,90 @@ export const reaperTick = table(
   },
 );
 
+// --- Compliance binder (customer-facing) -----------------------------------
+// The owner's organized, exportable compliance record: an obligation per law,
+// the proof filed against each, the vendor responsible, and a plain-language
+// history. Deliberately separate from the internal `event` audit log — this is
+// the owner's record, not developer plumbing.
+
+export const vendor = table(
+  { name: "vendor", public: true },
+  {
+    id: t.u64().primaryKey().autoInc(),
+    owner: t.identity().index("btree"),
+    fleetScope: t.u32().index("btree"),
+    name: t.string(),
+    company: t.string(),
+    roleType: t.string(), // QEWI | LMP | energy_auditor | ... (see VENDOR_ROLES)
+    email: t.string(),
+    phone: t.string(),
+    licenseNumber: t.string(),
+    licenseType: t.string(),
+    notes: t.string(),
+    createdAt: t.timestamp(),
+  },
+);
+
+export const obligation = table(
+  { name: "obligation", public: true },
+  {
+    id: t.u64().primaryKey().autoInc(),
+    owner: t.identity().index("btree"),
+    fleetScope: t.u32().index("btree"),
+    buildingId: t.u64().index("btree"),
+    lawId: t.string(),
+    title: t.string(),
+    status: t.string(), // see OBLIGATION_STATUSES
+    dueDate: t.option(t.timestamp()),
+    responsibleParty: t.string(),
+    vendorId: t.option(t.u64()),
+    filingReferenceNumber: t.string(),
+    notes: t.string(),
+    createdAt: t.timestamp(),
+    updatedAt: t.timestamp(),
+    completedAt: t.option(t.timestamp()),
+  },
+);
+
+export const evidence = table(
+  { name: "evidence", public: true },
+  {
+    id: t.u64().primaryKey().autoInc(),
+    owner: t.identity().index("btree"),
+    fleetScope: t.u32().index("btree"),
+    obligationId: t.u64().index("btree"),
+    buildingId: t.u64().index("btree"),
+    lawId: t.string(),
+    fileName: t.string(),
+    fileType: t.string(),
+    fileUrlOrKey: t.string(),
+    uploadedBy: t.string(),
+    uploadedAt: t.timestamp(),
+    documentDate: t.option(t.timestamp()),
+    expirationDate: t.option(t.timestamp()),
+    issuer: t.string(),
+    vendorId: t.option(t.u64()),
+    filingReferenceNumber: t.string(),
+    verificationStatus: t.string(), // see VERIFICATION_STATUSES
+    notes: t.string(),
+  },
+);
+
+export const binderEvent = table(
+  { name: "binder_event", public: true },
+  {
+    id: t.u64().primaryKey().autoInc(),
+    owner: t.identity().index("btree"),
+    fleetScope: t.u32().index("btree"),
+    buildingId: t.u64().index("btree"),
+    obligationId: t.option(t.u64()),
+    lawId: t.string(),
+    kind: t.string(),
+    summary: t.string(),
+    at: t.timestamp(),
+  },
+);
+
 const spacetimedb = schema({
   building,
   task,
@@ -160,6 +244,10 @@ const spacetimedb = schema({
   settings,
   event,
   reaperTick,
+  vendor,
+  obligation,
+  evidence,
+  binderEvent,
 });
 
 export default spacetimedb;
@@ -209,4 +297,19 @@ export const eventOwnerView = spacetimedb.clientVisibilityFilter.sql(
 
 export const settingsOwnerView = spacetimedb.clientVisibilityFilter.sql(
   "SELECT * FROM settings WHERE owner = :sender",
+);
+
+// The compliance binder is the owner's own record — owner-scoped only, with no
+// worker view (agents process tasks, not the customer's binder).
+export const vendorOwnerView = spacetimedb.clientVisibilityFilter.sql(
+  "SELECT * FROM vendor WHERE owner = :sender",
+);
+export const obligationOwnerView = spacetimedb.clientVisibilityFilter.sql(
+  "SELECT * FROM obligation WHERE owner = :sender",
+);
+export const evidenceOwnerView = spacetimedb.clientVisibilityFilter.sql(
+  "SELECT * FROM evidence WHERE owner = :sender",
+);
+export const binderEventOwnerView = spacetimedb.clientVisibilityFilter.sql(
+  "SELECT * FROM binder_event WHERE owner = :sender",
 );

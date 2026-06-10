@@ -28,6 +28,8 @@ import { projectionFor } from "@/lib/law-projections";
 import { tables } from "@/module_bindings/index";
 import type { Building } from "@/module_bindings/types";
 
+import { ComplianceBinder } from "@/components/compliance/ComplianceBinder";
+
 import { ComplianceSection, STATUS_DOT } from "./compliance-section";
 import { FineTimeline } from "./fine-timeline";
 import { InvestmentPlanner } from "./investment-planner";
@@ -143,6 +145,7 @@ export function ComplianceDashboard({ building }: { building: Building }) {
 
           <CompliancePlanCard planJson={building.compliancePlanJson} />
           <ComplianceSection buildingId={building.id} />
+          <ComplianceBinder building={building} />
           <ProvenanceFootnotes provenanceJson={building.provenanceJson} />
         </>
       )}

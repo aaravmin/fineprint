@@ -34,8 +34,12 @@ import {
 } from "spacetimedb";
 
 // Import all reducer arg schemas
+import AddBinderNoteReducer from "./add_binder_note_reducer";
 import AddBuildingReducer from "./add_building_reducer";
+import AddEvidenceReducer from "./add_evidence_reducer";
+import AddVendorReducer from "./add_vendor_reducer";
 import ApproveReducer from "./approve_reducer";
+import AssignVendorReducer from "./assign_vendor_reducer";
 import ClaimTaskReducer from "./claim_task_reducer";
 import FailIntakeReducer from "./fail_intake_reducer";
 import HeartbeatReducer from "./heartbeat_reducer";
@@ -46,6 +50,9 @@ import PruneDeadWorkersReducer from "./prune_dead_workers_reducer";
 import RegisterWorkerReducer from "./register_worker_reducer";
 import RejectReducer from "./reject_reducer";
 import RequestBuildingReducer from "./request_building_reducer";
+import SeedObligationsReducer from "./seed_obligations_reducer";
+import SetEvidenceVerificationReducer from "./set_evidence_verification_reducer";
+import SetObligationStatusReducer from "./set_obligation_status_reducer";
 import SetReviewModeReducer from "./set_review_mode_reducer";
 import SubmitWorkReducer from "./submit_work_reducer";
 
@@ -53,11 +60,15 @@ import SubmitWorkReducer from "./submit_work_reducer";
 
 // Import all table schema definitions
 import ApprovalRow from "./approval_table";
+import BinderEventRow from "./binder_event_table";
 import BuildingRow from "./building_table";
 import EventRow from "./event_table";
+import EvidenceRow from "./evidence_table";
+import ObligationRow from "./obligation_table";
 import SettingsRow from "./settings_table";
 import SubmissionRow from "./submission_table";
 import TaskRow from "./task_table";
+import VendorRow from "./vendor_table";
 import WorkerRow from "./worker_table";
 
 /** Type-only namespace exports for generated type groups. */
@@ -84,6 +95,26 @@ const tablesSchema = __schema({
       { name: 'approval_id_key', constraint: 'unique', columns: ['id'] },
     ],
   }, ApprovalRow),
+  binderEvent: __table({
+    name: 'binder_event',
+    indexes: [
+      { accessor: 'buildingId', name: 'binder_event_building_id_idx_btree', algorithm: 'btree', columns: [
+        'buildingId',
+      ] },
+      { accessor: 'fleetScope', name: 'binder_event_fleet_scope_idx_btree', algorithm: 'btree', columns: [
+        'fleetScope',
+      ] },
+      { accessor: 'id', name: 'binder_event_id_idx_btree', algorithm: 'btree', columns: [
+        'id',
+      ] },
+      { accessor: 'owner', name: 'binder_event_owner_idx_btree', algorithm: 'btree', columns: [
+        'owner',
+      ] },
+    ],
+    constraints: [
+      { name: 'binder_event_id_key', constraint: 'unique', columns: ['id'] },
+    ],
+  }, BinderEventRow),
   building: __table({
     name: 'building',
     indexes: [
@@ -115,6 +146,49 @@ const tablesSchema = __schema({
       { name: 'event_id_key', constraint: 'unique', columns: ['id'] },
     ],
   }, EventRow),
+  evidence: __table({
+    name: 'evidence',
+    indexes: [
+      { accessor: 'buildingId', name: 'evidence_building_id_idx_btree', algorithm: 'btree', columns: [
+        'buildingId',
+      ] },
+      { accessor: 'fleetScope', name: 'evidence_fleet_scope_idx_btree', algorithm: 'btree', columns: [
+        'fleetScope',
+      ] },
+      { accessor: 'id', name: 'evidence_id_idx_btree', algorithm: 'btree', columns: [
+        'id',
+      ] },
+      { accessor: 'obligationId', name: 'evidence_obligation_id_idx_btree', algorithm: 'btree', columns: [
+        'obligationId',
+      ] },
+      { accessor: 'owner', name: 'evidence_owner_idx_btree', algorithm: 'btree', columns: [
+        'owner',
+      ] },
+    ],
+    constraints: [
+      { name: 'evidence_id_key', constraint: 'unique', columns: ['id'] },
+    ],
+  }, EvidenceRow),
+  obligation: __table({
+    name: 'obligation',
+    indexes: [
+      { accessor: 'buildingId', name: 'obligation_building_id_idx_btree', algorithm: 'btree', columns: [
+        'buildingId',
+      ] },
+      { accessor: 'fleetScope', name: 'obligation_fleet_scope_idx_btree', algorithm: 'btree', columns: [
+        'fleetScope',
+      ] },
+      { accessor: 'id', name: 'obligation_id_idx_btree', algorithm: 'btree', columns: [
+        'id',
+      ] },
+      { accessor: 'owner', name: 'obligation_owner_idx_btree', algorithm: 'btree', columns: [
+        'owner',
+      ] },
+    ],
+    constraints: [
+      { name: 'obligation_id_key', constraint: 'unique', columns: ['id'] },
+    ],
+  }, ObligationRow),
   settings: __table({
     name: 'settings',
     indexes: [
@@ -169,6 +243,23 @@ const tablesSchema = __schema({
       { name: 'task_id_key', constraint: 'unique', columns: ['id'] },
     ],
   }, TaskRow),
+  vendor: __table({
+    name: 'vendor',
+    indexes: [
+      { accessor: 'fleetScope', name: 'vendor_fleet_scope_idx_btree', algorithm: 'btree', columns: [
+        'fleetScope',
+      ] },
+      { accessor: 'id', name: 'vendor_id_idx_btree', algorithm: 'btree', columns: [
+        'id',
+      ] },
+      { accessor: 'owner', name: 'vendor_owner_idx_btree', algorithm: 'btree', columns: [
+        'owner',
+      ] },
+    ],
+    constraints: [
+      { name: 'vendor_id_key', constraint: 'unique', columns: ['id'] },
+    ],
+  }, VendorRow),
   worker: __table({
     name: 'worker',
     indexes: [
@@ -191,8 +282,12 @@ const tablesSchema = __schema({
 
 /** The schema information for all reducers in this module. This is defined the same way as the reducers would have been defined in the server, except the body of the reducer is omitted in code generation. */
 const reducersSchema = __reducers(
+  __reducerSchema("add_binder_note", AddBinderNoteReducer),
   __reducerSchema("add_building", AddBuildingReducer),
+  __reducerSchema("add_evidence", AddEvidenceReducer),
+  __reducerSchema("add_vendor", AddVendorReducer),
   __reducerSchema("approve", ApproveReducer),
+  __reducerSchema("assign_vendor", AssignVendorReducer),
   __reducerSchema("claim_task", ClaimTaskReducer),
   __reducerSchema("fail_intake", FailIntakeReducer),
   __reducerSchema("heartbeat", HeartbeatReducer),
@@ -203,6 +298,9 @@ const reducersSchema = __reducers(
   __reducerSchema("register_worker", RegisterWorkerReducer),
   __reducerSchema("reject", RejectReducer),
   __reducerSchema("request_building", RequestBuildingReducer),
+  __reducerSchema("seed_obligations", SeedObligationsReducer),
+  __reducerSchema("set_evidence_verification", SetEvidenceVerificationReducer),
+  __reducerSchema("set_obligation_status", SetObligationStatusReducer),
   __reducerSchema("set_review_mode", SetReviewModeReducer),
   __reducerSchema("submit_work", SubmitWorkReducer),
 );

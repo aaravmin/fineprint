@@ -22,6 +22,19 @@ export const Approval = __t.object("Approval", {
 });
 export type Approval = __Infer<typeof Approval>;
 
+export const BinderEvent = __t.object("BinderEvent", {
+  id: __t.u64(),
+  owner: __t.identity(),
+  fleetScope: __t.u32(),
+  buildingId: __t.u64(),
+  obligationId: __t.option(__t.u64()),
+  lawId: __t.string(),
+  kind: __t.string(),
+  summary: __t.string(),
+  at: __t.timestamp(),
+});
+export type BinderEvent = __Infer<typeof BinderEvent>;
+
 export const Building = __t.object("Building", {
   id: __t.u64(),
   owner: __t.identity(),
@@ -53,6 +66,47 @@ export const Event = __t.object("Event", {
   at: __t.timestamp(),
 });
 export type Event = __Infer<typeof Event>;
+
+export const Evidence = __t.object("Evidence", {
+  id: __t.u64(),
+  owner: __t.identity(),
+  fleetScope: __t.u32(),
+  obligationId: __t.u64(),
+  buildingId: __t.u64(),
+  lawId: __t.string(),
+  fileName: __t.string(),
+  fileType: __t.string(),
+  fileUrlOrKey: __t.string(),
+  uploadedBy: __t.string(),
+  uploadedAt: __t.timestamp(),
+  documentDate: __t.option(__t.timestamp()),
+  expirationDate: __t.option(__t.timestamp()),
+  issuer: __t.string(),
+  vendorId: __t.option(__t.u64()),
+  filingReferenceNumber: __t.string(),
+  verificationStatus: __t.string(),
+  notes: __t.string(),
+});
+export type Evidence = __Infer<typeof Evidence>;
+
+export const Obligation = __t.object("Obligation", {
+  id: __t.u64(),
+  owner: __t.identity(),
+  fleetScope: __t.u32(),
+  buildingId: __t.u64(),
+  lawId: __t.string(),
+  title: __t.string(),
+  status: __t.string(),
+  dueDate: __t.option(__t.timestamp()),
+  responsibleParty: __t.string(),
+  vendorId: __t.option(__t.u64()),
+  filingReferenceNumber: __t.string(),
+  notes: __t.string(),
+  createdAt: __t.timestamp(),
+  updatedAt: __t.timestamp(),
+  completedAt: __t.option(__t.timestamp()),
+});
+export type Obligation = __Infer<typeof Obligation>;
 
 export const ReaperTick = __t.object("ReaperTick", {
   id: __t.u64(),
@@ -95,6 +149,22 @@ export const Task = __t.object("Task", {
   createdAt: __t.timestamp(),
 });
 export type Task = __Infer<typeof Task>;
+
+export const Vendor = __t.object("Vendor", {
+  id: __t.u64(),
+  owner: __t.identity(),
+  fleetScope: __t.u32(),
+  name: __t.string(),
+  company: __t.string(),
+  roleType: __t.string(),
+  email: __t.string(),
+  phone: __t.string(),
+  licenseNumber: __t.string(),
+  licenseType: __t.string(),
+  notes: __t.string(),
+  createdAt: __t.timestamp(),
+});
+export type Vendor = __Infer<typeof Vendor>;
 
 export const Worker = __t.object("Worker", {
   id: __t.u64(),
