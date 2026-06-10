@@ -29,6 +29,7 @@ import { tables } from "@/module_bindings/index";
 import type { Building } from "@/module_bindings/types";
 
 import { ComplianceBinder } from "@/components/compliance/ComplianceBinder";
+import { ComplianceReport } from "@/components/dashboard/ComplianceReport";
 
 import { ComplianceSection, STATUS_DOT } from "./compliance-section";
 import { FineTimeline } from "./fine-timeline";
@@ -143,6 +144,7 @@ export function ComplianceDashboard({ building }: { building: Building }) {
             </CardContent>
           </Card>
 
+          <ComplianceReport building={building} assessment={assessment} />
           <CompliancePlanCard planJson={building.compliancePlanJson} />
           <ComplianceSection buildingId={building.id} />
           <ComplianceBinder building={building} />

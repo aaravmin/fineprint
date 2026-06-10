@@ -272,8 +272,8 @@ function PathSummary({
           Investing <span className="font-medium">{fmtUsd(investmentUsd)}</span> cuts{" "}
           <span className="font-medium">{fmtTco2e(emissionsCut)}</span> of annual emissions
           and brings the building under every LL97 cap through 2039 —{" "}
-          <span className="font-medium text-success">no fines remain</span>, avoiding{" "}
-          {fmtUsd(finesAvoided)}.
+          <span className="font-medium text-success">no modeled fines remain</span>, avoiding{" "}
+          {fmtUsd(finesAvoided)} on the current projection.
         </p>
       ) : (
         <p>
