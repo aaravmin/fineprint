@@ -41,6 +41,7 @@ export const Building = __t.object("Building", {
   fleetScope: __t.u32(),
   address: __t.string(),
   bbl: __t.option(__t.string()),
+  bin: __t.option(__t.string()),
   sqft: __t.u32(),
   isAffordable: __t.bool(),
   annualEmissionsTco2E: __t.option(__t.f64()),

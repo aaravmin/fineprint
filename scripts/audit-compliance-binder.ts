@@ -86,6 +86,7 @@ const sampleExport = buildBinderExport({
     id: "sample",
     address: "350 Sample Ave, Manhattan",
     bbl: "1008350041",
+    bin: "1083900",
     sqft: 250_000,
     buildingType: "Office",
     yearBuilt: null,
@@ -99,7 +100,7 @@ const sampleExport = buildBinderExport({
 });
 const requiredSections = [
   "building_summary", "compliance_snapshot", "law_by_law_obligations",
-  "open_items", "compliance_history", "source_appendix", "assumptions_and_limitations",
+  "open_items", "compliance_history", "source_citations", "assumptions_and_limitations",
 ];
 const missingSections = requiredSections.filter(s => !(s in sampleExport));
 check("export produces every required section", missingSections.length === 0, missingSections.join(", "));

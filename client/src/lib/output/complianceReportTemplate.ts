@@ -12,6 +12,13 @@
 
 import { lawById } from "@/lib/laws/lawRegistry";
 
+import {
+  exportEnvelope,
+  standardCitations,
+  type ExportEnvelope,
+  type SourceCitation,
+} from "./exportEnvelope";
+
 export type FindingStatus =
   | "applies"
   | "may_apply"
@@ -30,6 +37,7 @@ export const STATUS_LABEL: Record<FindingStatus, string> = {
 export interface ReportBuilding {
   address: string;
   bbl: string | null;
+  bin: string | null;
   sqft: number;
   buildingType: string | null;
   yearBuilt: number | null;
@@ -69,6 +77,7 @@ export interface ReportInputs {
     openItems: number;
     obligationsMissingRequiredEvidence: number;
   } | null;
+  ll84Year?: number | null;
   generatedAt?: string;
 }
 
@@ -91,7 +100,8 @@ export interface ReportFinding {
   not_tracked_reason: string | null;
 }
 
-export interface ComplianceReport {
+export interface ComplianceReport extends ExportEnvelope {
+  document_type: "compliance_report";
   building_summary: ReportBuilding;
   compliance_snapshot: {
     applicable: string[];
@@ -105,8 +115,7 @@ export interface ComplianceReport {
   recommendations: ReportRecommendationInput[];
   action_plan: { immediate: string[]; near_term: string[]; capital_planning: string[]; recurring: string[] };
   assumptions_and_limitations: string[];
-  source_appendix: string[];
-  generated_at: string;
+  source_citations: SourceCitation[];
 }
 
 function usd(value: number): string {
@@ -202,6 +211,8 @@ export function buildComplianceReport(inputs: ReportInputs): ComplianceReport {
     .map(f => `${f.short}: ${f.estimated_exposure}`);
 
   return {
+    ...exportEnvelope({ bbl: inputs.building.bbl, bin: inputs.building.bin }, inputs.generatedAt),
+    document_type: "compliance_report",
     building_summary: inputs.building,
     compliance_snapshot: {
       applicable: applies.map(f => f.short),
@@ -233,12 +244,9 @@ export function buildComplianceReport(inputs: ReportInputs): ComplianceReport {
       "Where required source data is missing, the requirement is shown as 'missing data' rather than assumed compliant.",
       "Retrofit cost ranges and savings are sourced estimates for typical buildings, not engineering scopes or quotes.",
     ],
-    source_appendix: [
-      "Law applicability, statutory deadlines, and penalty rates: Fineprint law registry (NYC Admin Code citations per law).",
-      "Building characteristics: NYC PLUTO and the LL84 energy & water benchmarking disclosure.",
-      "Emissions and LL97 exposure: the building's reported emissions vs its occupancy-weighted cap.",
-      "Retrofit cost and savings: NYC NYSERDA/Urban Green cost studies, NREL REMDB, and NREL ResStock (see the master measure file).",
-    ],
-    generated_at: inputs.generatedAt ?? new Date().toISOString(),
+    source_citations: standardCitations(
+      { bbl: inputs.building.bbl, bin: inputs.building.bin },
+      inputs.ll84Year ?? null,
+    ),
   };
 }

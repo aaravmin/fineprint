@@ -11,12 +11,19 @@ import {
   lawsInOrder,
   type LawEvidence,
 } from "../laws/lawRegistry";
+import {
+  exportEnvelope,
+  standardCitations,
+  type ExportEnvelope,
+  type SourceCitation,
+} from "../output/exportEnvelope";
 
 // Plain shapes (a row from each binder table, decoupled from the bindings).
 export interface BinderBuilding {
   id: string;
   address: string;
   bbl: string | null;
+  bin: string | null;
   sqft: number;
   buildingType: string | null;
   yearBuilt: number | null;
@@ -68,6 +75,7 @@ export interface BinderInputs {
   evidence: BinderEvidence[];
   vendors: BinderVendor[];
   history: BinderHistoryEvent[];
+  ll84Year?: number | null;
   generatedAt?: string;
 }
 
@@ -120,7 +128,8 @@ export interface BinderObligationExport {
   notes: string;
 }
 
-export interface BinderExport {
+export interface BinderExport extends ExportEnvelope {
+  document_type: "compliance_binder";
   building_summary: BinderBuilding & { source_note: string };
   compliance_snapshot: {
     obligations_total: number;
@@ -132,9 +141,8 @@ export interface BinderExport {
   law_by_law_obligations: BinderObligationExport[];
   open_items: string[];
   compliance_history: BinderHistoryEvent[];
-  source_appendix: string[];
+  source_citations: SourceCitation[];
   assumptions_and_limitations: string[];
-  generated_at: string;
 }
 
 export function buildBinderExport(inputs: BinderInputs): BinderExport {
@@ -185,6 +193,8 @@ export function buildBinderExport(inputs: BinderInputs): BinderExport {
     .sort();
 
   return {
+    ...exportEnvelope({ bbl: building.bbl, bin: building.bin }, inputs.generatedAt),
+    document_type: "compliance_binder",
     building_summary: {
       ...building,
       source_note:
@@ -208,17 +218,15 @@ export function buildBinderExport(inputs: BinderInputs): BinderExport {
           : ""),
     ),
     compliance_history: inputs.history,
-    source_appendix: [
-      "Law applicability, deadlines, and penalty estimates: Fineprint law registry (NYC Admin Code citations per law).",
-      "Building characteristics: NYC PLUTO and LL84 benchmarking disclosure.",
-      "Evidence checklists: each law's statutory filing; uncertain items are marked recommended, not required.",
-    ],
+    source_citations: standardCitations(
+      { bbl: building.bbl, bin: building.bin },
+      inputs.ll84Year ?? null,
+    ),
     assumptions_and_limitations: [
       "This binder is an owner record, not a legal determination or a filed report.",
       "Penalty and deadline figures are estimates from available records; professional verification is recommended before filing or capital decisions.",
       "Evidence-to-checklist matching is best-effort by file name; confirm each item against the actual document.",
     ],
-    generated_at: inputs.generatedAt ?? new Date().toISOString(),
   };
 }
 

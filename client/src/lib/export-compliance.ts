@@ -3,6 +3,7 @@
 // the @media print rules in globals.css). Both run entirely in the browser.
 
 import type { FundedPlan } from "@/lib/engine";
+import { EXPORT_SCHEMA_VERSION } from "@/lib/output/exportEnvelope";
 import type { Building } from "@/module_bindings/types";
 
 export interface LawExposureRow {
@@ -33,8 +34,11 @@ export function buildComplianceCsv(
   const lines: string[] = [];
 
   lines.push(row(["Fineprint compliance export"]));
+  lines.push(row(["Schema version", EXPORT_SCHEMA_VERSION]));
+  lines.push(row(["Generated at", new Date().toISOString()]));
   lines.push(row(["Address", building.address]));
   lines.push(row(["BBL", building.bbl ?? ""]));
+  lines.push(row(["BIN", building.bin ?? ""]));
   lines.push(row(["Gross floor area (sqft)", building.sqft]));
   lines.push("");
 

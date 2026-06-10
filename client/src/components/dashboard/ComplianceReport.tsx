@@ -14,6 +14,7 @@ import {
   type ReportFindingInput,
   type ReportRecommendationInput,
 } from "@/lib/output/complianceReportTemplate";
+import { MASTER_MEASURES } from "@/lib/output/masterMeasures";
 import { tables } from "@/module_bindings/index";
 import type { Building } from "@/module_bindings/types";
 
@@ -64,7 +65,32 @@ export function ComplianceReport({
       };
     });
 
-  const recommendations: ReportRecommendationInput[] = (assessment?.macc ?? [])
+  // Recommendations come from the Phase 5 master measures whose laws bind this
+  // building (real cost ranges + savings), falling back to the engine's
+  // marginal-abatement curve only if the master module is empty.
+  const applicableLawIds = new Set(buildingTasks.map(task => task.lawId));
+  const lighter = new Set(["Envelope", "Water heating"]);
+  const masterRecs: ReportRecommendationInput[] = MASTER_MEASURES.filter(measure =>
+    measure.supports_law_ids.some(id => applicableLawIds.has(id)),
+  ).map(measure => ({
+    measure: measure.measure_name,
+    issueAddressed: measure.supports_law_ids.includes("ll97")
+      ? "Reduces LL97 emissions and over-cap exposure"
+      : "Supports the building's filing obligations",
+    lawIds: measure.supports_law_ids,
+    costLowUsd: measure.cost_low,
+    costHighUsd: measure.cost_high,
+    costUnit: measure.cost_unit,
+    annualSavingsUsd: measure.annual_utility_savings_mid,
+    annualEnergySavings:
+      measure.annual_energy_savings_mid !== null
+        ? `${Math.round(measure.annual_energy_savings_mid).toLocaleString()} kWh/yr`
+        : null,
+    priority: lighter.has(measure.category ?? "") ? "Near-term" : "Capital planning",
+    source: `${measure.cost_source ?? "—"} cost / ${measure.savings_source ?? "—"} savings · ${measure.confidence_level ?? "?"} confidence`,
+  }));
+
+  const maccRecs: ReportRecommendationInput[] = (assessment?.macc ?? [])
     .filter(point => Number.isFinite(point.usdPerTco2e) && point.annualReductionTco2e > 0)
     .slice(0, 5)
     .map((point, index) => ({
@@ -80,10 +106,13 @@ export function ComplianceReport({
       source: point.basis,
     }));
 
+  const recommendations = masterRecs.length > 0 ? masterRecs : maccRecs;
+
   const report = buildComplianceReport({
     building: {
       address: building.address,
       bbl: building.bbl ?? null,
+      bin: building.bin ?? null,
       sqft: building.sqft,
       buildingType: null,
       yearBuilt: null,
@@ -109,13 +138,20 @@ export function ComplianceReport({
             <Printer className="mr-1 size-3.5" /> Print / PDF
           </Button>
         </div>
-        <p className="text-sm text-muted-foreground">
-          {report.building_summary.address}
-          {report.building_summary.bbl ? ` · BBL ${report.building_summary.bbl}` : ""} ·{" "}
-          {report.building_summary.sqft.toLocaleString()} ft²
-        </p>
+        <div className="space-y-0.5 text-sm text-muted-foreground">
+          <p className="font-medium text-foreground">{report.building_summary.address}</p>
+          <p className="tabular-nums">
+            {report.building_identifiers.bbl ? `BBL ${report.building_identifiers.bbl}` : "BBL —"}
+            {report.building_identifiers.bin ? ` · BIN ${report.building_identifiers.bin}` : ""} ·{" "}
+            {report.building_summary.sqft.toLocaleString()} ft²
+          </p>
+          <p className="text-xs">
+            Prepared by Fineprint · {new Date(report.generated_at).toLocaleDateString()} ·{" "}
+            {report.schema_version}
+          </p>
+        </div>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="compliance-report space-y-6">
         <ComplianceSnapshot report={report} />
 
         <section className="space-y-3">
@@ -155,17 +191,31 @@ export function ComplianceReport({
                 <thead>
                   <tr className="border-b text-left text-xs uppercase tracking-wide text-muted-foreground">
                     <th className="py-2 pr-4 font-medium">Measure</th>
-                    <th className="py-2 pr-4 font-medium">Annual impact</th>
-                    <th className="py-2 pr-4 font-medium">Cost basis</th>
+                    <th className="py-2 pr-4 font-medium">Estimated cost</th>
+                    <th className="py-2 pr-4 font-medium">Annual savings</th>
                     <th className="py-2 pr-4 font-medium">Priority</th>
                   </tr>
                 </thead>
                 <tbody>
                   {report.recommendations.map((rec, i) => (
-                    <tr key={i} className="border-b last:border-0">
-                      <td className="py-2 pr-4">{rec.measure}</td>
-                      <td className="py-2 pr-4 tabular-nums">{rec.annualEnergySavings}</td>
-                      <td className="py-2 pr-4 tabular-nums">{rec.costUnit}</td>
+                    <tr key={i} className="border-b align-top last:border-0">
+                      <td className="py-2 pr-4">
+                        {rec.measure}
+                        <div className="text-xs text-muted-foreground">{rec.source}</div>
+                      </td>
+                      <td className="py-2 pr-4 tabular-nums">
+                        {rec.costLowUsd !== null && rec.costHighUsd !== null
+                          ? `${fmtUsd(rec.costLowUsd)}–${fmtUsd(rec.costHighUsd)}`
+                          : (rec.costUnit ?? "—")}
+                        {rec.costLowUsd !== null && rec.costUnit && (
+                          <div className="text-xs text-muted-foreground">{rec.costUnit}</div>
+                        )}
+                      </td>
+                      <td className="py-2 pr-4 tabular-nums">
+                        {[rec.annualEnergySavings, rec.annualSavingsUsd !== null ? `${fmtUsd(rec.annualSavingsUsd)}/yr` : null]
+                          .filter(Boolean)
+                          .join(" · ") || "—"}
+                      </td>
                       <td className="py-2 pr-4">{rec.priority}</td>
                     </tr>
                   ))}

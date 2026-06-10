@@ -16,6 +16,7 @@ export default __t.row({
   fleetScope: __t.u32().name("fleet_scope"),
   address: __t.string(),
   bbl: __t.option(__t.string()),
+  bin: __t.option(__t.string()),
   sqft: __t.u32(),
   isAffordable: __t.bool().name("is_affordable"),
   annualEmissionsTco2E: __t.option(__t.f64()).name("annual_emissions_tco_2_e"),

@@ -18,6 +18,9 @@ export const building = table(
     fleetScope: t.u32().index("btree"),
     address: t.string(),
     bbl: t.option(t.string()),
+    // NYC Building Identification Number — the second stable identifier (with
+    // BBL) that lets an external system cross-reference DOB/PLUTO/BEAM records.
+    bin: t.option(t.string()),
     sqft: t.u32(),
     isAffordable: t.bool(),
     // Real-data fields, filled by ingest_building from NYC public datasets.

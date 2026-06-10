@@ -107,6 +107,7 @@ export function ComplianceBinder({ building }: { building: Building }) {
       id: building.id.toString(),
       address: building.address,
       bbl: building.bbl ?? null,
+      bin: building.bin ?? null,
       sqft: building.sqft,
       buildingType: null,
       yearBuilt: null,

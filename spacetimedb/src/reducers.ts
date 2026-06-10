@@ -103,6 +103,7 @@ export const add_building = spacetimedb.reducer(
       fleetScope: 0,
       address,
       bbl: undefined,
+      bin: undefined,
       sqft,
       isAffordable,
       annualEmissionsTco2e: undefined,
@@ -199,6 +200,7 @@ export const ingest_building = spacetimedb.reducer(
   {
     address: t.string(),
     bbl: t.string(),
+    bin: t.string(),
     sqft: t.u32(),
     isArticle321: t.bool(),
     annualEmissionsTco2E: t.option(t.f64()),
@@ -228,6 +230,7 @@ export const ingest_building = spacetimedb.reducer(
 interface IngestArgs {
   address: string;
   bbl: string;
+  bin: string;
   sqft: number;
   isArticle321: boolean;
   annualEmissionsTco2E: number | undefined;
@@ -298,6 +301,7 @@ function ingestFromArgs(ctx: any, args: IngestArgs, owner: Identity) {
     ctx.db.building.id.update({
       ...existingBuilding,
       address: args.address,
+      bin: args.bin,
       sqft: args.sqft,
       isAffordable: args.isArticle321,
       annualEmissionsTco2e: args.annualEmissionsTco2E,
@@ -357,6 +361,7 @@ function ingestFromArgs(ctx: any, args: IngestArgs, owner: Identity) {
     fleetScope: 0,
     address: args.address,
     bbl: args.bbl,
+    bin: args.bin,
     sqft: args.sqft,
     isAffordable: args.isArticle321,
     annualEmissionsTco2e: args.annualEmissionsTco2E,

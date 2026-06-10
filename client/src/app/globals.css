@@ -331,5 +331,35 @@ html {
 
   body {
     background: white !important;
+    font-size: 11pt;
+  }
+
+  /* Print the compliance report as a clean paginated document: drop card
+     chrome, number the top-level sections, and keep findings/tables/rows from
+     splitting across a page. */
+  .compliance-report > section {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .compliance-report {
+    counter-reset: report-section;
+  }
+  .compliance-report > section > h3::before {
+    counter-increment: report-section;
+    content: counter(report-section) ". ";
+  }
+
+  .compliance-report table,
+  .compliance-report tr,
+  .compliance-report li,
+  .compliance-report .rounded-xl {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  [data-slot="card"] {
+    border: none !important;
+    box-shadow: none !important;
   }
 }

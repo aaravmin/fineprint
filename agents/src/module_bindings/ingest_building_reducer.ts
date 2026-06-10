@@ -13,6 +13,7 @@ import {
 export default {
   address: __t.string(),
   bbl: __t.string(),
+  bin: __t.string(),
   sqft: __t.u32(),
   isArticle321: __t.bool(),
   annualEmissionsTco2E: __t.option(__t.f64()),

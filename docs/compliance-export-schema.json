@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fineprint.app/schema/compliance-export/v1.json",
+  "title": "Fineprint compliance export (v1)",
+  "description": "The versioned JSON a Fineprint building compliance export (report or binder) produces, for integration into architecture / engineering / sustainability / compliance firm systems. Every export shares the envelope and is discriminated by document_type.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "jurisdiction",
+    "generated_at",
+    "building_identifiers",
+    "document_type"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schema_version": { "const": "fineprint.compliance-export/v1" },
+    "jurisdiction": { "type": "string", "examples": ["NYC"] },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "building_identifiers": {
+      "type": "object",
+      "description": "Stable identifiers for cross-referencing DOB / PLUTO / BEAM records.",
+      "required": ["bbl", "bin"],
+      "properties": {
+        "bbl": { "type": ["string", "null"], "description": "10-digit Borough-Block-Lot" },
+        "bin": { "type": ["string", "null"], "description": "7-digit Building Identification Number" }
+      }
+    },
+    "document_type": { "enum": ["compliance_report", "compliance_binder"] }
+  },
+  "$defs": {
+    "sourceCitation": {
+      "type": "object",
+      "required": ["dataset", "identifier", "as_of", "fields"],
+      "properties": {
+        "dataset": { "type": "string" },
+        "identifier": { "type": ["string", "null"] },
+        "as_of": { "type": "string", "description": "ISO date or a named statutory cycle" },
+        "fields": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "title": "Compliance report",
+      "properties": {
+        "document_type": { "const": "compliance_report" },
+        "building_summary": { "type": "object" },
+        "compliance_snapshot": {
+          "type": "object",
+          "properties": {
+            "applicable": { "type": "array", "items": { "type": "string" } },
+            "not_applicable": { "type": "array", "items": { "type": "string" } },
+            "missing_data": { "type": "array", "items": { "type": "string" } },
+            "nearest_deadline": { "type": ["string", "null"] },
+            "estimated_annual_exposure_usd": { "type": "number" },
+            "highest_risk": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["law_id", "status"],
+            "properties": {
+              "law_id": { "type": "string", "description": "Canonical Fineprint law id (foreign key)" },
+              "status": { "enum": ["applies", "may_apply", "does_not_apply", "unknown", "missing_data"] },
+              "next_deadline": { "type": ["string", "null"] },
+              "estimated_exposure": { "type": "string" },
+              "missing_data": { "type": "array", "items": { "type": "string" } },
+              "not_tracked_reason": { "type": ["string", "null"] }
+            }
+          }
+        },
+        "recommendations": { "type": "array" },
+        "action_plan": { "type": "object" },
+        "assumptions_and_limitations": { "type": "array", "items": { "type": "string" } },
+        "source_citations": { "type": "array", "items": { "$ref": "#/$defs/sourceCitation" } }
+      },
+      "required": ["building_summary", "compliance_snapshot", "findings", "source_citations"]
+    },
+    {
+      "title": "Compliance binder",
+      "properties": {
+        "document_type": { "const": "compliance_binder" },
+        "building_summary": { "type": "object" },
+        "compliance_snapshot": { "type": "object" },
+        "law_by_law_obligations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["law_id", "status"],
+            "properties": {
+              "law_id": { "type": "string" },
+              "status": { "type": "string" },
+              "assigned_vendor": { "type": ["object", "null"] },
+              "evidence_on_file": { "type": "array" },
+              "missing_required_evidence": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        },
+        "compliance_history": { "type": "array" },
+        "source_citations": { "type": "array", "items": { "$ref": "#/$defs/sourceCitation" } },
+        "assumptions_and_limitations": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["building_summary", "law_by_law_obligations", "source_citations"]
+    }
+  ]
+}

@@ -27,6 +27,7 @@ export interface IntakeResult {
   ingestArgs: {
     address: string;
     bbl: string;
+    bin: string;
     sqft: number;
     isArticle321: boolean;
     annualEmissionsTco2E: number | undefined;
@@ -104,6 +105,7 @@ export async function prepareIntake(
     ingestArgs: {
       address: facts.address,
       bbl: facts.bbl,
+      bin: facts.bin ?? "",
       sqft: facts.grossFloorAreaSqft ?? 0,
       isArticle321: facts.isArticle321 ?? false,
       annualEmissionsTco2E: facts.annualEmissionsTco2e ?? undefined,
