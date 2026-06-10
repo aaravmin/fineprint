@@ -45,7 +45,13 @@ export function ComplianceReport({
       const missing = law.source_data_keys.filter(key => !fieldPresent(building, key));
       const used = law.source_data_keys.filter(key => fieldPresent(building, key));
 
-      const status: FindingStatus = task ? "applies" : missing.length > 0 ? "missing_data" : "unknown";
+      // A task means the law binds this building. With no task: missing source
+      // data means we can't confirm it; complete data means it does not apply.
+      const status: FindingStatus = task
+        ? "applies"
+        : missing.length > 0
+          ? "missing_data"
+          : "does_not_apply";
 
       return {
         lawId: law.law_id,
@@ -115,11 +121,29 @@ export function ComplianceReport({
         <section className="space-y-3">
           <h3 className="text-sm font-semibold tracking-tight">Law-by-law findings</h3>
           <div className="space-y-2.5">
-            {report.findings.map(finding => (
-              <LawFindingCard key={finding.law_id} finding={finding} />
-            ))}
+            {report.findings
+              .filter(finding => finding.status === "applies")
+              .map(finding => (
+                <LawFindingCard key={finding.law_id} finding={finding} />
+              ))}
           </div>
         </section>
+
+        {report.findings.some(finding => finding.status !== "applies") && (
+          <section className="space-y-2">
+            <h3 className="text-sm font-semibold tracking-tight">Not tracked for this building</h3>
+            <ul className="space-y-1 text-sm leading-relaxed">
+              {report.findings
+                .filter(finding => finding.status !== "applies")
+                .map(finding => (
+                  <li key={finding.law_id} className="flex gap-2">
+                    <span className="font-mono text-xs text-muted-foreground">{finding.short}</span>
+                    <span className="text-muted-foreground">{finding.not_tracked_reason}</span>
+                  </li>
+                ))}
+            </ul>
+          </section>
+        )}
 
         {report.recommendations.length > 0 && (
           <section className="space-y-3">

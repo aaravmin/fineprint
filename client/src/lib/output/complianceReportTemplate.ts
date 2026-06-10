@@ -86,6 +86,9 @@ export interface ReportFinding {
   source_data_used: string[];
   missing_data: string[];
   recommended_action: string;
+  // Set only when the law does not bind this building (status is not "applies"):
+  // a one-line explanation of why it isn't tracked, so it is explained, not hidden.
+  not_tracked_reason: string | null;
 }
 
 export interface ComplianceReport {
@@ -126,6 +129,21 @@ function exposurePhrase(finding: ReportFindingInput): string {
   return `Estimated annual exposure of ${usd(finding.estimatedExposureUsd)} based on available records.`;
 }
 
+// Why a law isn't tracked for this building — explained, never silently dropped.
+function notTrackedReason(finding: ReportFindingInput, applicability: string): string | null {
+  if (finding.status === "applies") {
+    return null;
+  }
+  if (finding.status === "missing_data") {
+    return `Required data is missing (${finding.missingData.join(", ")}), so applicability could not be confirmed.`;
+  }
+  if (finding.status === "does_not_apply") {
+    const who = applicability ? applicability.charAt(0).toLowerCase() + applicability.slice(1) : "other buildings";
+    return `Does not apply to this building — this requirement binds ${who}`;
+  }
+  return "Applicability could not be confirmed from available records.";
+}
+
 function recommendedAction(finding: ReportFindingInput, requirementSteps: string): string {
   if (finding.status === "does_not_apply") {
     return "No action required; this requirement does not bind the building.";
@@ -161,6 +179,7 @@ export function buildComplianceReport(inputs: ReportInputs): ComplianceReport {
       source_data_used: finding.sourceDataUsed,
       missing_data: finding.missingData,
       recommended_action: recommendedAction(finding, defaultAction),
+      not_tracked_reason: notTrackedReason(finding, law?.applies_to_logic ?? ""),
     };
   });
 
