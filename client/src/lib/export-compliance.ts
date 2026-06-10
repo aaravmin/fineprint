@@ -10,6 +10,8 @@ export interface LawExposureRow {
   name: string;
   status: string;
   exposureUsd: number | undefined;
+  // Past the statutory deadline or SLA-breached — the exposure is live, not future.
+  overdue: boolean;
 }
 
 // One CSV cell: quote anything with a comma, quote, or newline; double any
@@ -77,7 +79,7 @@ export function buildComplianceCsv(
   }
 
   lines.push(row(["Law exposure"]));
-  lines.push(row(["Law", "Name", "Status", "Annual exposure (USD)"]));
+  lines.push(row(["Law", "Name", "Status", "Annual exposure (USD)", "Overdue"]));
   for (const law of lawRows) {
     lines.push(
       row([
@@ -85,6 +87,7 @@ export function buildComplianceCsv(
         law.name,
         law.status,
         law.exposureUsd !== undefined ? Math.round(law.exposureUsd) : "tracked",
+        law.overdue ? "yes" : "no",
       ]),
     );
   }

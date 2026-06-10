@@ -22,6 +22,7 @@
     "extract:nyc-pdfs": "tsx data/scripts/extract-nyc-pdfs.ts",
     "parse:resstock": "tsx data/scripts/parse-resstock.ts",
     "merge:measures": "tsx data/scripts/merge-measures.ts",
+    "find:overcap": "tsx data/scripts/find-overcap.ts",
     "audit:laws": "tsx scripts/audit-law-dashboard.ts",
     "audit:binder": "tsx scripts/audit-compliance-binder.ts",
     "dashboard": "npm run dev --workspace client",

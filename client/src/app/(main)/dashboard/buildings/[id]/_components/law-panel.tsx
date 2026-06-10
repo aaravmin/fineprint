@@ -22,8 +22,12 @@ export function LawPanel({
   projection: LawProjection;
   task: Task | undefined;
 }) {
-  const maxAccrual = Math.max(1, ...projection.accrual.map(point => point.cumulativeUsd));
   const deadline = task ? task.deadline.toDate() : null;
+  const overdue = task ? task.slaBreached || (deadline !== null && deadline.getTime() < Date.now()) : false;
+  // The penalty if the obligation goes unmet: the first accrual step and the
+  // cap it builds to, stated in words rather than drawn as bars.
+  const firstStep = projection.accrual[0];
+  const cap = projection.accrual[projection.accrual.length - 1];
 
   return (
     <Card>
@@ -61,26 +65,20 @@ export function LawPanel({
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             What's at stake
           </p>
-          {projection.accrual.length > 0 ? (
-            <div className="mt-3 space-y-2.5">
-              {projection.accrual.map(point => (
-                <div
-                  key={point.label}
-                  className="grid grid-cols-[8rem_1fr_5.5rem] items-center gap-3"
-                >
-                  <span className="text-xs text-muted-foreground">{point.label}</span>
-                  <div className="h-2.5 overflow-hidden rounded-full bg-muted">
-                    <div
-                      className="h-full rounded-full bg-destructive"
-                      style={{ width: `${(point.cumulativeUsd / maxAccrual) * 100}%` }}
-                    />
-                  </div>
-                  <span className="text-right text-xs font-medium tabular-nums text-destructive">
-                    {fmtUsd(point.cumulativeUsd)}
-                  </span>
-                </div>
-              ))}
-            </div>
+          {firstStep && cap ? (
+            <p className="mt-2 text-sm leading-relaxed">
+              <span className={overdue ? "font-semibold text-destructive" : "font-medium"}>
+                {overdue ? "Now accruing: " : "If unmet: "}
+              </span>
+              {firstStep.cumulativeUsd === cap.cumulativeUsd ? (
+                <>{fmtUsd(cap.cumulativeUsd)} ({cap.label}).</>
+              ) : (
+                <>
+                  {fmtUsd(firstStep.cumulativeUsd)} once {firstStep.label}, building to{" "}
+                  {fmtUsd(cap.cumulativeUsd)} ({cap.label}).
+                </>
+              )}
+            </p>
           ) : (
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
               {projection.variableNote}

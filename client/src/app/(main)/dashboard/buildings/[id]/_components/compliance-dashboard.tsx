@@ -83,16 +83,21 @@ export function ComplianceDashboard({ building }: { building: Building }) {
   );
 
   const buildingTasks = tasks.filter(task => task.buildingId === building.id);
+  const now = Date.now();
   const lawRows: LawExposureRow[] = LAW_REGISTRY.filter(
     law => law.law_id !== "art321" && law.law_id !== "ll96",
   ).map(
     law => {
       const task = buildingTasks.find(candidate => candidate.lawId === law.law_id);
+      const overdue = task
+        ? task.slaBreached || task.deadline.toDate().getTime() < now
+        : false;
       return {
         short: law.short_name,
         name: law.display_name,
         status: task?.status ?? "missing",
         exposureUsd: task?.fineEstimateUsd,
+        overdue,
       };
     },
   );
@@ -136,7 +141,8 @@ export function ComplianceDashboard({ building }: { building: Building }) {
             <CardHeader>
               <CardTitle>Exposure by law</CardTitle>
               <p className="text-sm text-muted-foreground">
-                Estimated annual exposure per law, colored by where the filing stands.
+                Estimated annual exposure per filing law. A figure turns red and
+                &ldquo;Overdue&rdquo; once the deadline has passed.
               </p>
             </CardHeader>
             <CardContent>
@@ -262,21 +268,20 @@ function EnergyGradeCard({ score }: { score: number | undefined }) {
   );
 }
 
-// A horizontal exposure bar per law: bar length is the dollar exposure, bar
-// color is the filing status (same palette as the per-law ledger dots).
+// Estimated annual exposure per filing law, as a plain number table. The figure
+// is the penalty the building would face if the obligation goes unmet; it reads
+// muted until the law is actually overdue, when it turns into a live red figure
+// with an "Overdue" tag. No bars — the numbers carry the meaning.
 function ExposureByLaw({ rows }: { rows: LawExposureRow[] }) {
-  const max = Math.max(1, ...rows.map(row => row.exposureUsd ?? 0));
-
   return (
-    <div className="space-y-2.5">
+    <div className="divide-y text-sm">
       {rows.map(row => {
         const value = row.exposureUsd ?? 0;
-        const width = value > 0 ? Math.max(4, (value / max) * 100) : 0;
 
         return (
           <div
             key={row.short}
-            className="grid grid-cols-[4.5rem_1fr_6rem] items-center gap-3"
+            className="grid grid-cols-[4.5rem_1fr_auto] items-center gap-3 py-2"
           >
             <span className="flex items-center gap-1.5 font-mono text-xs text-muted-foreground">
               <span
@@ -284,14 +289,18 @@ function ExposureByLaw({ rows }: { rows: LawExposureRow[] }) {
               />
               {row.short}
             </span>
-            <div className="h-2.5 overflow-hidden rounded-full bg-muted">
-              <div
-                className={`h-full rounded-full ${STATUS_DOT[row.status] ?? "bg-muted-foreground/40"}`}
-                style={{ width: `${width}%` }}
-              />
-            </div>
-            <span className="text-right text-xs tabular-nums text-muted-foreground">
-              {value > 0 ? `${fmtUsd(value)}/yr` : "tracked"}
+
+            <span className="min-w-0 truncate text-muted-foreground">{row.name}</span>
+
+            <span className="flex items-center justify-end gap-2 tabular-nums">
+              {row.overdue && (
+                <span className="rounded-sm bg-destructive/10 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-destructive">
+                  Overdue
+                </span>
+              )}
+              <span className={row.overdue ? "font-semibold text-destructive" : "text-muted-foreground"}>
+                {value > 0 ? `${fmtUsd(value)}/yr` : "—"}
+              </span>
             </span>
           </div>
         );
