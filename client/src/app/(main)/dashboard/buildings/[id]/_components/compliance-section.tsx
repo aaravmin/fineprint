@@ -208,13 +208,14 @@ export function ComplianceSection({
         ? approve({ taskId: task.id, note: "approved from the building page" })
         : reject({ taskId: task.id, note: "rejected from the building page" });
 
-    if (verdict === "approve") {
-      toast.success("Draft approved");
-    } else {
-      toast("Draft rejected. Task returned to the queue");
-    }
-
     withAck(call, "The review verdict")
+      .then(() => {
+        if (verdict === "approve") {
+          toast.success("Draft approved");
+        } else {
+          toast("Draft rejected. Task returned to the queue");
+        }
+      })
       .catch((error: Error) => toast.error(`Review failed: ${error.message}`))
       .finally(() => setPendingTaskId(null));
   }

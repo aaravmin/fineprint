@@ -58,7 +58,6 @@ interface FineBasis {
 const LAW_OPTIONS: LawOption[] = [
   { id: "all", label: "All laws", taskLawIds: [] },
   { id: "ll97", label: "Local Law 97", taskLawIds: ["ll97", "art321"] },
-  { id: "art321", label: "Article 321", taskLawIds: ["art321"] },
   { id: "ll84", label: "Local Law 84", taskLawIds: ["ll84"] },
   { id: "ll87", label: "Local Law 87", taskLawIds: ["ll87"] },
   { id: "ll11", label: "Local Law 11", taskLawIds: ["ll11"] },

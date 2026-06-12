@@ -1,0 +1,529 @@
+{
+  "key": "https://geosearch.planninglabs.nyc/v2/search?text=2111%20RICHMD%20TERRACE%2C%20Staten%20Island",
+  "recordedAt": "2026-06-10T18:29:46.350Z",
+  "value": {
+    "geocoding": {
+      "version": "0.2",
+      "attribution": "http://geosearch.planninglabs.nyc/attribution",
+      "query": {
+        "text": "2111 RICHMD TERRACE, Staten Island",
+        "size": 10,
+        "private": false,
+        "lang": {
+          "name": "English",
+          "iso6391": "en",
+          "iso6393": "eng",
+          "via": "default",
+          "defaulted": true
+        },
+        "querySize": 20,
+        "parser": "pelias",
+        "parsed_text": {
+          "subject": "2111 RICHMD TERRACE",
+          "housenumber": "2111",
+          "street": "RICHMD TERRACE",
+          "locality": "Staten Island",
+          "admin": "Staten Island"
+        }
+      },
+      "warnings": [
+        "invalid language provided via header"
+      ],
+      "engine": {
+        "name": "Pelias",
+        "author": "Mapzen",
+        "version": "1.0"
+      },
+      "timestamp": 1781116186423
+    },
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.13333,
+            40.64087
+          ]
+        },
+        "properties": {
+          "id": "4336680",
+          "gid": "nycpad:venue:4336680",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "4336680",
+          "country_code": "US",
+          "name": "2111 RICHMD TERRACE",
+          "housenumber": "2111",
+          "street": "RICHMD TERRACE",
+          "postalcode": "10302",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Richmond County",
+          "county_gid": "whosonfirst:county:102081779",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Staten Island",
+          "borough_gid": "whosonfirst:borough:421205775",
+          "neighbourhood": "Port Richmond",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85842829",
+          "label": "2111 RICHMD TERRACE, Staten Island, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "5010680072",
+              "bin": "5107019",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.08773,
+            40.647138
+          ]
+        },
+        "properties": {
+          "id": "4269060",
+          "gid": "nycpad:venue:4269060",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "4269060",
+          "country_code": "US",
+          "name": "446 RICHMD TERRACE",
+          "housenumber": "446",
+          "street": "RICHMD TERRACE",
+          "postalcode": "10301",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Richmond County",
+          "county_gid": "whosonfirst:county:102081779",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Staten Island",
+          "borough_gid": "whosonfirst:borough:421205775",
+          "neighbourhood": "St. George",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85846655",
+          "label": "446 RICHMD TERRACE, Staten Island, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "5000510030",
+              "bin": "5113004",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.08773,
+            40.647138
+          ]
+        },
+        "properties": {
+          "id": "4269062",
+          "gid": "nycpad:venue:4269062",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "4269062",
+          "country_code": "US",
+          "name": "448 RICHMD TERRACE",
+          "housenumber": "448",
+          "street": "RICHMD TERRACE",
+          "postalcode": "10301",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Richmond County",
+          "county_gid": "whosonfirst:county:102081779",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Staten Island",
+          "borough_gid": "whosonfirst:borough:421205775",
+          "neighbourhood": "St. George",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85846655",
+          "label": "448 RICHMD TERRACE, Staten Island, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "5000510030",
+              "bin": "5113004",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.08772,
+            40.64495
+          ]
+        },
+        "properties": {
+          "id": "4269320",
+          "gid": "nycpad:venue:4269320",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "4269320",
+          "country_code": "US",
+          "name": "500 RICHMD TERRACE",
+          "housenumber": "500",
+          "street": "RICHMD TERRACE",
+          "postalcode": "10301",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Richmond County",
+          "county_gid": "whosonfirst:county:102081779",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Staten Island",
+          "borough_gid": "whosonfirst:borough:421205775",
+          "neighbourhood": "New Brighton",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85836569",
+          "label": "500 RICHMD TERRACE, Staten Island, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "5000520078",
+              "bin": "5000000",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.09087,
+            40.645661
+          ]
+        },
+        "properties": {
+          "id": "4270000",
+          "gid": "nycpad:venue:4270000",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "4270000",
+          "country_code": "US",
+          "name": "562 RICHMD TERRACE",
+          "housenumber": "562",
+          "street": "RICHMD TERRACE",
+          "postalcode": "10301",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Richmond County",
+          "county_gid": "whosonfirst:county:102081779",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Staten Island",
+          "borough_gid": "whosonfirst:borough:421205775",
+          "neighbourhood": "New Brighton",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85836569",
+          "label": "562 RICHMD TERRACE, Staten Island, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "5000620086",
+              "bin": "5001472",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.090123,
+            40.645879
+          ]
+        },
+        "properties": {
+          "id": "4269929",
+          "gid": "nycpad:venue:4269929",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "4269929",
+          "country_code": "US",
+          "name": "536 RICHMD TERRACE",
+          "housenumber": "536",
+          "street": "RICHMD TERRACE",
+          "postalcode": "10301",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Richmond County",
+          "county_gid": "whosonfirst:county:102081779",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Staten Island",
+          "borough_gid": "whosonfirst:borough:421205775",
+          "neighbourhood": "New Brighton",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85836569",
+          "label": "536 RICHMD TERRACE, Staten Island, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "5000620011",
+              "bin": "5001462",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.091543,
+            40.645418
+          ]
+        },
+        "properties": {
+          "id": "4269970",
+          "gid": "nycpad:venue:4269970",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "4269970",
+          "country_code": "US",
+          "name": "574 RICHMD TERRACE",
+          "housenumber": "574",
+          "street": "RICHMD TERRACE",
+          "postalcode": "10301",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Richmond County",
+          "county_gid": "whosonfirst:county:102081779",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Staten Island",
+          "borough_gid": "whosonfirst:borough:421205775",
+          "neighbourhood": "New Brighton",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85836569",
+          "label": "574 RICHMD TERRACE, Staten Island, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "5000620027",
+              "bin": "5001471",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.09488,
+            40.64472
+          ]
+        },
+        "properties": {
+          "id": "4270472",
+          "gid": "nycpad:venue:4270472",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "4270472",
+          "country_code": "US",
+          "name": "650 RICHMD TERRACE",
+          "housenumber": "650",
+          "street": "RICHMD TERRACE",
+          "postalcode": "10301",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Richmond County",
+          "county_gid": "whosonfirst:county:102081779",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Staten Island",
+          "borough_gid": "whosonfirst:borough:421205775",
+          "neighbourhood": "New Brighton",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85836569",
+          "label": "650 RICHMD TERRACE, Staten Island, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "5000670111",
+              "bin": "5000000",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.09488,
+            40.64472
+          ]
+        },
+        "properties": {
+          "id": "4270488",
+          "gid": "nycpad:venue:4270488",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "4270488",
+          "country_code": "US",
+          "name": "668 RICHMD TERRACE",
+          "housenumber": "668",
+          "street": "RICHMD TERRACE",
+          "postalcode": "10301",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Richmond County",
+          "county_gid": "whosonfirst:county:102081779",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Staten Island",
+          "borough_gid": "whosonfirst:borough:421205775",
+          "neighbourhood": "New Brighton",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85836569",
+          "label": "668 RICHMD TERRACE, Staten Island, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "5000670111",
+              "bin": "5000000",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.09488,
+            40.64472
+          ]
+        },
+        "properties": {
+          "id": "4270496",
+          "gid": "nycpad:venue:4270496",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "4270496",
+          "country_code": "US",
+          "name": "676 RICHMD TERRACE",
+          "housenumber": "676",
+          "street": "RICHMD TERRACE",
+          "postalcode": "10301",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Richmond County",
+          "county_gid": "whosonfirst:county:102081779",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Staten Island",
+          "borough_gid": "whosonfirst:borough:421205775",
+          "neighbourhood": "New Brighton",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85836569",
+          "label": "676 RICHMD TERRACE, Staten Island, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "5000670111",
+              "bin": "5000000",
+              "version": "26a"
+            }
+          }
+        }
+      }
+    ],
+    "bbox": [
+      -74.13333,
+      40.64087,
+      -74.08772,
+      40.647138
+    ]
+  }
+}

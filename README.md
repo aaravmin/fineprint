@@ -21,10 +21,21 @@ node workers    ─┘
 ```bash
 curl -sSf https://install.spacetimedb.com | sh   # CLI, once
 npm install
-spacetime start                                   # terminal 1, keep open
+spacetime start --listen-addr 127.0.0.1:3011     # terminal 1, keep open
 npm run publish:local
 WORKER_NAME=atlas npm run worker                  # terminal 2, repeat for a fleet
 npm run dashboard                                 # terminal 3, port 3000
+```
+
+The database must listen on 3011 — port 3000 belongs to the Next.js dashboard,
+and both the dashboard and the workers expect `ws://localhost:3011` by default.
+
+The dashboard also needs Clerk auth keys in `client/.env.local` (Next.js reads
+env files from `client/`, not the repo root):
+
+```
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_SECRET_KEY=sk_test_...
 ```
 
 Add a building from the dashboard's address bar, or from the CLI:
@@ -33,7 +44,8 @@ Add a building from the dashboard's address bar, or from the CLI:
 spacetime call -s local fineprint request_building '"345 Park Avenue, Manhattan"'
 ```
 
-`npm run generate` rebuilds the client bindings after any schema change.
+After any schema or reducer change, `npm run sync` republishes the module and
+regenerates the bindings for both the client and the agents.
 
 ## Poke it from the CLI
 
@@ -45,7 +57,7 @@ spacetime logs -s local fineprint
 
 ## Where it stands
 
-Module and workers run today. The dashboard is a Vite shell with live row counts; board components come next. `scripts/demo-kill.md` has the 90-second demo script, including a CLI fallback that needs no frontend.
+Module, workers, and the Next.js dashboard all run today. `scripts/demo-kill.md` has the 90-second demo script, including a CLI fallback that needs no frontend.
 
 Workers draft from canned playbooks by default. Set `USE_LLM=true` plus an `ANTHROPIC_API_KEY` to let Claude write the drafts instead; without a key everything still works.
 

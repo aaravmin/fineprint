@@ -18,6 +18,7 @@ import { Switch } from "@/components/ui/switch";
 import { fmtUsd } from "@/lib/engine";
 import { withAck } from "@/lib/reducer-call";
 import { reducers, tables } from "@/module_bindings/index";
+import type { Task } from "@/module_bindings/types";
 
 // Same dot-and-word treatment as the building page's compliance ledger.
 const STATUS_DOT: Record<string, string> = {
@@ -41,6 +42,7 @@ const STATUS_OPTIONS: Option[] = [
 export function TasksClient() {
   const [tasks] = useTable(tables.task);
   const [buildings] = useTable(tables.building);
+  const [submissions] = useTable(tables.submission);
   const [workers] = useTable(tables.worker);
   const [settingsRows] = useTable(tables.settings);
   const approve = useReducer(reducers.approve);
@@ -64,23 +66,35 @@ export function TasksClient() {
     );
   }
 
-  function review(taskId: bigint, verdict: "approve" | "reject") {
-    setPendingTaskId(taskId);
+  function review(task: Task, verdict: "approve" | "reject") {
+    if (verdict === "approve" && task.kind === "building_intake") {
+      const latestSubmission = submissions
+        .filter(submission => submission.taskId === task.id)
+        .sort((a, b) => (a.id > b.id ? -1 : 1))[0];
 
-    // Optimistic: the verdict toast fires on click; the buttons stay disabled
-    // only until the server acks, and a refused reducer surfaces as an error.
-    const call =
-      verdict === "approve"
-        ? approve({ taskId, note: "approved from the dashboard" })
-        : reject({ taskId, note: "rejected from the dashboard; returned to the queue" });
-
-    if (verdict === "approve") {
-      toast.success("Draft approved");
-    } else {
-      toast("Draft rejected. Task returned to the queue");
+      if (!latestSubmission?.payloadJson) {
+        toast.error("This intake did not produce building data", {
+          description: "Reject it, then re-request the address.",
+        });
+        return;
+      }
     }
 
+    setPendingTaskId(task.id);
+
+    const call =
+      verdict === "approve"
+        ? approve({ taskId: task.id, note: "approved from the dashboard" })
+        : reject({ taskId: task.id, note: "rejected from the dashboard; returned to the queue" });
+
     withAck(call, "The review verdict")
+      .then(() => {
+        if (verdict === "approve") {
+          toast.success("Draft approved");
+        } else {
+          toast("Draft rejected. Task returned to the queue");
+        }
+      })
       .catch((error: Error) => toast.error(`Review failed: ${error.message}`))
       .finally(() => setPendingTaskId(null));
   }
@@ -253,7 +267,7 @@ export function TasksClient() {
                           <Button
                             size="sm"
                             disabled={pendingTaskId === task.id}
-                            onClick={() => review(task.id, "approve")}
+                            onClick={() => review(task, "approve")}
                           >
                             {pendingTaskId === task.id ? <LoadingDots /> : "Approve"}
                           </Button>
@@ -261,7 +275,7 @@ export function TasksClient() {
                             size="sm"
                             variant="outline"
                             disabled={pendingTaskId === task.id}
-                            onClick={() => review(task.id, "reject")}
+                            onClick={() => review(task, "reject")}
                           >
                             Reject
                           </Button>
