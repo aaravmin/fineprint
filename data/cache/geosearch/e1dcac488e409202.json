@@ -1,12 +1,12 @@
 {
-  "key": "https://geosearch.planninglabs.nyc/v2/search?text=350%205th%20Avenue%2C%20Manhattan",
-  "recordedAt": "2026-06-30T02:56:38.768Z",
+  "key": "https://geosearch.planninglabs.nyc/v2/search?text=421%20EAST%2021%20STREET%2C%20Brooklyn",
+  "recordedAt": "2026-06-07T13:43:59.440Z",
   "value": {
     "geocoding": {
       "version": "0.2",
       "attribution": "http://geosearch.planninglabs.nyc/attribution",
       "query": {
-        "text": "350 5th Avenue, Manhattan",
+        "text": "421 EAST 21 STREET, Brooklyn",
         "size": 10,
         "private": false,
         "lang": {
@@ -19,11 +19,11 @@
         "querySize": 20,
         "parser": "pelias",
         "parsed_text": {
-          "subject": "350 5th Avenue",
-          "housenumber": "350",
-          "street": "5th Avenue",
-          "locality": "Manhattan",
-          "admin": "Manhattan"
+          "subject": "421 EAST 21 STREET",
+          "housenumber": "421",
+          "street": "EAST 21 STREET",
+          "locality": "Brooklyn",
+          "admin": "Brooklyn"
         }
       },
       "warnings": [
@@ -34,7 +34,7 @@
         "author": "Mapzen",
         "version": "1.0"
       },
-      "timestamp": 1782788198775
+      "timestamp": 1780839839485
     },
     "type": "FeatureCollection",
     "features": [
@@ -43,69 +43,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.985656,
-            40.748441
+            -73.958497,
+            40.644086
           ]
         },
         "properties": {
-          "id": "88597",
-          "gid": "nycpad:venue:88597",
+          "id": "1280058",
+          "gid": "nycpad:venue:1280058",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "88597",
+          "source_id": "1280058",
           "country_code": "US",
-          "name": "350 5 AVENUE",
-          "housenumber": "350",
-          "street": "5 AVENUE",
-          "postalcode": "10118",
-          "confidence": 0.8,
-          "match_type": "fallback",
-          "accuracy": "point",
-          "country": "United States",
-          "country_gid": "whosonfirst:country:85633793",
-          "country_a": "USA",
-          "region": "New York",
-          "region_gid": "whosonfirst:region:85688543",
-          "region_a": "NY",
-          "county": "New York County",
-          "county_gid": "whosonfirst:county:102081863",
-          "locality": "New York",
-          "locality_gid": "whosonfirst:locality:85977539",
-          "locality_a": "NYC",
-          "borough": "Manhattan",
-          "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Midtown West",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85882233",
-          "label": "350 5 AVENUE, New York, NY, USA",
-          "addendum": {
-            "pad": {
-              "bbl": "1008350041",
-              "bin": "1015862",
-              "version": "26a"
-            }
-          }
-        }
-      },
-      {
-        "type": "Feature",
-        "geometry": {
-          "type": "Point",
-          "coordinates": [
-            -73.984456,
-            40.672191
-          ]
-        },
-        "properties": {
-          "id": "788177",
-          "gid": "nycpad:venue:788177",
-          "layer": "venue",
-          "source": "nycpad",
-          "source_id": "788177",
-          "country_code": "US",
-          "name": "350 5 AVENUE",
-          "housenumber": "350",
-          "street": "5 AVENUE",
-          "postalcode": "11215",
+          "name": "421 EAST 21 STREET",
+          "housenumber": "421",
+          "street": "EAST 21 STREET",
+          "postalcode": "11226",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -123,13 +75,13 @@
           "locality_a": "NYC",
           "borough": "Brooklyn",
           "borough_gid": "whosonfirst:borough:421205765",
-          "neighbourhood": "Park Slope",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85840609",
-          "label": "350 5 AVENUE, Brooklyn, NY, USA",
+          "neighbourhood": "Flatbush",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85869833",
+          "label": "421 EAST 21 STREET, Brooklyn, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "3009810111",
-              "bin": "3021057",
+              "bbl": "3051520020",
+              "bin": "3118558",
               "version": "26a"
             }
           }
@@ -140,21 +92,69 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.985656,
-            40.748441
+            -73.75638,
+            40.59811
           ]
         },
         "properties": {
-          "id": "88599",
-          "gid": "nycpad:venue:88599",
+          "id": "4195927",
+          "gid": "nycpad:venue:4195927",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "88599",
+          "source_id": "4195927",
           "country_code": "US",
-          "name": "350A 5 AVENUE",
-          "housenumber": "350A",
-          "street": "5 AVENUE",
-          "postalcode": "10118",
+          "name": "421 B 21 STREET",
+          "housenumber": "421",
+          "street": "B 21 STREET",
+          "postalcode": "11691",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Queens County",
+          "county_gid": "whosonfirst:county:102082377",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Queens",
+          "borough_gid": "whosonfirst:borough:421205767",
+          "neighbourhood": "Far Rockaway",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85818909",
+          "label": "421 B 21 STREET, Far Rockaway, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "4157700041",
+              "bin": "4000000",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.003147,
+            40.745836
+          ]
+        },
+        "properties": {
+          "id": "72117",
+          "gid": "nycpad:venue:72117",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "72117",
+          "country_code": "US",
+          "name": "421 WEST 21 STREET",
+          "housenumber": "421",
+          "street": "WEST 21 STREET",
+          "postalcode": "10011",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -171,13 +171,13 @@
           "locality_a": "NYC",
           "borough": "Manhattan",
           "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Midtown West",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85882233",
-          "label": "350A 5 AVENUE, New York, NY, USA",
+          "neighbourhood": "Chelsea",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85810589",
+          "label": "421 WEST 21 STREET, New York, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008350041",
-              "bin": "1015862",
+              "bbl": "1007190029",
+              "bin": "1012629",
               "version": "26a"
             }
           }
@@ -188,21 +188,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.985656,
-            40.748441
+            -73.75638,
+            40.59811
           ]
         },
         "properties": {
-          "id": "88601",
-          "gid": "nycpad:venue:88601",
+          "id": "4195928",
+          "gid": "nycpad:venue:4195928",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "88601",
+          "source_id": "4195928",
           "country_code": "US",
-          "name": "350B 5 AVENUE",
-          "housenumber": "350B",
-          "street": "5 AVENUE",
-          "postalcode": "10118",
+          "name": "421 BEACH 21 STREET",
+          "housenumber": "421",
+          "street": "BEACH 21 STREET",
+          "postalcode": "11691",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -212,20 +212,20 @@
           "region": "New York",
           "region_gid": "whosonfirst:region:85688543",
           "region_a": "NY",
-          "county": "New York County",
-          "county_gid": "whosonfirst:county:102081863",
+          "county": "Queens County",
+          "county_gid": "whosonfirst:county:102082377",
           "locality": "New York",
           "locality_gid": "whosonfirst:locality:85977539",
           "locality_a": "NYC",
-          "borough": "Manhattan",
-          "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Midtown West",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85882233",
-          "label": "350B 5 AVENUE, New York, NY, USA",
+          "borough": "Queens",
+          "borough_gid": "whosonfirst:borough:421205767",
+          "neighbourhood": "Far Rockaway",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85818909",
+          "label": "421 BEACH 21 STREET, Far Rockaway, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008350041",
-              "bin": "1015862",
+              "bbl": "4157700041",
+              "bin": "4000000",
               "version": "26a"
             }
           }
@@ -236,21 +236,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.98397,
-            40.671218
+            -73.96041,
+            40.654064
           ]
         },
         "properties": {
-          "id": "789261",
-          "gid": "nycpad:venue:789261",
+          "id": "1265039",
+          "gid": "nycpad:venue:1265039",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "789261",
+          "source_id": "1265039",
           "country_code": "US",
-          "name": "350 5 STREET",
-          "housenumber": "350",
-          "street": "5 STREET",
-          "postalcode": "11215",
+          "name": "21 EAST 21 STREET",
+          "housenumber": "21",
+          "street": "EAST 21 STREET",
+          "postalcode": "11226",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -268,13 +268,13 @@
           "locality_a": "NYC",
           "borough": "Brooklyn",
           "borough_gid": "whosonfirst:borough:421205765",
-          "neighbourhood": "Park Slope",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85840609",
-          "label": "350 5 STREET, Brooklyn, NY, USA",
+          "neighbourhood": "Flatbush",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85869833",
+          "label": "21 EAST 21 STREET, Brooklyn, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "3009880011",
-              "bin": "3021392",
+              "bbl": "3050630023",
+              "bin": "3116159",
               "version": "26a"
             }
           }
@@ -285,21 +285,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.955073,
-            40.708099
+            -73.959097,
+            40.64645
           ]
         },
         "properties": {
-          "id": "1026845",
-          "gid": "nycpad:venue:1026845",
+          "id": "1275825",
+          "gid": "nycpad:venue:1275825",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1026845",
+          "source_id": "1275825",
           "country_code": "US",
-          "name": "350 SOUTH 5 STREET",
-          "housenumber": "350",
-          "street": "SOUTH 5 STREET",
-          "postalcode": "11211",
+          "name": "327 EAST 21 STREET",
+          "housenumber": "327",
+          "street": "EAST 21 STREET",
+          "postalcode": "11226",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -317,13 +317,13 @@
           "locality_a": "NYC",
           "borough": "Brooklyn",
           "borough_gid": "whosonfirst:borough:421205765",
-          "neighbourhood": "Williamsburg",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85857853",
-          "label": "350 SOUTH 5 STREET, Brooklyn, NY, USA",
+          "neighbourhood": "Flatbush",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85869833",
+          "label": "327 EAST 21 STREET, Brooklyn, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "3024630003",
-              "bin": "3063600",
+              "bbl": "3051250033",
+              "bin": "3117646",
               "version": "26a"
             }
           }
@@ -334,21 +334,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.975876,
-            40.643793
+            -73.958796,
+            40.64546
           ]
         },
         "properties": {
-          "id": "1312944",
-          "gid": "nycpad:venue:1312944",
+          "id": "1275943",
+          "gid": "nycpad:venue:1275943",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1312944",
+          "source_id": "1275943",
           "country_code": "US",
-          "name": "350 EAST 5 STREET",
-          "housenumber": "350",
-          "street": "EAST 5 STREET",
-          "postalcode": "11218",
+          "name": "365 EAST 21 STREET",
+          "housenumber": "365",
+          "street": "EAST 21 STREET",
+          "postalcode": "11226",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -366,13 +366,13 @@
           "locality_a": "NYC",
           "borough": "Brooklyn",
           "borough_gid": "whosonfirst:borough:421205765",
-          "neighbourhood": "Kensington",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85828101",
-          "label": "350 EAST 5 STREET, Brooklyn, NY, USA",
+          "neighbourhood": "Flatbush",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85869833",
+          "label": "365 EAST 21 STREET, Brooklyn, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "3053370069",
-              "bin": "3124668",
+              "bbl": "3051250080",
+              "bin": "3117667",
               "version": "26a"
             }
           }
@@ -383,21 +383,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.990178,
-            40.741291
+            -73.958831,
+            40.645765
           ]
         },
         "properties": {
-          "id": "86850",
-          "gid": "nycpad:venue:86850",
+          "id": "1275948",
+          "gid": "nycpad:venue:1275948",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "86850",
+          "source_id": "1275948",
           "country_code": "US",
-          "name": "178 5 AVENUE",
-          "housenumber": "178",
-          "street": "5 AVENUE",
-          "postalcode": "10010",
+          "name": "355 EAST 21 STREET",
+          "housenumber": "355",
+          "street": "EAST 21 STREET",
+          "postalcode": "11226",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -407,20 +407,21 @@
           "region": "New York",
           "region_gid": "whosonfirst:region:85688543",
           "region_a": "NY",
-          "county": "New York County",
-          "county_gid": "whosonfirst:county:102081863",
+          "county": "Kings County",
+          "county_gid": "whosonfirst:county:102082361",
+          "county_a": "BK",
           "locality": "New York",
           "locality_gid": "whosonfirst:locality:85977539",
           "locality_a": "NYC",
-          "borough": "Manhattan",
-          "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Flatiron District",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85869245",
-          "label": "178 5 AVENUE, New York, NY, USA",
+          "borough": "Brooklyn",
+          "borough_gid": "whosonfirst:borough:421205765",
+          "neighbourhood": "Flatbush",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85869833",
+          "label": "355 EAST 21 STREET, Brooklyn, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008240039",
-              "bin": "1015563",
+              "bbl": "3051250084",
+              "bin": "3117670",
               "version": "26a"
             }
           }
@@ -431,21 +432,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.990178,
-            40.741291
+            -73.959187,
+            40.644769
           ]
         },
         "properties": {
-          "id": "86852",
-          "gid": "nycpad:venue:86852",
+          "id": "1279925",
+          "gid": "nycpad:venue:1279925",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "86852",
+          "source_id": "1279925",
           "country_code": "US",
-          "name": "180 5 AVENUE",
-          "housenumber": "180",
-          "street": "5 AVENUE",
-          "postalcode": "10010",
+          "name": "382 EAST 21 STREET",
+          "housenumber": "382",
+          "street": "EAST 21 STREET",
+          "postalcode": "11226",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -455,20 +456,21 @@
           "region": "New York",
           "region_gid": "whosonfirst:region:85688543",
           "region_a": "NY",
-          "county": "New York County",
-          "county_gid": "whosonfirst:county:102081863",
+          "county": "Kings County",
+          "county_gid": "whosonfirst:county:102082361",
+          "county_a": "BK",
           "locality": "New York",
           "locality_gid": "whosonfirst:locality:85977539",
           "locality_a": "NYC",
-          "borough": "Manhattan",
-          "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Flatiron District",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85869245",
-          "label": "180 5 AVENUE, New York, NY, USA",
+          "borough": "Brooklyn",
+          "borough_gid": "whosonfirst:borough:421205765",
+          "neighbourhood": "Flatbush",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85869833",
+          "label": "382 EAST 21 STREET, Brooklyn, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008240039",
-              "bin": "1015563",
+              "bbl": "3051510010",
+              "bin": "3118544",
               "version": "26a"
             }
           }
@@ -479,21 +481,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.989863,
-            40.742166
+            -73.959135,
+            40.644446
           ]
         },
         "properties": {
-          "id": "86934",
-          "gid": "nycpad:venue:86934",
+          "id": "1279929",
+          "gid": "nycpad:venue:1279929",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "86934",
+          "source_id": "1279929",
           "country_code": "US",
-          "name": "194 5 AVENUE",
-          "housenumber": "194",
-          "street": "5 AVENUE",
-          "postalcode": "10010",
+          "name": "394 EAST 21 STREET",
+          "housenumber": "394",
+          "street": "EAST 21 STREET",
+          "postalcode": "11226",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -503,20 +505,21 @@
           "region": "New York",
           "region_gid": "whosonfirst:region:85688543",
           "region_a": "NY",
-          "county": "New York County",
-          "county_gid": "whosonfirst:county:102081863",
+          "county": "Kings County",
+          "county_gid": "whosonfirst:county:102082361",
+          "county_a": "BK",
           "locality": "New York",
           "locality_gid": "whosonfirst:locality:85977539",
           "locality_a": "NYC",
-          "borough": "Manhattan",
-          "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Flatiron District",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85869245",
-          "label": "194 5 AVENUE, New York, NY, USA",
+          "borough": "Brooklyn",
+          "borough_gid": "whosonfirst:borough:421205765",
+          "neighbourhood": "Flatbush",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85869833",
+          "label": "394 EAST 21 STREET, Brooklyn, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008250031",
-              "bin": "1015583",
+              "bbl": "3051510012",
+              "bin": "3118546",
               "version": "26a"
             }
           }
@@ -524,10 +527,10 @@
       }
     ],
     "bbox": [
-      -73.990178,
-      40.643793,
-      -73.955073,
-      40.748441
+      -74.003147,
+      40.59811,
+      -73.75638,
+      40.745836
     ]
   }
 }

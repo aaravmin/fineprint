@@ -1,12 +1,12 @@
 {
-  "key": "https://geosearch.planninglabs.nyc/v2/search?text=350%205th%20Avenue%2C%20Manhattan",
-  "recordedAt": "2026-06-30T02:56:38.768Z",
+  "key": "https://geosearch.planninglabs.nyc/v2/search?text=1%20WALL%20STREET%2C%20New%20York",
+  "recordedAt": "2026-06-07T15:41:12.280Z",
   "value": {
     "geocoding": {
       "version": "0.2",
       "attribution": "http://geosearch.planninglabs.nyc/attribution",
       "query": {
-        "text": "350 5th Avenue, Manhattan",
+        "text": "1 WALL STREET, New York",
         "size": 10,
         "private": false,
         "lang": {
@@ -19,11 +19,11 @@
         "querySize": 20,
         "parser": "pelias",
         "parsed_text": {
-          "subject": "350 5th Avenue",
-          "housenumber": "350",
-          "street": "5th Avenue",
-          "locality": "Manhattan",
-          "admin": "Manhattan"
+          "subject": "1 WALL STREET",
+          "housenumber": "1",
+          "street": "WALL STREET",
+          "locality": "New York",
+          "admin": "New York"
         }
       },
       "warnings": [
@@ -34,7 +34,7 @@
         "author": "Mapzen",
         "version": "1.0"
       },
-      "timestamp": 1782788198775
+      "timestamp": 1780846872272
     },
     "type": "FeatureCollection",
     "features": [
@@ -43,21 +43,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.985656,
-            40.748441
+            -74.011806,
+            40.707122
           ]
         },
         "properties": {
-          "id": "88597",
-          "gid": "nycpad:venue:88597",
+          "id": "2982",
+          "gid": "nycpad:venue:2982",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "88597",
+          "source_id": "2982",
           "country_code": "US",
-          "name": "350 5 AVENUE",
-          "housenumber": "350",
-          "street": "5 AVENUE",
-          "postalcode": "10118",
+          "name": "1 WALL STREET",
+          "housenumber": "1",
+          "street": "WALL STREET",
+          "postalcode": "10005",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -74,13 +74,13 @@
           "locality_a": "NYC",
           "borough": "Manhattan",
           "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Midtown West",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85882233",
-          "label": "350 5 AVENUE, New York, NY, USA",
+          "neighbourhood": "Financial District",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85865711",
+          "label": "1 WALL STREET, New York, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008350041",
-              "bin": "1015862",
+              "bbl": "1000237501",
+              "bin": "1000815",
               "version": "26a"
             }
           }
@@ -91,70 +91,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.984456,
-            40.672191
+            -74.006797,
+            40.706191
           ]
         },
         "properties": {
-          "id": "788177",
-          "gid": "nycpad:venue:788177",
+          "id": "3854",
+          "gid": "nycpad:venue:3854",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "788177",
+          "source_id": "3854",
           "country_code": "US",
-          "name": "350 5 AVENUE",
-          "housenumber": "350",
-          "street": "5 AVENUE",
-          "postalcode": "11215",
-          "confidence": 0.8,
-          "match_type": "fallback",
-          "accuracy": "point",
-          "country": "United States",
-          "country_gid": "whosonfirst:country:85633793",
-          "country_a": "USA",
-          "region": "New York",
-          "region_gid": "whosonfirst:region:85688543",
-          "region_a": "NY",
-          "county": "Kings County",
-          "county_gid": "whosonfirst:county:102082361",
-          "county_a": "BK",
-          "locality": "New York",
-          "locality_gid": "whosonfirst:locality:85977539",
-          "locality_a": "NYC",
-          "borough": "Brooklyn",
-          "borough_gid": "whosonfirst:borough:421205765",
-          "neighbourhood": "Park Slope",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85840609",
-          "label": "350 5 AVENUE, Brooklyn, NY, USA",
-          "addendum": {
-            "pad": {
-              "bbl": "3009810111",
-              "bin": "3021057",
-              "version": "26a"
-            }
-          }
-        }
-      },
-      {
-        "type": "Feature",
-        "geometry": {
-          "type": "Point",
-          "coordinates": [
-            -73.985656,
-            40.748441
-          ]
-        },
-        "properties": {
-          "id": "88599",
-          "gid": "nycpad:venue:88599",
-          "layer": "venue",
-          "source": "nycpad",
-          "source_id": "88599",
-          "country_code": "US",
-          "name": "350A 5 AVENUE",
-          "housenumber": "350A",
-          "street": "5 AVENUE",
-          "postalcode": "10118",
+          "name": "1 WALL ST PLAZA",
+          "housenumber": "1",
+          "street": "WALL ST PLAZA",
+          "postalcode": "10005",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -171,13 +122,13 @@
           "locality_a": "NYC",
           "borough": "Manhattan",
           "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Midtown West",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85882233",
-          "label": "350A 5 AVENUE, New York, NY, USA",
+          "neighbourhood": "Financial District",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85865711",
+          "label": "1 WALL ST PLAZA, New York, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008350041",
-              "bin": "1015862",
+              "bbl": "1000397502",
+              "bin": "1000880",
               "version": "26a"
             }
           }
@@ -188,21 +139,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.985656,
-            40.748441
+            -74.006797,
+            40.706191
           ]
         },
         "properties": {
-          "id": "88601",
-          "gid": "nycpad:venue:88601",
+          "id": "3855",
+          "gid": "nycpad:venue:3855",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "88601",
+          "source_id": "3855",
           "country_code": "US",
-          "name": "350B 5 AVENUE",
-          "housenumber": "350B",
-          "street": "5 AVENUE",
-          "postalcode": "10118",
+          "name": "1 WALL STREET PLAZA",
+          "housenumber": "1",
+          "street": "WALL STREET PLAZA",
+          "postalcode": "10005",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -219,13 +170,13 @@
           "locality_a": "NYC",
           "borough": "Manhattan",
           "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Midtown West",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85882233",
-          "label": "350B 5 AVENUE, New York, NY, USA",
+          "neighbourhood": "Financial District",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85865711",
+          "label": "1 WALL STREET PLAZA, New York, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008350041",
-              "bin": "1015862",
+              "bbl": "1000397502",
+              "bin": "1000880",
               "version": "26a"
             }
           }
@@ -236,168 +187,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.98397,
-            40.671218
+            -74.008564,
+            40.705204
           ]
         },
         "properties": {
-          "id": "789261",
-          "gid": "nycpad:venue:789261",
+          "id": "3272",
+          "gid": "nycpad:venue:3272",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "789261",
+          "source_id": "3272",
           "country_code": "US",
-          "name": "350 5 STREET",
-          "housenumber": "350",
-          "street": "5 STREET",
-          "postalcode": "11215",
-          "confidence": 0.8,
-          "match_type": "fallback",
-          "accuracy": "point",
-          "country": "United States",
-          "country_gid": "whosonfirst:country:85633793",
-          "country_a": "USA",
-          "region": "New York",
-          "region_gid": "whosonfirst:region:85688543",
-          "region_a": "NY",
-          "county": "Kings County",
-          "county_gid": "whosonfirst:county:102082361",
-          "county_a": "BK",
-          "locality": "New York",
-          "locality_gid": "whosonfirst:locality:85977539",
-          "locality_a": "NYC",
-          "borough": "Brooklyn",
-          "borough_gid": "whosonfirst:borough:421205765",
-          "neighbourhood": "Park Slope",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85840609",
-          "label": "350 5 STREET, Brooklyn, NY, USA",
-          "addendum": {
-            "pad": {
-              "bbl": "3009880011",
-              "bin": "3021392",
-              "version": "26a"
-            }
-          }
-        }
-      },
-      {
-        "type": "Feature",
-        "geometry": {
-          "type": "Point",
-          "coordinates": [
-            -73.955073,
-            40.708099
-          ]
-        },
-        "properties": {
-          "id": "1026845",
-          "gid": "nycpad:venue:1026845",
-          "layer": "venue",
-          "source": "nycpad",
-          "source_id": "1026845",
-          "country_code": "US",
-          "name": "350 SOUTH 5 STREET",
-          "housenumber": "350",
-          "street": "SOUTH 5 STREET",
-          "postalcode": "11211",
-          "confidence": 0.8,
-          "match_type": "fallback",
-          "accuracy": "point",
-          "country": "United States",
-          "country_gid": "whosonfirst:country:85633793",
-          "country_a": "USA",
-          "region": "New York",
-          "region_gid": "whosonfirst:region:85688543",
-          "region_a": "NY",
-          "county": "Kings County",
-          "county_gid": "whosonfirst:county:102082361",
-          "county_a": "BK",
-          "locality": "New York",
-          "locality_gid": "whosonfirst:locality:85977539",
-          "locality_a": "NYC",
-          "borough": "Brooklyn",
-          "borough_gid": "whosonfirst:borough:421205765",
-          "neighbourhood": "Williamsburg",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85857853",
-          "label": "350 SOUTH 5 STREET, Brooklyn, NY, USA",
-          "addendum": {
-            "pad": {
-              "bbl": "3024630003",
-              "bin": "3063600",
-              "version": "26a"
-            }
-          }
-        }
-      },
-      {
-        "type": "Feature",
-        "geometry": {
-          "type": "Point",
-          "coordinates": [
-            -73.975876,
-            40.643793
-          ]
-        },
-        "properties": {
-          "id": "1312944",
-          "gid": "nycpad:venue:1312944",
-          "layer": "venue",
-          "source": "nycpad",
-          "source_id": "1312944",
-          "country_code": "US",
-          "name": "350 EAST 5 STREET",
-          "housenumber": "350",
-          "street": "EAST 5 STREET",
-          "postalcode": "11218",
-          "confidence": 0.8,
-          "match_type": "fallback",
-          "accuracy": "point",
-          "country": "United States",
-          "country_gid": "whosonfirst:country:85633793",
-          "country_a": "USA",
-          "region": "New York",
-          "region_gid": "whosonfirst:region:85688543",
-          "region_a": "NY",
-          "county": "Kings County",
-          "county_gid": "whosonfirst:county:102082361",
-          "county_a": "BK",
-          "locality": "New York",
-          "locality_gid": "whosonfirst:locality:85977539",
-          "locality_a": "NYC",
-          "borough": "Brooklyn",
-          "borough_gid": "whosonfirst:borough:421205765",
-          "neighbourhood": "Kensington",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85828101",
-          "label": "350 EAST 5 STREET, Brooklyn, NY, USA",
-          "addendum": {
-            "pad": {
-              "bbl": "3053370069",
-              "bin": "3124668",
-              "version": "26a"
-            }
-          }
-        }
-      },
-      {
-        "type": "Feature",
-        "geometry": {
-          "type": "Point",
-          "coordinates": [
-            -73.990178,
-            40.741291
-          ]
-        },
-        "properties": {
-          "id": "86850",
-          "gid": "nycpad:venue:86850",
-          "layer": "venue",
-          "source": "nycpad",
-          "source_id": "86850",
-          "country_code": "US",
-          "name": "178 5 AVENUE",
-          "housenumber": "178",
-          "street": "5 AVENUE",
-          "postalcode": "10010",
+          "name": "1 WALL ST COURT",
+          "housenumber": "1",
+          "street": "WALL ST COURT",
+          "postalcode": "10005",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -414,13 +218,13 @@
           "locality_a": "NYC",
           "borough": "Manhattan",
           "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Flatiron District",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85869245",
-          "label": "178 5 AVENUE, New York, NY, USA",
+          "neighbourhood": "Financial District",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85865711",
+          "label": "1 WALL ST COURT, New York, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008240039",
-              "bin": "1015563",
+              "bbl": "1000287501",
+              "bin": "1000835",
               "version": "26a"
             }
           }
@@ -431,21 +235,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.990178,
-            40.741291
+            -74.008564,
+            40.705204
           ]
         },
         "properties": {
-          "id": "86852",
-          "gid": "nycpad:venue:86852",
+          "id": "3273",
+          "gid": "nycpad:venue:3273",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "86852",
+          "source_id": "3273",
           "country_code": "US",
-          "name": "180 5 AVENUE",
-          "housenumber": "180",
-          "street": "5 AVENUE",
-          "postalcode": "10010",
+          "name": "1 WALL STREET COURT",
+          "housenumber": "1",
+          "street": "WALL STREET COURT",
+          "postalcode": "10005",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -462,13 +266,13 @@
           "locality_a": "NYC",
           "borough": "Manhattan",
           "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Flatiron District",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85869245",
-          "label": "180 5 AVENUE, New York, NY, USA",
+          "neighbourhood": "Financial District",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85865711",
+          "label": "1 WALL STREET COURT, New York, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008240039",
-              "bin": "1015563",
+              "bbl": "1000287501",
+              "bin": "1000835",
               "version": "26a"
             }
           }
@@ -479,21 +283,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.989863,
-            40.742166
+            -74.011149,
+            40.707195
           ]
         },
         "properties": {
-          "id": "86934",
-          "gid": "nycpad:venue:86934",
+          "id": "2901",
+          "gid": "nycpad:venue:2901",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "86934",
+          "source_id": "2901",
           "country_code": "US",
-          "name": "194 5 AVENUE",
-          "housenumber": "194",
-          "street": "5 AVENUE",
-          "postalcode": "10010",
+          "name": "19 WALL STREET",
+          "housenumber": "19",
+          "street": "WALL STREET",
+          "postalcode": "10005",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -510,13 +314,205 @@
           "locality_a": "NYC",
           "borough": "Manhattan",
           "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Flatiron District",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85869245",
-          "label": "194 5 AVENUE, New York, NY, USA",
+          "neighbourhood": "Financial District",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85865711",
+          "label": "19 WALL STREET, New York, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008250031",
-              "bin": "1015583",
+              "bbl": "1000230019",
+              "bin": "1078982",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.010142,
+            40.706476
+          ]
+        },
+        "properties": {
+          "id": "3118",
+          "gid": "nycpad:venue:3118",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "3118",
+          "country_code": "US",
+          "name": "37 WALL STREET",
+          "housenumber": "37",
+          "street": "WALL STREET",
+          "postalcode": "10005",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "New York County",
+          "county_gid": "whosonfirst:county:102081863",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Manhattan",
+          "borough_gid": "whosonfirst:borough:421205771",
+          "neighbourhood": "Financial District",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85865711",
+          "label": "37 WALL STREET, New York, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "1000260014",
+              "bin": "1078992",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.010561,
+            40.706523
+          ]
+        },
+        "properties": {
+          "id": "3169",
+          "gid": "nycpad:venue:3169",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "3169",
+          "country_code": "US",
+          "name": "35 WALL STREET",
+          "housenumber": "35",
+          "street": "WALL STREET",
+          "postalcode": "10005",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "New York County",
+          "county_gid": "whosonfirst:county:102081863",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Manhattan",
+          "borough_gid": "whosonfirst:borough:421205771",
+          "neighbourhood": "Financial District",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85865711",
+          "label": "35 WALL STREET, New York, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "1000267501",
+              "bin": "1078988",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.010561,
+            40.706523
+          ]
+        },
+        "properties": {
+          "id": "3171",
+          "gid": "nycpad:venue:3171",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "3171",
+          "country_code": "US",
+          "name": "25 WALL STREET",
+          "housenumber": "25",
+          "street": "WALL STREET",
+          "postalcode": "10005",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "New York County",
+          "county_gid": "whosonfirst:county:102081863",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Manhattan",
+          "borough_gid": "whosonfirst:borough:421205771",
+          "neighbourhood": "Financial District",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85865711",
+          "label": "25 WALL STREET, New York, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "1000267501",
+              "bin": "1078988",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.010561,
+            40.706523
+          ]
+        },
+        "properties": {
+          "id": "3175",
+          "gid": "nycpad:venue:3175",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "3175",
+          "country_code": "US",
+          "name": "33 WALL STREET",
+          "housenumber": "33",
+          "street": "WALL STREET",
+          "postalcode": "10005",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "New York County",
+          "county_gid": "whosonfirst:county:102081863",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Manhattan",
+          "borough_gid": "whosonfirst:borough:421205771",
+          "neighbourhood": "Financial District",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85865711",
+          "label": "33 WALL STREET, New York, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "1000267501",
+              "bin": "1078988",
               "version": "26a"
             }
           }
@@ -524,10 +520,10 @@
       }
     ],
     "bbox": [
-      -73.990178,
-      40.643793,
-      -73.955073,
-      40.748441
+      -74.011806,
+      40.705204,
+      -74.006797,
+      40.707195
     ]
   }
 }

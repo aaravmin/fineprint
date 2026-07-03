@@ -1,12 +1,12 @@
 {
-  "key": "https://geosearch.planninglabs.nyc/v2/search?text=350%205th%20Avenue%2C%20Manhattan",
-  "recordedAt": "2026-06-30T02:56:38.768Z",
+  "key": "https://geosearch.planninglabs.nyc/v2/search?text=56%20ELLIOT%20PLACE%2C%20Brooklyn",
+  "recordedAt": "2026-06-07T13:45:03.527Z",
   "value": {
     "geocoding": {
       "version": "0.2",
       "attribution": "http://geosearch.planninglabs.nyc/attribution",
       "query": {
-        "text": "350 5th Avenue, Manhattan",
+        "text": "56 ELLIOT PLACE, Brooklyn",
         "size": 10,
         "private": false,
         "lang": {
@@ -19,11 +19,11 @@
         "querySize": 20,
         "parser": "pelias",
         "parsed_text": {
-          "subject": "350 5th Avenue",
-          "housenumber": "350",
-          "street": "5th Avenue",
-          "locality": "Manhattan",
-          "admin": "Manhattan"
+          "subject": "56 ELLIOT PLACE",
+          "housenumber": "56",
+          "street": "ELLIOT PLACE",
+          "locality": "Brooklyn",
+          "admin": "Brooklyn"
         }
       },
       "warnings": [
@@ -34,7 +34,7 @@
         "author": "Mapzen",
         "version": "1.0"
       },
-      "timestamp": 1782788198775
+      "timestamp": 1780839903569
     },
     "type": "FeatureCollection",
     "features": [
@@ -43,69 +43,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.985656,
-            40.748441
+            -73.97796,
+            40.69724
           ]
         },
         "properties": {
-          "id": "88597",
-          "gid": "nycpad:venue:88597",
+          "id": "993403",
+          "gid": "nycpad:venue:993403",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "88597",
+          "source_id": "993403",
           "country_code": "US",
-          "name": "350 5 AVENUE",
-          "housenumber": "350",
-          "street": "5 AVENUE",
-          "postalcode": "10118",
-          "confidence": 0.8,
-          "match_type": "fallback",
-          "accuracy": "point",
-          "country": "United States",
-          "country_gid": "whosonfirst:country:85633793",
-          "country_a": "USA",
-          "region": "New York",
-          "region_gid": "whosonfirst:region:85688543",
-          "region_a": "NY",
-          "county": "New York County",
-          "county_gid": "whosonfirst:county:102081863",
-          "locality": "New York",
-          "locality_gid": "whosonfirst:locality:85977539",
-          "locality_a": "NYC",
-          "borough": "Manhattan",
-          "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Midtown West",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85882233",
-          "label": "350 5 AVENUE, New York, NY, USA",
-          "addendum": {
-            "pad": {
-              "bbl": "1008350041",
-              "bin": "1015862",
-              "version": "26a"
-            }
-          }
-        }
-      },
-      {
-        "type": "Feature",
-        "geometry": {
-          "type": "Point",
-          "coordinates": [
-            -73.984456,
-            40.672191
-          ]
-        },
-        "properties": {
-          "id": "788177",
-          "gid": "nycpad:venue:788177",
-          "layer": "venue",
-          "source": "nycpad",
-          "source_id": "788177",
-          "country_code": "US",
-          "name": "350 5 AVENUE",
-          "housenumber": "350",
-          "street": "5 AVENUE",
-          "postalcode": "11215",
+          "name": "56 ELLIOT PLACE",
+          "housenumber": "56",
+          "street": "ELLIOT PLACE",
+          "postalcode": "11205",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -123,13 +75,13 @@
           "locality_a": "NYC",
           "borough": "Brooklyn",
           "borough_gid": "whosonfirst:borough:421205765",
-          "neighbourhood": "Park Slope",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85840609",
-          "label": "350 5 AVENUE, Brooklyn, NY, USA",
+          "neighbourhood": "Fort Greene",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85820101",
+          "label": "56 ELLIOT PLACE, Brooklyn, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "3009810111",
-              "bin": "3021057",
+              "bbl": "3020250150",
+              "bin": "3000000",
               "version": "26a"
             }
           }
@@ -140,117 +92,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.985656,
-            40.748441
+            -73.97796,
+            40.69724
           ]
         },
         "properties": {
-          "id": "88599",
-          "gid": "nycpad:venue:88599",
+          "id": "993404",
+          "gid": "nycpad:venue:993404",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "88599",
+          "source_id": "993404",
           "country_code": "US",
-          "name": "350A 5 AVENUE",
-          "housenumber": "350A",
-          "street": "5 AVENUE",
-          "postalcode": "10118",
-          "confidence": 0.8,
-          "match_type": "fallback",
-          "accuracy": "point",
-          "country": "United States",
-          "country_gid": "whosonfirst:country:85633793",
-          "country_a": "USA",
-          "region": "New York",
-          "region_gid": "whosonfirst:region:85688543",
-          "region_a": "NY",
-          "county": "New York County",
-          "county_gid": "whosonfirst:county:102081863",
-          "locality": "New York",
-          "locality_gid": "whosonfirst:locality:85977539",
-          "locality_a": "NYC",
-          "borough": "Manhattan",
-          "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Midtown West",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85882233",
-          "label": "350A 5 AVENUE, New York, NY, USA",
-          "addendum": {
-            "pad": {
-              "bbl": "1008350041",
-              "bin": "1015862",
-              "version": "26a"
-            }
-          }
-        }
-      },
-      {
-        "type": "Feature",
-        "geometry": {
-          "type": "Point",
-          "coordinates": [
-            -73.985656,
-            40.748441
-          ]
-        },
-        "properties": {
-          "id": "88601",
-          "gid": "nycpad:venue:88601",
-          "layer": "venue",
-          "source": "nycpad",
-          "source_id": "88601",
-          "country_code": "US",
-          "name": "350B 5 AVENUE",
-          "housenumber": "350B",
-          "street": "5 AVENUE",
-          "postalcode": "10118",
-          "confidence": 0.8,
-          "match_type": "fallback",
-          "accuracy": "point",
-          "country": "United States",
-          "country_gid": "whosonfirst:country:85633793",
-          "country_a": "USA",
-          "region": "New York",
-          "region_gid": "whosonfirst:region:85688543",
-          "region_a": "NY",
-          "county": "New York County",
-          "county_gid": "whosonfirst:county:102081863",
-          "locality": "New York",
-          "locality_gid": "whosonfirst:locality:85977539",
-          "locality_a": "NYC",
-          "borough": "Manhattan",
-          "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Midtown West",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85882233",
-          "label": "350B 5 AVENUE, New York, NY, USA",
-          "addendum": {
-            "pad": {
-              "bbl": "1008350041",
-              "bin": "1015862",
-              "version": "26a"
-            }
-          }
-        }
-      },
-      {
-        "type": "Feature",
-        "geometry": {
-          "type": "Point",
-          "coordinates": [
-            -73.98397,
-            40.671218
-          ]
-        },
-        "properties": {
-          "id": "789261",
-          "gid": "nycpad:venue:789261",
-          "layer": "venue",
-          "source": "nycpad",
-          "source_id": "789261",
-          "country_code": "US",
-          "name": "350 5 STREET",
-          "housenumber": "350",
-          "street": "5 STREET",
-          "postalcode": "11215",
+          "name": "56 ELLIOT PLACE NORTH",
+          "housenumber": "56",
+          "street": "ELLIOT PLACE NORTH",
+          "postalcode": "11205",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -268,13 +124,13 @@
           "locality_a": "NYC",
           "borough": "Brooklyn",
           "borough_gid": "whosonfirst:borough:421205765",
-          "neighbourhood": "Park Slope",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85840609",
-          "label": "350 5 STREET, Brooklyn, NY, USA",
+          "neighbourhood": "Fort Greene",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85820101",
+          "label": "56 ELLIOT PLACE NORTH, Brooklyn, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "3009880011",
-              "bin": "3021392",
+              "bbl": "3020250150",
+              "bin": "3000000",
               "version": "26a"
             }
           }
@@ -285,21 +141,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.955073,
-            40.708099
+            -73.97796,
+            40.69724
           ]
         },
         "properties": {
-          "id": "1026845",
-          "gid": "nycpad:venue:1026845",
+          "id": "993407",
+          "gid": "nycpad:venue:993407",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1026845",
+          "source_id": "993407",
           "country_code": "US",
-          "name": "350 SOUTH 5 STREET",
-          "housenumber": "350",
-          "street": "SOUTH 5 STREET",
-          "postalcode": "11211",
+          "name": "56 NORTH ELLIOT PLACE",
+          "housenumber": "56",
+          "street": "NORTH ELLIOT PLACE",
+          "postalcode": "11205",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -317,13 +173,13 @@
           "locality_a": "NYC",
           "borough": "Brooklyn",
           "borough_gid": "whosonfirst:borough:421205765",
-          "neighbourhood": "Williamsburg",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85857853",
-          "label": "350 SOUTH 5 STREET, Brooklyn, NY, USA",
+          "neighbourhood": "Fort Greene",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85820101",
+          "label": "56 NORTH ELLIOT PLACE, Brooklyn, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "3024630003",
-              "bin": "3063600",
+              "bbl": "3020250150",
+              "bin": "3000000",
               "version": "26a"
             }
           }
@@ -334,21 +190,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.975876,
-            40.643793
+            -73.97796,
+            40.69724
           ]
         },
         "properties": {
-          "id": "1312944",
-          "gid": "nycpad:venue:1312944",
+          "id": "993313",
+          "gid": "nycpad:venue:993313",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "1312944",
+          "source_id": "993313",
           "country_code": "US",
-          "name": "350 EAST 5 STREET",
-          "housenumber": "350",
-          "street": "EAST 5 STREET",
-          "postalcode": "11218",
+          "name": "26 ELLIOT PLACE",
+          "housenumber": "26",
+          "street": "ELLIOT PLACE",
+          "postalcode": "11205",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -366,13 +222,13 @@
           "locality_a": "NYC",
           "borough": "Brooklyn",
           "borough_gid": "whosonfirst:borough:421205765",
-          "neighbourhood": "Kensington",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85828101",
-          "label": "350 EAST 5 STREET, Brooklyn, NY, USA",
+          "neighbourhood": "Fort Greene",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85820101",
+          "label": "26 ELLIOT PLACE, Brooklyn, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "3053370069",
-              "bin": "3124668",
+              "bbl": "3020250150",
+              "bin": "3000000",
               "version": "26a"
             }
           }
@@ -383,21 +239,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.990178,
-            40.741291
+            -73.97796,
+            40.69724
           ]
         },
         "properties": {
-          "id": "86850",
-          "gid": "nycpad:venue:86850",
+          "id": "993325",
+          "gid": "nycpad:venue:993325",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "86850",
+          "source_id": "993325",
           "country_code": "US",
-          "name": "178 5 AVENUE",
-          "housenumber": "178",
-          "street": "5 AVENUE",
-          "postalcode": "10010",
+          "name": "30 ELLIOT PLACE",
+          "housenumber": "30",
+          "street": "ELLIOT PLACE",
+          "postalcode": "11205",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -407,20 +263,21 @@
           "region": "New York",
           "region_gid": "whosonfirst:region:85688543",
           "region_a": "NY",
-          "county": "New York County",
-          "county_gid": "whosonfirst:county:102081863",
+          "county": "Kings County",
+          "county_gid": "whosonfirst:county:102082361",
+          "county_a": "BK",
           "locality": "New York",
           "locality_gid": "whosonfirst:locality:85977539",
           "locality_a": "NYC",
-          "borough": "Manhattan",
-          "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Flatiron District",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85869245",
-          "label": "178 5 AVENUE, New York, NY, USA",
+          "borough": "Brooklyn",
+          "borough_gid": "whosonfirst:borough:421205765",
+          "neighbourhood": "Fort Greene",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85820101",
+          "label": "30 ELLIOT PLACE, Brooklyn, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008240039",
-              "bin": "1015563",
+              "bbl": "3020250150",
+              "bin": "3000000",
               "version": "26a"
             }
           }
@@ -431,21 +288,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.990178,
-            40.741291
+            -73.97796,
+            40.69724
           ]
         },
         "properties": {
-          "id": "86852",
-          "gid": "nycpad:venue:86852",
+          "id": "993361",
+          "gid": "nycpad:venue:993361",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "86852",
+          "source_id": "993361",
           "country_code": "US",
-          "name": "180 5 AVENUE",
-          "housenumber": "180",
-          "street": "5 AVENUE",
-          "postalcode": "10010",
+          "name": "42 ELLIOT PLACE",
+          "housenumber": "42",
+          "street": "ELLIOT PLACE",
+          "postalcode": "11205",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -455,20 +312,21 @@
           "region": "New York",
           "region_gid": "whosonfirst:region:85688543",
           "region_a": "NY",
-          "county": "New York County",
-          "county_gid": "whosonfirst:county:102081863",
+          "county": "Kings County",
+          "county_gid": "whosonfirst:county:102082361",
+          "county_a": "BK",
           "locality": "New York",
           "locality_gid": "whosonfirst:locality:85977539",
           "locality_a": "NYC",
-          "borough": "Manhattan",
-          "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Flatiron District",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85869245",
-          "label": "180 5 AVENUE, New York, NY, USA",
+          "borough": "Brooklyn",
+          "borough_gid": "whosonfirst:borough:421205765",
+          "neighbourhood": "Fort Greene",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85820101",
+          "label": "42 ELLIOT PLACE, Brooklyn, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008240039",
-              "bin": "1015563",
+              "bbl": "3020250150",
+              "bin": "3000000",
               "version": "26a"
             }
           }
@@ -479,21 +337,21 @@
         "geometry": {
           "type": "Point",
           "coordinates": [
-            -73.989863,
-            40.742166
+            -73.97796,
+            40.69724
           ]
         },
         "properties": {
-          "id": "86934",
-          "gid": "nycpad:venue:86934",
+          "id": "993421",
+          "gid": "nycpad:venue:993421",
           "layer": "venue",
           "source": "nycpad",
-          "source_id": "86934",
+          "source_id": "993421",
           "country_code": "US",
-          "name": "194 5 AVENUE",
-          "housenumber": "194",
-          "street": "5 AVENUE",
-          "postalcode": "10010",
+          "name": "62 ELLIOT PLACE",
+          "housenumber": "62",
+          "street": "ELLIOT PLACE",
+          "postalcode": "11205",
           "confidence": 0.8,
           "match_type": "fallback",
           "accuracy": "point",
@@ -503,20 +361,168 @@
           "region": "New York",
           "region_gid": "whosonfirst:region:85688543",
           "region_a": "NY",
-          "county": "New York County",
-          "county_gid": "whosonfirst:county:102081863",
+          "county": "Kings County",
+          "county_gid": "whosonfirst:county:102082361",
+          "county_a": "BK",
           "locality": "New York",
           "locality_gid": "whosonfirst:locality:85977539",
           "locality_a": "NYC",
-          "borough": "Manhattan",
-          "borough_gid": "whosonfirst:borough:421205771",
-          "neighbourhood": "Flatiron District",
-          "neighbourhood_gid": "whosonfirst:neighbourhood:85869245",
-          "label": "194 5 AVENUE, New York, NY, USA",
+          "borough": "Brooklyn",
+          "borough_gid": "whosonfirst:borough:421205765",
+          "neighbourhood": "Fort Greene",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85820101",
+          "label": "62 ELLIOT PLACE, Brooklyn, NY, USA",
           "addendum": {
             "pad": {
-              "bbl": "1008250031",
-              "bin": "1015583",
+              "bbl": "3020250150",
+              "bin": "3000000",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.97796,
+            40.69724
+          ]
+        },
+        "properties": {
+          "id": "993427",
+          "gid": "nycpad:venue:993427",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "993427",
+          "country_code": "US",
+          "name": "64 ELLIOT PLACE",
+          "housenumber": "64",
+          "street": "ELLIOT PLACE",
+          "postalcode": "11205",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Kings County",
+          "county_gid": "whosonfirst:county:102082361",
+          "county_a": "BK",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Brooklyn",
+          "borough_gid": "whosonfirst:borough:421205765",
+          "neighbourhood": "Fort Greene",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85820101",
+          "label": "64 ELLIOT PLACE, Brooklyn, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "3020250150",
+              "bin": "3000000",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.977795,
+            40.697535
+          ]
+        },
+        "properties": {
+          "id": "993471",
+          "gid": "nycpad:venue:993471",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "993471",
+          "country_code": "US",
+          "name": "14 ELLIOT PLACE",
+          "housenumber": "14",
+          "street": "ELLIOT PLACE",
+          "postalcode": "11205",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Kings County",
+          "county_gid": "whosonfirst:county:102082361",
+          "county_a": "BK",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Brooklyn",
+          "borough_gid": "whosonfirst:borough:421205765",
+          "neighbourhood": "Fort Greene",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85820101",
+          "label": "14 ELLIOT PLACE, Brooklyn, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "3020250150",
+              "bin": "3335207",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.976922,
+            40.69686
+          ]
+        },
+        "properties": {
+          "id": "993499",
+          "gid": "nycpad:venue:993499",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "993499",
+          "country_code": "US",
+          "name": "41 ELLIOT PLACE",
+          "housenumber": "41",
+          "street": "ELLIOT PLACE",
+          "postalcode": "11205",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Kings County",
+          "county_gid": "whosonfirst:county:102082361",
+          "county_a": "BK",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Brooklyn",
+          "borough_gid": "whosonfirst:borough:421205765",
+          "neighbourhood": "Fort Greene",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85820101",
+          "label": "41 ELLIOT PLACE, Brooklyn, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "3020270001",
+              "bin": "3057921",
               "version": "26a"
             }
           }
@@ -524,10 +530,10 @@
       }
     ],
     "bbox": [
-      -73.990178,
-      40.643793,
-      -73.955073,
-      40.748441
+      -73.97796,
+      40.69686,
+      -73.976922,
+      40.697535
     ]
   }
 }

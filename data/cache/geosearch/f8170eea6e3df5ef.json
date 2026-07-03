@@ -1,6 +1,6 @@
 {
   "key": "https://geosearch.planninglabs.nyc/v2/search?text=20%20Exchange%20Place",
-  "recordedAt": "2026-06-07T13:27:28.794Z",
+  "recordedAt": "2026-06-07T13:51:58.937Z",
   "value": {
     "geocoding": {
       "version": "0.2",
@@ -32,7 +32,7 @@
         "author": "Mapzen",
         "version": "1.0"
       },
-      "timestamp": 1780838848835
+      "timestamp": 1780840318978
     },
     "type": "FeatureCollection",
     "features": [

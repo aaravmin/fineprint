@@ -6,12 +6,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { MotionConfig, motion } from "framer-motion";
-import { ArrowRight, BadgeCheck, Menu, ScrollText, TriangleAlert } from "lucide-react";
+import { ArrowRight, Menu } from "lucide-react";
 
 import { AddressAutocomplete } from "@/components/address-autocomplete";
+import { DemoOpsRoom } from "@/components/demo-ops-room";
 import { FineprintLogo } from "@/components/fineprint-logo";
-import DisplayCards from "@/components/ui/display-cards";
-import { Separator } from "@/components/ui/separator";
 import {
   Sheet,
   SheetClose,
@@ -51,7 +50,6 @@ const inView = {
 const NAV_LINKS = [
   { label: "How it works", href: "#how" },
   { label: "Laws covered", href: "#laws" },
-  { label: "Dashboard", href: DASH },
 ];
 
 const STEPS = [
@@ -111,59 +109,19 @@ const LAWS = [
   },
 ];
 
-// Non-breaking spaces keep each exposure on a single line — TextRotate splits
-// on regular spaces and lets the resulting words reflow.
-const HERO_FINE_EXPOSURES = [
-  "LL97: ~$200M/yr",
-  "LL84: ~$56M/yr",
-  "LL87: ~$70M/yr",
-  "LL11: ~$192M/yr",
-  "LL88: ~$42M+/yr",
-  "LL152: ~$35M/yr",
-  "LL55: ~$24M/yr",
-];
-
-const TICKET_CARDS = [
-  {
-    icon: <BadgeCheck className="size-4 text-[var(--success)]" />,
-    iconClassName: "bg-[var(--success)]/10",
-    title: "LL84 benchmarking",
-    titleClassName: "text-foreground",
-    description: "Submitted before the May 1 deadline",
-    date: "approved",
-    className:
-      "[grid-area:stack] hover:-translate-y-10 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:before:opacity-0 before:transition-opacity before:duration-700 hover:grayscale-0 before:left-0 before:top-0",
-  },
-  {
-    icon: <ScrollText className="size-4 text-foreground" />,
-    iconClassName: "bg-secondary",
-    title: "FISP cycle 9 filing",
-    titleClassName: "text-foreground",
-    description: "Facade report drafted, awaiting review",
-    date: "drafting / nyx",
-    className:
-      "[grid-area:stack] translate-x-8 translate-y-6 sm:translate-x-12 sm:translate-y-8 hover:-translate-y-1 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:before:opacity-0 before:transition-opacity before:duration-700 hover:grayscale-0 before:left-0 before:top-0",
-  },
-  {
-    icon: <TriangleAlert className="size-4 text-destructive" />,
-    iconClassName: "bg-destructive-subtle",
-    title: "LL97 over-cap exposure",
-    titleClassName: "text-destructive",
-    description: "$214,000/yr fine; retrofit plan in progress",
-    date: "claimed / atlas",
-    className:
-      "[grid-area:stack] translate-x-16 translate-y-12 sm:translate-x-24 sm:translate-y-16 hover:translate-y-6",
-  },
-];
-
 export default function Home() {
   const router = useRouter();
   const [address, setAddress] = useState("");
 
-  // Backend not wired yet — searching just routes to the dashboard.
+  // Hand the address to the portfolio, which queues a real city-data intake
+  // (GeoSearch -> LL84 -> covered list -> engine). An agent resolves it and
+  // the building lands in review. Signed-out visitors pass through Clerk
+  // first; the address rides along and the intake fires once they land.
   const search = (value: string) => {
-    const a = value.trim();
-    router.push(a ? `${DASH}?address=${encodeURIComponent(a)}` : DASH);
+    const trimmedAddress = value.trim();
+    router.push(
+      trimmedAddress ? `${DASH}?address=${encodeURIComponent(trimmedAddress)}` : DASH,
+    );
   };
 
   return (
@@ -248,18 +206,6 @@ export default function Home() {
               className="absolute inset-x-0 bottom-0 z-0 h-40 bg-gradient-to-t from-background to-transparent"
             />
 
-            {/* Vertical statute stamp on the right edge. */}
-            <div
-              aria-hidden="true"
-              className="absolute right-0 top-1/2 z-10 hidden -translate-y-1/2 lg:flex"
-            >
-              <div className="bg-foreground px-3 py-6 text-sm font-bold text-background">
-                <span className="rotate-180 [writing-mode:vertical-rl]">
-                  1 RCNY §103-14
-                </span>
-              </div>
-            </div>
-
             <motion.div
               variants={stagger}
               initial="hidden"
@@ -284,13 +230,13 @@ export default function Home() {
                 </p>
               </motion.div>
 
-              {/* Row 3 — SKIP THE [rotating word], width locked to the longest word */}
-              <motion.div variants={rise} className="mt-1 md:mt-2">
-                <p className="font-heading flex items-baseline whitespace-nowrap text-[clamp(2.25rem,9vw,7.5rem)] font-bold leading-none tracking-tight">
-                  SKIP&nbsp;THE&nbsp;
+              {/* Value line — one rotating word, sized well below the wordmark */}
+              <motion.div variants={rise} className="mt-6 md:mt-8">
+                <p className="font-heading flex flex-wrap items-baseline gap-x-2 text-2xl font-semibold tracking-tight sm:text-3xl md:text-4xl">
+                  Skip the
                   <span className="inline-grid">
-                    {/* Invisible copies reserve the widest word so rotation never reflows the page. */}
-                    {["FINE.", "CLIFF.", "PANIC."].map(word => (
+                    {/* Invisible copies reserve the widest word so rotation never reflows. */}
+                    {["fine.", "cliff.", "panic."].map(word => (
                       <span
                         key={word}
                         aria-hidden="true"
@@ -301,8 +247,8 @@ export default function Home() {
                     ))}
                     <span className="[grid-area:1/1]">
                       <TextRotate
-                        texts={["FINE.", "CLIFF.", "PANIC."]}
-                        mainClassName="inline-flex text-destructive overflow-hidden"
+                        texts={["fine.", "cliff.", "panic."]}
+                        mainClassName="inline-flex overflow-hidden text-destructive"
                         staggerDuration={0.02}
                         staggerFrom="first"
                         rotationInterval={2600}
@@ -310,41 +256,10 @@ export default function Home() {
                     </span>
                   </span>
                 </p>
-              </motion.div>
-
-              {/* Ledger rule — jurisdiction stamp + rotating statutory exposure. */}
-              <motion.div variants={rise} className="mt-8 w-full max-w-[52rem] md:mt-12">
-                <Separator />
-                <div className="mt-4 grid gap-2 text-muted-foreground sm:grid-cols-[minmax(0,36rem)_minmax(0,1fr)] sm:items-baseline">
-                  <span className="text-xs tracking-wide md:text-sm md:whitespace-nowrap">
-                    NEW YORK CITY, NY / 28,000 COVERED BUILDINGS
-                  </span>
-                  <span className="flex flex-col gap-1 text-left sm:flex-row sm:items-baseline sm:gap-3 md:text-right">
-                    <span className="whitespace-nowrap text-lg font-thin tracking-wide text-foreground md:text-2xl">
-                      ANNUAL RISK
-                    </span>
-                    <span className="inline-grid font-heading text-2xl font-bold italic text-destructive tabular-nums [&_*]:whitespace-nowrap [&_.flex-wrap]:!flex-nowrap md:text-3xl lg:text-4xl">
-                      {HERO_FINE_EXPOSURES.map(exposure => (
-                        <span
-                          key={exposure}
-                          aria-hidden="true"
-                          className="invisible whitespace-nowrap [grid-area:1/1]"
-                        >
-                          {exposure}
-                        </span>
-                      ))}
-                      <span className="[grid-area:1/1]">
-                        <TextRotate
-                          texts={HERO_FINE_EXPOSURES}
-                          mainClassName="inline-flex overflow-hidden whitespace-nowrap"
-                          staggerDuration={0.01}
-                          staggerFrom="first"
-                          rotationInterval={2600}
-                        />
-                      </span>
-                    </span>
-                  </span>
-                </div>
+                <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
+                  Type any NYC address — your LL97 fine and the 2030 cliff, computed from
+                  the city&apos;s own records in about ten seconds.
+                </p>
               </motion.div>
 
               {/* Address search — the primary CTA. */}
@@ -463,8 +378,8 @@ export default function Home() {
                   variants={rise}
                   className="font-heading max-w-2xl text-3xl font-bold leading-snug tracking-tight sm:text-4xl"
                 >
-                  Your LL97 fine, figured from real emissions. Every other deadline, dated to
-                  the day.{" "}
+                  Your LL97 fine, figured from real emissions. Every other deadline, dated
+                  to the day.{" "}
                   <span className="text-destructive">Never a made-up number.</span>
                 </motion.h3>
                 {/* The statute ledger: the product's subject matter IS the design.
@@ -525,35 +440,20 @@ export default function Home() {
             </StickyTabs.Item>
 
             <StickyTabs.Item title="03 / The ops room" id="ops">
-              <motion.div
-                variants={stagger}
-                {...inView}
-                className="grid items-center gap-16 lg:grid-cols-[1fr_1fr]"
-              >
-                <motion.div variants={rise}>
-                  <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
-                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--success)]" />{" "}
-                    Real-time
-                  </span>
-                  <h3 className="font-heading mt-5 text-3xl font-bold tracking-tight sm:text-4xl">
+              <motion.div variants={stagger} {...inView}>
+                <motion.div variants={rise} className="max-w-2xl">
+                  <h3 className="font-heading text-3xl font-bold tracking-tight sm:text-4xl">
                     Every obligation becomes a ticket
                   </h3>
-                  <p className="mt-4 max-w-md text-lg leading-relaxed text-muted-foreground">
-                    Each one carries its statutory deadline on a timer. AI workers claim
-                    tickets, draft the remediation, and submit. You approve every one.
+                  <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
+                    Each covered law is a ticket on a timer. Dispatch an agent and watch
+                    the fleet and the activity log move in unison — claim, draft, submit,
+                    approve.
                   </p>
-                  <Link
-                    href={DASH}
-                    className="fp-press mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-                  >
-                    Open the dashboard <ArrowRight className="size-4" />
-                  </Link>
                 </motion.div>
-                <motion.div
-                  variants={rise}
-                  className="flex justify-center pb-12 sm:pb-16 sm:pr-8"
-                >
-                  <DisplayCards cards={TICKET_CARDS} />
+
+                <motion.div variants={rise} className="mt-8">
+                  <DemoOpsRoom />
                 </motion.div>
               </motion.div>
             </StickyTabs.Item>
@@ -624,7 +524,14 @@ export default function Home() {
                 <p className="max-w-xl text-[11px] leading-relaxed text-muted-foreground/70">
                   Estimates from NYC LL84 benchmarking data and LL97 emission limits (1
                   RCNY §103-14). Not legal advice. Official compliance requires a
-                  registered design professional.
+                  registered design professional.{" "}
+                  <Link
+                    href="/privacy"
+                    className="underline underline-offset-2 hover:text-foreground"
+                  >
+                    Privacy policy
+                  </Link>
+                  .
                 </p>
               </div>
             </footer>

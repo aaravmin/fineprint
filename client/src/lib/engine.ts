@@ -13,8 +13,8 @@ import {
 } from "fineprint-engine";
 import type { Building } from "@/module_bindings/types";
 
-export { DEFAULT_MEASURES };
-export type { FineResult, FundedPlan, RetrofitAssessment, RetrofitPlan };
+export { DEFAULT_MEASURES, computeAllPeriods };
+export type { FineResult, FundedPlan, RetrofitAssessment, RetrofitPlan, BuildingInput };
 
 export function toBuildingInput(building: Building): BuildingInput | null {
   if (building.annualEmissionsTco2E === undefined || building.usesJson === undefined) {

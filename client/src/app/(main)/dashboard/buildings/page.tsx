@@ -1,5 +1,5 @@
-import { BuildingsClient } from "./_components/buildings-client";
+import { BuildingsIndexClient } from "./_components/buildings-index-client";
 
 export default function BuildingsPage() {
-  return <BuildingsClient />;
+  return <BuildingsIndexClient />;
 }

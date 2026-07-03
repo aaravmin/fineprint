@@ -14,30 +14,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyFolder } from "@/components/ui/empty-folder";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { computePeriods, fmtUsd } from "@/lib/engine";
 import { getLocalStorageValue, setLocalStorageValue } from "@/lib/local-storage.client";
 import { withAck } from "@/lib/reducer-call";
 import { reducers, tables } from "@/module_bindings/index";
 import type { Building, Task } from "@/module_bindings/types";
 
-type LawScope =
-  | "all"
-  | "ll97"
-  | "art321"
-  | "ll84"
-  | "ll87"
-  | "ll11"
-  | "ll88"
-  | "ll152"
-  | "ll55";
+type LawScope = "all" | "ll97" | "art321" | "ll84" | "ll87" | "ll11" | "ll88" | "ll152" | "ll55";
 
 interface LawOption {
   id: LawScope;
@@ -83,8 +67,7 @@ const FINE_BASES: FineBasis[] = [
     type: "Fine type",
     value: "$10,000",
     unit: "flat penalties",
-    detail:
-      "Affordable-housing pathway: comply through prescribed measures or the 2030 target.",
+    detail: "Affordable-housing pathway: comply through prescribed measures or the 2030 target.",
   },
   {
     id: "ll84-benchmarking",
@@ -93,8 +76,7 @@ const FINE_BASES: FineBasis[] = [
     type: "Fine type",
     value: "$500",
     unit: "/quarter",
-    detail:
-      "Annual energy and water benchmarking; repeated quarterly violations are tracked as annual exposure.",
+    detail: "Annual energy and water benchmarking; repeated quarterly violations are tracked as annual exposure.",
   },
   {
     id: "ll87-audit",
@@ -103,8 +85,7 @@ const FINE_BASES: FineBasis[] = [
     type: "Fine type",
     value: "$3,000",
     unit: "estimated filing exposure",
-    detail:
-      "Energy audit and retro-commissioning cycle exposure is tracked from task metadata.",
+    detail: "Energy audit and retro-commissioning cycle exposure is tracked from task metadata.",
   },
   {
     id: "ll11-fisp",
@@ -113,8 +94,7 @@ const FINE_BASES: FineBasis[] = [
     type: "Fine type",
     value: "$5,000",
     unit: "estimated annualized exposure",
-    detail:
-      "Facade inspection exposure is task-backed until DOB cycle-window data is fully wired.",
+    detail: "Facade inspection exposure is task-backed until DOB cycle-window data is fully wired.",
   },
   {
     id: "ll88-lighting",
@@ -123,8 +103,7 @@ const FINE_BASES: FineBasis[] = [
     type: "Fine type",
     value: "Filing + upgrade",
     unit: "lighting and tenant submetering evidence",
-    detail:
-      "No per-ton rate is modeled; the dashboard tracks the upgrade/report obligation.",
+    detail: "No per-ton rate is modeled; the dashboard tracks the upgrade/report obligation.",
   },
   {
     id: "ll152-gas",
@@ -154,8 +133,7 @@ const ALL_FINE_BASIS: FineBasis = {
   type: "Fine types",
   value: "All",
   unit: "every modeled penalty",
-  detail:
-    "Every fine type across all covered laws is rolled into this portfolio-wide view.",
+  detail: "Every fine type across all covered laws is rolled into this portfolio-wide view.",
 };
 
 function fineBasesForScope(lawScope: LawScope): FineBasis[] {
@@ -163,9 +141,9 @@ function fineBasesForScope(lawScope: LawScope): FineBasis[] {
     return [ALL_FINE_BASIS];
   }
   if (lawScope === "ll97") {
-    return FINE_BASES.filter(basis => basis.lawId === "ll97" || basis.lawId === "art321");
+    return FINE_BASES.filter((basis) => basis.lawId === "ll97" || basis.lawId === "art321");
   }
-  return FINE_BASES.filter(basis => basis.lawId === lawScope);
+  return FINE_BASES.filter((basis) => basis.lawId === lawScope);
 }
 
 const RECENT_ADDRESSES_KEY = "fineprint:recent-addresses";
@@ -177,12 +155,12 @@ function ll97Fine(building: Building, periodIndex: number): number | null {
 }
 
 function openTaskCount(buildingId: bigint, tasks: readonly Task[]): number {
-  return tasks.filter(t => t.buildingId === buildingId && t.status === "open").length;
+  return tasks.filter((t) => t.buildingId === buildingId && t.status === "open").length;
 }
 
 function lawMatches(task: Task, lawScope: LawScope): boolean {
   if (lawScope === "all") return true;
-  const option = LAW_OPTIONS.find(law => law.id === lawScope);
+  const option = LAW_OPTIONS.find((law) => law.id === lawScope);
   return option?.taskLawIds.includes(task.lawId) ?? false;
 }
 
@@ -195,9 +173,7 @@ function readRecentAddresses(): string[] {
   if (!raw) return [];
   try {
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed)
-      ? parsed.filter((item): item is string => typeof item === "string")
-      : [];
+    return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === "string") : [];
   } catch {
     return [];
   }
@@ -206,10 +182,10 @@ function readRecentAddresses(): string[] {
 function rememberAddress(address: string): string[] {
   const trimmed = address.trim();
   if (!trimmed) return readRecentAddresses();
-  const next = [
-    trimmed,
-    ...readRecentAddresses().filter(item => item.toLowerCase() !== trimmed.toLowerCase()),
-  ].slice(0, RECENT_LIMIT);
+  const next = [trimmed, ...readRecentAddresses().filter((item) => item.toLowerCase() !== trimmed.toLowerCase())].slice(
+    0,
+    RECENT_LIMIT,
+  );
   setLocalStorageValue(RECENT_ADDRESSES_KEY, JSON.stringify(next));
   return next;
 }
@@ -233,7 +209,7 @@ export function PortfolioClient() {
 
   useEffect(() => {
     const visibleBases = fineBasesForScope(lawScope);
-    if (!visibleBases.some(basis => basis.id === fineBasisId)) {
+    if (!visibleBases.some((basis) => basis.id === fineBasisId)) {
       setFineBasisId(visibleBases[0]?.id ?? ALL_FINE_BASIS.id);
     }
   }, [fineBasisId, lawScope]);
@@ -256,20 +232,16 @@ export function PortfolioClient() {
       if (queuedFlashTimer.current) clearTimeout(queuedFlashTimer.current);
       queuedFlashTimer.current = setTimeout(() => setJustQueued(false), 2_200);
 
-      withAck(requestBuilding({ address: trimmed }), `Intake for "${trimmed}"`).catch(
-        (error: Error) => {
-          setJustQueued(false);
-          toast.error(`Intake for "${trimmed}" failed: ${error.message}`);
-        },
-      );
+      withAck(requestBuilding({ address: trimmed }), `Intake for "${trimmed}"`).catch((error: Error) => {
+        setJustQueued(false);
+        toast.error(`Intake for "${trimmed}" failed: ${error.message}`);
+      });
     },
     [address, requestBuilding],
   );
 
   useEffect(() => {
-    const queryAddress = new URLSearchParams(window.location.search)
-      .get("address")
-      ?.trim();
+    const queryAddress = new URLSearchParams(window.location.search).get("address")?.trim();
     if (!queryAddress || requestedQueryAddress.current === queryAddress) return;
 
     requestedQueryAddress.current = queryAddress;
@@ -277,31 +249,23 @@ export function PortfolioClient() {
     submitAddress(queryAddress);
   }, [submitAddress]);
 
-  const visibleTasks = tasks.filter(task => lawMatches(task, lawScope));
-  const visibleOpenTasks = visibleTasks.filter(t => t.status === "open");
+  const visibleTasks = tasks.filter((task) => lawMatches(task, lawScope));
+  const visibleOpenTasks = visibleTasks.filter((t) => t.status === "open");
   const visibleTaskExposure = taskExposure(visibleTasks);
-  const totalCurrent =
-    lawScope === "ll97"
-      ? buildings.reduce((sum, b) => sum + (ll97Fine(b, 0) ?? 0), 0)
-      : 0;
-  const total2030 =
-    lawScope === "ll97"
-      ? buildings.reduce((sum, b) => sum + (ll97Fine(b, 1) ?? 0), 0)
-      : 0;
+  const totalCurrent = lawScope === "ll97" ? buildings.reduce((sum, b) => sum + (ll97Fine(b, 0) ?? 0), 0) : 0;
+  const total2030 = lawScope === "ll97" ? buildings.reduce((sum, b) => sum + (ll97Fine(b, 1) ?? 0), 0) : 0;
   const visibleFineBases = fineBasesForScope(lawScope);
   const activeFineBasis =
-    [ALL_FINE_BASIS, ...FINE_BASES].find(basis => basis.id === fineBasisId) ??
-    visibleFineBases[0];
+    [ALL_FINE_BASIS, ...FINE_BASES].find((basis) => basis.id === fineBasisId) ?? visibleFineBases[0];
 
   const sorted = [...buildings].sort((a, b) => {
     if (lawScope === "ll97") return (ll97Fine(b, 1) ?? 0) - (ll97Fine(a, 1) ?? 0);
-    const bExposure = taskExposure(visibleTasks.filter(task => task.buildingId === b.id));
-    const aExposure = taskExposure(visibleTasks.filter(task => task.buildingId === a.id));
+    const bExposure = taskExposure(visibleTasks.filter((task) => task.buildingId === b.id));
+    const aExposure = taskExposure(visibleTasks.filter((task) => task.buildingId === a.id));
     return bExposure - aExposure;
   });
   const showLl97Columns = lawScope === "ll97";
-  const selectedLawLabel =
-    LAW_OPTIONS.find(law => law.id === lawScope)?.label ?? "All laws";
+  const selectedLawLabel = LAW_OPTIONS.find((law) => law.id === lawScope)?.label ?? "All laws";
 
   return (
     <div className="@container/main flex flex-col gap-6">
@@ -311,7 +275,7 @@ export function PortfolioClient() {
         <div className="grid gap-2 px-4 py-3 @md/main:grid-cols-[5.5rem_1fr] @md/main:items-start">
           <p className="pt-1.5 text-xs font-medium text-muted-foreground">Law scope</p>
           <div className="flex flex-wrap gap-1.5">
-            {LAW_OPTIONS.map(law => (
+            {LAW_OPTIONS.map((law) => (
               <Button
                 key={law.id}
                 type="button"
@@ -329,7 +293,7 @@ export function PortfolioClient() {
           <p className="pt-1.5 text-xs font-medium text-muted-foreground">Fine basis</p>
           <div className="min-w-0">
             <div className="flex flex-wrap gap-1.5">
-              {visibleFineBases.map(basis => (
+              {visibleFineBases.map((basis) => (
                 <Button
                   key={basis.id}
                   type="button"
@@ -341,9 +305,7 @@ export function PortfolioClient() {
                 </Button>
               ))}
             </div>
-            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-              {activeFineBasis.detail}
-            </p>
+            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{activeFineBasis.detail}</p>
           </div>
           <div className="text-right">
             <p className="text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
@@ -389,14 +351,8 @@ export function PortfolioClient() {
       {recentAddresses.length > 0 && (
         <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
           <span>Recent:</span>
-          {recentAddresses.map(recent => (
-            <Button
-              key={recent}
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => submitAddress(recent)}
-            >
+          {recentAddresses.map((recent) => (
+            <Button key={recent} type="button" variant="outline" size="sm" onClick={() => submitAddress(recent)}>
               {recent}
             </Button>
           ))}
@@ -405,11 +361,7 @@ export function PortfolioClient() {
 
       {/* Metric strip */}
       <div className="grid grid-cols-1 gap-3 @sm/main:grid-cols-2 @xl/main:grid-cols-4">
-        <MetricTile
-          icon={<Building2 className="size-4" />}
-          label="Buildings"
-          value={String(buildings.length)}
-        />
+        <MetricTile icon={<Building2 className="size-4" />} label="Buildings" value={String(buildings.length)} />
         <MetricTile
           icon={<ListTodo className="size-4" />}
           label={`${selectedLawLabel} open tasks`}
@@ -451,7 +403,7 @@ export function PortfolioClient() {
           {buildings.length === 0 ? (
             <EmptyFolder
               title="No buildings yet"
-              description="Add an address to start building your portfolio."
+              description="Add an address above to pull city records and compute its fines."
             />
           ) : (
             <Table className="tabular-nums">
@@ -476,13 +428,11 @@ export function PortfolioClient() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sorted.map(b => {
+                {sorted.map((b) => {
                   const fine0 = ll97Fine(b, 0);
                   const fine1 = ll97Fine(b, 1);
                   const fine2 = ll97Fine(b, 2);
-                  const buildingLawTasks = visibleTasks.filter(
-                    task => task.buildingId === b.id,
-                  );
+                  const buildingLawTasks = visibleTasks.filter((task) => task.buildingId === b.id);
                   const open = openTaskCount(b.id, visibleTasks);
                   const buildingExposure = taskExposure(buildingLawTasks);
 
@@ -493,9 +443,7 @@ export function PortfolioClient() {
                       onClick={() => router.push(`/dashboard/buildings/${b.id}`)}
                     >
                       <TableCell className="pl-6 font-medium">{b.address}</TableCell>
-                      <TableCell className="text-right text-muted-foreground">
-                        {b.sqft.toLocaleString()}
-                      </TableCell>
+                      <TableCell className="text-right text-muted-foreground">{b.sqft.toLocaleString()}</TableCell>
                       {showLl97Columns ? (
                         <>
                           <TableCell className="text-right text-muted-foreground">
@@ -512,9 +460,7 @@ export function PortfolioClient() {
                       ) : (
                         <>
                           <TableCell className="text-right text-muted-foreground">
-                            {buildingLawTasks.length || (
-                              <span className="text-xs italic">missing</span>
-                            )}
+                            {buildingLawTasks.length || <span className="text-xs italic">missing</span>}
                           </TableCell>
                           <TableCell className="text-right text-muted-foreground">
                             {buildingExposure > 0 ? (
@@ -544,9 +490,8 @@ export function PortfolioClient() {
       </Card>
 
       <p className="text-xs text-muted-foreground">
-        Data sourced from NYC LL84 benchmarking submissions and LL97 emission limits (1
-        RCNY §103-14). Not legal advice — official compliance requires a registered design
-        professional.
+        Data sourced from NYC LL84 benchmarking submissions and LL97 emission limits (1 RCNY §103-14). Not legal advice
+        — official compliance requires a registered design professional.
       </p>
     </div>
   );
@@ -575,11 +520,7 @@ function MetricTile({
         </span>
         <p className="text-xs">{label}</p>
       </div>
-      <p
-        className={`mt-2 text-2xl font-semibold tabular-nums ${danger ? "text-destructive" : ""}`}
-      >
-        {value}
-      </p>
+      <p className={`mt-2 text-2xl font-semibold tabular-nums ${danger ? "text-destructive" : ""}`}>{value}</p>
       {sub && <p className="mt-0.5 text-xs text-muted-foreground">{sub}</p>}
     </div>
   );
@@ -587,21 +528,13 @@ function MetricTile({
 
 function FineCell({ fine, highlight }: { fine: number | null; highlight?: boolean }) {
   if (fine === null) {
-    return (
-      <TableCell className="text-right text-xs italic text-muted-foreground">
-        missing
-      </TableCell>
-    );
+    return <TableCell className="text-right text-xs italic text-muted-foreground">missing</TableCell>;
   }
   if (fine === 0) {
-    return (
-      <TableCell className="text-right text-xs font-medium text-success">$0</TableCell>
-    );
+    return <TableCell className="text-right text-xs font-medium text-success">$0</TableCell>;
   }
   return (
-    <TableCell
-      className={`text-right text-xs font-medium ${highlight ? "text-destructive" : ""}`}
-    >
+    <TableCell className={`text-right text-xs font-medium ${highlight ? "text-destructive" : ""}`}>
       {fmtUsd(fine)}
     </TableCell>
   );
