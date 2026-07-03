@@ -11,14 +11,7 @@ import { ArrowRight, Menu } from "lucide-react";
 import { AddressAutocomplete } from "@/components/address-autocomplete";
 import { DemoOpsRoom } from "@/components/demo-ops-room";
 import { FineprintLogo } from "@/components/fineprint-logo";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import StickyTabs from "@/components/ui/sticky-tabs";
 import { TextRotate } from "@/components/ui/text-rotate";
 
@@ -119,9 +112,7 @@ export default function Home() {
   // first; the address rides along and the intake fires once they land.
   const search = (value: string) => {
     const trimmedAddress = value.trim();
-    router.push(
-      trimmedAddress ? `${DASH}?address=${encodeURIComponent(trimmedAddress)}` : DASH,
-    );
+    router.push(trimmedAddress ? `${DASH}?address=${encodeURIComponent(trimmedAddress)}` : DASH);
   };
 
   return (
@@ -131,10 +122,7 @@ export default function Home() {
           {/* ── NAV ── */}
           <header className="sticky top-0 z-50 border-b border-border/70 bg-background/80 backdrop-blur-md">
             <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5">
-              <Link
-                href="/"
-                className="font-heading flex items-center text-xl font-bold tracking-tight"
-              >
+              <Link href="/" className="font-heading flex items-center text-xl font-bold tracking-tight">
                 <span className="sr-only">Fineprint</span>
                 <span aria-hidden="true" className="flex items-center">
                   <FineprintLogo className="mr-px h-[0.95em] w-auto" />
@@ -142,12 +130,8 @@ export default function Home() {
                 </span>
               </Link>
               <div className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
-                {NAV_LINKS.map(link => (
-                  <Link
-                    key={link.label}
-                    href={link.href}
-                    className="transition-colors hover:text-foreground"
-                  >
+                {NAV_LINKS.map((link) => (
+                  <Link key={link.label} href={link.href} className="transition-colors hover:text-foreground">
                     {link.label}
                   </Link>
                 ))}
@@ -177,7 +161,7 @@ export default function Home() {
                       </SheetTitle>
                     </SheetHeader>
                     <div className="grid gap-1 px-4">
-                      {NAV_LINKS.map(link => (
+                      {NAV_LINKS.map((link) => (
                         <SheetClose key={link.label} asChild>
                           <Link
                             href={link.href}
@@ -236,12 +220,8 @@ export default function Home() {
                   Skip the
                   <span className="inline-grid">
                     {/* Invisible copies reserve the widest word so rotation never reflows. */}
-                    {["fine.", "cliff.", "panic."].map(word => (
-                      <span
-                        key={word}
-                        aria-hidden="true"
-                        className="invisible [grid-area:1/1]"
-                      >
+                    {["fine.", "cliff.", "panic."].map((word) => (
+                      <span key={word} aria-hidden="true" className="invisible [grid-area:1/1]">
                         {word}
                       </span>
                     ))}
@@ -257,8 +237,8 @@ export default function Home() {
                   </span>
                 </p>
                 <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
-                  Type any NYC address — your LL97 fine and the 2030 cliff, computed from
-                  the city&apos;s own records in about ten seconds.
+                  Type any NYC address — your LL97 fine and the 2030 cliff, computed from the city&apos;s own records in
+                  about ten seconds.
                 </p>
               </motion.div>
 
@@ -288,18 +268,16 @@ export default function Home() {
                 </div>
                 <div className="mt-3.5 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                   <span>Try:</span>
-                  {["1 Wall Street", "20 Exchange Place", "1870 Pelham Pkwy S"].map(
-                    ex => (
-                      <button
-                        key={ex}
-                        type="button"
-                        onClick={() => search(ex)}
-                        className="fp-press rounded-full border border-border bg-card px-3 py-1.5 text-foreground/80 hover:border-foreground/25"
-                      >
-                        {ex}
-                      </button>
-                    ),
-                  )}
+                  {["1 Wall Street", "20 Exchange Place", "1870 Pelham Pkwy S"].map((ex) => (
+                    <button
+                      key={ex}
+                      type="button"
+                      onClick={() => search(ex)}
+                      className="fp-press rounded-full border border-border bg-card px-3 py-1.5 text-foreground/80 hover:border-foreground/25"
+                    >
+                      {ex}
+                    </button>
+                  ))}
                 </div>
               </motion.form>
             </motion.div>
@@ -321,16 +299,14 @@ export default function Home() {
                 },
                 { n: "~28,000", s: "NYC buildings covered", red: false },
                 { n: "40+", s: "cities passed the same standard", red: false },
-              ].map(s => (
+              ].map((s) => (
                 <motion.div variants={rise} key={s.n} className="px-5 py-8">
                   <p
                     className={`font-heading text-4xl font-bold tracking-tight ${s.red ? "text-destructive" : "text-foreground"}`}
                   >
                     {s.n}
                   </p>
-                  <p className="mt-1.5 text-sm leading-snug text-muted-foreground">
-                    {s.s}
-                  </p>
+                  <p className="mt-1.5 text-sm leading-snug text-muted-foreground">{s.s}</p>
                 </motion.div>
               ))}
             </motion.div>
@@ -340,15 +316,12 @@ export default function Home() {
           <StickyTabs>
             <StickyTabs.Item title="01 / How it works" id="how">
               <motion.div variants={stagger} {...inView} id="how">
-                <motion.p
-                  variants={rise}
-                  className="max-w-lg text-lg text-muted-foreground"
-                >
+                <motion.p variants={rise} className="max-w-lg text-lg text-muted-foreground">
                   Address to funded plan. No spreadsheet, no consultant.
                 </motion.p>
                 {/* Docket ledger — each step is a filing line, numeral inks up on hover. */}
                 <div className="mt-10 border-y border-border">
-                  {STEPS.map(step => (
+                  {STEPS.map((step) => (
                     <motion.div
                       variants={rise}
                       key={step.n}
@@ -360,9 +333,7 @@ export default function Home() {
                       >
                         {step.n}
                       </span>
-                      <h3 className="font-heading text-xl font-semibold tracking-tight md:text-2xl">
-                        {step.t}
-                      </h3>
+                      <h3 className="font-heading text-xl font-semibold tracking-tight md:text-2xl">{step.t}</h3>
                       <p className="col-span-2 col-start-2 leading-relaxed text-muted-foreground md:col-span-1 md:col-start-3 md:text-lg">
                         {step.d}
                       </p>
@@ -378,8 +349,7 @@ export default function Home() {
                   variants={rise}
                   className="font-heading max-w-2xl text-3xl font-bold leading-snug tracking-tight sm:text-4xl"
                 >
-                  Your LL97 fine, figured from real emissions. Every other deadline, dated
-                  to the day.{" "}
+                  Your LL97 fine, figured from real emissions. Every other deadline, dated to the day.{" "}
                   <span className="text-destructive">Never a made-up number.</span>
                 </motion.h3>
                 {/* The statute ledger: the product's subject matter IS the design.
@@ -389,30 +359,24 @@ export default function Home() {
                     <thead>
                       <tr className="border-b border-border text-left text-xs uppercase tracking-wider text-muted-foreground/70">
                         <th className="py-3 pr-4 font-medium">Statute</th>
-                        <th className="hidden py-3 pr-4 font-medium sm:table-cell">
-                          Obligation
-                        </th>
+                        <th className="hidden py-3 pr-4 font-medium sm:table-cell">Obligation</th>
                         <th className="py-3 pr-4 font-medium">Handling</th>
                         <th className="py-3 text-right font-medium">Cost of a miss</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {LAWS.map(law => (
+                      {LAWS.map((law) => (
                         <tr
                           key={law.statute}
                           className="group border-b border-border transition-colors last:border-b-0 hover:bg-card"
                         >
                           <td className="py-4 pr-4">
-                            <span className="font-heading font-semibold tracking-tight">
-                              {law.statute}
-                            </span>
+                            <span className="font-heading font-semibold tracking-tight">{law.statute}</span>
                             <span className="mt-0.5 block text-xs text-muted-foreground sm:hidden">
                               {law.obligation}
                             </span>
                           </td>
-                          <td className="hidden py-4 pr-4 text-muted-foreground sm:table-cell">
-                            {law.obligation}
-                          </td>
+                          <td className="hidden py-4 pr-4 text-muted-foreground sm:table-cell">{law.obligation}</td>
                           <td className="py-4 pr-4">
                             <span className="inline-flex items-center gap-1.5 text-xs font-medium">
                               <span
@@ -421,20 +385,15 @@ export default function Home() {
                               {law.computed ? "Computed" : "Tracked"}
                             </span>
                           </td>
-                          <td className="py-4 text-right font-medium text-destructive tabular-nums">
-                            {law.stakes}
-                          </td>
+                          <td className="py-4 text-right font-medium text-destructive tabular-nums">{law.stakes}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </motion.div>
-                <motion.p
-                  variants={rise}
-                  className="mt-5 max-w-2xl text-sm text-muted-foreground"
-                >
-                  Computed means we publish the math against the statute. Tracked means
-                  the public DOB deadline sits on a live board with a timer.
+                <motion.p variants={rise} className="mt-5 max-w-2xl text-sm text-muted-foreground">
+                  Computed means we publish the math against the statute. Tracked means the public DOB deadline sits on
+                  a live board with a timer.
                 </motion.p>
               </motion.div>
             </StickyTabs.Item>
@@ -446,9 +405,8 @@ export default function Home() {
                     Every obligation becomes a ticket
                   </h3>
                   <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
-                    Each covered law is a ticket on a timer. Dispatch an agent and watch
-                    the fleet and the activity log move in unison — claim, draft, submit,
-                    approve.
+                    Each covered law is a ticket on a timer. Dispatch an agent and watch the fleet and the activity log
+                    move in unison — claim, draft, submit, approve.
                   </p>
                 </motion.div>
 
@@ -461,31 +419,18 @@ export default function Home() {
 
           {/* ── CTA + FOOTER ── */}
           <section className="border-t border-border bg-card">
-            <motion.div
-              variants={stagger}
-              {...inView}
-              className="mx-auto max-w-6xl px-5 py-20 text-center md:py-24"
-            >
-              <motion.h2
-                variants={rise}
-                className="font-heading text-4xl font-bold tracking-tight sm:text-5xl"
-              >
+            <motion.div variants={stagger} {...inView} className="mx-auto max-w-6xl px-5 py-20 text-center md:py-24">
+              <motion.h2 variants={rise} className="font-heading text-4xl font-bold tracking-tight sm:text-5xl">
                 <span className="sr-only">See your building&apos;s number</span>
                 <span aria-hidden="true">
                   {"See your building's number".split("").map((ch, i) => (
-                    <span
-                      key={`${ch}-${i}`}
-                      className="transition-colors duration-150 hover:text-destructive"
-                    >
+                    <span key={`${ch}-${i}`} className="transition-colors duration-150 hover:text-destructive">
                       {ch}
                     </span>
                   ))}
                 </span>
               </motion.h2>
-              <motion.p
-                variants={rise}
-                className="mx-auto mt-4 max-w-md text-lg text-muted-foreground"
-              >
+              <motion.p variants={rise} className="mx-auto mt-4 max-w-md text-lg text-muted-foreground">
                 One address. About ten seconds.
               </motion.p>
               <motion.form
@@ -512,32 +457,86 @@ export default function Home() {
               </motion.form>
             </motion.div>
             <footer className="border-t border-border">
-              <div className="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-8 md:flex-row md:items-center md:justify-between">
-                <div className="font-heading flex items-center text-base font-semibold text-foreground">
-                  <span className="sr-only">Fineprint</span>
-                  <span aria-hidden="true" className="flex items-center">
-                    <FineprintLogo className="mr-px h-[0.95em] w-auto" />
-                    ineprint
-                  </span>
+              <div className="mx-auto max-w-6xl px-5 py-12 md:py-16">
+                <div className="grid gap-10 md:grid-cols-[1.6fr_1fr_1fr_1fr]">
+                  <div>
+                    <div className="font-heading flex items-center text-base font-semibold text-foreground">
+                      <span className="sr-only">Fineprint</span>
+                      <span aria-hidden="true" className="flex items-center">
+                        <FineprintLogo className="mr-px h-[0.95em] w-auto" />
+                        ineprint
+                      </span>
+                    </div>
+                    <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted-foreground">
+                      Your building&apos;s LL97 fine and the 2030 cliff, computed from the city&apos;s own records in
+                      about ten seconds.
+                    </p>
+                  </div>
+
+                  <FooterColumn
+                    title="Product"
+                    links={[
+                      { label: "How it works", href: "#how" },
+                      { label: "Laws covered", href: "#laws" },
+                      { label: "Open dashboard", href: DASH },
+                    ]}
+                  />
+                  <FooterColumn
+                    title="Legal"
+                    links={[
+                      { label: "Privacy policy", href: "/privacy" },
+                      { label: "Terms of service", href: "/terms" },
+                    ]}
+                  />
+                  <FooterColumn
+                    title="Contact"
+                    links={[
+                      {
+                        label: "dkosukhintech@gmail.com",
+                        href: "mailto:dkosukhintech@gmail.com",
+                      },
+                    ]}
+                  />
                 </div>
-                {/* The footer is set, on purpose, in actual fine print. */}
-                <p className="max-w-xl text-[11px] leading-relaxed text-muted-foreground/70">
-                  Estimates from NYC LL84 benchmarking data and LL97 emission limits (1
-                  RCNY §103-14). Not legal advice. Official compliance requires a
-                  registered design professional.{" "}
-                  <Link
-                    href="/privacy"
-                    className="underline underline-offset-2 hover:text-foreground"
-                  >
-                    Privacy policy
-                  </Link>
-                  .
-                </p>
+
+                <div className="mt-12 flex flex-col gap-3 border-t border-border pt-6 md:flex-row md:items-baseline md:justify-between">
+                  <p className="text-[11px] text-muted-foreground/60">© 2026 Fineprint. All rights reserved.</p>
+                  {/* The disclaimer is set, on purpose, in actual fine print. */}
+                  <p className="max-w-xl text-[11px] leading-relaxed text-muted-foreground/60 md:text-right">
+                    Estimates from NYC LL84 benchmarking data and LL97 emission limits (1 RCNY §103-14). Not legal
+                    advice. Official compliance requires a registered design professional.
+                  </p>
+                </div>
               </div>
             </footer>
           </section>
         </div>
       </div>
     </MotionConfig>
+  );
+}
+
+function FooterColumn({ title, links }: { title: string; links: { label: string; href: string }[] }) {
+  return (
+    <div>
+      <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/60">{title}</p>
+      <ul className="mt-3 space-y-2 text-sm">
+        {links.map((link) =>
+          link.href.includes(":") ? (
+            <li key={link.label}>
+              <a href={link.href} className="text-muted-foreground transition-colors hover:text-foreground">
+                {link.label}
+              </a>
+            </li>
+          ) : (
+            <li key={link.label}>
+              <Link href={link.href} className="text-muted-foreground transition-colors hover:text-foreground">
+                {link.label}
+              </Link>
+            </li>
+          ),
+        )}
+      </ul>
+    </div>
   );
 }
