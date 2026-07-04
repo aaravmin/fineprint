@@ -31,6 +31,6 @@
     "worker:inspections": "WORKER_KINDS=facade_inspection,gas_piping_certification,mold_pest_remediation npm run worker"
   },
   "devDependencies": {
-    "tsx": "^4.19.2"
+    "tsx": "^4.23.0"
   }
 }
