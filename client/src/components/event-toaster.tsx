@@ -3,9 +3,7 @@
 import { useEffect, useRef } from "react";
 
 import { toast } from "sonner";
-import { useTable } from "spacetimedb/react";
-
-import { tables } from "@/module_bindings/index";
+import { useEvents } from "@/lib/data/hooks";
 
 // Every reducer writes an event row; this turns the rows that matter into
 // toasts. The audit trail is the single source: nothing toasts here unless a
@@ -20,7 +18,7 @@ const ERROR_KINDS = new Set(["task_rejected", "worker_killed", "worker_reaped", 
 const SUCCESS_KINDS = new Set(["task_approved", "building_ingested"]);
 
 export function EventToaster() {
-  const [events] = useTable(tables.event);
+  const events = useEvents();
 
   // Everything already in the table at mount is history, not news. Only rows
   // with a higher id than the baseline toast.

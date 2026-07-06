@@ -1,0 +1,61 @@
+{
+  "key": "https://data.cityofnewyork.us/resource/3h2n-5cm9.json?bin=5107019&%24order=issue_date+DESC&%24limit=50000&%24offset=0",
+  "recordedAt": "2026-07-06T04:52:05.211Z",
+  "value": [
+    {
+      "isn_dob_bis_viol": "2582882",
+      "boro": "5",
+      "bin": "5107019",
+      "block": "01068",
+      "lot": "00072",
+      "issue_date": "20220511",
+      "violation_type_code": "AEUHAZ1",
+      "violation_number": "00561",
+      "house_number": "2111",
+      "street": "RICHMOND TERRACE",
+      "disposition_date": "20221007",
+      "disposition_comments": "000810 PAID INVOICE 90703920",
+      "description": "FAILURE TO CERTIFY CORRECTION ON IMMEDIATELY HAZARDOUS (CLASS 1) ECB VIOLATION",
+      "ecb_number": "35646010Y",
+      "number": "V*051122AEUHAZ100561",
+      "violation_category": "V*-DOB VIOLATION - DISMISSED",
+      "violation_type": "AEUHAZ1-FAIL TO CERTIFY CLASS 1                                         NONE"
+    },
+    {
+      "isn_dob_bis_viol": "2499227",
+      "boro": "5",
+      "bin": "5107019",
+      "block": "01068",
+      "lot": "00072",
+      "issue_date": "20201209",
+      "violation_type_code": "C",
+      "violation_number": "20-01642",
+      "house_number": "2111",
+      "street": "RICHMOND TERRACE",
+      "disposition_date": "20230731",
+      "disposition_comments": "OK TO DISMISS. SWO HAS BEEN RESCINDED",
+      "description": "DUE TO THE GC LICENSE REVOKE THE BOROUGH COMMISSIONERS OFFICE HAS               ORDERED ALL WORK UNDER PERMIT S-00025695 12-08-2020 STOPPED, KINDLY             CONTACT THE COMMISSIONERS OFFICE IN RESPONSE TO THIS LETTER.",
+      "number": "V*120920C20-01642",
+      "violation_category": "V*-DOB VIOLATION - DISMISSED",
+      "violation_type": "C-CONSTRUCTION                                                    OTHER   OPTIONAL"
+    },
+    {
+      "isn_dob_bis_viol": "2499228",
+      "boro": "5",
+      "bin": "5107019",
+      "block": "01068",
+      "lot": "00072",
+      "issue_date": "20201209",
+      "violation_type_code": "C",
+      "violation_number": "20-01643",
+      "house_number": "2111",
+      "street": "RICHMOND TERRACE",
+      "disposition_date": "20230731",
+      "disposition_comments": "OK TO DISMISS. SWO HAS BEEN RESCINDED",
+      "description": "DUE TO THE GC LICENSE REVOKE THE BOROUGH COMMISSIONERS OFFICE HAS               ORDERED ALL WORK UNDER PERMIT S-00025695 STOPPED, KINDLY CONTACT THE            COMMISSIONERS OFFICE IN RESPONSE TO THIS LETTER.",
+      "number": "V*120920C20-01643",
+      "violation_category": "V*-DOB VIOLATION - DISMISSED",
+      "violation_type": "C-CONSTRUCTION                                                    OTHER   OPTIONAL"
+    }
+  ]
+}

@@ -5,6 +5,7 @@
 // editorial assumptions for typical NYC buildings, never quotes, and every
 // consumer is expected to say so.
 
+import type { RetrofitCategory } from "./categories.ts";
 import {
   computeFine,
   type BuildingInput,
@@ -22,6 +23,20 @@ export interface RetrofitMeasure {
   // whole-building plan can credit one action against several laws rather than
   // double-count it. Pure metadata — the optimizer's math ignores it.
   satisfiesLaws?: string[];
+  // The infrastructure category this measure belongs to (lighting, heating ...),
+  // and the building system it targets. Pure metadata for grouping the UI; the
+  // math ignores them.
+  category?: RetrofitCategory;
+  targetSystem?: string;
+  // Measures in the same exclusiveGroup are mutually exclusive alternatives
+  // (e.g. two competing heating-plant replacements). The UI funds at most one;
+  // the optimizer keeps only the highest-reduction member so a subset never
+  // double-counts the same system's replacement.
+  exclusiveGroup?: string;
+  // True when the measure is a readiness/enabling cost that itself cuts no
+  // emissions (e.g. an electrical service upgrade). The UI shows it as a cost
+  // line, not an emissions slider.
+  reducesEmissions?: boolean;
 }
 
 // Reduction fractions multiply, so the catalog's deepest reachable cut is
@@ -90,7 +105,7 @@ const PERIOD_YEARS: Record<Period, number> = {
   "2035-2039": 5,
 };
 const HORIZON_YEARS = 16; // 2024 through 2039
-const MAX_CATALOG = 12; // 2^12 = 4,096 subsets; enumeration stays instant
+const MAX_CATALOG = 16; // 2^16 = 65,536 subsets; enumeration stays within a few ms
 
 export interface RetrofitPlan {
   measureIds: string[];
@@ -144,6 +159,9 @@ export function optimizeRetrofit(
 
   for (let mask = 0; mask < subsetCount; mask++) {
     const chosen = measures.filter((_, index) => mask & (1 << index));
+    if (hasExclusiveConflict(chosen)) {
+      continue;
+    }
     const plan = evaluatePlan(building, chosen, options);
 
     if (mask === 0) {
@@ -203,6 +221,9 @@ export function planForBudget(
 
   for (let mask = 0; mask < subsetCount; mask++) {
     const chosen = measures.filter((_, index) => mask & (1 << index));
+    if (hasExclusiveConflict(chosen)) {
+      continue;
+    }
     const plan = evaluatePlan(building, chosen, options);
 
     if (plan.capexUsd > affordableBudget) {
@@ -233,6 +254,10 @@ export interface FundedMeasure {
   name: string;
   basis: string;
   satisfiesLaws?: string[];
+  category?: RetrofitCategory;
+  targetSystem?: string;
+  exclusiveGroup?: string;
+  reducesEmissions?: boolean;
   fullCostUsd: number;
   fundedUsd: number;
   fundedFraction: number; // 0..1, the share of the measure paid for
@@ -298,6 +323,10 @@ export function planFromFunding(
     name: line.measure.name,
     basis: line.measure.basis,
     satisfiesLaws: line.measure.satisfiesLaws,
+    category: line.measure.category,
+    targetSystem: line.measure.targetSystem,
+    exclusiveGroup: line.measure.exclusiveGroup,
+    reducesEmissions: line.measure.reducesEmissions,
     fullCostUsd: round2(line.fullCostUsd),
     fundedUsd: round2(line.fundedUsd),
     fundedFraction: line.fundedFraction,
@@ -450,6 +479,9 @@ export function optimizeArticle321(
 
   for (let mask = 0; mask < subsetCount; mask++) {
     const chosen = measures.filter((_, index) => mask & (1 << index));
+    if (hasExclusiveConflict(chosen)) {
+      continue;
+    }
     const { capexUsd, projectedEmissionsTco2e } = applyMeasures(building, chosen);
 
     if (projectedEmissionsTco2e > target) {
@@ -509,4 +541,21 @@ function round2(value: number): number {
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
+}
+
+// Two measures in the same exclusiveGroup are competing alternatives (e.g. a
+// heat pump vs a new steam boiler vs geothermal for the heating plant). Funding
+// both would double-count the same system's replacement, so the optimizer never
+// considers a subset that picks more than one member of a group.
+function hasExclusiveConflict(chosen: RetrofitMeasure[]): boolean {
+  const groups = new Set<string>();
+  for (const measure of chosen) {
+    if (measure.exclusiveGroup) {
+      if (groups.has(measure.exclusiveGroup)) {
+        return true;
+      }
+      groups.add(measure.exclusiveGroup);
+    }
+  }
+  return false;
 }

@@ -146,3 +146,42 @@ describe("parseLl84Rows", () => {
     expect(facts!.grossFloorAreaSqft).toBe(2_852_257);
   });
 });
+
+// The fuel detail the recompute used to discard. Same columns, same
+// coefficients, now kept per fuel so the systems dossier can attribute
+// emissions instead of working from one total.
+describe("parseLl84Rows fuel detail", () => {
+  test("records per-fuel energy and emissions for every consumed fuel", () => {
+    const facts = parseLl84Rows(esbRows, "1008350041");
+    const gas = facts!.fuelUse.find(entry => entry.fuel === "natural_gas");
+    const steam = facts!.fuelUse.find(entry => entry.fuel === "district_steam");
+    const electricity = facts!.fuelUse.find(entry => entry.fuel === "electricity");
+
+    expect(gas?.kbtu).toBeCloseTo(5_469_879.2, 1);
+    expect(steam?.column).toBe("district_steam_use_kbtu");
+    // Electricity is metered in kWh; kbtu is the converted common unit, and
+    // electricityKwh keeps the native reading.
+    expect(electricity?.kbtu).toBeCloseTo(30_849_800.6 * 3.412, 0);
+    expect(facts!.electricityKwh).toBeCloseTo(30_849_800.6, 1);
+  });
+
+  test("per-fuel tCO2e sums back to the whole-building recompute", () => {
+    const facts = parseLl84Rows(esbRows, "1008350041");
+    const summed = facts!.fuelUse.reduce((total, entry) => total + (entry.tco2e ?? 0), 0);
+
+    expect(summed).toBeCloseTo(facts!.recomputedEmissionsTco2e!, 1);
+  });
+
+  test("an unpriceable fuel keeps its energy but leaves tCO2e null", () => {
+    const rows = structuredClone(esbRows);
+    rows[0].fuel_oil_5_6_use_kbtu = "100000";
+
+    const facts = parseLl84Rows(rows, "1008350041");
+    const heavyOil = facts!.fuelUse.find(entry => entry.fuel === "fuel_oil_5_6");
+
+    expect(heavyOil?.kbtu).toBe(100_000);
+    expect(heavyOil?.tco2e).toBeNull();
+    // The whole-building recompute still refuses to price it; semantics intact.
+    expect(facts!.recomputedEmissionsTco2e).toBeNull();
+  });
+});

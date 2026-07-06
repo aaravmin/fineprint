@@ -15,12 +15,12 @@ import {
   UserPlus,
   XCircle,
 } from "lucide-react";
-import { useTable } from "spacetimedb/react";
+import { useEvents } from "@/lib/data/hooks";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyFolder } from "@/components/ui/empty-folder";
-import { tables } from "@/module_bindings/index";
+import { relativeTimeAgo } from "@/lib/format";
 
 interface KindStyle {
   icon: React.ReactNode;
@@ -41,7 +41,7 @@ const KIND_STYLE: Record<string, KindStyle> = {
   },
   task_approved: {
     icon: <BadgeCheck className="size-3.5" />,
-    ring: "bg-[var(--success)]/10 text-[var(--success)]",
+    ring: "bg-success/10 text-success",
     variant: "default",
   },
   task_rejected: {
@@ -98,7 +98,7 @@ const FALLBACK_STYLE: KindStyle = {
 };
 
 export function ActivityClient() {
-  const [events] = useTable(tables.event);
+  const events = useEvents();
 
   const sorted = [...events].sort((a, b) => (a.id > b.id ? -1 : 1)).slice(0, 100);
 
@@ -117,18 +117,12 @@ export function ActivityClient() {
         </CardHeader>
         <CardContent className="p-0">
           {sorted.length === 0 ? (
-            <EmptyFolder
-              title="No events yet"
-              description="Reducer calls write the audit trail here in real time"
-            />
+            <EmptyFolder title="No events yet" description="Reducer calls write the audit trail here in real time" />
           ) : (
             <ul className="relative">
               {/* Timeline rail */}
-              <span
-                aria-hidden="true"
-                className="absolute inset-y-3 left-[2.375rem] w-px bg-border"
-              />
-              {sorted.map(e => {
+              <span aria-hidden="true" className="absolute inset-y-3 left-[2.375rem] w-px bg-border" />
+              {sorted.map((e) => {
                 const style = KIND_STYLE[e.kind] ?? FALLBACK_STYLE;
 
                 return (
@@ -146,17 +140,11 @@ export function ActivityClient() {
                         <Badge variant={style.variant} className="text-[10px]">
                           {e.kind.replace(/_/g, " ")}
                         </Badge>
-                        <span className="font-mono text-[11px] text-muted-foreground tabular-nums">
-                          {e.at.toDate().toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                            second: "2-digit",
-                          })}
+                        <span className="text-[11px] text-muted-foreground tabular-nums">
+                          {relativeTimeAgo(e.at.toDate())}
                         </span>
                       </div>
-                      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                        {e.payload}
-                      </p>
+                      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{e.payload}</p>
                     </div>
                   </li>
                 );

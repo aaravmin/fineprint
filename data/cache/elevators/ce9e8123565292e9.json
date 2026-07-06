@@ -1,0 +1,31 @@
+{
+  "key": "https://data.cityofnewyork.us/resource/e5aq-a4j2.json?bin=1011379&%24limit=50000&%24offset=0",
+  "recordedAt": "2026-07-06T04:52:11.279Z",
+  "value": [
+    {
+      "device_number": "1P8069",
+      "device_type": "Elevator",
+      "device_status": "Active",
+      "status_date": "2020-09-05T00:00:00.000",
+      "periodic_report_year": "2026",
+      "cat1_report_year": "2026",
+      "cat1_latest_report_filed": "2026-05-13T00:00:00.000",
+      "cat5_latest_report_filed": "2026-05-13T00:00:00.000",
+      "periodic_latest_inspection": "2026-01-14T00:00:00.000",
+      "bin": "1011379",
+      "borough": "Manhattan",
+      "house_number": "13",
+      "street_name": "ABINGDON SQUARE",
+      "block": "624",
+      "lot": "31",
+      "zip_code": "10014",
+      "latitude": "40.737191",
+      "longitude": "-74.005193",
+      "communitydistrict": "102",
+      "citycouncildistrict": "03",
+      "bbl": "1006240031",
+      "censustract": "77",
+      "ntaname": "West Village"
+    }
+  ]
+}

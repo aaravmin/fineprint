@@ -36,8 +36,7 @@ export const LAW_REGISTRY: LawRegistryEntry[] = [
     short_name: "LL97",
     jurisdiction: "NYC",
     category: "Emissions cap",
-    description:
-      "Annual carbon-emissions limits for large buildings, with a $268/tCO2e penalty on the overage.",
+    description: "Annual carbon-emissions limits for large buildings, with a $268/tCO2e penalty on the overage.",
     applies_to_logic:
       "Buildings over 25,000 ft² (or a tax lot whose buildings total over 50,000 ft²), excluding the affordable-housing Article 321 pathway and houses of worship.",
     dashboard_output_key: "law-card:ll97",
@@ -61,133 +60,9 @@ export const LAW_REGISTRY: LawRegistryEntry[] = [
     enabled: true,
     sort_order: 1,
   },
-  {
-    law_id: "ll84",
-    slug: "local-law-84",
-    display_name: "Energy & Water Benchmarking",
-    short_name: "LL84",
-    jurisdiction: "NYC",
-    category: "Benchmarking",
-    description:
-      "Annual energy and water benchmarking through ENERGY STAR Portfolio Manager, due May 1.",
-    applies_to_logic: "Buildings over 25,000 ft².",
-    dashboard_output_key: "law-card:ll84",
-    source_data_keys: ["sqft"],
-    enabled: true,
-    sort_order: 2,
-  },
-  {
-    law_id: "ll87",
-    slug: "local-law-87",
-    display_name: "Energy Audit & Retro-commissioning",
-    short_name: "LL87",
-    jurisdiction: "NYC",
-    category: "Energy audit",
-    description:
-      "ASHRAE Level II energy audit and retro-commissioning once per 10-year cycle, scheduled by tax block.",
-    applies_to_logic: "Buildings over 50,000 ft².",
-    dashboard_output_key: "law-card:ll87",
-    source_data_keys: ["sqft", "bbl"],
-    enabled: true,
-    sort_order: 3,
-  },
-  {
-    law_id: "ll11",
-    slug: "local-law-11",
-    display_name: "Facade Inspection (FISP)",
-    short_name: "LL11",
-    jurisdiction: "NYC",
-    category: "Facade safety",
-    description:
-      "Periodic facade inspection and safety report (FISP) on a 5-year cycle, by a Qualified Exterior Wall Inspector.",
-    applies_to_logic:
-      "Buildings over six stories (from PLUTO floor count; a 60,000 ft² floor-area proxy when the count is unknown).",
-    dashboard_output_key: "law-card:ll11",
-    source_data_keys: ["numFloors", "bbl"],
-    enabled: true,
-    sort_order: 4,
-  },
-  {
-    law_id: "ll88",
-    slug: "local-law-88",
-    display_name: "Lighting Upgrades & Submetering",
-    short_name: "LL88",
-    jurisdiction: "NYC",
-    category: "Lighting & submetering",
-    description:
-      "Lighting upgrades to the NYC Energy Conservation Code and tenant-space submetering.",
-    applies_to_logic: "Buildings over 25,000 ft².",
-    dashboard_output_key: "law-card:ll88",
-    source_data_keys: ["sqft"],
-    enabled: true,
-    sort_order: 5,
-  },
-  {
-    law_id: "ll33",
-    slug: "local-law-33",
-    display_name: "Building Energy Grade",
-    short_name: "LL33",
-    jurisdiction: "NYC",
-    category: "Energy grade",
-    description:
-      "Public A-F energy letter grade (LL33/LL95) derived from the LL84 ENERGY STAR score, posted near every entrance.",
-    applies_to_logic: "Buildings over 25,000 ft² (the LL84 benchmarking floor).",
-    dashboard_output_key: "law-card:ll33",
-    source_data_keys: ["sqft", "energyStarScore"],
-    enabled: true,
-    sort_order: 6,
-  },
-  {
-    law_id: "ll152",
-    slug: "local-law-152",
-    display_name: "Gas Piping Inspection & Certification",
-    short_name: "LL152",
-    jurisdiction: "NYC",
-    category: "Gas safety",
-    description:
-      "Periodic gas-piping inspection and certification by a Licensed Master Plumber, on a 4-year community-district cycle.",
-    applies_to_logic:
-      "Buildings with gas service (assumed present until a DOB gas dataset lands).",
-    dashboard_output_key: "law-card:ll152",
-    source_data_keys: ["communityDistrict"],
-    enabled: true,
-    sort_order: 7,
-  },
-  {
-    law_id: "ll96",
-    slug: "local-law-96",
-    display_name: "PACE Clean Energy Financing",
-    short_name: "LL96",
-    jurisdiction: "NYC",
-    category: "Clean energy financing",
-    description:
-      "Property Assessed Clean Energy financing for efficiency and renewable retrofits — an opportunity, not an obligation, so it carries no deadline or penalty.",
-    applies_to_logic:
-      "Available to covered buildings (over 25,000 ft²) to fund the retrofits LL97 and LL87 call for.",
-    dashboard_output_key: "law-card:ll96",
-    source_data_keys: ["sqft"],
-    enabled: true,
-    sort_order: 8,
-  },
-  {
-    law_id: "ll55",
-    slug: "local-law-55",
-    display_name: "Indoor Allergen Hazards",
-    short_name: "LL55",
-    jurisdiction: "NYC",
-    category: "Healthy housing",
-    description:
-      "Annual inspection and remediation of mold and pest hazards in residential units, with a tenant allergen notice.",
-    applies_to_logic:
-      "Buildings with three or more residential units (from PLUTO unit count; the affordable flag as fallback).",
-    dashboard_output_key: "law-card:ll55",
-    source_data_keys: ["unitsResidential", "isAffordable"],
-    enabled: true,
-    sort_order: 9,
-  },
 ];
 
-const byId = new Map(LAW_REGISTRY.map(law => [law.law_id, law]));
+const byId = new Map(LAW_REGISTRY.map((law) => [law.law_id, law]));
 
 export function lawById(lawId: string): LawRegistryEntry | undefined {
   return byId.get(lawId);
@@ -205,9 +80,7 @@ export function lawShortName(lawId: string): string {
 
 // Registry laws in display order, optionally only the enabled ones.
 export function lawsInOrder(onlyEnabled = true): LawRegistryEntry[] {
-  return LAW_REGISTRY.filter(law => !onlyEnabled || law.enabled).sort(
-    (a, b) => a.sort_order - b.sort_order,
-  );
+  return LAW_REGISTRY.filter((law) => !onlyEnabled || law.enabled).sort((a, b) => a.sort_order - b.sort_order);
 }
 
 // Evidence checklist per law (Phase 7.6). `required` is proof the law's own
@@ -222,7 +95,7 @@ export interface LawEvidence {
 
 export const LAW_EVIDENCE: Record<string, LawEvidence> = {
   ll97: {
-    required: ["LL97 emissions report (BEAM filing)", "LL84 benchmarking data"],
+    required: ["LL97 emissions report (BEAM filing)", "Energy benchmarking data (ENERGY STAR Portfolio Manager)"],
     recommended: [
       "Compliance/penalty calculation",
       "Decarbonization or good-faith-effort plan",
@@ -232,40 +105,6 @@ export const LAW_EVIDENCE: Record<string, LawEvidence> = {
   art321: {
     required: ["Article 321 certification of compliance (DOB)"],
     recommended: ["Prescribed-measures documentation (28-321.2.2)", "Emissions calculation vs 2030 limit"],
-  },
-  ll84: {
-    required: ["Benchmarking submission confirmation", "Reported energy and water data"],
-    recommended: ["ENERGY STAR Portfolio Manager report", "Filing confirmation receipt"],
-  },
-  ll87: {
-    required: ["Energy efficiency report (EER) filing confirmation", "ASHRAE Level II energy audit report"],
-    recommended: ["Retro-commissioning report", "Approved-auditor certification"],
-  },
-  ll88: {
-    required: ["LL88 lighting/submetering compliance filing"],
-    recommended: ["Lighting upgrade documentation", "Submetering documentation", "Contractor invoice"],
-  },
-  ll11: {
-    required: ["QEWI facade safety report (FISP) filing confirmation"],
-    recommended: ["Inspection photos", "Repair documentation", "Scaffold/sidewalk-shed permits if applicable"],
-  },
-  ll33: {
-    required: ["Photo of the posted energy label near a public entrance"],
-    recommended: ["ENERGY STAR score record (from LL84)"],
-  },
-  ll152: {
-    required: ["Gas piping inspection report (GPS1)", "Licensed Master Plumber certification", "DOB submission confirmation"],
-    recommended: ["Correction documentation (GPS2) if repairs were required"],
-  },
-  ll96: {
-    // PACE is an opportunity, not an obligation — no proof is mandated.
-    required: [],
-    recommended: ["PACE financing application", "Lender term sheet"],
-  },
-  ll55: {
-    // No DOB filing exists; enforcement is HPD violations, so nothing is required.
-    required: [],
-    recommended: ["Annual unit inspection records", "Remediation records", "Tenant allergen notice with lease"],
   },
 };
 

@@ -8,6 +8,7 @@ import {
   type Article321Assessment,
   type RetrofitAssessment,
 } from "../../engine/src/retrofit.ts";
+import { assessBuildingSystems } from "./buildingSystems.ts";
 import { toEngineInput } from "./engineBridge.ts";
 import { assessObligations, type Obligation } from "./obligations.ts";
 import { categorizeBuilding } from "./category.ts";
@@ -16,6 +17,7 @@ import {
   proceduralPenaltySavings,
   type CompliancePlan,
 } from "./compliancePlan.ts";
+import { personalizeMeasures } from "./personalizedMeasures.ts";
 import { planRetrofit, type MeasureExclusion } from "./retrofit.ts";
 import { retrieveLawChunks } from "./ask.ts";
 import { lookupBuilding as realLookupBuilding } from "./lookup.ts";
@@ -159,8 +161,12 @@ interface Assessment {
 }
 
 function assessBuilding(facts: BuildingFacts): Assessment {
-  const compliancePlan = buildCompliancePlan(facts);
-  const obligations = assessObligations(facts).obligations;
+  const asOf = new Date();
+  const systems = assessBuildingSystems(facts, asOf);
+  const personalized = personalizeMeasures(facts, systems, asOf);
+
+  const compliancePlan = buildCompliancePlan(facts, { asOf, systems });
+  const obligations = assessObligations(facts, { asOf }).obligations;
   const { input, missing } = toEngineInput(facts);
 
   if (!input) {
@@ -175,12 +181,12 @@ function assessBuilding(facts: BuildingFacts): Assessment {
       retrofitFindings: [],
       note:
         `Fine projections unavailable: the city has no ${missing.join(", ")} ` +
-        "for this building (usually a missing LL84 filing — emissions and " +
+        "for this building (usually a missing benchmarking filing - emissions and " +
         "use splits are unknown). The facts above are still sourced.",
     };
   }
 
-  const plan = planRetrofit(facts, {
+  const plan = planRetrofit(facts, personalized, {
     proceduralPenaltySavingsByLaw: proceduralPenaltySavings(obligations),
   });
 

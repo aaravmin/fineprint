@@ -1,6 +1,8 @@
 import { describe, expect, test } from "vitest";
 import { planRetrofit } from "../src/retrofit.ts";
-import type { BuildingFacts, InfrastructureProfile } from "../src/types.ts";
+import { emptyPublicRecords } from "../src/lookup.ts";
+import type { PersonalizedMeasure } from "../src/personalizedMeasures.ts";
+import type { BuildingFacts, InfrastructureProfile, SystemKey } from "../src/types.ts";
 
 const baseProfile: InfrastructureProfile = {
   hasLl84Filing: true,
@@ -31,63 +33,136 @@ const gasOffice: BuildingFacts = {
   plutoCharacteristics: null,
   infrastructureProfile: baseProfile,
   openViolations: [],
+  ll84FuelUse: [],
+  publicRecords: emptyPublicRecords(),
   provenance: [],
 };
 
+function measure(overrides: Partial<PersonalizedMeasure> = {}): PersonalizedMeasure {
+  return {
+    id: "hvac_controls",
+    name: "BMS scheduling and controls optimization",
+    targetSystem: "heating_plant" as SystemKey,
+    applicability: "recommended",
+    applicabilityReason: "The heating plant is aging.",
+    estReductionTco2e: 200,
+    effectiveReductionFraction: 0.06,
+    capexUsd: 100_000,
+    capexBasis: "engine editorial $1.00/sqft.",
+    costPerTco2eAvoided: 31.25,
+    why: "The heating plant is aging. A control upgrade trims its runtime.",
+    evidence: [],
+    ...overrides,
+  };
+}
+
+// planRetrofit now takes the building's personalized measures and turns the
+// applicable ones into the engine's vocabulary. These tests pin that contract
+// directly; personalizedMeasures.test.ts covers how the measures are personalized.
 describe("planRetrofit", () => {
-  test("a gas building with bad boilers keeps every measure and cites the boilers", () => {
-    const plan = planRetrofit(gasOffice);
+  test("only recommended and applicable measures reach the optimizer", () => {
+    const personalized = [
+      measure({ id: "hvac_controls", applicability: "recommended" }),
+      measure({ id: "led_lighting", applicability: "applicable", targetSystem: "lighting" }),
+      measure({ id: "air_sealing", applicability: "applicable", targetSystem: "envelope" }),
+    ];
+
+    const plan = planRetrofit(gasOffice, personalized);
 
     expect(plan).not.toBeNull();
+    // Three usable measures on the table -> 2^3 subsets enumerated.
+    expect(plan!.assessment.evaluatedSubsets).toBe(8);
     expect(plan!.excluded).toHaveLength(0);
-    expect(plan!.assessment.evaluatedSubsets).toBe(128); // all 7 measures on the table
+  });
+
+  test("already-done and not-applicable measures become exclusions, not engine inputs", () => {
+    const personalized = [
+      measure({ id: "hvac_controls", applicability: "recommended" }),
+      measure({
+        id: "solar_pv",
+        applicability: "already_done",
+        targetSystem: "solar_pv",
+        applicabilityReason: "Rooftop solar is already on record (2019).",
+        estReductionTco2e: null,
+        effectiveReductionFraction: null,
+      }),
+      measure({
+        id: "steam_distribution_improvements",
+        applicability: "not_applicable",
+        applicabilityReason: "No steam distribution is on record.",
+        estReductionTco2e: null,
+        effectiveReductionFraction: null,
+      }),
+    ];
+
+    const plan = planRetrofit(gasOffice, personalized);
+
+    // Only hvac_controls is usable -> 2^1 subsets.
+    expect(plan!.assessment.evaluatedSubsets).toBe(2);
+    expect(plan!.excluded.map(exclusion => exclusion.id)).toEqual([
+      "solar_pv",
+      "steam_distribution_improvements",
+    ]);
+    expect(plan!.excluded[0].reason).toMatch(/already on record/i);
+  });
+
+  test("the plan carries the full personalized catalog for the persisted story", () => {
+    const personalized = [
+      measure({ id: "hvac_controls", applicability: "recommended" }),
+      measure({ id: "solar_pv", applicability: "already_done", targetSystem: "solar_pv" }),
+    ];
+
+    const plan = planRetrofit(gasOffice, personalized);
+
+    expect(plan!.measures).toHaveLength(2);
+    expect(plan!.measures.map(m => m.id)).toContain("solar_pv");
+  });
+
+  test("findings still narrate the equipment from the infrastructure profile", () => {
+    const plan = planRetrofit(gasOffice, [measure()]);
+
     expect(plan!.findings.some(finding => /boiler/i.test(finding))).toBe(true);
     expect(plan!.findings.some(finding => /defects on record/i.test(finding))).toBe(true);
   });
 
-  test("an existing solar array drops the rooftop PV measure", () => {
-    const withSolar: BuildingFacts = {
-      ...gasOffice,
-      infrastructureProfile: { ...baseProfile, hasPV: true },
-    };
-
-    const plan = planRetrofit(withSolar);
-
-    expect(plan!.pathway).toBe("standard");
-    if (plan!.pathway !== "standard") return;
-
-    expect(plan!.excluded.map(measure => measure.id)).toContain("solar_pv");
-    expect(plan!.assessment.evaluatedSubsets).toBe(64); // 6 measures left
-    expect(plan!.assessment.macc.map(point => point.measureId)).not.toContain("solar_pv");
-  });
-
-  test("an all-electric building drops the electrification measure", () => {
-    const allElectric: BuildingFacts = {
-      ...gasOffice,
-      infrastructureProfile: {
-        ...baseProfile,
-        heatingFuel: "electricity",
-        fuelTypes: ["electricity"],
-        boilerCount: 0,
-        boilerCondition: null,
-      },
-    };
-
-    const plan = planRetrofit(allElectric);
-    const excludedIds = plan!.excluded.map(measure => measure.id);
-
-    expect(excludedIds).toContain("full_electrification");
-    expect(plan!.assessment.evaluatedSubsets).toBe(64); // 6 measures left
-  });
-
-  test("no infrastructure profile means no tailoring — the full catalog runs", () => {
+  test("no infrastructure profile means no equipment findings", () => {
     const noProfile: BuildingFacts = { ...gasOffice, infrastructureProfile: null };
 
-    const plan = planRetrofit(noProfile);
+    const plan = planRetrofit(noProfile, [measure()]);
 
-    expect(plan!.excluded).toHaveLength(0);
     expect(plan!.findings).toHaveLength(0);
-    expect(plan!.assessment.evaluatedSubsets).toBe(128);
+  });
+
+  test("a measure with no reduction to offer is left out of the optimizer", () => {
+    const personalized = [
+      measure({ id: "hvac_controls", applicability: "recommended" }),
+      measure({
+        id: "windows",
+        applicability: "applicable",
+        targetSystem: "envelope",
+        estReductionTco2e: null,
+        effectiveReductionFraction: null,
+      }),
+    ];
+
+    const plan = planRetrofit(gasOffice, personalized);
+
+    // windows has nothing to reduce, so only hvac_controls is enumerated.
+    expect(plan!.assessment.evaluatedSubsets).toBe(2);
+    expect(plan!.excluded).toHaveLength(0);
+  });
+
+  test("a fat live catalog is truncated to the engine's enumeration cap", () => {
+    // The catalog can carry more usable measures than the engine can enumerate;
+    // the bridge ranks by reduction and truncates to twelve, so the optimizer
+    // never sees more than 2^12 subsets no matter how many measures are live.
+    const many = Array.from({ length: 18 }, (_, index) =>
+      measure({ id: `measure_${index}`, estReductionTco2e: 100 + index }),
+    );
+
+    const plan = planRetrofit(gasOffice, many);
+
+    expect(plan!.assessment.evaluatedSubsets).toBe(2 ** 12);
   });
 
   test("a building the engine can't price has no retrofit plan", () => {
@@ -97,6 +172,6 @@ describe("planRetrofit", () => {
       occupancyGroups: [],
     };
 
-    expect(planRetrofit(unpriceable)).toBeNull();
+    expect(planRetrofit(unpriceable, [measure()])).toBeNull();
   });
 });

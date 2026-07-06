@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { computeFine } from "../../engine/src/index.ts";
 import { toEngineInput } from "../src/engineBridge.ts";
+import { emptyPublicRecords } from "../src/lookup.ts";
 import type { BuildingFacts } from "../src/types.ts";
 
 // The single conversion point between the data layer's BuildingFacts and
@@ -17,6 +18,8 @@ const completeFacts: BuildingFacts = {
   isArticle321: false,
   plutoCharacteristics: null,
   openViolations: [],
+  ll84FuelUse: [],
+  publicRecords: emptyPublicRecords(),
   provenance: [],
 };
 

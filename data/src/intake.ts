@@ -5,6 +5,9 @@
 
 import { computeFine } from "../../engine/src/index.ts";
 import { applicableLaws, LAWS } from "../laws.ts";
+import { assessBuildingSystems } from "./buildingSystems.ts";
+import { assessSystemDeadlines } from "./systemDeadlines.ts";
+import type { UserOverrides } from "./overrides.ts";
 import { buildCompliancePlan } from "./compliancePlan.ts";
 import { assessObligations } from "./obligations.ts";
 import { getCblEntry as realGetCblEntry, type CblEntry } from "./coveredBuildings.ts";
@@ -36,6 +39,13 @@ export interface IntakeResult {
     provenanceJson: string;
     ll97AnnualFineUsd: number | undefined;
     compliancePlanJson: string;
+    // The building's systems dossier (assessBuildingSystems), serialized. Rides
+    // in alongside the compliance plan so the module can persist it without
+    // importing the data layer, and the dashboard can render the per-system view.
+    systemsJson: string;
+    // Inspection-driven "act-by" deadlines (assessSystemDeadlines), serialized.
+    // Same asOf as the dossier, so their status is consistent with it.
+    systemDeadlinesJson: string;
     numFloors: number | undefined;
     unitsResidential: number | undefined;
     communityDistrict: number | undefined;
@@ -47,18 +57,25 @@ export interface IntakeResult {
 export async function prepareIntake(
   address: string,
   deps: IntakeDeps = realDeps,
+  overrides?: UserOverrides,
 ): Promise<IntakeResult> {
+  // One clock for the whole intake: the systems dossier, obligations, and
+  // compliance plan all date their recency judgments from the same instant, so
+  // the persisted artifacts are internally consistent.
+  const asOf = new Date();
   const facts = await deps.lookupBuilding(address);
   const cbl = deps.getCblEntry(facts.bbl);
 
+  const systems = assessBuildingSystems(facts, asOf, overrides);
+  const systemDeadlines = assessSystemDeadlines(facts, asOf);
+
   // Coverage and the compliance plan must come from the same brain — the
-  // LAW_ANALYZERS in obligations.ts — or the dashboard shows a plan with laws
-  // that never spawned tickets (the old registry path collapsed a small
-  // residential walk-up to LL152 alone while its plan listed LL55 too). The
-  // CBL stays authoritative for the one thing it decides best, the LL97
-  // performance pathway; the registry's sqft thresholds remain the pathway
-  // fallback when the building has no CBL row. With no floor area known, no
-  // PLUTO row, and no CBL row, we know nothing — claim nothing.
+  // LAW_ANALYZERS in obligations.ts - or the dashboard shows a plan that
+  // disagrees with the tickets it spawned. The CBL stays authoritative for the
+  // one thing it decides best, the LL97 performance pathway; the registry's
+  // sqft thresholds remain the pathway fallback when the building has no CBL
+  // row. With no floor area known, no PLUTO row, and no CBL row, we know
+  // nothing - claim nothing.
   const knownSqft = facts.grossFloorAreaSqft ?? 0;
   const knowsAnything =
     knownSqft > 0 || facts.plutoCharacteristics !== null || cbl !== null;
@@ -78,7 +95,7 @@ export async function prepareIntake(
     : sizeApplicableLawIds.filter(id => id === "ll97" || id === "art321");
 
   const analyzerLawIds = knowsAnything
-    ? assessObligations(facts)
+    ? assessObligations(facts, { asOf })
         .obligations.map(obligation => obligation.lawId)
         .filter(id => id !== "ll97" && id !== "art321")
     : [];
@@ -98,7 +115,7 @@ export async function prepareIntake(
     ? Math.round(computeFine(engineInput, "2024-2029").annualFineUsd)
     : undefined;
 
-  const compliancePlan = buildCompliancePlan(facts);
+  const compliancePlan = buildCompliancePlan(facts, { asOf, systems });
 
   return {
     facts,
@@ -114,6 +131,8 @@ export async function prepareIntake(
       provenanceJson: JSON.stringify(facts.provenance),
       ll97AnnualFineUsd,
       compliancePlanJson: JSON.stringify(compliancePlan),
+      systemsJson: JSON.stringify(systems),
+      systemDeadlinesJson: JSON.stringify(systemDeadlines),
       numFloors: facts.plutoCharacteristics?.numFloors ?? undefined,
       unitsResidential: facts.plutoCharacteristics?.unitsResidential ?? undefined,
       communityDistrict: facts.plutoCharacteristics?.communityDistrict ?? undefined,

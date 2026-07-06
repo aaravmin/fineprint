@@ -35,6 +35,9 @@
   --color-destructive-subtle: var(--destructive-subtle);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-subtle: var(--warning-subtle);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -78,12 +81,15 @@ These serve as the fallback; there is no separate default.css file. */
   --destructive-subtle: #fcebe8; /* signal-red wash (badges) */
   --success: #15a34a; /* compliant / positive */
   --success-foreground: #ffffff;
+  --warning: #d97706; /* due soon / caution (amber, distinct from signal red) */
+  --warning-foreground: #ffffff;
+  --warning-subtle: #fdf1e3; /* amber wash (badges) */
   --border: #e7e3db;
   --input: #e7e3db;
   --ring: #141414;
-  --chart-1: #e5342b; /* signal red — primary series (the fine cliff) */
+  --chart-1: #e5342b; /* signal red - primary series (the fine cliff) */
   --chart-2: #141414; /* ink */
-  --chart-3: #15a34a; /* green — positive */
+  --chart-3: #15a34a; /* green - positive */
   --chart-4: #8a857e; /* faint */
   --chart-5: #c9c3b8; /* light warm gray */
   --sidebar: #faf9f6;
@@ -124,6 +130,9 @@ These serve as the fallback; there is no separate default.css file. */
   --destructive-subtle: oklch(0.28 0.06 26);
   --success: oklch(0.72 0.17 152);
   --success-foreground: oklch(0.2 0.05 152);
+  --warning: oklch(0.75 0.15 65);
+  --warning-foreground: oklch(0.2 0.05 65);
+  --warning-subtle: oklch(0.3 0.05 65);
   --border: oklch(0.95 0.01 85 / 12%);
   --input: oklch(0.95 0.01 85 / 16%);
   --ring: oklch(0.71 0.012 85);
@@ -361,5 +370,16 @@ html {
   [data-slot="card"] {
     border: none !important;
     box-shadow: none !important;
+  }
+
+  /* Deliverables print as their own clean document: keep each section, table, and
+     row from splitting across pages. Not nested under .compliance-report, so they
+     never inherit its section numbering. */
+  .deliverable-doc section,
+  .deliverable-doc table,
+  .deliverable-doc tr,
+  .deliverable-doc dl {
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
 }

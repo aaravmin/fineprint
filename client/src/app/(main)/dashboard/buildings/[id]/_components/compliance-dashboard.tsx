@@ -1,449 +1,353 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import type { ReactNode } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-import { Download, Flame, Leaf, Printer, Ruler } from "lucide-react";
-import { useTable } from "spacetimedb/react";
+import Link from "next/link";
 
+import { ArrowLeft, Download, Flame, Leaf, Printer, Ruler, Star } from "lucide-react";
+import { useTasks } from "@/lib/data/hooks";
+
+import { DaysLeftPill } from "@/components/dashboard/DaysLeftPill";
+import { InfoHint } from "@/components/dashboard/InfoHint";
+import { Meter } from "@/components/dashboard/Meter";
+import { SectionCard } from "@/components/dashboard/SectionCard";
+import { StatTile } from "@/components/dashboard/StatTile";
+import { StatusPill } from "@/components/dashboard/StatusPill";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { type CompliancePlan, dedash, parseBuildingSystems, parseCompliancePlan } from "@/lib/compliance/plan";
 import {
   computeFundedPlan,
   computePeriods,
   computeRetrofit,
-  fmtTco2e,
-  fmtUsd,
-  measureFullCosts,
+  DEFAULT_MEASURES,
   type FineResult,
+  fmtTco2e,
+  measureFullCosts,
+  personalizedEngineMeasures,
+  type RetrofitAssessment,
+  type RetrofitMeasure,
 } from "@/lib/engine";
-import {
-  buildComplianceCsv,
-  downloadCsv,
-  slugForBuilding,
-  type LawExposureRow,
-} from "@/lib/export-compliance";
-import { LAW_REGISTRY, lawsInOrder } from "@/lib/laws/lawRegistry";
-import { projectionFor } from "@/lib/law-projections";
-import { tables } from "@/module_bindings/index";
-import type { Building } from "@/module_bindings/types";
+import { buildComplianceCsv, downloadCsv, type LawExposureRow, slugForBuilding } from "@/lib/export-compliance";
+import { capSeverity, compactUsd, formatShortDate } from "@/lib/format";
+import { LAW_REGISTRY } from "@/lib/laws/lawRegistry";
+import type { Building } from "@/lib/data/types";
 
-import { ComplianceBinder } from "@/components/compliance/ComplianceBinder";
-import { ComplianceReport } from "@/components/dashboard/ComplianceReport";
-
-import { ComplianceSection } from "./compliance-section";
+import { BuildingDocuments, type OpenDoc } from "./building-documents";
+import { BuildingSystems } from "./building-systems";
+import { CompliancePlanPanel } from "./compliance-plan-panel";
 import { FineTimeline } from "./fine-timeline";
-import { InvestmentPlanner } from "./investment-planner";
-import { LawPanel } from "./law-panel";
+import { RetrofitPlan } from "./retrofit-plan";
 
-// A scope is "all" or any registry law_id. Tabs and tracked scopes are derived
-// from the canonical registry, so a new law shows up here automatically.
-type LawScope = string;
+const TERMINAL_TASK_STATUSES = new Set(["done", "rejected"]);
 
-// Article 321 rides inside the LL97 tab (same emissions pathway), so it gets no
-// pill of its own here. Every other registry law is a focused tab.
-const LAW_TABS: { id: LawScope; label: string }[] = [
-  { id: "all", label: "All laws" },
-  ...lawsInOrder()
-    .filter(law => law.law_id !== "art321")
-    .map(law => ({ id: law.law_id, label: law.short_name })),
-];
+// The optimizer's pick, fully funded, as a per-measure funding split across the
+// building's fundable measures. Every applicable measure is fundable now (see
+// engineMeasures below), so there is no visibility gate. This is both the
+// planner's default and its reset target.
+function optimizerFunding(
+  building: Building,
+  assessment: RetrofitAssessment | null,
+  measures: RetrofitMeasure[],
+): Record<string, number> {
+  if (!assessment) {
+    return {};
+  }
 
-// LL97 has its own emissions-and-fines view; every other registry law (besides
-// the art321 pathway folded into LL97) is a filing/inspection tracked on its tab.
-const TRACKED_SCOPES = new Set<LawScope>(
-  lawsInOrder()
-    .filter(law => law.law_id !== "ll97" && law.law_id !== "art321")
-    .map(law => law.law_id),
-);
+  const picks = new Set(assessment.best.measureIds);
+  const costs = measureFullCosts(building, measures);
+  return Object.fromEntries(
+    Object.entries(costs).map(([id, cost]) => [id, picks.has(id) ? cost : 0]),
+  );
+}
 
-// The whole building compliance view, behind a law toggle, reused by both the
-// single-building page and the Buildings selector. Funding state lives here so
-// the chart, the planner, and the export all read one set of numbers.
+// The whole building compliance view: everything glanceable on one screen, with
+// the wordy report and binder collapsed into Documents. Funding state lives here
+// so the fine projection, the retrofit planner, and the CSV export read one set
+// of numbers.
 export function ComplianceDashboard({ building }: { building: Building }) {
-  const [tasks] = useTable(tables.task);
-  const [scope, setScope] = useState<LawScope>("all");
+  const tasks = useTasks();
 
   const periods = useMemo(() => computePeriods(building), [building]);
-  const assessment = useMemo(() => computeRetrofit(building), [building]);
+  const plan = useMemo(() => parseCompliancePlan(building.compliancePlanJson), [building]);
+  const systems = useMemo(
+    () => parseBuildingSystems(building.systemsJson) ?? plan?.personalization?.systems ?? null,
+    [building, plan],
+  );
 
-  // Default the planner to the optimizer's pick, fully funded.
-  const [funding, setFunding] = useState<Record<string, number>>(() => {
-    if (!assessment) return {};
-    const picks = new Set(assessment.best.measureIds);
-    const costs = measureFullCosts(building);
-    return Object.fromEntries(
-      Object.entries(costs).map(([id, cost]) => [id, picks.has(id) ? cost : 0]),
-    );
+  // The ROI sliders run on the building's personalized measures (categorized,
+  // every applicable one fundable); the generic catalog is the no-plan fallback.
+  const engineMeasures = useMemo(() => {
+    const personalized = plan?.personalization?.measures ?? [];
+    return personalized.length > 0 ? personalizedEngineMeasures(building, personalized) : DEFAULT_MEASURES;
+  }, [building, plan]);
+
+  const assessment = useMemo(() => computeRetrofit(building, engineMeasures), [building, engineMeasures]);
+
+  const [funding, setFunding] = useState<Record<string, number>>(() =>
+    optimizerFunding(building, assessment, engineMeasures),
+  );
+  const fundedPlan = useMemo(
+    () => computeFundedPlan(building, funding, engineMeasures),
+    [building, funding, engineMeasures],
+  );
+  const finesAvoidedUsd =
+    fundedPlan && assessment ? Math.max(0, assessment.doNothing.horizonFinesUsd - fundedPlan.horizonFinesUsd) : null;
+
+  const [openDoc, setOpenDoc] = useState<OpenDoc>(null);
+  const [printRequested, setPrintRequested] = useState(false);
+
+  // Printing needs the report mounted first; open it, then print once it renders.
+  useEffect(() => {
+    if (printRequested && openDoc === "report") {
+      setPrintRequested(false);
+      window.print();
+    }
+  }, [printRequested, openDoc]);
+
+  const printReport = () => {
+    if (openDoc === "report") {
+      window.print();
+      return;
+    }
+    setOpenDoc("report");
+    setPrintRequested(true);
+  };
+
+  const buildingTasks = tasks.filter((task) => task.buildingId === building.id);
+  const now = Date.now();
+
+  const lawRows: LawExposureRow[] = LAW_REGISTRY.filter((law) => law.law_id !== "art321").map((law) => {
+    const task = buildingTasks.find((candidate) => candidate.lawId === law.law_id);
+    const overdue = task ? task.slaBreached || task.deadline.toDate().getTime() < now : false;
+    return {
+      short: law.short_name,
+      name: law.display_name,
+      status: task?.status ?? "missing",
+      exposureUsd: task?.fineEstimateUsd,
+      overdue,
+    };
   });
 
-  const fundedPlan = useMemo(
-    () => computeFundedPlan(building, funding),
-    [building, funding],
-  );
-
-  const buildingTasks = tasks.filter(task => task.buildingId === building.id);
-  const now = Date.now();
-  const lawRows: LawExposureRow[] = LAW_REGISTRY.filter(
-    law => law.law_id !== "art321" && law.law_id !== "ll96",
-  ).map(
-    law => {
-      const task = buildingTasks.find(candidate => candidate.lawId === law.law_id);
-      const overdue = task
-        ? task.slaBreached || task.deadline.toDate().getTime() < now
-        : false;
-      return {
-        short: law.short_name,
-        name: law.display_name,
-        status: task?.status ?? "missing",
-        exposureUsd: task?.fineEstimateUsd,
-        overdue,
-      };
-    },
-  );
+  const activeTasks = buildingTasks.filter((task) => !TERMINAL_TASK_STATUSES.has(task.status));
+  const nextDeadline =
+    activeTasks.length > 0 ? new Date(Math.min(...activeTasks.map((task) => task.deadline.toDate().getTime()))) : null;
 
   const exportCsv = () => {
     const csv = buildComplianceCsv(building, fundedPlan, lawRows);
     downloadCsv(`fineprint-${slugForBuilding(building)}.csv`, csv);
   };
 
-  return (
-    <div className="@container/main flex flex-col gap-4 md:gap-6">
-      <BuildingHeader building={building} />
+  const fineMessage =
+    plan?.fineData?.message && plan.fineData.message.length > 0 ? dedash(plan.fineData.message) : null;
 
-      <div className="flex flex-wrap items-center justify-between gap-3 print-hide">
-        <div className="flex flex-wrap gap-1.5">
-          {LAW_TABS.map(tab => (
-            <Button
-              key={tab.id}
-              type="button"
-              size="sm"
-              variant={scope === tab.id ? "default" : "outline"}
-              onClick={() => setScope(tab.id)}
-            >
-              {tab.label}
-            </Button>
-          ))}
+  return (
+    <div className="@container/main flex flex-col gap-6">
+      <div className="flex flex-col gap-6 print-hide">
+        <BuildingHeader building={building} onExportCsv={exportCsv} onPrint={printReport} />
+
+        <StatTiles periods={periods} nextDeadline={nextDeadline} />
+
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_360px]">
+          <FineProjectionCard results={fundedPlan?.results ?? null} message={fineMessage} />
+          <CompliancePlanPanel plan={plan} fallbackRows={lawRows} />
         </div>
-        <div className="flex gap-2">
-          <Button type="button" variant="outline" size="sm" onClick={exportCsv}>
-            <Download className="mr-1 size-3.5" /> CSV
-          </Button>
-          <Button type="button" variant="outline" size="sm" onClick={() => window.print()}>
-            <Printer className="mr-1 size-3.5" /> Print / PDF
-          </Button>
-        </div>
+
+        <BuildingSystems systems={systems} />
+
+        <RetrofitPlan
+          personalizedMeasures={plan?.personalization?.measures ?? []}
+          fundedPlan={fundedPlan}
+          finesAvoidedUsd={finesAvoidedUsd}
+          funding={funding}
+          onFundingChange={setFunding}
+          onResetOptimizer={
+            assessment ? () => setFunding(optimizerFunding(building, assessment, engineMeasures)) : undefined
+          }
+        />
       </div>
 
-      {scope === "all" && (
-        <>
-          {/* The consolidated compliance report (snapshot, per-law findings,
-              recommendations, action plan, sources) is the to-the-point
-              overview; the binder is the proof/evidence record. Per-law detail
-              and the obligation ledger live on each law's own tab. */}
-          <ComplianceReport building={building} assessment={assessment} />
-          <ComplianceBinder building={building} />
-        </>
-      )}
-
-      {scope === "ll97" &&
-        (periods && fundedPlan && assessment ? (
-          <>
-            <Card>
-              <CardHeader>
-                <CardTitle>Fine projection</CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  LL97 fines through 2039 at the funding below — move the planner to watch
-                  them fall.
-                </p>
-              </CardHeader>
-              <CardContent>
-                <FineTimeline periods={fundedPlan.results} />
-              </CardContent>
-            </Card>
-
-            <PlainEnglishCard periods={periods} address={building.address} />
-
-            <InvestmentPlanner
-              building={building}
-              plan={fundedPlan}
-              assessment={assessment}
-              funding={funding}
-              onFundingChange={setFunding}
-            />
-          </>
-        ) : (
-          <Card>
-            <CardContent className="py-8 text-center text-sm text-muted-foreground">
-              No energy data yet. Run the ingest pipeline to pull real LL84 data and unlock
-              the LL97 projection.
-            </CardContent>
-          </Card>
-        ))}
-
-      {TRACKED_SCOPES.has(scope) &&
-        (() => {
-          const law = LAW_REGISTRY.find(entry => entry.law_id === scope);
-          const projection = projectionFor(scope);
-          const task = buildingTasks.find(candidate => candidate.lawId === scope);
-
-          return (
-            <>
-              {scope === "ll33" && <EnergyGradeCard score={building.energyStarScore} />}
-              {law && projection && (
-                <LawPanel lawName={law.display_name} projection={projection} task={task} />
-              )}
-              {scope !== "ll96" && (
-                <ComplianceSection buildingId={building.id} onlyLawId={scope} />
-              )}
-            </>
-          );
-        })()}
+      <BuildingDocuments
+        building={building}
+        assessment={assessment}
+        openDoc={openDoc}
+        onOpenChange={setOpenDoc}
+        onPrintReport={printReport}
+      />
     </div>
   );
 }
 
-// The LL33 letter grade for an ENERGY STAR score, per the statutory LL33/LL95
-// bands (Admin Code 28-309.12.2). Mirrors energyGradeForScore in
-// spacetimedb/src/laws.ts. undefined means the building has no score on file.
-function energyGradeFor(score: number | undefined): { grade: string; tone: string } {
-  if (score === undefined) {
-    return { grade: "N", tone: "text-muted-foreground" };
-  }
-  if (score >= 85) return { grade: "A", tone: "text-success" };
-  if (score >= 70) return { grade: "B", tone: "text-success" };
-  if (score >= 55) return { grade: "C", tone: "text-amber-500" };
-  if (score >= 20) return { grade: "D", tone: "text-destructive" };
-  return { grade: "F", tone: "text-destructive" };
-}
-
-// The building's posted LL33 grade, read straight from its latest LL84 ENERGY
-// STAR score. An unscored building posts an "N" until a benchmarking score is
-// on file.
-function EnergyGradeCard({ score }: { score: number | undefined }) {
-  const { grade, tone } = energyGradeFor(score);
+function BuildingHeader({
+  building,
+  onExportCsv,
+  onPrint,
+}: {
+  building: Building;
+  onExportCsv: () => void;
+  onPrint: () => void;
+}) {
+  const uses: Array<{ group: string; sqft: number }> = building.usesJson ? JSON.parse(building.usesJson) : [];
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Energy grade</CardTitle>
-        <p className="text-sm text-muted-foreground">
-          The letter grade this building must post near every public entrance, set by its
-          latest LL84 ENERGY STAR score.
-        </p>
-      </CardHeader>
-      <CardContent>
-        <div className="flex items-center gap-4">
-          <span className={`text-6xl font-bold tabular-nums ${tone}`}>{grade}</span>
-          <div className="text-sm text-muted-foreground">
-            {score === undefined ? (
-              <p>
-                No ENERGY STAR score on file yet — the grade is{" "}
-                <span className="font-medium">N</span> until a benchmarking score is
-                reported.
-              </p>
-            ) : (
-              <p>
-                ENERGY STAR score{" "}
-                <span className="font-medium text-foreground tabular-nums">{score}</span> out
-                of 100.
-              </p>
-            )}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
+    <div className="flex flex-col gap-3">
+      <Link
+        href="/dashboard/buildings"
+        className="inline-flex w-fit items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+      >
+        <ArrowLeft className="size-3.5" /> Buildings
+      </Link>
 
-function BuildingHeader({ building }: { building: Building }) {
-  const uses: Array<{ group: string; sqft: number }> = building.usesJson
-    ? JSON.parse(building.usesJson)
-    : [];
-
-  const ll97Status =
-    building.ll97Covered === true
-      ? building.isAffordable
-        ? "Article 321"
-        : "LL97 Covered"
-      : building.ll97Covered === false
-        ? "LL97 Exempt"
-        : "LL97 Unknown";
-
-  return (
-    <Card>
-      <CardHeader>
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <CardTitle className="text-xl">{building.address}</CardTitle>
-            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
-              {building.bbl && <span className="font-mono text-xs">BBL {building.bbl}</span>}
-              <span className="inline-flex items-center gap-1">
-                <Ruler className="size-3.5" />
-                {building.sqft.toLocaleString()} sqft
-              </span>
-            </div>
-            {uses.length > 0 && (
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {uses.map(use => (
-                  <Badge key={use.group} variant="outline" className="text-xs">
-                    {use.group} / {use.sqft.toLocaleString()} sqft
-                  </Badge>
-                ))}
-              </div>
-            )}
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Badge variant={building.ll97Covered ? "destructive" : "secondary"}>
-              <Flame className="mr-1 size-3" />
-              {ll97Status}
-            </Badge>
-            {building.annualEmissionsTco2E !== undefined && (
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h1 className="font-heading text-2xl font-bold tracking-tight">{building.address}</h1>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <Ll97Badge building={building} />
+            {building.annualEmissionsTco2E !== undefined ? (
               <Badge variant="outline">
                 <Leaf className="mr-1 size-3" />
                 {fmtTco2e(building.annualEmissionsTco2E)}/yr
               </Badge>
-            )}
+            ) : null}
+            {building.energyStarScore !== undefined ? (
+              <Badge variant="outline">
+                <Star className="mr-1 size-3" />
+                Energy Star {building.energyStarScore}
+              </Badge>
+            ) : null}
+            {building.bbl ? <span className="font-mono text-xs text-muted-foreground">BBL {building.bbl}</span> : null}
+            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+              <Ruler className="size-3.5" />
+              {building.sqft.toLocaleString()} sqft
+            </span>
+            {uses.map((use) => (
+              <Badge key={use.group} variant="outline" className="text-xs">
+                {use.group} / {use.sqft.toLocaleString()} sqft
+              </Badge>
+            ))}
           </div>
         </div>
-      </CardHeader>
-    </Card>
+
+        <div className="flex shrink-0 gap-2">
+          <Button type="button" variant="outline" size="sm" onClick={onExportCsv}>
+            <Download className="mr-1 size-3.5" /> Export CSV
+          </Button>
+          <Button type="button" variant="outline" size="sm" onClick={onPrint}>
+            <Printer className="mr-1 size-3.5" /> Print
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 }
 
-function PlainEnglishCard({
-  periods,
-  address,
-}: {
-  periods: FineResult[];
-  address: string;
-}) {
-  const current = periods[0];
-  const p2030 = periods[1];
-  const p2035 = periods[2];
-  const isArticle321 = current.pathway === "article321";
-  const cliffRatio =
-    current.annualFineUsd > 0
-      ? (p2030.annualFineUsd / current.annualFineUsd).toFixed(1)
-      : null;
+function Ll97Badge({ building }: { building: Building }): ReactNode {
+  if (building.ll97Covered === true) {
+    return building.isAffordable ? (
+      <StatusPill tone="warning" icon={<Flame className="size-3" />}>
+        Article 321
+      </StatusPill>
+    ) : (
+      <StatusPill tone="destructive" icon={<Flame className="size-3" />}>
+        LL97 Covered
+      </StatusPill>
+    );
+  }
+  if (building.ll97Covered === false) {
+    return (
+      <Badge variant="secondary">
+        <Flame className="mr-1 size-3" /> LL97 Exempt
+      </Badge>
+    );
+  }
+  return (
+    <StatusPill tone="muted" icon={<Flame className="size-3" />}>
+      LL97 Unknown
+    </StatusPill>
+  );
+}
+
+// A building fractionally over its cap rounds to 0%, but it is still over - show
+// that in destructive, never as green headroom.
+function capHeadroomLabel(overFraction: number | null): ReactNode {
+  if (overFraction === null) {
+    return undefined;
+  }
+
+  const overPercent = Math.round(overFraction * 100);
+  if (overFraction > 0 && overPercent === 0) {
+    return <span className="text-destructive">under 1% over cap</span>;
+  }
+  if (overPercent > 0) {
+    return <span className="text-destructive">{overPercent}% over cap</span>;
+  }
+  return <span className="text-success">{Math.abs(overPercent)}% headroom</span>;
+}
+
+function StatTiles({ periods, nextDeadline }: { periods: FineResult[] | null; nextDeadline: Date | null }) {
+  const fine0 = periods ? periods[0].annualFineUsd : null;
+  const fine1 = periods ? periods[1].annualFineUsd : null;
+  const actual = periods ? periods[0].actualEmissionsTco2e : null;
+  const limit = periods ? periods[0].emissionsLimitTco2e : null;
+  const overFraction = actual !== null && limit !== null && limit > 0 ? actual / limit - 1 : null;
+  const cliffRatio = fine0 !== null && fine0 > 0 && fine1 !== null ? (fine1 / fine0).toFixed(1) : null;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Plain English</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3 text-sm leading-relaxed">
-        {isArticle321 ? (
-          <p>
-            <span className="font-medium">{address}</span> qualifies for the LL97 Article
-            321 affordable housing pathway. It must implement the prescribed energy
-            conservation measures (Admin Code 28-321.2.2) or meet its 2030 target of{" "}
-            <span className="font-medium text-success">
-              {fmtTco2e(current.emissionsLimitTco2e)}
-            </span>{" "}
-            early. Non-compliance draws flat $10,000 penalties — not modeled here.
-          </p>
-        ) : current.compliant ? (
-          <p>
-            <span className="font-medium">{address}</span> is compliant across all three
-            LL97 periods. Its emissions of{" "}
-            <span className="font-medium">{fmtTco2e(current.actualEmissionsTco2e)}</span>{" "}
-            stay below the 2024–2029 cap of{" "}
-            <span className="font-medium text-success">
-              {fmtTco2e(current.emissionsLimitTco2e)}
-            </span>
-            .
-          </p>
-        ) : (
-          <>
-            <p>
-              <span className="font-medium">{address}</span> emits{" "}
-              <span className="font-medium">{fmtTco2e(current.actualEmissionsTco2e)}</span>
-              /year against a 2024–2029 cap of{" "}
-              <span className="font-medium">{fmtTco2e(current.emissionsLimitTco2e)}</span>.
-              The{" "}
-              <span className="font-medium text-destructive">
-                {fmtTco2e(current.overageTco2e)} overage
-              </span>{" "}
-              costs{" "}
-              <span className="font-medium text-destructive">
-                {fmtUsd(current.annualFineUsd)}/year
-              </span>{" "}
-              at $268/tCO₂e.¹
-            </p>
-            {p2030.annualFineUsd > 0 && (
-              <p>
-                In 2030, the cap tightens. With the same emissions, the fine jumps to{" "}
-                <span className="font-medium text-destructive">
-                  {fmtUsd(p2030.annualFineUsd)}/year
-                </span>
-                {cliffRatio && Number(cliffRatio) > 1.1 ? ` — a ${cliffRatio}× increase` : ""}.
-                By 2035 it reaches{" "}
-                <span className="font-medium text-destructive">
-                  {fmtUsd(p2035.annualFineUsd)}/year
-                </span>
-                .
-              </p>
-            )}
-            <p>
-              The fastest path to $0: close the{" "}
-              <span className="font-medium">{fmtTco2e(current.overageTco2e)}</span> gap
-              before 2030 — size it in the LL97 investment planner.
-            </p>
-          </>
-        )}
-
-        <div className="space-y-1 border-t pt-3">
-          <p className="text-xs text-muted-foreground">
-            ¹ 1 RCNY 103-14(h) — penalty at $268/tCO₂e over the building emissions limit.
-          </p>
-          <p className="text-xs text-muted-foreground">
-            ² Admin Code 28-320.3 — building emissions limits by occupancy group.
-          </p>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="grid grid-cols-1 gap-3 @sm/main:grid-cols-2 @3xl/main:grid-cols-4">
+      <StatTile
+        label="Annual fine now"
+        value={fine0 === null ? "-" : compactUsd(fine0)}
+        tone={fine0 === null ? "default" : fine0 > 0 ? "destructive" : "success"}
+        sub="2024-2029 per year"
+      />
+      <StatTile
+        label="2030 annual fine"
+        value={fine1 === null ? "-" : compactUsd(fine1)}
+        tone={fine1 === null ? "default" : fine1 > 0 ? "destructive" : "success"}
+        sub={cliffRatio && Number(cliffRatio) > 1 ? `${cliffRatio}x current` : "2030-2034 per year"}
+      />
+      <StatTile
+        label="Emissions vs cap"
+        value={
+          actual !== null && limit !== null
+            ? `${Math.round(actual).toLocaleString()} / ${Math.round(limit).toLocaleString()} t`
+            : "-"
+        }
+        meter={
+          actual !== null && limit !== null ? (
+            <Meter
+              fraction={limit > 0 ? Math.min(actual / limit, 1) : 0}
+              tone={capSeverity(actual, limit)}
+              ariaLabel="Emissions against cap"
+            />
+          ) : undefined
+        }
+        sub={capHeadroomLabel(overFraction)}
+      />
+      <StatTile
+        label="Next deadline"
+        value={nextDeadline ? formatShortDate(nextDeadline) : "-"}
+        sub={nextDeadline ? <DaysLeftPill date={nextDeadline} /> : undefined}
+      />
+    </div>
   );
 }
 
-interface PlanMeasure {
-  id: string;
-  name: string;
-  capexUsd: number;
-  alsoSatisfies: string[];
+function FineProjectionCard({ results, message }: { results: FineResult[] | null; message: string | null }) {
+  return (
+    <SectionCard
+      title="Fine projection"
+      titleAside={message ? <InfoHint text={message} label="Why these figures" /> : undefined}
+      sub={results ? "At current funding - adjust in the retrofit plan below." : undefined}
+    >
+      {results ? (
+        <FineTimeline periods={results} />
+      ) : (
+        <p className="py-8 text-center text-sm text-muted-foreground">
+          No energy benchmarking on file yet. The LL97 projection unlocks once this building is benchmarked.
+        </p>
+      )}
+    </SectionCard>
+  );
 }
-
-interface PlanDisposition {
-  lawId: string;
-  lawName: string;
-  kind: "performance" | "procedural";
-  status: string;
-  handledBy: string;
-  detail: string;
-}
-
-interface StoredCompliancePlan {
-  pathway: "standard" | "article321" | null;
-  measures: PlanMeasure[];
-  totalCapexUsd: number;
-  dispositions: PlanDisposition[];
-  crossCredits: string[];
-  notes: string[];
-}
-
-const HANDLING_LABEL: Record<string, string> = {
-  retrofit_measures: "Retrofit plan",
-  filing: "File",
-  already_compliant: "Compliant",
-  needs_attention: "Needs attention",
-};
-
-const HANDLING_VARIANT: Record<
-  string,
-  "default" | "secondary" | "destructive" | "outline"
-> = {
-  retrofit_measures: "default",
-  filing: "outline",
-  already_compliant: "secondary",
-  needs_attention: "destructive",
-};

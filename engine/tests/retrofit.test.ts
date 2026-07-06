@@ -111,7 +111,7 @@ describe("optimizeRetrofit", () => {
   });
 
   test("rejects a catalog too large to enumerate", () => {
-    const big = Array.from({ length: 13 }, (_, index) => ({
+    const big = Array.from({ length: 17 }, (_, index) => ({
       id: `m${index}`,
       name: `m${index}`,
       capexUsdPerSqft: 1,

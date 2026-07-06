@@ -5,10 +5,25 @@ export * from "./types.ts";
 export { lookupBbl, lookupBblCandidates } from "./geosearch.ts";
 export { fetchLl84 } from "./ll84.ts";
 export { fetchArticle321Flag, getCblEntry, isLl97Covered } from "./coveredBuildings.ts";
-export { lookupBuilding } from "./lookup.ts";
+export { lookupBuilding, emptyPublicRecords, type LookupSources } from "./lookup.ts";
+export { assessBuildingSystems } from "./buildingSystems.ts";
+export {
+  assessSystemDeadlines,
+  type SystemDeadline,
+  type SystemDeadlineKind,
+  type SystemDeadlineStatus,
+} from "./systemDeadlines.ts";
+export { applyUserOverrides, type OverrideValue, type SystemOverride, type UserOverrides } from "./overrides.ts";
 export { dataToolDefinitions, executeDataTool } from "./tools.ts";
 export { toEngineInput, type EngineInputResult } from "./engineBridge.ts";
 export { planRetrofit, type RetrofitPlan, type MeasureExclusion } from "./retrofit.ts";
+export {
+  personalizeMeasures,
+  measureSatisfiesLaws,
+  PERSONALIZED_CATALOG,
+  type PersonalizedMeasure,
+  type CatalogEntry,
+} from "./personalizedMeasures.ts";
 export {
   buildCompliancePlan,
   explainFineData,
@@ -23,14 +38,6 @@ export {
   type PlanMeasure,
   type Handling,
 } from "./compliancePlan.ts";
-export {
-  ll84FilingStatus,
-  ll87FilingStatus,
-  ll88FilingStatus,
-  ll11FilingStatus,
-  ll152FilingStatus,
-  type FilingStatus,
-} from "./filings.ts";
 export {
   assessObligations,
   LAW_ANALYZERS,

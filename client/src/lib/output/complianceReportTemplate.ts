@@ -12,19 +12,9 @@
 
 import { lawById } from "@/lib/laws/lawRegistry";
 
-import {
-  exportEnvelope,
-  standardCitations,
-  type ExportEnvelope,
-  type SourceCitation,
-} from "./exportEnvelope";
+import { type ExportEnvelope, exportEnvelope, type SourceCitation, standardCitations } from "./exportEnvelope";
 
-export type FindingStatus =
-  | "applies"
-  | "may_apply"
-  | "does_not_apply"
-  | "unknown"
-  | "missing_data";
+export type FindingStatus = "applies" | "may_apply" | "does_not_apply" | "unknown" | "missing_data";
 
 export const STATUS_LABEL: Record<FindingStatus, string> = {
   applies: "Applies",
@@ -166,7 +156,7 @@ function recommendedAction(finding: ReportFindingInput, requirementSteps: string
 // The one-line requirement and a default action come from the registry's
 // description / applicability logic, so the report and the dashboard agree.
 export function buildComplianceReport(inputs: ReportInputs): ComplianceReport {
-  const findings: ReportFinding[] = inputs.findings.map(finding => {
+  const findings: ReportFinding[] = inputs.findings.map((finding) => {
     const law = lawById(finding.lawId);
     const requirement = law?.description ?? finding.lawId;
     const defaultAction =
@@ -192,32 +182,32 @@ export function buildComplianceReport(inputs: ReportInputs): ComplianceReport {
     };
   });
 
-  const applies = findings.filter(f => f.status === "applies");
+  const applies = findings.filter((f) => f.status === "applies");
   const totalExposure = inputs.findings
-    .filter(f => f.status === "applies")
+    .filter((f) => f.status === "applies")
     .reduce((sum, f) => sum + (f.estimatedExposureUsd ?? 0), 0);
   const deadlines = inputs.findings
-    .map(f => f.nextDeadline)
+    .map((f) => f.nextDeadline)
     .filter((d): d is string => !!d)
     .sort();
   const highestRisk = [...applies]
-    .filter(f => f.status === "applies")
+    .filter((f) => f.status === "applies")
     .sort(
       (a, b) =>
-        (inputs.findings.find(x => x.lawId === b.law_id)?.estimatedExposureUsd ?? 0) -
-        (inputs.findings.find(x => x.lawId === a.law_id)?.estimatedExposureUsd ?? 0),
+        (inputs.findings.find((x) => x.lawId === b.law_id)?.estimatedExposureUsd ?? 0) -
+        (inputs.findings.find((x) => x.lawId === a.law_id)?.estimatedExposureUsd ?? 0),
     )
     .slice(0, 3)
-    .map(f => `${f.short}: ${f.estimated_exposure}`);
+    .map((f) => `${f.short}: ${f.estimated_exposure}`);
 
   return {
     ...exportEnvelope({ bbl: inputs.building.bbl, bin: inputs.building.bin }, inputs.generatedAt),
     document_type: "compliance_report",
     building_summary: inputs.building,
     compliance_snapshot: {
-      applicable: applies.map(f => f.short),
-      not_applicable: findings.filter(f => f.status === "does_not_apply").map(f => f.short),
-      missing_data: findings.filter(f => f.status === "missing_data").map(f => f.short),
+      applicable: applies.map((f) => f.short),
+      not_applicable: findings.filter((f) => f.status === "does_not_apply").map((f) => f.short),
+      missing_data: findings.filter((f) => f.status === "missing_data").map((f) => f.short),
       nearest_deadline: deadlines[0] ?? null,
       estimated_annual_exposure_usd: Math.round(totalExposure),
       highest_risk: highestRisk,
@@ -226,17 +216,17 @@ export function buildComplianceReport(inputs: ReportInputs): ComplianceReport {
     recommendations: inputs.recommendations,
     action_plan: {
       immediate: findings
-        .filter(f => f.status === "applies" && f.next_deadline !== null)
-        .map(f => f.recommended_action),
+        .filter((f) => f.status === "applies" && f.next_deadline !== null)
+        .map((f) => f.recommended_action),
       near_term: inputs.recommendations
-        .filter(r => r.priority === "Near-term")
-        .map(r => `${r.measure}: ${r.issueAddressed}`),
+        .filter((r) => r.priority === "Near-term")
+        .map((r) => `${r.measure}: ${r.issueAddressed}`),
       capital_planning: inputs.recommendations
-        .filter(r => r.priority === "Capital planning")
-        .map(r => `${r.measure}: ${r.issueAddressed}`),
+        .filter((r) => r.priority === "Capital planning")
+        .map((r) => `${r.measure}: ${r.issueAddressed}`),
       recurring: findings
-        .filter(f => f.status === "applies" && f.cadence !== null)
-        .map(f => `${f.short}: ${f.cadence}`),
+        .filter((f) => f.status === "applies" && f.cadence !== null)
+        .map((f) => `${f.short}: ${f.cadence}`),
     },
     assumptions_and_limitations: [
       "This report is an owner/property-manager record, not a filed report or a legal determination of compliance.",

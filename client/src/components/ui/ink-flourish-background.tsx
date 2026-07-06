@@ -74,7 +74,7 @@ const LEGALESE = [
   { t: "HEREINAFTER", x: 460, y: 896, r: 3, s: 9 },
   { t: "PURSUANT TO §28-320", x: 1080, y: 198, r: -5, s: 8 },
   { t: "RETROACTIVE LIABILITY", x: 48, y: 350, r: 4, s: 8 },
-  { t: "LL84 BENCHMARKING", x: 1280, y: 798, r: -3, s: 9 },
+  { t: "GOOD FAITH EFFORT", x: 1280, y: 798, r: -3, s: 9 },
   { t: "APPROVED", x: 680, y: 148, r: -14, s: 15 },
 ] as const;
 

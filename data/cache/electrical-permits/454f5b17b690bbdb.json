@@ -1,0 +1,129 @@
+{
+  "key": "https://data.cityofnewyork.us/resource/dm9a-ab7w.json?bin=5107019&%24select=bin%2Cfiling_number%2Cjob_filing_number%2Cjob_description%2Cfiling_status%2Cfiling_date%2Cpermit_issued_date&%24limit=50000&%24offset=0",
+  "recordedAt": "2026-07-06T04:52:04.835Z",
+  "value": [
+    {
+      "bin": "5107019",
+      "filing_number": "I1",
+      "job_filing_number": "S00410588-I1-EL",
+      "job_description": "INSTALLATION OF A 1200AMP 3 PHASE 277480V ELECTRICAL SERVICE",
+      "filing_status": "Complete",
+      "filing_date": "2020-10-08T00:00:00.000",
+      "permit_issued_date": "2020-10-08T00:00:00.000"
+    },
+    {
+      "bin": "5107019",
+      "filing_number": "P1",
+      "job_filing_number": "S00410588-P1",
+      "job_description": "INSTALLATION OF A 1200AMP 3 PHASE 277480V ELECTRICAL SERVICE",
+      "filing_status": "Approved",
+      "filing_date": "2023-02-16T00:00:00.000"
+    },
+    {
+      "bin": "5107019",
+      "filing_number": "I1",
+      "job_filing_number": "S00489501-I1-EL",
+      "job_description": "Control wiring for 2 elevators each to have the following- 480V – 3 PH – 60HZ, 100 hp motor, 114 fully loaded amps 795 locked rotor amps",
+      "filing_status": "Cancelled",
+      "filing_date": "2021-03-31T00:00:00.000",
+      "permit_issued_date": "2021-03-31T00:00:00.000"
+    },
+    {
+      "bin": "5107019",
+      "filing_number": "I1",
+      "job_filing_number": "S00536020-I1-EL",
+      "job_description": "SIDEWALK SHED",
+      "filing_status": "Complete",
+      "filing_date": "2021-06-08T00:00:00.000",
+      "permit_issued_date": "2021-06-08T00:00:00.000"
+    },
+    {
+      "bin": "5107019",
+      "filing_number": "I1",
+      "job_filing_number": "S00598725-I1-EL",
+      "job_description": "PERMIT FOR SINGLE PERSONNEL MATERIAL HOIST ONLY. CONNECT FROM SECONDARY SIDE OF TRANSFORMER (SUPPLIED BY OTHERS) TO MATERIAL HOIST",
+      "filing_status": "Complete",
+      "filing_date": "2021-09-22T00:00:00.000",
+      "permit_issued_date": "2021-09-22T00:00:00.000"
+    },
+    {
+      "bin": "5107019",
+      "filing_number": "I1",
+      "job_filing_number": "S00830051-I1-EL",
+      "job_description": "INSTALLATION OF TEMP LIGHT & POWER FOR CONSTRUCTION.",
+      "filing_status": "Complete",
+      "filing_date": "2023-02-15T00:00:00.000",
+      "permit_issued_date": "2023-02-15T00:00:00.000"
+    },
+    {
+      "bin": "5107019",
+      "filing_number": "I1",
+      "job_filing_number": "S00830070-I1-EL",
+      "job_description": "INSTALLATION OF TEMP LIGHT & POWER FOR CONSTRUCTION - FLOORS 2, 3, 5, 6 , 7",
+      "filing_status": "Cancelled",
+      "filing_date": "2023-02-15T00:00:00.000",
+      "permit_issued_date": "2023-02-15T00:00:00.000"
+    },
+    {
+      "bin": "5107019",
+      "filing_number": "I1",
+      "job_filing_number": "S00830537-I1-EL",
+      "job_description": "INSTALLATION OF GENERAL LIGHT & POWER",
+      "filing_status": "Complete",
+      "filing_date": "2023-02-16T00:00:00.000",
+      "permit_issued_date": "2023-02-16T00:00:00.000"
+    },
+    {
+      "bin": "5107019",
+      "filing_number": "P1",
+      "job_filing_number": "S00830537-P1",
+      "job_description": "INSTALLATION OF GENERAL LIGHT & POWER",
+      "filing_status": "Approved",
+      "filing_date": "2024-03-14T00:00:00.000"
+    },
+    {
+      "bin": "5107019",
+      "filing_number": "I1",
+      "job_filing_number": "S00996835-I1-EL",
+      "job_description": "Filing to takeover and close Electrical Permit # S00489501-11-EL. Control wiring for 2 elevators each to have the following - 480V - 3PH - 60HZ, 100 hp Moto, 114 fully loaded amps 795 locked rotor amps",
+      "filing_status": "Complete",
+      "filing_date": "2024-01-26T00:00:00.000",
+      "permit_issued_date": "2024-01-26T00:00:00.000"
+    },
+    {
+      "bin": "5107019",
+      "filing_number": "I1",
+      "job_filing_number": "S01027928-I1-EL",
+      "job_description": "electrical work for solar",
+      "filing_status": "Complete",
+      "filing_date": "2024-03-29T00:00:00.000",
+      "permit_issued_date": "2024-03-29T00:00:00.000"
+    },
+    {
+      "bin": "5107019",
+      "filing_number": "P1",
+      "job_filing_number": "S01027928-P1",
+      "job_description": "electrical work for solar",
+      "filing_status": "Approved",
+      "filing_date": "2024-03-29T00:00:00.000"
+    },
+    {
+      "bin": "5107019",
+      "filing_number": "I1",
+      "job_filing_number": "S01034388-I1-EL",
+      "job_description": "electrical connection to illuminated sign",
+      "filing_status": "Complete",
+      "filing_date": "2024-04-11T00:00:00.000",
+      "permit_issued_date": "2024-04-11T00:00:00.000"
+    },
+    {
+      "bin": "5107019",
+      "filing_number": "I1",
+      "job_filing_number": "S01171132-I1-EL",
+      "job_description": "WIRING AND INSTALLED: 3RD FLOOR (50)  LIGHTS AND (5) OCCUPANCY SENSORS SWITCHES , 5TH FLOOR (50) LIGHTS AND (5) OCCUPANCY SENSORS SWITCHES, 6TH FLOOR (50) LIGHTS AND (5) OCCUPANCY SENSORS SWITCHES, AND 7TH FLOOR (50) LIGHTS AND (5) OCCUPANCY SENSORS SWITCHES.",
+      "filing_status": "Complete",
+      "filing_date": "2025-01-23T00:00:00.000",
+      "permit_issued_date": "2025-01-23T00:00:00.000"
+    }
+  ]
+}

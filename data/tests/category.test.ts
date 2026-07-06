@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { categorizeBuilding, type PlaceLookup } from "../src/category.ts";
+import { emptyPublicRecords } from "../src/lookup.ts";
 import type { BuildingFacts, PlutoCharacteristics } from "../src/types.ts";
 
 function pluto(overrides: Partial<PlutoCharacteristics>): PlutoCharacteristics {
@@ -31,6 +32,8 @@ function facts(plutoCharacteristics: PlutoCharacteristics | null): BuildingFacts
     isArticle321: null,
     plutoCharacteristics,
     openViolations: [],
+    ll84FuelUse: [],
+    publicRecords: emptyPublicRecords(),
     provenance: [],
   };
 }

@@ -4,7 +4,7 @@
 // plenty don't, and the orchestrator must degrade honestly.
 
 import { cachedFetchJson } from "./http.ts";
-import type { Bbl, Ll84Facts, UseSplit } from "./types.ts";
+import type { Bbl, Ll84Facts, Ll84FuelUse, UseSplit } from "./types.ts";
 
 const LL84_URL = "https://data.cityofnewyork.us/resource/5zyy-y8am.json";
 
@@ -54,51 +54,145 @@ const LL84_USE_UNMAPPABLE = new Set([
   "Drinking Water Treatment & Distribution",
 ]);
 
-// Fuel coefficients in tCO2e per kBtu (electricity per kWh), as DOB prices
-// them for 2024-2029 penalties. Sources: Admin Code 28-320.3.1.1 (gas, oils,
-// steam, electricity; echoed in DOB's June 2024 guidance,
+// kBtu per kWh: the unit bridge between metered electricity and the kBtu every
+// other fuel column reports. Exported for the personalization layer's heat-pump
+// math, which converts delivered heat back into the electricity a pump draws.
+export const KBTU_PER_KWH = 3.412;
+
+// Grid electricity's statutory emissions factor, tCO2e per kWh, from Admin Code
+// 28-320.3.1.1 (the same figure the electricity column below is priced with).
+// Exported so the personalization layer prices heat-pump electricity with the
+// statute's coefficient instead of restating it.
+export const ELECTRICITY_TCO2E_PER_KWH = 0.000288962;
+
+// Every fuel-use column an LL84 filing can report, in one table. `coefficient`
+// prices the fuel in tCO2e per native unit (per kBtu, or per kWh for
+// electricity) as DOB prices them for 2024-2029 penalties; null marks a fuel
+// with no verified coefficient, so its energy is still recorded but its tCO2e
+// stays null instead of nuking the whole recompute. `role` sorts a column into
+// the building's fuel mix: a heating/hot-water source, purchased electricity,
+// or an "other" load (district cooling, on-site generation) the mix ignores.
+//
+// Coefficient sources: Admin Code 28-320.3.1.1 (gas, oils, steam, electricity;
+// echoed in DOB's June 2024 guidance,
 // https://www.nyc.gov/assets/buildings/pdf/ll97_emissions.pdf) and
-// 1 RCNY 103-14(d)(3)(i) (diesel, kerosene, propane) — verified 2026-06-06.
-const FUEL_COEFFICIENTS_PER_KBTU: Record<string, number> = {
-  natural_gas_use_kbtu: 0.00005311,
-  fuel_oil_1_use_kbtu: 0.0000735,
-  fuel_oil_2_use_kbtu: 0.00007421,
-  fuel_oil_4_use_kbtu: 0.00007529,
-  diesel_2_use_kbtu: 0.00007421,
-  propane_use_kbtu: 0.00006425,
-  kerosene_use_kbtu: 0.00007769,
-  district_steam_use_kbtu: 0.00004493,
-};
+// 1 RCNY 103-14(d)(3)(i) (diesel, kerosene, propane), verified 2026-06-06.
+interface FuelColumn {
+  column: string;
+  label: string;
+  unit: "kbtu" | "kwh";
+  coefficient: number | null;
+  role: "heating" | "electricity" | "other";
+}
 
-const ELECTRICITY_KWH_COLUMN = "electricity_use_grid_purchase_1";
-const ELECTRICITY_COEFFICIENT_PER_KWH = 0.000288962;
-
-// Fuels the statute prices differently or not at all (no. 5/6 oil has no
-// verified coefficient; district hot/chilled water and on-site generation
-// have their own rules). Any consumption here blocks the recompute.
-const UNPRICEABLE_FUEL_COLUMNS = [
-  "fuel_oil_5_6_use_kbtu",
-  "district_hot_water_use_kbtu",
-  "district_chilled_water_use",
-  "electricity_use_generated",
+const FUEL_COLUMNS: FuelColumn[] = [
+  {
+    column: "natural_gas_use_kbtu",
+    label: "natural_gas",
+    unit: "kbtu",
+    coefficient: 0.00005311,
+    role: "heating",
+  },
+  {
+    column: "fuel_oil_1_use_kbtu",
+    label: "fuel_oil_1",
+    unit: "kbtu",
+    coefficient: 0.0000735,
+    role: "heating",
+  },
+  {
+    column: "fuel_oil_2_use_kbtu",
+    label: "fuel_oil_2",
+    unit: "kbtu",
+    coefficient: 0.00007421,
+    role: "heating",
+  },
+  {
+    column: "fuel_oil_4_use_kbtu",
+    label: "fuel_oil_4",
+    unit: "kbtu",
+    coefficient: 0.00007529,
+    role: "heating",
+  },
+  {
+    column: "diesel_2_use_kbtu",
+    label: "diesel_2",
+    unit: "kbtu",
+    coefficient: 0.00007421,
+    role: "heating",
+  },
+  {
+    column: "propane_use_kbtu",
+    label: "propane",
+    unit: "kbtu",
+    coefficient: 0.00006425,
+    role: "heating",
+  },
+  {
+    column: "kerosene_use_kbtu",
+    label: "kerosene",
+    unit: "kbtu",
+    coefficient: 0.00007769,
+    role: "heating",
+  },
+  {
+    column: "district_steam_use_kbtu",
+    label: "district_steam",
+    unit: "kbtu",
+    coefficient: 0.00004493,
+    role: "heating",
+  },
+  // No. 5/6 oil and district hot water are heating sources the statute prices
+  // differently, so they carry no coefficient and any consumption blocks the
+  // recompute (see recomputeEmissions).
+  {
+    column: "fuel_oil_5_6_use_kbtu",
+    label: "fuel_oil_5_6",
+    unit: "kbtu",
+    coefficient: null,
+    role: "heating",
+  },
+  {
+    column: "district_hot_water_use_kbtu",
+    label: "district_hot_water",
+    unit: "kbtu",
+    coefficient: null,
+    role: "heating",
+  },
+  {
+    column: "electricity_use_grid_purchase_1",
+    label: "electricity",
+    unit: "kwh",
+    coefficient: ELECTRICITY_TCO2E_PER_KWH,
+    role: "electricity",
+  },
+  // District cooling and on-site generation are neither heating nor a purchased
+  // fuel; they are unpriceable and stay out of the heating-fuel pick.
+  {
+    column: "district_chilled_water_use",
+    label: "district_chilled_water",
+    unit: "kbtu",
+    coefficient: null,
+    role: "other",
+  },
+  {
+    column: "electricity_use_generated",
+    label: "electricity_generated",
+    unit: "kwh",
+    coefficient: null,
+    role: "other",
+  },
 ];
 
-// Fuel-use columns mapped to the names the profile reports. Covers priced,
-// unpriceable, and district fuels — every combustion or district source.
-const FUEL_USE_COLUMNS: Record<string, string> = {
-  natural_gas_use_kbtu: "natural_gas",
-  fuel_oil_1_use_kbtu: "fuel_oil_1",
-  fuel_oil_2_use_kbtu: "fuel_oil_2",
-  fuel_oil_4_use_kbtu: "fuel_oil_4",
-  fuel_oil_5_6_use_kbtu: "fuel_oil_5_6",
-  diesel_2_use_kbtu: "diesel_2",
-  propane_use_kbtu: "propane",
-  kerosene_use_kbtu: "kerosene",
-  district_steam_use_kbtu: "district_steam",
-  district_hot_water_use_kbtu: "district_hot_water",
-};
+const ELECTRICITY_COLUMN = "electricity_use_grid_purchase_1";
 
-const KBTU_PER_KWH = 3.412;
+// The role a fuel column plays in a building's energy, keyed by the raw column
+// name Ll84FuelUse carries. Exposed so the systems dossier can split emissions
+// between heating, electricity, and other loads without re-listing the fuel
+// taxonomy that lives here. Null for a column outside the table.
+export function fuelRole(column: string): "heating" | "electricity" | "other" | null {
+  return FUEL_COLUMNS.find(fuel => fuel.column === column)?.role ?? null;
+}
 
 interface Ll84Row {
   report_year?: string;
@@ -148,6 +242,7 @@ export function parseLl84Rows(rows: Ll84Row[], bbl: Bbl): Ll84Facts | null {
   const { mapped, proxied, unmapped } = mapUseList(latestFiling.list_of_all_property_use);
   const { recomputed, unpriceable } = recomputeEmissions(latestFiling);
   const { fuelMix, heatingFuel } = deriveFuels(latestFiling);
+  const { fuelUse, electricityKwh } = collectFuelUse(latestFiling);
 
   return {
     bbl,
@@ -157,6 +252,8 @@ export function parseLl84Rows(rows: Ll84Row[], bbl: Bbl): Ll84Facts | null {
     annualEmissionsTco2e: parseNumber(latestFiling.total_location_based_ghg),
     recomputedEmissionsTco2e: recomputed,
     unpriceableFuels: unpriceable,
+    fuelUse,
+    electricityKwh,
     reportingYear: parseNumber(latestFiling.report_year),
     proxiedUses: proxied,
     unmappedUses: unmapped,
@@ -172,29 +269,58 @@ export function parseLl84Rows(rows: Ll84Row[], bbl: Bbl): Ll84Facts | null {
 // building reports "electricity"; a filing with no fuel use reports null.
 function deriveFuels(row: Ll84Row): { fuelMix: string[]; heatingFuel: string | null } {
   const consumption: Array<{ fuel: string; kbtu: number; isHeating: boolean }> = [];
+  let electricityPresent = false;
 
-  for (const [column, label] of Object.entries(FUEL_USE_COLUMNS)) {
-    const kbtu = parseNumber(row[column]) ?? 0;
-    if (kbtu > 0) {
-      consumption.push({ fuel: label, kbtu, isHeating: true });
+  for (const fuel of FUEL_COLUMNS) {
+    if (fuel.role === "other") {
+      continue;
     }
-  }
+    const consumed = parseNumber(row[fuel.column]) ?? 0;
+    if (consumed <= 0) {
+      continue;
+    }
 
-  const electricityKwh = parseNumber(row[ELECTRICITY_KWH_COLUMN]) ?? 0;
-  if (electricityKwh > 0) {
-    consumption.push({
-      fuel: "electricity",
-      kbtu: electricityKwh * KBTU_PER_KWH,
-      isHeating: false,
-    });
+    const kbtu = fuel.unit === "kwh" ? consumed * KBTU_PER_KWH : consumed;
+    consumption.push({ fuel: fuel.label, kbtu, isHeating: fuel.role === "heating" });
+    if (fuel.role === "electricity") {
+      electricityPresent = true;
+    }
   }
 
   consumption.sort((a, b) => b.kbtu - a.kbtu);
 
   const topHeatingFuel = consumption.find(entry => entry.isHeating)?.fuel;
-  const heatingFuel = topHeatingFuel ?? (electricityKwh > 0 ? "electricity" : null);
+  const heatingFuel = topHeatingFuel ?? (electricityPresent ? "electricity" : null);
 
   return { fuelMix: consumption.map(entry => entry.fuel), heatingFuel };
+}
+
+// Per-fuel energy and emissions for every consumed column: the priced fuels,
+// the unpriceable ones (tCO2e null), electricity, and other loads alike. This
+// keeps the fuel detail the recompute would otherwise discard, so the systems
+// dossier can attribute emissions rather than working from one total. kBtu is
+// the common unit (electricity converted from its native kWh).
+function collectFuelUse(row: Ll84Row): {
+  fuelUse: Ll84FuelUse[];
+  electricityKwh: number | null;
+} {
+  const fuelUse: Ll84FuelUse[] = [];
+
+  for (const fuel of FUEL_COLUMNS) {
+    const consumed = parseNumber(row[fuel.column]);
+    if (consumed === null || consumed <= 0) {
+      continue;
+    }
+
+    fuelUse.push({
+      fuel: fuel.label,
+      column: fuel.column,
+      kbtu: fuel.unit === "kwh" ? consumed * KBTU_PER_KWH : consumed,
+      tco2e: fuel.coefficient === null ? null : consumed * fuel.coefficient,
+    });
+  }
+
+  return { fuelUse, electricityKwh: parseNumber(row[ELECTRICITY_COLUMN]) };
 }
 
 // ESPM's location-based GHG prices electricity with national eGRID factors;
@@ -206,9 +332,9 @@ function recomputeEmissions(row: Ll84Row): {
   recomputed: number | null;
   unpriceable: string[];
 } {
-  const unpriceable = UNPRICEABLE_FUEL_COLUMNS.filter(
-    column => (parseNumber(row[column]) ?? 0) > 0,
-  );
+  const unpriceable = FUEL_COLUMNS.filter(
+    fuel => fuel.coefficient === null && (parseNumber(row[fuel.column]) ?? 0) > 0,
+  ).map(fuel => fuel.column);
   if (unpriceable.length > 0) {
     return { recomputed: null, unpriceable };
   }
@@ -216,18 +342,15 @@ function recomputeEmissions(row: Ll84Row): {
   let totalTco2e = 0;
   let pricedAnything = false;
 
-  for (const [column, coefficient] of Object.entries(FUEL_COEFFICIENTS_PER_KBTU)) {
-    const kbtu = parseNumber(row[column]);
-    if (kbtu !== null && kbtu > 0) {
-      totalTco2e += kbtu * coefficient;
+  for (const fuel of FUEL_COLUMNS) {
+    if (fuel.coefficient === null) {
+      continue;
+    }
+    const consumed = parseNumber(row[fuel.column]);
+    if (consumed !== null && consumed > 0) {
+      totalTco2e += consumed * fuel.coefficient;
       pricedAnything = true;
     }
-  }
-
-  const electricityKwh = parseNumber(row[ELECTRICITY_KWH_COLUMN]);
-  if (electricityKwh !== null && electricityKwh > 0) {
-    totalTco2e += electricityKwh * ELECTRICITY_COEFFICIENT_PER_KWH;
-    pricedAnything = true;
   }
 
   if (!pricedAnything) {

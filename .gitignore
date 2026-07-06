@@ -19,6 +19,11 @@ coverage/
 spacetime.local.json
 .spacetime/
 
+# trigger.dev + supabase local state
+.trigger/
+supabase/.branches/
+supabase/.temp/
+
 # logs
 *.log
 npm-debug.log*

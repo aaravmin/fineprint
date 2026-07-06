@@ -225,3 +225,14 @@ export {
   type MaccPoint,
   type RetrofitAssessment,
 } from "./retrofit.ts";
+
+// The retrofit category taxonomy — one vocabulary shared by data/ and client/.
+export {
+  RETROFIT_CATEGORIES,
+  categoryById,
+  categoryDisplayName,
+  categoryForSystem,
+  enabledCategories,
+  type CategoryDef,
+  type RetrofitCategory,
+} from "./categories.ts";

@@ -2,9 +2,8 @@
 
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 
-import { createPortal } from "react-dom";
-
 import { MapPin } from "lucide-react";
+import { createPortal } from "react-dom";
 
 import { cn } from "@/lib/utils";
 
@@ -83,9 +82,7 @@ export function AddressAutocomplete({
     setPosition({
       left: rect.left + 8,
       width: rect.width - 16,
-      ...(opensUpward
-        ? { bottom: window.innerHeight - rect.top + GAP }
-        : { top: rect.bottom + GAP }),
+      ...(opensUpward ? { bottom: window.innerHeight - rect.top + GAP } : { top: rect.bottom + GAP }),
     });
   }, []);
 
@@ -104,7 +101,7 @@ export function AddressAutocomplete({
 
         const data = (await response.json()) as { features?: GeoSearchFeature[] };
         const labels = (data.features ?? [])
-          .map(feature => feature.properties?.label)
+          .map((feature) => feature.properties?.label)
           .filter((label): label is string => Boolean(label))
           .map(cleanLabel)
           .slice(0, MAX_SUGGESTIONS);
@@ -179,10 +176,10 @@ export function AddressAutocomplete({
 
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setHighlighted(prev => (prev + 1) % suggestions.length);
+      setHighlighted((prev) => (prev + 1) % suggestions.length);
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setHighlighted(prev => (prev <= 0 ? suggestions.length - 1 : prev - 1));
+      setHighlighted((prev) => (prev <= 0 ? suggestions.length - 1 : prev - 1));
     } else if (e.key === "Enter" && highlighted >= 0) {
       e.preventDefault();
       pick(suggestions[highlighted]);
@@ -196,7 +193,7 @@ export function AddressAutocomplete({
       <input
         ref={inputRef}
         value={value}
-        onChange={e => onValueChange(e.target.value)}
+        onChange={(e) => onValueChange(e.target.value)}
         onKeyDown={handleKeyDown}
         onBlur={() => setOpen(false)}
         onFocus={() => {
@@ -210,9 +207,7 @@ export function AddressAutocomplete({
         aria-label={placeholder}
         aria-expanded={open}
         aria-controls={listboxId}
-        aria-activedescendant={
-          highlighted >= 0 ? `${listboxId}-option-${highlighted}` : undefined
-        }
+        aria-activedescendant={highlighted >= 0 ? `${listboxId}-option-${highlighted}` : undefined}
         aria-autocomplete="list"
         autoComplete="off"
         placeholder={placeholder}
@@ -225,6 +220,7 @@ export function AddressAutocomplete({
         createPortal(
           <ul
             id={listboxId}
+            // biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: listbox/option is the WAI-ARIA combobox pattern; the input keeps focus and selection is driven by aria-activedescendant.
             role="listbox"
             aria-label="Address suggestions"
             style={{
@@ -237,13 +233,15 @@ export function AddressAutocomplete({
             className="z-[999] overflow-hidden rounded-2xl border border-border bg-card py-1.5 shadow-[0_2px_4px_rgba(20,20,20,0.04),0_12px_32px_-8px_rgba(20,20,20,0.16)]"
           >
             {suggestions.map((suggestion, index) => (
+              // biome-ignore lint/a11y/useFocusableInteractive: options are activated through aria-activedescendant on the input, so they are not tab-focusable themselves.
               <li
                 key={suggestion}
                 id={`${listboxId}-option-${index}`}
+                // biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: option is the WAI-ARIA combobox pattern for a listbox item.
                 role="option"
                 aria-selected={index === highlighted}
                 // mousedown beats the input's blur, so the click still lands
-                onMouseDown={e => {
+                onMouseDown={(e) => {
                   e.preventDefault();
                   pick(suggestion);
                 }}

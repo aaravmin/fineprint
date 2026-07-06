@@ -7,9 +7,7 @@ export function ActionPlanTable({ report }: { report: ComplianceReport }) {
   const group = (title: string, items: string[]) =>
     items.length === 0 ? null : (
       <div key={title}>
-        <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          {title}
-        </p>
+        <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</p>
         <ul className="space-y-1 text-sm leading-relaxed">
           {items.map((item, i) => (
             <li key={i} className="flex gap-2">

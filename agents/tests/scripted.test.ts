@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { LAWS } from "../../spacetimedb/src/laws.ts";
+import { LAWS } from "../../data/laws.ts";
 import { draftScripted } from "../src/policies/scripted.ts";
 import type { DraftInput } from "../src/policies/types.ts";
 
@@ -27,6 +27,8 @@ function draftInput(overrides: Partial<DraftInput> = {}): DraftInput {
         detail: "2024 filing",
       },
     ],
+    systemDrivers: [],
+    measureHighlights: [],
     ...overrides,
   };
 }
@@ -68,14 +70,6 @@ describe("draftScripted", () => {
 
     expect(draft).toContain("$TBD");
     expect(draft).not.toMatch(/undefined|NaN/);
-  });
-
-  test("the benchmarking draft carries the building's square footage", () => {
-    const draft = draftScripted(
-      draftInput({ kind: "benchmarking_filing", lawId: "ll84", fineEstimateUsd: 2_500 }),
-    );
-
-    expect(draft).toContain("2,852,257");
   });
 
   test("an unknown kind flags for manual triage and names the kind", () => {
@@ -163,26 +157,6 @@ describe("draftScripted", () => {
     expect(draft).toMatch(/avoids \$[\d,.]+ in fines through 2039/);
   });
 
-  test("the LL152 draft covers the plumber, the fix, and the GPS2 filing", () => {
-    const draft = draftScripted(
-      draftInput({ kind: "gas_piping_certification", lawId: "ll152" }),
-    );
-
-    expect(draft).toMatch(/licensed master plumber/i);
-    expect(draft).toMatch(/GPS2/);
-    expect(draft).toMatch(/DOB NOW/);
-  });
-
-  test("the LL55 draft covers complaint triage and the underlying condition", () => {
-    const draft = draftScripted(
-      draftInput({ kind: "mold_pest_remediation", lawId: "ll55" }),
-    );
-
-    expect(draft).toMatch(/HPD complaints/i);
-    expect(draft).toMatch(/underlying condition/i);
-    expect(draft).toMatch(/tenant-safe/i);
-  });
-
   test("a compliant building's LL97 draft has no retrofit pitch", () => {
     const draft = draftScripted(
       draftInput({
@@ -192,5 +166,45 @@ describe("draftScripted", () => {
     );
 
     expect(draft).not.toMatch(/Cheapest path/);
+  });
+
+  test("the LL97 draft leads with the building's emissions drivers and top measures", () => {
+    const draft = draftScripted(
+      draftInput({
+        systemDrivers: [
+          {
+            system: "heating_plant",
+            headline: "No. 4 fuel oil boiler, installed around 1995",
+            condition: "failing",
+            shareOfEmissions: 0.52,
+          },
+        ],
+        measureHighlights: [
+          {
+            name: "Cold-climate heat pump conversion",
+            targetSystem: "heating_plant",
+            capexUsd: 3_300_000,
+            estReductionTco2e: 1_527.5,
+            why: "The heating plant is a No. 4 fuel oil boiler and reads as failing.",
+          },
+        ],
+      }),
+    );
+
+    expect(draft).toMatch(/Emissions drivers/);
+    expect(draft).toMatch(/No\. 4 fuel oil boiler/);
+    expect(draft).toMatch(/failing/);
+    expect(draft).toMatch(/52% of emissions/);
+    expect(draft).toMatch(/Building-specific measures/);
+    expect(draft).toMatch(/Cold-climate heat pump conversion/);
+    expect(draft).toMatch(/\$3,300,000 capex/);
+    expect(draft).toMatch(/1,527.5 tCO2e/);
+  });
+
+  test("a building with no systems dossier surfaces no drivers section", () => {
+    const draft = draftScripted(draftInput());
+
+    expect(draft).not.toMatch(/Emissions drivers/);
+    expect(draft).not.toMatch(/Building-specific measures/);
   });
 });

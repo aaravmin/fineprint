@@ -20,9 +20,7 @@ export function ComplianceSnapshot({ report }: { report: ComplianceReport }) {
         {stat("Applicable requirements", String(snapshot.applicable.length))}
         {stat(
           "Estimated annual exposure",
-          snapshot.estimated_annual_exposure_usd > 0
-            ? fmtUsd(snapshot.estimated_annual_exposure_usd)
-            : "None modeled",
+          snapshot.estimated_annual_exposure_usd > 0 ? fmtUsd(snapshot.estimated_annual_exposure_usd) : "None modeled",
           snapshot.estimated_annual_exposure_usd > 0 ? "text-destructive" : undefined,
         )}
         {stat("Nearest deadline", snapshot.nearest_deadline ?? "Not dated")}

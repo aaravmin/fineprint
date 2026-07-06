@@ -20,6 +20,8 @@ const input: DraftInput = {
   uses: [{ group: "Office", sqft: 2_852_257 }],
   ll97Covered: true,
   provenance: [],
+  systemDrivers: [],
+  measureHighlights: [],
 };
 
 function goodDeps(text: string): LlmDeps {

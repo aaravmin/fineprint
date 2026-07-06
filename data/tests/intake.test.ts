@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 import type { CblEntry } from "../src/coveredBuildings.ts";
 import { prepareIntake } from "../src/intake.ts";
+import { emptyPublicRecords } from "../src/lookup.ts";
 import type { BuildingFacts, PlutoCharacteristics } from "../src/types.ts";
 
 // prepareIntake is the shared brain of building intake: one address in,
@@ -35,15 +36,14 @@ const esbFacts: BuildingFacts = {
   isArticle321: false,
   plutoCharacteristics: esbPluto,
   openViolations: [],
+  ll84FuelUse: [],
+  publicRecords: emptyPublicRecords(),
   provenance: [{ field: "bbl", source: "NYC GeoSearch" }],
 };
 
 const cblEntry: CblEntry = {
   ll97: true,
   article321: false,
-  ll84: true,
-  ll87: true,
-  ll88: true,
   dofGrossSqft: 2_812_739,
   dofAddress: "338 5 AVENUE",
   source: "DOB Sustainability Covered Buildings List, Filing Year 2026",
@@ -64,15 +64,7 @@ describe("prepareIntake", () => {
     expect(intake.ingestArgs.bbl).toBe("1008350041");
     expect(intake.ingestArgs.sqft).toBe(2_852_257);
     expect(intake.ingestArgs.isArticle321).toBe(false);
-    expect(JSON.parse(intake.ingestArgs.coveredLawIdsJson)).toEqual([
-      "ll97",
-      "ll84",
-      "ll87",
-      "ll11",
-      "ll88",
-      "ll33",
-      "ll152",
-    ]);
+    expect(JSON.parse(intake.ingestArgs.coveredLawIdsJson)).toEqual(["ll97"]);
     expect(JSON.parse(intake.ingestArgs.usesJson)).toHaveLength(1);
   });
 
@@ -101,8 +93,6 @@ describe("prepareIntake", () => {
     const lawIds = JSON.parse(intake.ingestArgs.coveredLawIdsJson);
     expect(lawIds).toContain("art321");
     expect(lawIds).not.toContain("ll97");
-    // Residential units carry the allergen law along.
-    expect(lawIds).toContain("ll55");
   });
 
   test("the summary reads like a report: building, coverage, exposure, sources", async () => {
@@ -110,7 +100,7 @@ describe("prepareIntake", () => {
 
     expect(intake.summary).toMatch(/1008350041/);
     expect(intake.summary).toMatch(/2,852,257/);
-    expect(intake.summary).toMatch(/ll97, ll84, ll87, ll11, ll88, ll33, ll152/);
+    expect(intake.summary).toMatch(/ll97/);
     expect(intake.summary).toMatch(/NYC GeoSearch/);
   });
 
@@ -148,10 +138,9 @@ describe("prepareIntake", () => {
   });
 });
 
-// Coverage is what the reported bug was about: small buildings collapsed to
-// LL152 alone, LL11 never appeared, and residential laws never fired. These pin
-// the corrected applicability — floor area for the energy laws, stories for
-// LL11, residential units for LL55, and the CBL for the LL97 pathway.
+// Coverage pins LL97 applicability: the 25k floor-area threshold, the CBL as
+// the authoritative covered-buildings source, and the Article 321 pathway for
+// affordable housing.
 describe("prepareIntake coverage", () => {
   function buildingOf(
     sqft: number,
@@ -187,47 +176,16 @@ describe("prepareIntake coverage", () => {
     return new Set<string>(JSON.parse(intake.ingestArgs.coveredLawIdsJson));
   }
 
-  test("an under-25k commercial building is covered by LL152 alone", async () => {
-    expect(await coverageFor(buildingOf(13_194))).toEqual(new Set(["ll152"]));
-  });
-
-  test("the 25k threshold is inclusive for the floor-area laws", async () => {
-    expect(await coverageFor(buildingOf(25_000))).toEqual(
-      new Set(["ll97", "ll84", "ll88", "ll33", "ll152"]),
-    );
-    // One square foot short stays LL152-only — the boundary is exact.
-    expect(await coverageFor(buildingOf(24_999))).toEqual(new Set(["ll152"]));
-  });
-
-  test("crossing 50k adds the LL87 audit obligation", async () => {
-    expect(await coverageFor(buildingOf(50_000))).toEqual(
-      new Set(["ll97", "ll84", "ll87", "ll88", "ll33", "ll152"]),
-    );
-  });
-
-  test("LL11 turns on stories, not floor area", async () => {
-    // A tall but small building gets the facade obligation a 60k cutoff missed.
-    expect(await coverageFor(buildingOf(30_000, { numFloors: 7 }))).toContain("ll11");
-    // Six stories is the statutory floor — at six it does not apply.
-    expect(await coverageFor(buildingOf(30_000, { numFloors: 6 }))).not.toContain("ll11");
-  });
-
-  test("LL55 turns on residential units, not the affordability flag alone", async () => {
-    expect(await coverageFor(buildingOf(40_000, { unitsResidential: 50 }))).toContain(
-      "ll55",
-    );
-    expect(await coverageFor(buildingOf(40_000, { unitsResidential: 0 }))).not.toContain(
-      "ll55",
-    );
+  test("the 25k threshold is inclusive for LL97", async () => {
+    expect(await coverageFor(buildingOf(25_000))).toEqual(new Set(["ll97"]));
+    // One square foot short clears no law - the boundary is exact.
+    expect(await coverageFor(buildingOf(24_999))).toEqual(new Set([]));
   });
 
   test("the CBL is authoritative for LL97: a large building it excludes gets no LL97", async () => {
     const notLl97Covered = (): CblEntry => ({
       ll97: false,
       article321: false,
-      ll84: false,
-      ll87: false,
-      ll88: false,
       dofGrossSqft: null,
       dofAddress: null,
       source: "test",
@@ -239,12 +197,16 @@ describe("prepareIntake coverage", () => {
     );
 
     expect(coverage.has("ll97")).toBe(false);
-    // The size- and height-based obligations still apply regardless of LL97.
-    expect(coverage).toEqual(new Set(["ll84", "ll87", "ll88", "ll33", "ll11", "ll152"]));
+    // With LL97 excluded by the CBL, no modeled law binds this building.
+    expect(coverage).toEqual(new Set([]));
   });
 
-  test("an affordable residential building maps to art321 and the allergen law", async () => {
-    const article321Cbl = (): CblEntry => ({ ...cblEntry, ll97: false, article321: true });
+  test("an affordable residential building maps to art321, not standard LL97", async () => {
+    const article321Cbl = (): CblEntry => ({
+      ...cblEntry,
+      ll97: false,
+      article321: true,
+    });
 
     const coverage = await coverageFor(
       buildingOf(100_000, { numFloors: 20, unitsResidential: 200, isArticle321: true }),
@@ -252,7 +214,6 @@ describe("prepareIntake coverage", () => {
     );
 
     expect(coverage.has("art321")).toBe(true);
-    expect(coverage.has("ll55")).toBe(true);
     expect(coverage.has("ll97")).toBe(false);
   });
 });
@@ -293,13 +254,6 @@ describe("prepareIntake coverage agrees with the compliance plan", () => {
     });
   }
 
-  test("a small market-rate walk-up gets the allergen law, not LL152 alone", async () => {
-    const intake = await prepareIntake(walkUpFacts.address, walkUpDeps());
-
-    const coverage = new Set(JSON.parse(intake.ingestArgs.coveredLawIdsJson));
-    expect(coverage).toEqual(new Set(["ll152", "ll55"]));
-  });
-
   test("every law in the compliance plan spawns a ticket", async () => {
     const intake = await prepareIntake(walkUpFacts.address, walkUpDeps());
 
@@ -310,24 +264,5 @@ describe("prepareIntake coverage agrees with the compliance plan", () => {
       ),
     );
     expect(coverage).toEqual(planLawIds);
-  });
-
-  test("a tall building under 60k sqft still gets the facade law from its floor count", async () => {
-    const tallNarrow: BuildingFacts = {
-      ...walkUpFacts,
-      plutoCharacteristics: {
-        ...walkUpFacts.plutoCharacteristics!,
-        numFloors: 12,
-        unitsResidential: 0,
-        unitsTotal: 0,
-      },
-    };
-
-    const intake = await prepareIntake(
-      tallNarrow.address,
-      fakeDeps({ lookupBuilding: async () => tallNarrow, getCblEntry: () => null }),
-    );
-
-    expect(JSON.parse(intake.ingestArgs.coveredLawIdsJson)).toContain("ll11");
   });
 });

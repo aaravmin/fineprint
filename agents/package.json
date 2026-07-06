@@ -4,17 +4,19 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "worker": "tsx src/worker.ts",
     "test": "vitest run",
     "test:watch": "vitest",
-    "reviewer": "tsx src/reviewer.ts",
+    "trigger:dev": "npx trigger.dev@latest dev",
+    "trigger:deploy": "npx trigger.dev@latest deploy",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
-    "spacetimedb": "^2.4.1"
+    "@supabase/supabase-js": "^2.110.0",
+    "@trigger.dev/sdk": "^4.5.0"
   },
   "devDependencies": {
+    "@trigger.dev/build": "^4.5.0",
     "@types/node": "^22.10.2",
     "tsx": "^4.19.2",
     "typescript": "~5.6.2",

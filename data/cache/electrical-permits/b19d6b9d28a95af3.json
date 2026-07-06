@@ -1,0 +1,33 @@
+{
+  "key": "https://data.cityofnewyork.us/resource/dm9a-ab7w.json?bin=1011379&%24select=bin%2Cfiling_number%2Cjob_filing_number%2Cjob_description%2Cfiling_status%2Cfiling_date%2Cpermit_issued_date&%24limit=50000&%24offset=0",
+  "recordedAt": "2026-07-06T04:52:10.987Z",
+  "value": [
+    {
+      "bin": "1011379",
+      "filing_number": "I1",
+      "job_filing_number": "M00053862-I1-EL",
+      "job_description": "SIDEWALK SHED",
+      "filing_status": "Permit Issued",
+      "filing_date": "2018-06-15T00:00:00.000",
+      "permit_issued_date": "2018-06-15T00:00:00.000"
+    },
+    {
+      "bin": "1011379",
+      "filing_number": "I1",
+      "job_filing_number": "M00305596-I1-EL",
+      "job_description": "elevator",
+      "filing_status": "Permit Issued",
+      "filing_date": "2020-01-29T00:00:00.000",
+      "permit_issued_date": "2020-01-29T00:00:00.000"
+    },
+    {
+      "bin": "1011379",
+      "filing_number": "I1",
+      "job_filing_number": "M00893221-I1-EL",
+      "job_description": "SIDEWALK SHED, PIPING WIRING AND LIGHTING FOR SHED",
+      "filing_status": "Complete",
+      "filing_date": "2023-06-20T00:00:00.000",
+      "permit_issued_date": "2023-06-20T00:00:00.000"
+    }
+  ]
+}

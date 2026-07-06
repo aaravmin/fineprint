@@ -1,0 +1,51 @@
+{
+  "key": "https://data.cityofnewyork.us/resource/f4rp-2kvy.json?bin=1011379&%24order=issuedate+DESC&%24limit=50000&%24offset=0",
+  "recordedAt": "2026-07-06T04:52:11.341Z",
+  "value": [
+    {
+      "requestid": "459866",
+      "applicationid": "CB038115",
+      "requesttype": "REGISTRATION INSPECTION",
+      "house": "15",
+      "street": "ABINGDON SQUARE",
+      "borough": "MANHATTAN",
+      "bin": "1011379",
+      "block": "00624",
+      "lot": "0031",
+      "ownername": "SIX SQUARE INC.",
+      "expirationdate": "2028-05-17T00:00:00.000",
+      "make": "BEST",
+      "model": "5B-70",
+      "burnermake": "WEBSTER",
+      "burnermodel": "JB2C-10",
+      "primaryfuel": "NATURALGAS",
+      "secondaryfuel": "NO2FUEL",
+      "quantity": "1",
+      "issuedate": "2025-05-19T11:20:06.000",
+      "status": "CURRENT",
+      "premisename": "SIX SQUARE INC."
+    },
+    {
+      "requestid": "116842",
+      "applicationid": "CA043278",
+      "requesttype": "CERTIFICATE TO OPERATE",
+      "house": "15",
+      "street": "ABINGDON SQUARE",
+      "borough": "MANHATTAN",
+      "bin": "1011379",
+      "block": "00624",
+      "lot": "0031",
+      "ownername": "6 SQUARE CO.THE ALPERT OFFICE",
+      "expirationdate": "2015-03-02T00:00:00.000",
+      "make": "ROCKMILLS MP90",
+      "model": "ROCKMILLS MP90",
+      "burnermake": "INDS COMB INC DE42YS",
+      "burnermodel": "INDS COMB INC DE42YS",
+      "primaryfuel": "NO6FUEL",
+      "secondaryfuel": "NONE",
+      "quantity": "1",
+      "issuedate": "1899-12-30T00:00:00.000",
+      "status": "CANCELLED"
+    }
+  ]
+}

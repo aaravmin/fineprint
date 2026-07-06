@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { assessObligations } from "../src/obligations.ts";
+import { emptyPublicRecords } from "../src/lookup.ts";
 import type { BuildingFacts } from "../src/types.ts";
 
 // A covered, over-cap office (the 350 5th Ave shape used elsewhere) plus an
@@ -31,18 +32,18 @@ const coveredOffice: BuildingFacts = {
     energyStarScore: 30,
   },
   openViolations: [],
+  ll84FuelUse: [],
+  publicRecords: emptyPublicRecords(),
   provenance: [],
 };
 
 describe("assessObligations", () => {
-  test("an over-cap covered office gets a performance and a procedural obligation", () => {
+  test("an over-cap covered office gets an LL97 performance obligation", () => {
     const { obligations } = assessObligations(coveredOffice);
 
     const ll97 = obligations.find(obligation => obligation.lawId === "ll97");
-    const ll84 = obligations.find(obligation => obligation.lawId === "ll84");
 
     expect(ll97?.kind).toBe("performance");
-    expect(ll84?.kind).toBe("procedural");
   });
 
   test("the LL97 performance obligation carries the engine's three periods and flags risk", () => {
@@ -57,51 +58,6 @@ describe("assessObligations", () => {
     // 2030-2034 is far over cap for this building, so it can't read satisfied.
     expect(ll97.status).not.toBe("satisfied");
     expect(ll97.findings.length).toBeGreaterThan(0);
-  });
-
-  const asOf = new Date("2026-06-06T00:00:00Z");
-
-  test("a current LL84 filing reads satisfied with no recommendation", () => {
-    const ll84 = assessObligations(coveredOffice, { asOf }).obligations.find(
-      obligation => obligation.lawId === "ll84",
-    );
-
-    expect(ll84?.status).toBe("satisfied");
-    expect(ll84?.recommendations).toHaveLength(0);
-  });
-
-  test("a missing LL84 filing reads due with a concrete next action", () => {
-    const noFiling: BuildingFacts = {
-      ...coveredOffice,
-      infrastructureProfile: {
-        ...coveredOffice.infrastructureProfile!,
-        hasLl84Filing: false,
-        ll84ReportingYear: null,
-      },
-    };
-
-    const ll84 = assessObligations(noFiling, { asOf }).obligations.find(
-      obligation => obligation.lawId === "ll84",
-    );
-
-    expect(ll84?.status).toBe("due");
-    expect(ll84?.recommendations[0]).toMatch(/benchmarking/i);
-  });
-
-  test("a stale LL84 filing reads at_risk", () => {
-    const stale: BuildingFacts = {
-      ...coveredOffice,
-      infrastructureProfile: {
-        ...coveredOffice.infrastructureProfile!,
-        ll84ReportingYear: 2021,
-      },
-    };
-
-    const ll84 = assessObligations(stale, { asOf }).obligations.find(
-      obligation => obligation.lawId === "ll84",
-    );
-
-    expect(ll84?.status).toBe("at_risk");
   });
 
   test("LL97 with no emissions data degrades to an unknown obligation, not a guess", () => {
@@ -122,7 +78,7 @@ describe("assessObligations", () => {
     expect(ll97.periods).toHaveLength(0);
   });
 
-  test("a small non-LL97 building still carries the universal gas-piping duty", () => {
+  test("a small building that isn't LL97-covered carries no LL97 obligation", () => {
     const tiny: BuildingFacts = {
       ...coveredOffice,
       grossFloorAreaSqft: 10_000,
@@ -133,26 +89,11 @@ describe("assessObligations", () => {
       obligation => obligation.lawId,
     );
 
-    // Under 25k sqft and not LL97-covered: no LL97/LL84/LL87, but LL152 binds.
-    expect(lawIds).toContain("ll152");
     expect(lawIds).not.toContain("ll97");
-    expect(lawIds).not.toContain("ll84");
   });
 });
 
-describe("LL88 and Article 321 analyzers", () => {
-  const asOfLl88 = new Date("2026-06-06T00:00:00Z");
-
-  test("LL88 binds a large building with a passed deadline and an LL97 cross-reference", () => {
-    const ll88 = assessObligations(coveredOffice, { asOf: asOfLl88 }).obligations.find(
-      obligation => obligation.lawId === "ll88",
-    );
-
-    expect(ll88?.kind).toBe("procedural");
-    expect(ll88?.status).toBe("due");
-    expect(ll88?.recommendations[0]).toMatch(/LL97/);
-  });
-
+describe("Article 321 analyzer", () => {
   test("an Article 321 building gets the art321 analyzer, not standard LL97", () => {
     const affordable: BuildingFacts = { ...coveredOffice, isArticle321: true };
 

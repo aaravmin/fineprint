@@ -1,0 +1,24 @@
+{
+  "key": "https://data.cityofnewyork.us/resource/dm9a-ab7w.json?bin=4059726&%24select=bin%2Cfiling_number%2Cjob_filing_number%2Cjob_description%2Cfiling_status%2Cfiling_date%2Cpermit_issued_date&%24limit=50000&%24offset=0",
+  "recordedAt": "2026-07-06T04:51:59.485Z",
+  "value": [
+    {
+      "bin": "4059726",
+      "filing_number": "I1",
+      "job_filing_number": "Q00984492-I1-EL",
+      "job_description": "This application is for the EPR work done in EPR#QN01404A3",
+      "filing_status": "Cancelled",
+      "filing_date": "2024-01-02T00:00:00.000",
+      "permit_issued_date": "2024-01-02T00:00:00.000"
+    },
+    {
+      "bin": "4059726",
+      "filing_number": "I1",
+      "job_filing_number": "Q01124935-I1-EL",
+      "job_description": "New panels and feeders from new ConEd service. this work is for work after EPR scope which is another app",
+      "filing_status": "Permit Issued",
+      "filing_date": "2024-10-09T00:00:00.000",
+      "permit_issued_date": "2024-10-09T00:00:00.000"
+    }
+  ]
+}

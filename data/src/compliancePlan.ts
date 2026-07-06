@@ -1,11 +1,11 @@
-// The whole-building compliance plan: one address, one plan covering every law
-// at once. It joins the obligation set to the retrofit plan so that a single
-// physical measure is credited against every law it retires — the LED lighting
-// upgrade closes the LL97 gap and clears LL88 in one line, never two. Each
+// The whole-building compliance plan: one address, one plan covering LL97 and
+// its Article 321 pathway. It joins the obligation set to the retrofit plan so
+// that a single physical measure is credited once toward closing the emissions
+// gap - the LED lighting upgrade is one line, never double-counted. Each
 // obligation gets exactly one disposition, so nothing is recommended or counted
 // twice.
 
-import { DEFAULT_MEASURES } from "../../engine/src/retrofit.ts";
+import { assessBuildingSystems } from "./buildingSystems.ts";
 import { toEngineInput } from "./engineBridge.ts";
 import type { Obligation as ObligationType } from "./obligations.ts";
 import {
@@ -13,13 +13,24 @@ import {
   type ComplianceStatus,
   type Obligation,
 } from "./obligations.ts";
+import {
+  measureSatisfiesLaws,
+  personalizeMeasures,
+  PERSONALIZED_CATALOG,
+  type PersonalizedMeasure,
+} from "./personalizedMeasures.ts";
 import { planRetrofit, type RetrofitPlan } from "./retrofit.ts";
-import type { BuildingFacts } from "./types.ts";
+import type { BuildingFacts, BuildingSystems, SystemKey } from "./types.ts";
 
 export interface PlanMeasure {
   id: string;
   name: string;
   capexUsd: number;
+  // The building system this measure targets, and the evidence-cited reason it
+  // was chosen - carried through from the personalized measure so the plan
+  // speaks in the building's own terms, not a generic catalog line.
+  targetSystem: SystemKey;
+  why: string;
   // Procedural laws this measure also retires for this building.
   alsoSatisfies: string[];
 }
@@ -46,7 +57,7 @@ export interface ObligationDisposition {
 export type FineDataStatus =
   | "available" // fines were computed; nothing to explain
   | "not_applicable" // absent from DOB's covered list -> LL97 most likely doesn't apply
-  | "covered_unfiled" // LL97 applies, but no LL84 filing exists to compute from
+  | "covered_unfiled" // LL97 applies, but no benchmarking filing exists to compute from
   | "data_incomplete" // a filing exists but is missing/unpriceable fields
   | "error"; // the lookup itself failed (bad address, dataset unreachable)
 
@@ -93,6 +104,10 @@ export interface PrioritizedAction {
   id: string;
   name: string;
   capexUsd: number | null;
+  // Present on measure actions: the building system the measure targets and the
+  // evidence-cited reason to do it. Absent on filing actions.
+  targetSystem?: SystemKey;
+  why?: string;
   satisfies: ActionLawLink[];
   // True when this single action resolves more than one law.
   isOverlap: boolean;
@@ -123,26 +138,35 @@ export interface CompliancePlan {
   crossCredits: string[];
   // Why fines are or aren't shown, reasoned from the data. See explainFineData.
   fineData: FineDataExplanation;
+  // The building's systems dossier and its full personalized measure catalog -
+  // recommendations and set-aside options alike. This is the whole story behind
+  // the plan, persisted in compliancePlanJson for the dashboard to render.
+  personalization: {
+    systems: BuildingSystems;
+    measures: PersonalizedMeasure[];
+  };
   notes: string[];
 }
 
 export function buildCompliancePlan(
   facts: BuildingFacts,
-  options: { asOf?: Date } = {},
+  options: { asOf?: Date; systems?: BuildingSystems } = {},
 ): CompliancePlan {
   const asOf = options.asOf ?? new Date();
+  const systems = options.systems ?? assessBuildingSystems(facts, asOf);
+  const personalized = personalizeMeasures(facts, systems, asOf);
+
   const { obligations } = assessObligations(facts, { asOf });
-  const plan = planRetrofit(facts, {
+  const plan = planRetrofit(facts, personalized, {
     proceduralPenaltySavingsByLaw: proceduralPenaltySavings(obligations),
   });
 
-  const sqft = facts.grossFloorAreaSqft ?? 0;
   const proceduralLawIds = new Set(
     obligations.filter(obligation => obligation.kind === "procedural").map(o => o.lawId),
   );
   const lawNameById = new Map(obligations.map(o => [o.lawId, o.lawName]));
 
-  const measures = chosenMeasures(plan, sqft, proceduralLawIds);
+  const measures = chosenMeasures(plan, personalized, proceduralLawIds);
 
   // Which procedural law each chosen measure retires, so dispositions and
   // cross-credits agree on a single source.
@@ -171,12 +195,13 @@ export function buildCompliancePlan(
     bbl: facts.bbl,
     pathway: plan?.pathway ?? null,
     measures,
-    totalCapexUsd: planTotalCapex(plan),
+    totalCapexUsd: totalCapex(measures),
     dispositions,
     laws,
     actions,
     crossCredits,
     fineData: explainFineData(facts),
+    personalization: { systems, measures: personalized },
     notes: plan?.findings ?? [],
   };
 }
@@ -228,7 +253,10 @@ function buildActions(
       satisfies.push(linkFor(lawId));
     }
     actions.push(
-      makeAction("measure", measure.id, measure.name, measure.capexUsd, satisfies),
+      makeAction("measure", measure.id, measure.name, measure.capexUsd, satisfies, {
+        targetSystem: measure.targetSystem,
+        why: measure.why,
+      }),
     );
   }
 
@@ -252,6 +280,7 @@ function makeAction(
   name: string,
   capexUsd: number | null,
   satisfies: ActionLawLink[],
+  measureContext: { targetSystem?: SystemKey; why?: string } = {},
 ): PrioritizedAction {
   const exposureAddressedUsd = satisfies.reduce(
     (sum, link) => sum + (link.exposureUsd ?? 0),
@@ -264,6 +293,8 @@ function makeAction(
     id,
     name,
     capexUsd,
+    targetSystem: measureContext.targetSystem,
+    why: measureContext.why,
     satisfies,
     isOverlap: satisfies.length > 1,
     exposureAddressedUsd,
@@ -310,9 +341,9 @@ function buildLawSummaries(
 //                     a small office, shop, or storefront). Caveat: the list is
 //                     annual, so a genuinely large building could be missing —
 //                     we say to verify size rather than assume exemption.
-//   covered_unfiled — on the list, but no LL84 filing exists. LL97 DOES apply;
-//                     the data is missing because the building wasn't benchmarked.
-//                     That is a compliance gap, not an exemption.
+//   covered_unfiled - on the list, but no benchmarking filing exists. LL97 DOES
+//                     apply; the data is missing because the building wasn't
+//                     benchmarked. That is a compliance gap, not an exemption.
 //   data_incomplete — a filing exists but a needed field is missing/unpriceable
 //                     (e.g. a fuel with no verified coefficient). A data-quality
 //                     problem to review, not an exemption.
@@ -340,10 +371,10 @@ export function explainFineData(facts: BuildingFacts): FineDataExplanation {
       status: "data_incomplete",
       missing,
       message:
-        "LL97 covers this building and an LL84 filing is on record, but the filing is " +
-        `missing the data needed to price fines (${missing.join(", ")}). That points to ` +
-        "an incomplete or unmappable benchmarking submission — review the LL84 filing " +
-        "rather than treat it as an exemption.",
+        "LL97 covers this building and a benchmarking filing is on record, but the filing " +
+        `is missing the data needed to price fines (${missing.join(", ")}). That points to ` +
+        "an incomplete or unmappable benchmarking submission - review the benchmarking " +
+        "filing rather than treat it as an exemption.",
     };
   }
 
@@ -353,9 +384,9 @@ export function explainFineData(facts: BuildingFacts): FineDataExplanation {
       missing,
       message:
         "LL97 applies to this building — it is on DOB's Covered Buildings List — but no " +
-        "LL84 benchmarking filing is on record, so fines can't be computed. The data is " +
+        "energy benchmarking filing is on record, so fines can't be computed. The data is " +
         "missing because the building hasn't been benchmarked, which is itself a " +
-        "compliance gap, not an exemption. File LL84 to establish the baseline.",
+        "compliance gap, not an exemption. Benchmark the building to establish the baseline.",
     };
   }
 
@@ -406,20 +437,26 @@ export function explainLookupError(error: unknown): FineDataExplanation {
   };
 }
 
+// The optimizer picks measure ids; this joins each back to its personalized
+// measure for the real cost, the targeted system, and the evidence-cited why -
+// never a per-sqft recompute. Ids the optimizer chose but the catalog no longer
+// carries degrade to a bare line rather than crash.
 function chosenMeasures(
   plan: RetrofitPlan | null,
-  sqft: number,
+  personalized: PersonalizedMeasure[],
   proceduralLawIds: Set<string>,
 ): PlanMeasure[] {
+  const personalizedById = new Map(personalized.map(measure => [measure.id, measure]));
+
   return chosenMeasureIds(plan).map(id => {
-    const definition = DEFAULT_MEASURES.find(measure => measure.id === id);
+    const measure = personalizedById.get(id);
     return {
       id,
-      name: definition?.name ?? id,
-      capexUsd: round2((definition?.capexUsdPerSqft ?? 0) * sqft),
-      alsoSatisfies: (definition?.satisfiesLaws ?? []).filter(lawId =>
-        proceduralLawIds.has(lawId),
-      ),
+      name: measure?.name ?? id,
+      capexUsd: round2(measure?.capexUsd ?? 0),
+      targetSystem: measure?.targetSystem ?? "heating_plant",
+      why: measure?.why ?? "",
+      alsoSatisfies: measureSatisfiesLaws(id).filter(lawId => proceduralLawIds.has(lawId)),
     };
   });
 }
@@ -441,7 +478,8 @@ function disposition(
       return {
         ...base,
         handledBy: "needs_attention",
-        detail: "Emissions baseline is missing — file LL84 so the gap can be computed.",
+        detail:
+          "Emissions baseline is missing - benchmark the building so the gap can be computed.",
       };
     }
     if (obligation.status === "satisfied") {
@@ -497,14 +535,11 @@ function chosenMeasureIds(plan: RetrofitPlan | null): string[] {
   return plan.assessment.cheapestCompliantPlan?.measureIds ?? [];
 }
 
-function planTotalCapex(plan: RetrofitPlan | null): number {
-  if (!plan) {
-    return 0;
-  }
-  if (plan.pathway === "standard") {
-    return plan.assessment.best.capexUsd;
-  }
-  return plan.assessment.cheapestCompliantPlan?.capexUsd ?? 0;
+// The plan's capex is the sum of its chosen measures' real personalized costs,
+// so the headline total and the per-measure lines always agree. Right-sizing's
+// negative incremental cost is already floored to cost-neutral upstream.
+function totalCapex(measures: PlanMeasure[]): number {
+  return round2(measures.reduce((sum, measure) => sum + measure.capexUsd, 0));
 }
 
 // Avoidable penalty per procedural law a measure could retire: only laws that
@@ -514,7 +549,7 @@ export function proceduralPenaltySavings(
   obligations: ObligationType[],
 ): Record<string, number> {
   const measureSatisfiable = new Set(
-    DEFAULT_MEASURES.flatMap(measure => measure.satisfiesLaws ?? []),
+    PERSONALIZED_CATALOG.flatMap(entry => entry.satisfiesLaws ?? []),
   );
 
   const savings: Record<string, number> = {};

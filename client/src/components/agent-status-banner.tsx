@@ -1,9 +1,7 @@
 "use client";
 
 import { TriangleAlert } from "lucide-react";
-import { useTable } from "spacetimedb/react";
-
-import { tables } from "@/module_bindings/index";
+import { useWorkers } from "@/lib/data/hooks";
 
 // Without a live worker the queue silently dead-ends: intakes sit open
 // forever and nothing in the UI says why. This strip says why — but it speaks
@@ -11,13 +9,13 @@ import { tables } from "@/module_bindings/index";
 // deployed build a regular user can't act on "npm run worker", so we never
 // show it to them; keeping workers alive is an operations concern there.
 export function AgentStatusBanner() {
-  const [workers] = useTable(tables.worker);
+  const workers = useWorkers();
 
   if (process.env.NODE_ENV === "production") {
     return null;
   }
 
-  const aliveWorkers = workers.filter(worker => worker.status !== "dead");
+  const aliveWorkers = workers.filter((worker) => worker.status !== "dead");
   if (aliveWorkers.length > 0) {
     return null;
   }

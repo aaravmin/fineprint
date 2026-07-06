@@ -1,0 +1,28 @@
+{
+  "key": "https://data.cityofnewyork.us/resource/f4rp-2kvy.json?bin=3071509&%24order=issuedate+DESC&%24limit=50000&%24offset=0",
+  "recordedAt": "2026-07-06T04:52:18.145Z",
+  "value": [
+    {
+      "requestid": "459587",
+      "applicationid": "CA131480",
+      "requesttype": "REGISTRATION INSPECTION",
+      "house": "77",
+      "street": "VARET STREET",
+      "borough": "BROOKLYN",
+      "bin": "3071509",
+      "block": "03106",
+      "lot": "00001",
+      "ownername": "ABECA MAGEMENT",
+      "expirationdate": "2027-07-01T00:00:00.000",
+      "make": "ROCKMILLS",
+      "model": "MP-70",
+      "burnermake": "IRON FIREMAN",
+      "burnermodel": "C-240-GO-SME",
+      "primaryfuel": "NO2FUEL",
+      "secondaryfuel": "NATURALGAS",
+      "quantity": "1",
+      "issuedate": "2025-07-17T12:40:00.000",
+      "status": "CURRENT"
+    }
+  ]
+}

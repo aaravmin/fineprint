@@ -1,0 +1,531 @@
+{
+  "key": "https://geosearch.planninglabs.nyc/v2/search?text=2111%20RICHMOND%20TERRACE%2C%20Staten%20Island%2C%20NY%2C%20USA",
+  "recordedAt": "2026-07-06T04:52:03.747Z",
+  "value": {
+    "geocoding": {
+      "version": "0.2",
+      "attribution": "http://geosearch.planninglabs.nyc/attribution",
+      "query": {
+        "text": "2111 RICHMOND TERRACE, Staten Island, NY, USA",
+        "size": 10,
+        "private": false,
+        "lang": {
+          "name": "English",
+          "iso6391": "en",
+          "iso6393": "eng",
+          "via": "default",
+          "defaulted": true
+        },
+        "querySize": 20,
+        "parser": "pelias",
+        "parsed_text": {
+          "subject": "2111 RICHMOND TERRACE",
+          "housenumber": "2111",
+          "street": "RICHMOND TERRACE",
+          "locality": "Staten Island",
+          "region": "NY",
+          "country": "USA",
+          "admin": "Staten Island, NY, USA"
+        }
+      },
+      "warnings": [
+        "invalid language provided via header"
+      ],
+      "engine": {
+        "name": "Pelias",
+        "author": "Mapzen",
+        "version": "1.0"
+      },
+      "timestamp": 1783313523918
+    },
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.13333,
+            40.64087
+          ]
+        },
+        "properties": {
+          "id": "4336681",
+          "gid": "nycpad:venue:4336681",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "4336681",
+          "country_code": "US",
+          "name": "2111 RICHMOND TERRACE",
+          "housenumber": "2111",
+          "street": "RICHMOND TERRACE",
+          "postalcode": "10302",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Richmond County",
+          "county_gid": "whosonfirst:county:102081779",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Staten Island",
+          "borough_gid": "whosonfirst:borough:421205775",
+          "neighbourhood": "Port Richmond",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85842829",
+          "label": "2111 RICHMOND TERRACE, Staten Island, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "5010680072",
+              "bin": "5107019",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.090372,
+            40.645911
+          ]
+        },
+        "properties": {
+          "id": "4270005",
+          "gid": "nycpad:venue:4270005",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "4270005",
+          "country_code": "US",
+          "name": "544 RICHMOND TERRACE",
+          "housenumber": "544",
+          "street": "RICHMOND TERRACE",
+          "postalcode": "10301",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Richmond County",
+          "county_gid": "whosonfirst:county:102081779",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Staten Island",
+          "borough_gid": "whosonfirst:borough:421205775",
+          "neighbourhood": "New Brighton",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85836569",
+          "label": "544 RICHMOND TERRACE, Staten Island, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "5000620094",
+              "bin": "5001474",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.089362,
+            40.646204
+          ]
+        },
+        "properties": {
+          "id": "4270009",
+          "gid": "nycpad:venue:4270009",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "4270009",
+          "country_code": "US",
+          "name": "514 RICHMOND TERRACE",
+          "housenumber": "514",
+          "street": "RICHMOND TERRACE",
+          "postalcode": "10301",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Richmond County",
+          "county_gid": "whosonfirst:county:102081779",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Staten Island",
+          "borough_gid": "whosonfirst:borough:421205775",
+          "neighbourhood": "New Brighton",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85836569",
+          "label": "514 RICHMOND TERRACE, Staten Island, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "5000620106",
+              "bin": "5001475",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.091543,
+            40.645418
+          ]
+        },
+        "properties": {
+          "id": "4269991",
+          "gid": "nycpad:venue:4269991",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "4269991",
+          "country_code": "US",
+          "name": "594 RICHMOND TERRACE",
+          "housenumber": "594",
+          "street": "RICHMOND TERRACE",
+          "postalcode": "10301",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Richmond County",
+          "county_gid": "whosonfirst:county:102081779",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Staten Island",
+          "borough_gid": "whosonfirst:borough:421205775",
+          "neighbourhood": "New Brighton",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85836569",
+          "label": "594 RICHMOND TERRACE, Staten Island, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "5000620027",
+              "bin": "5001471",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.091543,
+            40.645418
+          ]
+        },
+        "properties": {
+          "id": "4269995",
+          "gid": "nycpad:venue:4269995",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "4269995",
+          "country_code": "US",
+          "name": "598 RICHMOND TERRACE",
+          "housenumber": "598",
+          "street": "RICHMOND TERRACE",
+          "postalcode": "10301",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Richmond County",
+          "county_gid": "whosonfirst:county:102081779",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Staten Island",
+          "borough_gid": "whosonfirst:borough:421205775",
+          "neighbourhood": "New Brighton",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85836569",
+          "label": "598 RICHMOND TERRACE, Staten Island, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "5000620027",
+              "bin": "5001471",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.09488,
+            40.64472
+          ]
+        },
+        "properties": {
+          "id": "4270469",
+          "gid": "nycpad:venue:4270469",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "4270469",
+          "country_code": "US",
+          "name": "646 RICHMOND TERRACE",
+          "housenumber": "646",
+          "street": "RICHMOND TERRACE",
+          "postalcode": "10301",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Richmond County",
+          "county_gid": "whosonfirst:county:102081779",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Staten Island",
+          "borough_gid": "whosonfirst:borough:421205775",
+          "neighbourhood": "New Brighton",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85836569",
+          "label": "646 RICHMOND TERRACE, Staten Island, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "5000670111",
+              "bin": "5000000",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.09488,
+            40.64472
+          ]
+        },
+        "properties": {
+          "id": "4270487",
+          "gid": "nycpad:venue:4270487",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "4270487",
+          "country_code": "US",
+          "name": "666 RICHMOND TERRACE",
+          "housenumber": "666",
+          "street": "RICHMOND TERRACE",
+          "postalcode": "10301",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Richmond County",
+          "county_gid": "whosonfirst:county:102081779",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Staten Island",
+          "borough_gid": "whosonfirst:borough:421205775",
+          "neighbourhood": "New Brighton",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85836569",
+          "label": "666 RICHMOND TERRACE, Staten Island, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "5000670111",
+              "bin": "5000000",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.09488,
+            40.64472
+          ]
+        },
+        "properties": {
+          "id": "4270495",
+          "gid": "nycpad:venue:4270495",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "4270495",
+          "country_code": "US",
+          "name": "674 RICHMOND TERRACE",
+          "housenumber": "674",
+          "street": "RICHMOND TERRACE",
+          "postalcode": "10301",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Richmond County",
+          "county_gid": "whosonfirst:county:102081779",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Staten Island",
+          "borough_gid": "whosonfirst:borough:421205775",
+          "neighbourhood": "New Brighton",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85836569",
+          "label": "674 RICHMOND TERRACE, Staten Island, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "5000670111",
+              "bin": "5000000",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.09488,
+            40.64472
+          ]
+        },
+        "properties": {
+          "id": "4270499",
+          "gid": "nycpad:venue:4270499",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "4270499",
+          "country_code": "US",
+          "name": "678 RICHMOND TERRACE",
+          "housenumber": "678",
+          "street": "RICHMOND TERRACE",
+          "postalcode": "10301",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Richmond County",
+          "county_gid": "whosonfirst:county:102081779",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Staten Island",
+          "borough_gid": "whosonfirst:borough:421205775",
+          "neighbourhood": "New Brighton",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85836569",
+          "label": "678 RICHMOND TERRACE, Staten Island, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "5000670111",
+              "bin": "5000000",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -74.09312,
+            40.64503
+          ]
+        },
+        "properties": {
+          "id": "4270513",
+          "gid": "nycpad:venue:4270513",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "4270513",
+          "country_code": "US",
+          "name": "626 RICHMOND TERRACE",
+          "housenumber": "626",
+          "street": "RICHMOND TERRACE",
+          "postalcode": "10301",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Richmond County",
+          "county_gid": "whosonfirst:county:102081779",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Staten Island",
+          "borough_gid": "whosonfirst:borough:421205775",
+          "neighbourhood": "New Brighton",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85836569",
+          "label": "626 RICHMOND TERRACE, Staten Island, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "5000670142",
+              "bin": "5000000",
+              "version": "26a"
+            }
+          }
+        }
+      }
+    ],
+    "bbox": [
+      -74.13333,
+      40.64087,
+      -74.089362,
+      40.646204
+    ]
+  }
+}

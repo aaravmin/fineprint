@@ -4,31 +4,34 @@ import { useState } from "react";
 
 import { Bot, CircleDot, Skull, Zap } from "lucide-react";
 import { toast } from "sonner";
-import { useReducer, useTable } from "spacetimedb/react";
 
+import { useTasks, useWorkers } from "@/lib/data/hooks";
+import { useKillWorker, usePruneDeadWorkers } from "@/lib/data/mutations";
+
+import { StatusDot, type StatusTone } from "@/components/dashboard/StatusPill";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyFolder } from "@/components/ui/empty-folder";
 import { LoadingDots } from "@/components/ui/loading-dots";
+import { relativeTimeAgo } from "@/lib/format";
 import { withAck } from "@/lib/reducer-call";
-import { reducers, tables } from "@/module_bindings/index";
 
-const STATUS_VARIANT: Record<
-  string,
-  "default" | "secondary" | "destructive" | "outline"
-> = {
-  idle: "secondary",
-  working: "default",
-  dead: "destructive",
-};
+function workerTone(status: string): StatusTone {
+  if (status === "working") {
+    return "success";
+  }
+  if (status === "dead") {
+    return "destructive";
+  }
+  return "muted";
+}
 
 export function AgentsClient() {
-  const [workers] = useTable(tables.worker);
-  const [tasks] = useTable(tables.task);
-  const killWorker = useReducer(reducers.killWorker);
-  const pruneDeadWorkers = useReducer(reducers.pruneDeadWorkers);
+  const workers = useWorkers();
+  const tasks = useTasks();
+  const killWorker = useKillWorker();
+  const pruneDeadWorkers = usePruneDeadWorkers();
   const [killingId, setKillingId] = useState<bigint | null>(null);
   const [showDead, setShowDead] = useState(false);
 
@@ -43,18 +46,16 @@ export function AgentsClient() {
 
   function clearDead() {
     toast("Clearing dead agents");
-    withAck(pruneDeadWorkers(), "The cleanup").catch((error: Error) =>
-      toast.error(`Cleanup failed: ${error.message}`),
-    );
+    withAck(pruneDeadWorkers(), "The cleanup").catch((error: Error) => toast.error(`Cleanup failed: ${error.message}`));
   }
 
   // Per-task agents leave one dead row each; hide them unless asked.
-  const visibleWorkers = showDead ? workers : workers.filter(w => w.status !== "dead");
+  const visibleWorkers = showDead ? workers : workers.filter((w) => w.status !== "dead");
   const sorted = [...visibleWorkers].sort((a, b) => (a.id < b.id ? -1 : 1));
 
-  const idle = workers.filter(w => w.status === "idle").length;
-  const working = workers.filter(w => w.status === "working").length;
-  const dead = workers.filter(w => w.status === "dead").length;
+  const idle = workers.filter((w) => w.status === "idle").length;
+  const working = workers.filter((w) => w.status === "working").length;
+  const dead = workers.filter((w) => w.status === "dead").length;
 
   return (
     <div className="@container/main flex flex-col gap-4 md:gap-6">
@@ -69,7 +70,7 @@ export function AgentsClient() {
         />
         <StatCard
           icon={<Zap className="size-4" />}
-          iconClassName="bg-[var(--success)]/10 text-[var(--success)]"
+          iconClassName="bg-success/10 text-success"
           label="Working"
           value={working}
           pulse={working > 0}
@@ -88,12 +89,7 @@ export function AgentsClient() {
           <div className="flex flex-wrap items-center justify-between gap-2">
             <CardTitle>Fleet</CardTitle>
             <div className="flex items-center gap-2">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowDead(previous => !previous)}
-              >
+              <Button type="button" variant="ghost" size="sm" onClick={() => setShowDead((previous) => !previous)}>
                 {showDead ? "Hide dead" : `Show dead (${dead})`}
               </Button>
               {dead > 0 && (
@@ -106,55 +102,38 @@ export function AgentsClient() {
         </CardHeader>
         <CardContent className="p-0">
           {sorted.length === 0 ? (
-            <EmptyFolder
-              title="No agents connected"
-              description="Connected agents will appear here in real time."
-            />
+            <EmptyFolder title="No agents connected" description="Connected agents will appear here in real time." />
           ) : (
             <div className="divide-y">
-              {sorted.map(w => {
+              {sorted.map((w) => {
                 const currentTask =
-                  w.currentTaskId !== undefined
-                    ? tasks.find(t => t.id === w.currentTaskId)
-                    : undefined;
+                  w.currentTaskId !== undefined ? tasks.find((t) => t.id === w.currentTaskId) : undefined;
 
                 return (
                   <div key={String(w.id)} className="flex items-center gap-4 px-6 py-4">
                     <Avatar className="size-9">
                       <AvatarFallback
-                        className={
-                          w.status === "dead"
-                            ? "bg-destructive-subtle text-destructive"
-                            : "bg-secondary"
-                        }
+                        className={w.status === "dead" ? "bg-destructive-subtle text-destructive" : "bg-secondary"}
                       >
-                        {w.status === "dead" ? (
-                          <Skull className="size-4" />
-                        ) : (
-                          <Bot className="size-4" />
-                        )}
+                        {w.status === "dead" ? <Skull className="size-4" /> : <Bot className="size-4" />}
                       </AvatarFallback>
                     </Avatar>
 
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-medium">{w.name}</span>
-                        <Badge variant={STATUS_VARIANT[w.status] ?? "secondary"}>
-                          {w.status === "working" && (
-                            <span className="mr-1 inline-block size-1.5 animate-pulse rounded-full bg-[var(--success)]" />
-                          )}
+                        <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <StatusDot tone={workerTone(w.status)} pulse={w.status === "working"} label={w.status} />
                           {w.status}
-                        </Badge>
+                        </span>
                       </div>
                       {currentTask && (
-                        <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                          {currentTask.title}
-                        </p>
+                        <p className="mt-0.5 truncate text-xs text-muted-foreground">{currentTask.title}</p>
                       )}
                     </div>
 
-                    <span className="hidden font-mono text-xs text-muted-foreground sm:inline">
-                      {w.identity.toHexString().slice(0, 8)}
+                    <span className="hidden text-xs text-muted-foreground sm:inline">
+                      {relativeTimeAgo(w.lastHeartbeat.toDate())}
                     </span>
                     {w.status !== "dead" && (
                       <Button
@@ -211,9 +190,7 @@ function StatCard({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <p className={`text-3xl font-semibold tabular-nums ${valueClassName ?? ""}`}>
-          {value}
-        </p>
+        <p className={`text-3xl font-semibold tabular-nums ${valueClassName ?? ""}`}>{value}</p>
       </CardContent>
     </Card>
   );

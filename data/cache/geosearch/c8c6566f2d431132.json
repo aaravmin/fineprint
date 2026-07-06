@@ -1,0 +1,530 @@
+{
+  "key": "https://geosearch.planninglabs.nyc/v2/search?text=58-80%2059%20STREET%2C%20Maspeth%2C%20NY%2C%20USA",
+  "recordedAt": "2026-07-06T04:51:58.368Z",
+  "value": {
+    "geocoding": {
+      "version": "0.2",
+      "attribution": "http://geosearch.planninglabs.nyc/attribution",
+      "query": {
+        "text": "58-80 59 STREET, Maspeth, NY, USA",
+        "size": 10,
+        "private": false,
+        "lang": {
+          "name": "English",
+          "iso6391": "en",
+          "iso6393": "eng",
+          "via": "default",
+          "defaulted": true
+        },
+        "querySize": 20,
+        "parser": "pelias",
+        "parsed_text": {
+          "subject": "58-80 59 STREET",
+          "housenumber": "58-80",
+          "street": "59 STREET",
+          "locality": "NY",
+          "country": "USA",
+          "admin": "Maspeth, NY, USA"
+        }
+      },
+      "warnings": [
+        "invalid language provided via header"
+      ],
+      "engine": {
+        "name": "Pelias",
+        "author": "Mapzen",
+        "version": "1.0"
+      },
+      "timestamp": 1783313518555
+    },
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.909327,
+            40.7251
+          ]
+        },
+        "properties": {
+          "id": "2141811",
+          "gid": "nycpad:venue:2141811",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "2141811",
+          "country_code": "US",
+          "name": "58-80 59 STREET",
+          "housenumber": "58-80",
+          "street": "59 STREET",
+          "postalcode": "11378",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Queens County",
+          "county_gid": "whosonfirst:county:102082377",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Queens",
+          "borough_gid": "whosonfirst:borough:421205767",
+          "neighbourhood": "Maspeth",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85832845",
+          "label": "58-80 59 STREET, Maspeth, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "4026660020",
+              "bin": "4059726",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.894918,
+            40.693373
+          ]
+        },
+        "properties": {
+          "id": "2525554",
+          "gid": "nycpad:venue:2525554",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "2525554",
+          "country_code": "US",
+          "name": "80-58 59 STREET",
+          "housenumber": "80-58",
+          "street": "59 STREET",
+          "postalcode": "11385",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Queens County",
+          "county_gid": "whosonfirst:county:102082377",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Queens",
+          "borough_gid": "whosonfirst:borough:421205767",
+          "neighbourhood": "Fresh Pond",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85821899",
+          "label": "80-58 59 STREET, Fresh Pond, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "4037310035",
+              "bin": "4091099",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.910012,
+            40.718615
+          ]
+        },
+        "properties": {
+          "id": "2142853",
+          "gid": "nycpad:venue:2142853",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "2142853",
+          "country_code": "US",
+          "name": "58-80 59 AVENUE",
+          "housenumber": "58-80",
+          "street": "59 AVENUE",
+          "postalcode": "11378",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Queens County",
+          "county_gid": "whosonfirst:county:102082377",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Queens",
+          "borough_gid": "whosonfirst:borough:421205767",
+          "neighbourhood": "Maspeth",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85832845",
+          "label": "58-80 59 AVENUE, Maspeth, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "4026820001",
+              "bin": "4312831",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.908805,
+            40.719353
+          ]
+        },
+        "properties": {
+          "id": "2142810",
+          "gid": "nycpad:venue:2142810",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "2142810",
+          "country_code": "US",
+          "name": "58-58 59 STREET",
+          "housenumber": "58-58",
+          "street": "59 STREET",
+          "postalcode": "11378",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Queens County",
+          "county_gid": "whosonfirst:county:102082377",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Queens",
+          "borough_gid": "whosonfirst:borough:421205767",
+          "neighbourhood": "Maspeth",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85832845",
+          "label": "58-58 59 STREET, Maspeth, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "4026810084",
+              "bin": "4059939",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.907952,
+            40.719415
+          ]
+        },
+        "properties": {
+          "id": "2144447",
+          "gid": "nycpad:venue:2144447",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "2144447",
+          "country_code": "US",
+          "name": "58-59 59 STREET",
+          "housenumber": "58-59",
+          "street": "59 STREET",
+          "postalcode": "11378",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Queens County",
+          "county_gid": "whosonfirst:county:102082377",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Queens",
+          "borough_gid": "whosonfirst:borough:421205767",
+          "neighbourhood": "Maspeth",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85832845",
+          "label": "58-59 59 STREET, Maspeth, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "4026990106",
+              "bin": "4533547",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.89425,
+            40.693006
+          ]
+        },
+        "properties": {
+          "id": "2525574",
+          "gid": "nycpad:venue:2525574",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "2525574",
+          "country_code": "US",
+          "name": "80-80 59 STREET",
+          "housenumber": "80-80",
+          "street": "59 STREET",
+          "postalcode": "11385",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Queens County",
+          "county_gid": "whosonfirst:county:102082377",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Queens",
+          "borough_gid": "whosonfirst:borough:421205767",
+          "neighbourhood": "Fresh Pond",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85821899",
+          "label": "80-80 59 STREET, Fresh Pond, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "4037310048",
+              "bin": "4531270",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.908531,
+            40.720696
+          ]
+        },
+        "properties": {
+          "id": "2142736",
+          "gid": "nycpad:venue:2142736",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "2142736",
+          "country_code": "US",
+          "name": "58-12 59 STREET",
+          "housenumber": "58-12",
+          "street": "59 STREET",
+          "postalcode": "11378",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Queens County",
+          "county_gid": "whosonfirst:county:102082377",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Queens",
+          "borough_gid": "whosonfirst:borough:421205767",
+          "neighbourhood": "Maspeth",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85832845",
+          "label": "58-12 59 STREET, Maspeth, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "4026800052",
+              "bin": "4059926",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.908572,
+            40.71988
+          ]
+        },
+        "properties": {
+          "id": "2142796",
+          "gid": "nycpad:venue:2142796",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "2142796",
+          "country_code": "US",
+          "name": "58-46 59 STREET",
+          "housenumber": "58-46",
+          "street": "59 STREET",
+          "postalcode": "11378",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Queens County",
+          "county_gid": "whosonfirst:county:102082377",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Queens",
+          "borough_gid": "whosonfirst:borough:421205767",
+          "neighbourhood": "Maspeth",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85832845",
+          "label": "58-46 59 STREET, Maspeth, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "4026810054",
+              "bin": "4538797",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.908568,
+            40.719813
+          ]
+        },
+        "properties": {
+          "id": "2142798",
+          "gid": "nycpad:venue:2142798",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "2142798",
+          "country_code": "US",
+          "name": "58-48 59 STREET",
+          "housenumber": "58-48",
+          "street": "59 STREET",
+          "postalcode": "11378",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Queens County",
+          "county_gid": "whosonfirst:county:102082377",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Queens",
+          "borough_gid": "whosonfirst:borough:421205767",
+          "neighbourhood": "Maspeth",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85832845",
+          "label": "58-48 59 STREET, Maspeth, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "4026810058",
+              "bin": "4539687",
+              "version": "26a"
+            }
+          }
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.908114,
+            40.720803
+          ]
+        },
+        "properties": {
+          "id": "2144038",
+          "gid": "nycpad:venue:2144038",
+          "layer": "venue",
+          "source": "nycpad",
+          "source_id": "2144038",
+          "country_code": "US",
+          "name": "58-07 59 STREET",
+          "housenumber": "58-07",
+          "street": "59 STREET",
+          "postalcode": "11378",
+          "confidence": 0.8,
+          "match_type": "fallback",
+          "accuracy": "point",
+          "country": "United States",
+          "country_gid": "whosonfirst:country:85633793",
+          "country_a": "USA",
+          "region": "New York",
+          "region_gid": "whosonfirst:region:85688543",
+          "region_a": "NY",
+          "county": "Queens County",
+          "county_gid": "whosonfirst:county:102082377",
+          "locality": "New York",
+          "locality_gid": "whosonfirst:locality:85977539",
+          "locality_a": "NYC",
+          "borough": "Queens",
+          "borough_gid": "whosonfirst:borough:421205767",
+          "neighbourhood": "Maspeth",
+          "neighbourhood_gid": "whosonfirst:neighbourhood:85832845",
+          "label": "58-07 59 STREET, Maspeth, NY, USA",
+          "addendum": {
+            "pad": {
+              "bbl": "4026950017",
+              "bin": "4060206",
+              "version": "26a"
+            }
+          }
+        }
+      }
+    ],
+    "bbox": [
+      -73.910012,
+      40.693006,
+      -73.89425,
+      40.7251
+    ]
+  }
+}

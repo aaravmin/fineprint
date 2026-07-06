@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { dataToolDefinitions, executeDataTool } from "../src/tools.ts";
+import { emptyPublicRecords } from "../src/lookup.ts";
 import type { BuildingFacts } from "../src/types.ts";
 
 // Tool layer for agent workers: Anthropic tool-use definitions plus a
@@ -16,6 +17,8 @@ const emirateFacts: BuildingFacts = {
   isArticle321: false,
   plutoCharacteristics: null,
   openViolations: [],
+  ll84FuelUse: [],
+  publicRecords: emptyPublicRecords(),
   provenance: [{ field: "bbl", source: "NYC GeoSearch" }],
 };
 
@@ -73,7 +76,12 @@ describe("data tools for agents", () => {
     );
     const parsed = JSON.parse(reply);
 
-    expect(parsed.retrofit.evaluatedSubsets).toBe(128);
+    // This office has more usable measures than the engine can enumerate: the
+    // steam-only and elevator/electrical measures are gated out, but the fossil
+    // heating, hot-water, and envelope options still leave more than twelve on the
+    // table. The retrofit bridge ranks and truncates them to the engine's cap, so
+    // exactly 2^12 subsets are enumerated.
+    expect(parsed.retrofit.evaluatedSubsets).toBe(2 ** 12);
     expect(parsed.retrofit.best.totalCostUsd).toBeLessThanOrEqual(
       parsed.retrofit.doNothing.totalCostUsd,
     );

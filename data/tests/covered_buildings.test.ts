@@ -22,15 +22,14 @@ describe("covered buildings list", () => {
     expect(await fetchArticle321Flag("1000087501")).toBe(true);
   });
 
-  test("an LL84-only building is not LL97-covered", async () => {
+  test("a listed building outside the LL97 threshold is not LL97-covered", async () => {
     const entry = getCblEntry("1000020023");
 
     expect(await isLl97Covered("1000020023")).toBe(false);
-    expect(entry?.ll84).toBe(true);
-    expect(entry?.ll87).toBe(false);
+    expect(entry?.ll97).toBe(false);
   });
 
-  test("a BBL absent from the list is not covered by any law", async () => {
+  test("a BBL absent from the list is not covered", async () => {
     expect(getCblEntry("9999999999")).toBeNull();
     expect(await isLl97Covered("9999999999")).toBe(false);
     expect(await fetchArticle321Flag("9999999999")).toBe(false);

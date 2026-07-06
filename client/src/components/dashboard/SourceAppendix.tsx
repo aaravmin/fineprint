@@ -33,14 +33,12 @@ export function SourceAppendix({ report }: { report: ComplianceReport }) {
       <div className="rounded-lg border bg-muted/30 px-4 py-3 text-xs text-muted-foreground">
         <p className="font-medium text-foreground/80">Professional verification</p>
         <p className="mt-1">
-          This report is an owner/property-manager record, not a filed report or a legal
-          determination of compliance. The emissions calculation and any filing decision require
-          verification by a Registered Design Professional before submission to the NYC Department of
-          Buildings.
+          This report is an owner/property-manager record, not a filed report or a legal determination of compliance.
+          The emissions calculation and any filing decision require verification by a Registered Design Professional
+          before submission to the NYC Department of Buildings.
         </p>
         <p className="mt-2 tabular-nums">
-          Schema {report.schema_version} · generated{" "}
-          {new Date(report.generated_at).toLocaleString()}
+          Schema {report.schema_version} · generated {new Date(report.generated_at).toLocaleString()}
         </p>
       </div>
     </section>

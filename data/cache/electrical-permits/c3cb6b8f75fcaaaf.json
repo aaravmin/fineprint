@@ -1,0 +1,42 @@
+{
+  "key": "https://data.cityofnewyork.us/resource/dm9a-ab7w.json?bin=3071509&%24select=bin%2Cfiling_number%2Cjob_filing_number%2Cjob_description%2Cfiling_status%2Cfiling_date%2Cpermit_issued_date&%24limit=50000&%24offset=0",
+  "recordedAt": "2026-07-06T04:52:17.840Z",
+  "value": [
+    {
+      "bin": "3071509",
+      "filing_number": "I1",
+      "job_filing_number": "B00220715-I1-EL",
+      "job_description": "General Wiring, To Correct ECB Violation # 35228133M for BRANCH CIRCUIT WIRING INSTALLED IN APT 25",
+      "filing_status": "Complete",
+      "filing_date": "2019-09-03T00:00:00.000",
+      "permit_issued_date": "2019-09-03T00:00:00.000"
+    },
+    {
+      "bin": "3071509",
+      "filing_number": "I1",
+      "job_filing_number": "B00220786-I1-EL",
+      "job_description": "Disconnect switch for Hot water Heater in Basement, Correct ECB Violation # 35228136H",
+      "filing_status": "Complete",
+      "filing_date": "2019-09-03T00:00:00.000",
+      "permit_issued_date": "2019-09-03T00:00:00.000"
+    },
+    {
+      "bin": "3071509",
+      "filing_number": "I1",
+      "job_filing_number": "B00265466-I1-EL",
+      "job_description": "Permit being Filed to Correct ECB Violation #s: 35228133M, 35228134Y, and 35228136H. Branch Circuit Wiring in Apt 25, Redid Unsafe and Unapproved Electrical Work in Basement and Installed Disconnect Switch for Hot Water Heater in Basement",
+      "filing_status": "Permit Issued",
+      "filing_date": "2019-11-14T00:00:00.000",
+      "permit_issued_date": "2019-11-14T00:00:00.000"
+    },
+    {
+      "bin": "3071509",
+      "filing_number": "I1",
+      "job_filing_number": "B00840737-I1-EL",
+      "job_description": "Install two new service switches. One 200 amp and one 400 amp to pick up existing loads.",
+      "filing_status": "Permit Issued",
+      "filing_date": "2023-03-08T00:00:00.000",
+      "permit_issued_date": "2023-03-08T00:00:00.000"
+    }
+  ]
+}

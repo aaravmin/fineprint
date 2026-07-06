@@ -29,6 +29,21 @@ const ll84Facts: Ll84Facts = {
   proxiedUses: [],
   unmappedUses: [],
   unpriceableFuels: [],
+  fuelUse: [
+    {
+      fuel: "electricity",
+      column: "electricity_use_grid_purchase_1",
+      kbtu: 105_259_519.8,
+      tco2e: 8_914.51,
+    },
+    {
+      fuel: "district_steam",
+      column: "district_steam_use_kbtu",
+      kbtu: 64_363_489.2,
+      tco2e: 2_892.45,
+    },
+  ],
+  electricityKwh: 30_849_800.6,
   fuelMix: ["electricity", "district_steam"],
   heatingFuel: "district_steam",
   siteEuiKbtuPerSqft: 61.4,
@@ -38,9 +53,6 @@ const ll84Facts: Ll84Facts = {
 const cblEntry: CblEntry = {
   ll97: true,
   article321: false,
-  ll84: true,
-  ll87: true,
-  ll88: true,
   dofGrossSqft: 2_812_739,
   dofAddress: "338 5 AVENUE",
   source: "DOB Sustainability Covered Buildings List, Filing Year 2026",
@@ -284,6 +296,93 @@ describe("lookupBuilding", () => {
 
     expect(facts.isLl97Covered).toBe(false);
     expect(facts.isArticle321).toBe(false);
+  });
+
+  test("public records flow into facts.publicRecords with a provenance note each", async () => {
+    const facts = await lookupBuilding(
+      "350 5th Avenue, Manhattan",
+      fakeSources({
+        fetchBisPermitsByBin: async () => [
+          {
+            jobNumber: "220161278",
+            permitSiNo: "2498297",
+            bin: "1015862",
+            jobType: "A3",
+            workType: "BL",
+            permitType: "EQ",
+            permitSubtype: "SH",
+            permitStatus: "ISSUED",
+            filingDate: "12/23/2011",
+            issuanceDate: "12/23/2011",
+            expirationDate: "04/04/2012",
+            raw: {},
+          },
+        ],
+        fetchCatsPermitsByBin: async () => [
+          {
+            applicationId: "CA187669",
+            requestId: null,
+            requestType: "CERTIFICATE TO OPERATE",
+            bin: "1015862",
+            primaryFuel: "NO6FUEL",
+            secondaryFuel: "NO4FUEL",
+            make: "TITUSVILLE",
+            model: null,
+            burnerMake: null,
+            burnerModel: null,
+            issueDate: "1900-01-01T00:00:00.000",
+            expirationDate: "1997-07-01T00:00:00.000",
+            status: "CANCELLED",
+            raw: {},
+          },
+        ],
+        fetchHpdComplaintsByBbl: async () => [
+          {
+            complaintId: "14872017",
+            problemId: "28918465",
+            bbl: "1008350041",
+            bin: "1015862",
+            majorCategory: "HEAT/HOT WATER",
+            minorCategory: "ENTIRE BUILDING",
+            problemCode: "NO HEAT",
+            complaintStatus: "OPEN",
+            problemStatus: "OPEN",
+            statusDescription: null,
+            receivedDate: "2026-01-01T00:00:00.000",
+            raw: {},
+          },
+        ],
+      }),
+    );
+
+    expect(facts.publicRecords.bisPermits[0].workType).toBe("BL");
+    expect(facts.publicRecords.catsPermits[0].primaryFuel).toBe("NO6FUEL");
+    expect(facts.publicRecords.hpdComplaints[0].majorCategory).toBe("HEAT/HOT WATER");
+    // A dataset with no fake enricher resolves to an honest empty list.
+    expect(facts.publicRecords.elevatorDevices).toEqual([]);
+
+    const permitNote = facts.provenance.find(
+      note => note.field === "publicRecords.bisPermits",
+    );
+    expect(permitNote?.detail).toMatch(/record\(s\) on file/);
+  });
+
+  test("public records degrade to empty with a note when there is no BIN", async () => {
+    const facts = await lookupBuilding(
+      "350 5th Avenue, Manhattan",
+      fakeSources({
+        lookupBblCandidates: async () => [{ ...geoResult, bin: null }],
+        fetchBisPermitsByBin: async () => {
+          throw new Error("should not be called without a BIN");
+        },
+      }),
+    );
+
+    expect(facts.publicRecords.bisPermits).toEqual([]);
+    const permitNote = facts.provenance.find(
+      note => note.field === "publicRecords.bisPermits",
+    );
+    expect(permitNote?.detail).toMatch(/no BIN/i);
   });
 
   test("an unresolvable address propagates GeoSearch's error", async () => {

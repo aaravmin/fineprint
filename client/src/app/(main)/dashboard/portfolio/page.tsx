@@ -1,5 +1,8 @@
+import { currentUser } from "@clerk/nextjs/server";
+
 import { PortfolioClient } from "./_components/portfolio-client";
 
-export default function PortfolioPage() {
-  return <PortfolioClient />;
+export default async function PortfolioPage() {
+  const user = await currentUser();
+  return <PortfolioClient firstName={user?.firstName ?? null} />;
 }

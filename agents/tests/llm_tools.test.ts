@@ -21,6 +21,8 @@ function draftInput(overrides: Partial<DraftInput> = {}): DraftInput {
     uses: [{ group: "Office", sqft: 2_852_257 }],
     ll97Covered: true,
     provenance: [],
+    systemDrivers: [],
+    measureHighlights: [],
     ...overrides,
   };
 }

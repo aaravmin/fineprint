@@ -30,6 +30,8 @@ function esbInput(overrides: Partial<DraftInput> = {}): DraftInput {
     ],
     ll97Covered: true,
     provenance: [],
+    systemDrivers: [],
+    measureHighlights: [],
     ...overrides,
   };
 }

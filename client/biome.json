@@ -39,7 +39,8 @@
       "!.next",
       "!dist",
       "!out",
-      "!src/components/ui"
+      "!src/components/ui",
+      "!src/module_bindings"
     ]
   },
   "formatter": {

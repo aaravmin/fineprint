@@ -2,9 +2,9 @@
 // the numbers, and a print/Save-as-PDF of the styled report (window.print plus
 // the @media print rules in globals.css). Both run entirely in the browser.
 
+import type { Building } from "@/lib/data/types";
 import type { FundedPlan } from "@/lib/engine";
 import { EXPORT_SCHEMA_VERSION } from "@/lib/output/exportEnvelope";
-import type { Building } from "@/module_bindings/types";
 
 export interface LawExposureRow {
   short: string;
@@ -17,20 +17,16 @@ export interface LawExposureRow {
 
 // One CSV cell: quote anything with a comma, quote, or newline; double any
 // embedded quotes. Numbers and plain strings pass through untouched.
-function cell(value: string | number): string {
+export function cell(value: string | number): string {
   const text = String(value);
   return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 }
 
-function row(cells: Array<string | number>): string {
+export function row(cells: Array<string | number>): string {
   return cells.map(cell).join(",");
 }
 
-export function buildComplianceCsv(
-  building: Building,
-  plan: FundedPlan | null,
-  lawRows: LawExposureRow[],
-): string {
+export function buildComplianceCsv(building: Building, plan: FundedPlan | null, lawRows: LawExposureRow[]): string {
   const lines: string[] = [];
 
   lines.push(row(["Fineprint compliance export"]));
@@ -49,9 +45,7 @@ export function buildComplianceCsv(
     lines.push("");
 
     lines.push(row(["LL97 fine projection"]));
-    lines.push(
-      row(["Period", "Emissions limit (tCO2e)", "Annual fine (USD)", "Compliant"]),
-    );
+    lines.push(row(["Period", "Emissions limit (tCO2e)", "Annual fine (USD)", "Compliant"]));
     for (const result of plan.results) {
       lines.push(
         row([
@@ -65,9 +59,7 @@ export function buildComplianceCsv(
     lines.push("");
 
     lines.push(row(["Funded measures"]));
-    lines.push(
-      row(["Measure", "Full cost (USD)", "Funded (USD)", "% funded", "Cut (tCO2e/yr)"]),
-    );
+    lines.push(row(["Measure", "Full cost (USD)", "Funded (USD)", "% funded", "Cut (tCO2e/yr)"]));
     for (const measure of plan.measures) {
       lines.push(
         row([

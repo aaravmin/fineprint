@@ -1,5 +1,5 @@
 // The orchestrator: one address in, everything Fineprint knows out.
-// Chains GeoSearch -> LL84 -> covered buildings list, assembles
+// Chains GeoSearch -> energy benchmarking -> covered buildings list, assembles
 // BuildingFacts with provenance per field, and degrades honestly when a
 // dataset is silent. Sources are injectable so tests run offline.
 
@@ -15,20 +15,33 @@ import fetchBuildJobFilingsByBin from "./permits.ts";
 import fetchOpenEcbViolationsByBin from "./ecb.ts";
 import fetchPlutoByBbl from "./pluto.ts";
 import fetchSolarElectricalPermitsByBin from "./electrical.ts";
-import fetchFacadeFilingsByBin from "./facades.ts";
+import fetchBisPermitsByBin from "./bisPermits.ts";
+import fetchBisJobFilingsByBin from "./bisJobs.ts";
+import fetchDobViolationsByBin from "./dobViolations.ts";
+import fetchHpdViolationsByBin from "./hpdViolations.ts";
+import fetchHpdComplaintsByBbl from "./hpdComplaints.ts";
+import fetchCatsPermitsByBin from "./cats.ts";
+import fetchElevatorDevicesByBin from "./elevators.ts";
 import type {
   Bbl,
   BblResult,
   Bin,
+  BisJobFiling,
+  BisPermit,
   BoilerRecord,
   BuildJobFiling,
   BuildingFacts,
+  CatsPermit,
+  DobViolation,
   EcbViolation,
   ElectricalPermit,
-  FacadeFiling,
+  ElevatorDevice,
+  HpdComplaintProblem,
+  HpdViolation,
   Ll84Facts,
   PlutoCharacteristics,
   ProvenanceNote,
+  PublicRecords,
   InfrastructureProfile,
 } from "./types.ts";
 
@@ -43,7 +56,15 @@ export interface LookupSources {
   fetchBuildJobFilingsByBin?: (bin: Bin) => Promise<BuildJobFiling[]>;
   fetchSolarElectricalPermitsByBin?: (bin: Bin) => Promise<ElectricalPermit[]>;
   fetchOpenEcbViolationsByBin?: (bin: Bin) => Promise<EcbViolation[]>;
-  fetchFacadeFilingsByBin?: (bin: Bin) => Promise<FacadeFiling[]>;
+  // Public-record enrichers behind BuildingFacts.publicRecords. All BIN-keyed
+  // except HPD complaints, which key by BBL.
+  fetchBisPermitsByBin?: (bin: Bin) => Promise<BisPermit[]>;
+  fetchBisJobFilingsByBin?: (bin: Bin) => Promise<BisJobFiling[]>;
+  fetchDobViolationsByBin?: (bin: Bin) => Promise<DobViolation[]>;
+  fetchHpdViolationsByBin?: (bin: Bin) => Promise<HpdViolation[]>;
+  fetchHpdComplaintsByBbl?: (bbl: Bbl) => Promise<HpdComplaintProblem[]>;
+  fetchCatsPermitsByBin?: (bin: Bin) => Promise<CatsPermit[]>;
+  fetchElevatorDevicesByBin?: (bin: Bin) => Promise<ElevatorDevice[]>;
 }
 
 const realSources: LookupSources = {
@@ -55,8 +76,29 @@ const realSources: LookupSources = {
   fetchBuildJobFilingsByBin: fetchBuildJobFilingsByBin,
   fetchSolarElectricalPermitsByBin: fetchSolarElectricalPermitsByBin,
   fetchOpenEcbViolationsByBin: fetchOpenEcbViolationsByBin,
-  fetchFacadeFilingsByBin: fetchFacadeFilingsByBin,
+  fetchBisPermitsByBin: fetchBisPermitsByBin,
+  fetchBisJobFilingsByBin: fetchBisJobFilingsByBin,
+  fetchDobViolationsByBin: fetchDobViolationsByBin,
+  fetchHpdViolationsByBin: fetchHpdViolationsByBin,
+  fetchHpdComplaintsByBbl: fetchHpdComplaintsByBbl,
+  fetchCatsPermitsByBin: fetchCatsPermitsByBin,
+  fetchElevatorDevicesByBin: fetchElevatorDevicesByBin,
 };
+
+// A publicRecords object with every dataset empty. Callers that assemble facts
+// without a live lookup (tests, backfills) start here so the shape is always
+// complete.
+export function emptyPublicRecords(): PublicRecords {
+  return {
+    bisPermits: [],
+    bisJobs: [],
+    dobViolations: [],
+    hpdViolations: [],
+    hpdComplaints: [],
+    catsPermits: [],
+    elevatorDevices: [],
+  };
+}
 
 export async function lookupBuilding(
   address: string,
@@ -86,7 +128,7 @@ export async function lookupBuilding(
     sources,
   );
   const openViolations = await resolveOpenViolations(geo.bin, sources, provenance);
-  const facadeFilings = await resolveFacadeFilings(geo.bin, sources, provenance);
+  const publicRecords = await resolvePublicRecords(geo.bin, geo.bbl, sources, provenance);
 
   const grossFloorAreaSqft = resolveFloorArea(
     ll84,
@@ -145,14 +187,145 @@ export async function lookupBuilding(
     grossFloorAreaSqft,
     occupancyGroups: ll84?.occupancyGroups ?? [],
     annualEmissionsTco2e,
+    ll84FuelUse: ll84?.fuelUse ?? [],
     isLl97Covered: cbl?.ll97 ?? false,
     isArticle321,
     plutoCharacteristics,
     provenance,
     infrastructureProfile,
     openViolations,
-    facadeFilings,
+    publicRecords,
   };
+}
+
+// Pull the deep public-record history behind BuildingFacts.publicRecords. Six
+// datasets key by BIN and one (HPD complaints) by BBL; the fetches run together
+// since they are independent, and each pushes one provenance note whether it
+// found records, found none, or had no BIN to query. This history is evidence
+// for the systems dossier, not an input to the fine math.
+async function resolvePublicRecords(
+  bin: Bin | null,
+  bbl: Bbl,
+  sources: LookupSources,
+  provenance: ProvenanceNote[],
+): Promise<PublicRecords> {
+  const [
+    bisPermits,
+    bisJobs,
+    dobViolations,
+    hpdViolations,
+    hpdComplaints,
+    catsPermits,
+    elevatorDevices,
+  ] = await Promise.all([
+    fetchByBin(bin, sources.fetchBisPermitsByBin),
+    fetchByBin(bin, sources.fetchBisJobFilingsByBin),
+    fetchByBin(bin, sources.fetchDobViolationsByBin),
+    fetchByBin(bin, sources.fetchHpdViolationsByBin),
+    sources.fetchHpdComplaintsByBbl
+      ? sources.fetchHpdComplaintsByBbl(bbl)
+      : Promise.resolve([]),
+    fetchByBin(bin, sources.fetchCatsPermitsByBin),
+    fetchByBin(bin, sources.fetchElevatorDevicesByBin),
+  ]);
+
+  const hasBin = bin !== null;
+  noteRecords(
+    provenance,
+    "publicRecords.bisPermits",
+    "DOB Permit Issuance (BIS)",
+    hasBin,
+    bisPermits.length,
+  );
+  noteRecords(
+    provenance,
+    "publicRecords.bisJobs",
+    "DOB Job Application Filings (BIS)",
+    hasBin,
+    bisJobs.length,
+  );
+  noteRecords(
+    provenance,
+    "publicRecords.dobViolations",
+    "DOB Violations",
+    hasBin,
+    dobViolations.length,
+  );
+  noteRecords(
+    provenance,
+    "publicRecords.hpdViolations",
+    "HPD Housing Maintenance Code Violations",
+    hasBin,
+    hpdViolations.length,
+  );
+  noteRecords(
+    provenance,
+    "publicRecords.hpdComplaints",
+    "HPD Complaints and Problems",
+    true,
+    hpdComplaints.length,
+  );
+  noteRecords(
+    provenance,
+    "publicRecords.catsPermits",
+    "DEP Clean Air Tracking System",
+    hasBin,
+    catsPermits.length,
+  );
+  noteRecords(
+    provenance,
+    "publicRecords.elevatorDevices",
+    "DOB NOW Elevator Devices",
+    hasBin,
+    elevatorDevices.length,
+  );
+
+  return {
+    bisPermits,
+    bisJobs,
+    dobViolations,
+    hpdViolations,
+    hpdComplaints,
+    catsPermits,
+    elevatorDevices,
+  };
+}
+
+// Run a BIN-keyed enricher, or resolve to [] when there is no BIN or the source
+// wasn't provided (a small fakeSources in tests).
+function fetchByBin<T>(
+  bin: Bin | null,
+  fetch: ((bin: Bin) => Promise<T[]>) | undefined,
+): Promise<T[]> {
+  if (bin === null || fetch === undefined) {
+    return Promise.resolve([]);
+  }
+  return fetch(bin);
+}
+
+function noteRecords(
+  provenance: ProvenanceNote[],
+  field: string,
+  source: string,
+  keyResolved: boolean,
+  count: number,
+): void {
+  if (!keyResolved) {
+    provenance.push({
+      field,
+      source,
+      detail: "no BIN resolved for this building, so record history is unavailable",
+    });
+    return;
+  }
+  provenance.push({
+    field,
+    source,
+    detail:
+      count === 0
+        ? "no records on file for this building"
+        : `${count.toLocaleString("en-US")} record(s) on file`,
+  });
 }
 
 async function resolveInfrastructureProfile(
@@ -229,29 +402,6 @@ function deriveEfficiencyTier(energyStarScore: number | null): string | null {
     return "medium";
   }
   return "low";
-}
-
-// FISP filings are BIN-keyed; null (not empty) when the dataset can't be
-// queried, so downstream code can tell "no filings" from "no answer".
-async function resolveFacadeFilings(
-  bin: Bin | null,
-  sources: LookupSources,
-  provenance: ProvenanceNote[],
-): Promise<FacadeFiling[] | null> {
-  if (!bin || !sources.fetchFacadeFilingsByBin) {
-    return null;
-  }
-
-  const filings = await sources.fetchFacadeFilingsByBin(bin);
-  provenance.push({
-    field: "facadeFilings",
-    source: "DOB NOW: Safety - Facades",
-    detail:
-      filings.length === 0
-        ? "no FISP filings on record for this BIN"
-        : `${filings.length} FISP filing row(s) on record`,
-  });
-  return filings;
 }
 
 // Open ECB violations are BIN-keyed; with no BIN there is nothing to query.

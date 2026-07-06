@@ -1,608 +1,480 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import type { ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
-import { AnimatePresence, motion } from "framer-motion";
-import { Building2, Check, CircleDollarSign, ListTodo, TrendingUp } from "lucide-react";
-import { toast } from "sonner";
-import { useReducer, useTable } from "spacetimedb/react";
-
-import { AddressAutocomplete } from "@/components/address-autocomplete";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { EmptyFolder } from "@/components/ui/empty-folder";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { computePeriods, fmtUsd } from "@/lib/engine";
-import { getLocalStorageValue, setLocalStorageValue } from "@/lib/local-storage.client";
-import { withAck } from "@/lib/reducer-call";
-import { reducers, tables } from "@/module_bindings/index";
-import type { Building, Task } from "@/module_bindings/types";
+  Activity,
+  BadgeCheck,
+  Building2,
+  Calendar,
+  CircleDollarSign,
+  Clock,
+  FileText,
+  Leaf,
+  ListTodo,
+  Skull,
+  TrendingUp,
+  TriangleAlert,
+  XCircle,
+} from "lucide-react";
+import { useBuildings, useEvents, useTasks, useWorkers } from "@/lib/data/hooks";
 
-type LawScope =
-  | "all"
-  | "ll97"
-  | "art321"
-  | "ll84"
-  | "ll87"
-  | "ll11"
-  | "ll88"
-  | "ll152"
-  | "ll55";
+import { AddBuildingDialog } from "@/components/dashboard/AddBuildingDialog";
+import { DaysLeftPill } from "@/components/dashboard/DaysLeftPill";
+import { ActionLink, SectionCard } from "@/components/dashboard/SectionCard";
+import { StatTile } from "@/components/dashboard/StatTile";
+import { StatusDot } from "@/components/dashboard/StatusPill";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useRequestBuilding } from "@/hooks/use-request-building";
+import { computePeriods } from "@/lib/engine";
+import { compactNumber, compactUsd, formatShortDate, relativeTimeAgo, shortAddress } from "@/lib/format";
+import { lawShortName } from "@/lib/laws/lawRegistry";
+import type { Building, Event, Task, Worker } from "@/lib/data/types";
 
-interface LawOption {
-  id: LawScope;
-  label: string;
-  taskLawIds: readonly string[];
-}
-
-interface FineBasis {
-  id: string;
-  lawId: LawScope;
-  label: string;
-  type: string;
-  value: string;
-  unit: string;
-  detail: string;
-}
-
-const LAW_OPTIONS: LawOption[] = [
-  { id: "all", label: "All laws", taskLawIds: [] },
-  { id: "ll97", label: "Local Law 97", taskLawIds: ["ll97", "art321"] },
-  { id: "ll84", label: "Local Law 84", taskLawIds: ["ll84"] },
-  { id: "ll87", label: "Local Law 87", taskLawIds: ["ll87"] },
-  { id: "ll11", label: "Local Law 11", taskLawIds: ["ll11"] },
-  { id: "ll88", label: "Local Law 88", taskLawIds: ["ll88"] },
-  { id: "ll152", label: "Local Law 152", taskLawIds: ["ll152"] },
-  { id: "ll55", label: "Local Law 55", taskLawIds: ["ll55"] },
-];
-
-const FINE_BASES: FineBasis[] = [
-  {
-    id: "ll97-standard",
-    lawId: "ll97",
-    label: "LL97 standard",
-    type: "Fine rate",
-    value: "$268",
-    unit: "/ton",
-    detail: "Applies when a covered building exceeds its annual emissions limit.",
-  },
-  {
-    id: "ll97-article-321",
-    lawId: "art321",
-    label: "Article 321",
-    type: "Fine type",
-    value: "$10,000",
-    unit: "flat penalties",
-    detail:
-      "Affordable-housing pathway: comply through prescribed measures or the 2030 target.",
-  },
-  {
-    id: "ll84-benchmarking",
-    lawId: "ll84",
-    label: "LL84 benchmarking",
-    type: "Fine type",
-    value: "$500",
-    unit: "/quarter",
-    detail:
-      "Annual energy and water benchmarking; repeated quarterly violations are tracked as annual exposure.",
-  },
-  {
-    id: "ll87-audit",
-    lawId: "ll87",
-    label: "LL87 audit",
-    type: "Fine type",
-    value: "$3,000",
-    unit: "estimated filing exposure",
-    detail:
-      "Energy audit and retro-commissioning cycle exposure is tracked from task metadata.",
-  },
-  {
-    id: "ll11-fisp",
-    lawId: "ll11",
-    label: "LL11 / FISP",
-    type: "Fine type",
-    value: "$5,000",
-    unit: "estimated annualized exposure",
-    detail:
-      "Facade inspection exposure is task-backed until DOB cycle-window data is fully wired.",
-  },
-  {
-    id: "ll88-lighting",
-    lawId: "ll88",
-    label: "LL88 lighting",
-    type: "Fine type",
-    value: "Filing + upgrade",
-    unit: "lighting and tenant submetering evidence",
-    detail:
-      "No per-ton rate is modeled; the dashboard tracks the upgrade/report obligation.",
-  },
-  {
-    id: "ll152-gas",
-    lawId: "ll152",
-    label: "LL152 gas piping",
-    type: "Fine type",
-    value: "$10,000",
-    unit: "failure-to-certify exposure",
-    detail: "Gas-piping certification exposure is tracked per building task.",
-  },
-  {
-    id: "ll55-allergens",
-    lawId: "ll55",
-    label: "LL55 allergens",
-    type: "Fine type",
-    value: "Variable",
-    unit: "HPD violation classes",
-    detail:
-      "Mold and pest penalties vary too widely to model honestly, so Fineprint tracks the obligation without a fake rate.",
-  },
-];
-
-const ALL_FINE_BASIS: FineBasis = {
-  id: "all",
-  lawId: "all",
-  label: "All types of fines",
-  type: "Fine types",
-  value: "All",
-  unit: "every modeled penalty",
-  detail:
-    "Every fine type across all covered laws is rolled into this portfolio-wide view.",
-};
-
-function fineBasesForScope(lawScope: LawScope): FineBasis[] {
-  if (lawScope === "all") {
-    return [ALL_FINE_BASIS];
+function greetingWord(date: Date): string {
+  const hour = date.getHours();
+  if (hour < 12) {
+    return "Good morning";
   }
-  if (lawScope === "ll97") {
-    return FINE_BASES.filter(basis => basis.lawId === "ll97" || basis.lawId === "art321");
+  if (hour < 18) {
+    return "Good afternoon";
   }
-  return FINE_BASES.filter(basis => basis.lawId === lawScope);
+  return "Good evening";
 }
 
-const RECENT_ADDRESSES_KEY = "fineprint:recent-addresses";
-const RECENT_LIMIT = 6;
+const TERMINAL_TASK_STATUSES = new Set(["done", "rejected"]);
 
-function ll97Fine(building: Building, periodIndex: number): number | null {
-  const periods = computePeriods(building);
-  return periods?.[periodIndex]?.annualFineUsd ?? null;
-}
+export function PortfolioClient({ firstName }: { firstName?: string | null }) {
+  const buildings = useBuildings();
+  const tasks = useTasks();
+  const workers = useWorkers();
+  const events = useEvents();
 
-function openTaskCount(buildingId: bigint, tasks: readonly Task[]): number {
-  return tasks.filter(t => t.buildingId === buildingId && t.status === "open").length;
-}
-
-function lawMatches(task: Task, lawScope: LawScope): boolean {
-  if (lawScope === "all") return true;
-  const option = LAW_OPTIONS.find(law => law.id === lawScope);
-  return option?.taskLawIds.includes(task.lawId) ?? false;
-}
-
-function taskExposure(tasks: readonly Task[]): number {
-  return tasks.reduce((sum, task) => sum + (task.fineEstimateUsd ?? 0), 0);
-}
-
-function readRecentAddresses(): string[] {
-  const raw = getLocalStorageValue(RECENT_ADDRESSES_KEY);
-  if (!raw) return [];
-  try {
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed)
-      ? parsed.filter((item): item is string => typeof item === "string")
-      : [];
-  } catch {
-    return [];
-  }
-}
-
-function rememberAddress(address: string): string[] {
-  const trimmed = address.trim();
-  if (!trimmed) return readRecentAddresses();
-  const next = [
-    trimmed,
-    ...readRecentAddresses().filter(item => item.toLowerCase() !== trimmed.toLowerCase()),
-  ].slice(0, RECENT_LIMIT);
-  setLocalStorageValue(RECENT_ADDRESSES_KEY, JSON.stringify(next));
-  return next;
-}
-
-export function PortfolioClient() {
-  const [buildings] = useTable(tables.building);
-  const [tasks] = useTable(tables.task);
-  const router = useRouter();
-  const requestBuilding = useReducer(reducers.requestBuilding);
-  const [address, setAddress] = useState("");
-  const [lawScope, setLawScope] = useState<LawScope>("all");
-  const [fineBasisId, setFineBasisId] = useState(ALL_FINE_BASIS.id);
-  const [recentAddresses, setRecentAddresses] = useState<string[]>([]);
-  const [justQueued, setJustQueued] = useState(false);
+  const { submit } = useRequestBuilding();
   const requestedQueryAddress = useRef<string | null>(null);
-  const queuedFlashTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // The homepage CTA deep-links here with ?address=; submit that intake once on
+  // arrival, the same optimistic path the dialog uses, minus any inline UI.
   useEffect(() => {
-    setRecentAddresses(readRecentAddresses());
-  }, []);
-
-  useEffect(() => {
-    const visibleBases = fineBasesForScope(lawScope);
-    if (!visibleBases.some(basis => basis.id === fineBasisId)) {
-      setFineBasisId(visibleBases[0]?.id ?? ALL_FINE_BASIS.id);
+    const queryAddress = new URLSearchParams(window.location.search).get("address")?.trim();
+    if (!queryAddress || requestedQueryAddress.current === queryAddress) {
+      return;
     }
-  }, [fineBasisId, lawScope]);
-
-  const submitAddress = useCallback(
-    (nextAddress = address) => {
-      const trimmed = nextAddress.trim();
-      if (!trimmed) {
-        toast.error("Enter a street address with the borough");
-        return;
-      }
-
-      // Optimistic: confirm immediately, surface a failure if the ack comes
-      // back negative. The reducer is the source of truth either way.
-      setRecentAddresses(rememberAddress(trimmed));
-      setAddress("");
-      toast.success("Intake queued. An agent is pulling the city's records now");
-
-      setJustQueued(true);
-      if (queuedFlashTimer.current) clearTimeout(queuedFlashTimer.current);
-      queuedFlashTimer.current = setTimeout(() => setJustQueued(false), 2_200);
-
-      withAck(requestBuilding({ address: trimmed }), `Intake for "${trimmed}"`).catch(
-        (error: Error) => {
-          setJustQueued(false);
-          toast.error(`Intake for "${trimmed}" failed: ${error.message}`);
-        },
-      );
-    },
-    [address, requestBuilding],
-  );
-
-  useEffect(() => {
-    const queryAddress = new URLSearchParams(window.location.search)
-      .get("address")
-      ?.trim();
-    if (!queryAddress || requestedQueryAddress.current === queryAddress) return;
 
     requestedQueryAddress.current = queryAddress;
-    setAddress(queryAddress);
-    submitAddress(queryAddress);
-  }, [submitAddress]);
+    submit(queryAddress);
+  }, [submit]);
 
-  const visibleTasks = tasks.filter(task => lawMatches(task, lawScope));
-  const visibleOpenTasks = visibleTasks.filter(t => t.status === "open");
-  const visibleTaskExposure = taskExposure(visibleTasks);
-  const totalCurrent =
-    lawScope === "ll97"
-      ? buildings.reduce((sum, b) => sum + (ll97Fine(b, 0) ?? 0), 0)
-      : 0;
-  const total2030 =
-    lawScope === "ll97"
-      ? buildings.reduce((sum, b) => sum + (ll97Fine(b, 1) ?? 0), 0)
-      : 0;
-  const visibleFineBases = fineBasesForScope(lawScope);
-  const activeFineBasis =
-    [ALL_FINE_BASIS, ...FINE_BASES].find(basis => basis.id === fineBasisId) ??
-    visibleFineBases[0];
+  // Time-of-day greeting and the date chips depend on the wall clock, which the
+  // server can't know without risking a hydration mismatch; resolve after mount.
+  const [now, setNow] = useState<Date | null>(null);
+  useEffect(() => {
+    setNow(new Date());
+  }, []);
 
-  const sorted = [...buildings].sort((a, b) => {
-    if (lawScope === "ll97") return (ll97Fine(b, 1) ?? 0) - (ll97Fine(a, 1) ?? 0);
-    const bExposure = taskExposure(visibleTasks.filter(task => task.buildingId === b.id));
-    const aExposure = taskExposure(visibleTasks.filter(task => task.buildingId === a.id));
-    return bExposure - aExposure;
-  });
-  const showLl97Columns = lawScope === "ll97";
-  const selectedLawLabel =
-    LAW_OPTIONS.find(law => law.id === lawScope)?.label ?? "All laws";
+  const fines = useMemo(
+    () =>
+      buildings.map((building) => {
+        const periods = computePeriods(building);
+        return {
+          building,
+          fine0: periods?.[0]?.annualFineUsd ?? 0,
+          fine1: periods?.[1]?.annualFineUsd ?? 0,
+          fine2: periods?.[2]?.annualFineUsd ?? 0,
+          actual: periods?.[0]?.actualEmissionsTco2e ?? 0,
+          limit: periods?.[0]?.emissionsLimitTco2e ?? 0,
+          hasData: periods !== null,
+        };
+      }),
+    [buildings],
+  );
+
+  const nowMs = Date.now();
+  const openTasks = tasks.filter((task) => task.status === "open");
+  const overdueOpen = openTasks.filter((task) => task.slaBreached || task.deadline.toDate().getTime() < nowMs);
+
+  const totalFine0 = fines.reduce((sum, row) => sum + row.fine0, 0);
+  const totalFine1 = fines.reduce((sum, row) => sum + row.fine1, 0);
+  const totalEmissions = buildings.reduce((sum, building) => sum + (building.annualEmissionsTco2E ?? 0), 0);
+  const totalSqft = buildings.reduce((sum, building) => sum + building.sqft, 0);
+  const missingDataCount = fines.filter((row) => !row.hasData).length;
+
+  const sumActual = fines.reduce((sum, row) => sum + row.actual, 0);
+  const sumLimit = fines.reduce((sum, row) => sum + row.limit, 0);
+  const percentOverCaps = sumLimit > 0 && sumActual > sumLimit ? Math.round((sumActual / sumLimit - 1) * 100) : 0;
+
+  const cliffRatio = totalFine0 > 0 ? (totalFine1 / totalFine0).toFixed(1) : null;
+
+  const nextDeadline =
+    openTasks.length > 0 ? new Date(Math.min(...openTasks.map((task) => task.deadline.toDate().getTime()))) : null;
 
   return (
     <div className="@container/main flex flex-col gap-6">
-      <h1 className="font-heading text-2xl font-bold tracking-tight">Portfolio</h1>
-
-      <div className="rounded-xl border bg-background">
-        <div className="grid gap-2 px-4 py-3 @md/main:grid-cols-[5.5rem_1fr] @md/main:items-start">
-          <p className="pt-1.5 text-xs font-medium text-muted-foreground">Law scope</p>
-          <div className="flex flex-wrap gap-1.5">
-            {LAW_OPTIONS.map(law => (
-              <Button
-                key={law.id}
-                type="button"
-                size="sm"
-                variant={lawScope === law.id ? "default" : "outline"}
-                onClick={() => setLawScope(law.id)}
-              >
-                {law.label}
-              </Button>
-            ))}
-          </div>
+      <div className="flex flex-col gap-4 @2xl/main:flex-row @2xl/main:items-start @2xl/main:justify-between">
+        <div>
+          <h1 className="font-heading text-2xl font-bold tracking-tight">
+            {firstName ? (now ? `${greetingWord(now)}, ${firstName}` : `Welcome, ${firstName}`) : "Overview"}
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">{"Here's where your portfolio stands."}</p>
         </div>
 
-        <div className="grid gap-2 border-t px-4 py-3 @md/main:grid-cols-[5.5rem_1fr_auto] @md/main:items-start">
-          <p className="pt-1.5 text-xs font-medium text-muted-foreground">Fine basis</p>
-          <div className="min-w-0">
-            <div className="flex flex-wrap gap-1.5">
-              {visibleFineBases.map(basis => (
-                <Button
-                  key={basis.id}
-                  type="button"
-                  size="sm"
-                  variant={fineBasisId === basis.id ? "default" : "outline"}
-                  onClick={() => setFineBasisId(basis.id)}
-                >
-                  {basis.label}
-                </Button>
-              ))}
-            </div>
-            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-              {activeFineBasis.detail}
-            </p>
-          </div>
-          <div className="text-right">
-            <p className="text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
-              {activeFineBasis.type}
-            </p>
-            <p className="font-heading whitespace-nowrap text-xl font-bold text-destructive">
-              {activeFineBasis.value}
-              <span className="ml-1 text-sm font-medium">{activeFineBasis.unit}</span>
-            </p>
-          </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {now ? (
+            <Chip>
+              <Calendar className="size-3.5" />
+              {formatShortDate(now)}
+            </Chip>
+          ) : null}
+          {nextDeadline ? (
+            <Chip>
+              <Clock className="size-3.5" />
+              Next deadline {formatShortDate(nextDeadline)}
+              <DaysLeftPill date={nextDeadline} now={now ?? undefined} />
+            </Chip>
+          ) : null}
+          <AddBuildingDialog />
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 @sm/main:flex-row">
-        <AddressAutocomplete
-          value={address}
-          onValueChange={setAddress}
-          placeholder="Street address with borough"
-          className="flex-1"
-          inputClassName="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-[3px] focus:ring-ring/20 disabled:cursor-not-allowed disabled:opacity-50"
+      <div className="grid grid-cols-1 gap-3 @sm/main:grid-cols-2 @5xl/main:grid-cols-5">
+        <StatTile
+          icon={<Building2 />}
+          label="Buildings"
+          value={buildings.length.toString()}
+          sub={
+            missingDataCount > 0 ? (
+              <span className="text-warning">{missingDataCount} missing energy data</span>
+            ) : (
+              `${compactNumber(totalSqft)} sqft`
+            )
+          }
         />
-        <span className="flex shrink-0 items-center gap-2">
-          <Button onClick={() => submitAddress()} className="h-10">
-            Get my number
-          </Button>
-          <AnimatePresence>
-            {justQueued && (
-              <motion.span
-                initial={{ scale: 0, opacity: 0, rotate: -90 }}
-                animate={{ scale: 1, opacity: 1, rotate: 0 }}
-                exit={{ scale: 0.5, opacity: 0 }}
-                transition={{ type: "spring", stiffness: 520, damping: 22 }}
-                className="flex size-6 items-center justify-center rounded-full bg-success text-success-foreground"
-                aria-hidden="true"
-              >
-                <Check className="size-3.5" strokeWidth={3} />
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </span>
+        <StatTile
+          icon={<Leaf />}
+          label="Portfolio emissions"
+          value={`${compactNumber(totalEmissions)} t`}
+          tooltip="Sum of benchmarked annual emissions (tCO2e per year) across your portfolio."
+          sub={
+            percentOverCaps > 0 ? (
+              <span className="text-warning">{percentOverCaps}% over 2024 caps</span>
+            ) : (
+              "CO2e per year"
+            )
+          }
+        />
+        <StatTile
+          icon={<CircleDollarSign />}
+          label="Annual fine exposure"
+          value={compactUsd(totalFine0)}
+          tone={totalFine0 > 0 ? "destructive" : "default"}
+          sub="2024-2029 per year"
+        />
+        <StatTile
+          icon={<TrendingUp />}
+          label="2030 fine exposure"
+          value={compactUsd(totalFine1)}
+          tone={totalFine1 > 0 ? "destructive" : "default"}
+          tooltip="The 2030-2034 LL97 cap tightens sharply. This is your annual exposure once it does."
+          sub={cliffRatio && Number(cliffRatio) > 1 ? `${cliffRatio}x current` : "the 2030 cliff"}
+        />
+        <StatTile
+          icon={<ListTodo />}
+          label="Open tasks"
+          value={openTasks.length.toString()}
+          sub={
+            overdueOpen.length > 0 ? (
+              <span className="text-destructive">{overdueOpen.length} overdue</span>
+            ) : openTasks.length > 0 ? (
+              "all on track"
+            ) : (
+              "none open"
+            )
+          }
+        />
       </div>
 
-      {recentAddresses.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-          <span>Recent:</span>
-          {recentAddresses.map(recent => (
-            <Button
-              key={recent}
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => submitAddress(recent)}
-            >
-              {recent}
-            </Button>
-          ))}
-        </div>
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_380px]">
+        <ExposureByBuilding fines={fines} />
+        <DeadlinesPanel tasks={tasks} buildings={buildings} now={now} />
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <NeedsAttentionPanel fines={fines} overdueTasks={overdueOpen} buildings={buildings} />
+        <RecentActivityPanel events={events} />
+        <AgentsPanel workers={workers} tasks={tasks} now={now} />
+      </div>
+    </div>
+  );
+}
+
+function Chip({ children }: { children: ReactNode }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-lg border bg-card px-2.5 py-1.5 text-xs text-muted-foreground">
+      {children}
+    </span>
+  );
+}
+
+type FineRow = {
+  building: Building;
+  fine0: number;
+  fine1: number;
+  fine2: number;
+  hasData: boolean;
+};
+
+function ExposureByBuilding({ fines }: { fines: FineRow[] }) {
+  const exposed = fines.filter((row) => row.fine1 > 0).sort((a, b) => b.fine1 - a.fine1);
+  const quietCount = fines.length - exposed.length;
+  const maxFine = Math.max(...exposed.map((row) => row.fine1), 1);
+
+  return (
+    <SectionCard title="Exposure by building" sub="Annual LL97 fine once the 2030 cap takes effect">
+      {exposed.length === 0 ? (
+        <p className="py-6 text-center text-sm text-success">
+          Every building is compliant or awaiting data. No modeled 2030 exposure.
+        </p>
+      ) : (
+        <TooltipProvider delayDuration={150}>
+          <ul className="space-y-3.5">
+            {exposed.map((row) => (
+              <li key={String(row.building.id)}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Link href={`/dashboard/buildings/${row.building.id}`} className="group block">
+                      <div className="flex items-baseline justify-between gap-3 text-xs">
+                        <span className="truncate font-medium text-foreground group-hover:underline">
+                          {shortAddress(row.building.address)}
+                        </span>
+                        <span className="shrink-0 tabular-nums text-foreground">{compactUsd(row.fine1)}</span>
+                      </div>
+                      <div className="mt-1.5 h-2.5 w-full overflow-hidden rounded-full bg-chart-1/10">
+                        <div
+                          className="h-full rounded-full bg-chart-1"
+                          style={{ width: `${Math.max((row.fine1 / maxFine) * 100, 2)}%` }}
+                        />
+                      </div>
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent className="tabular-nums">
+                    <p className="mb-1 font-medium">{shortAddress(row.building.address)}</p>
+                    <p>2024-2029: {compactUsd(row.fine0)} per year</p>
+                    <p>2030-2034: {compactUsd(row.fine1)} per year</p>
+                    <p>2035-2039: {compactUsd(row.fine2)} per year</p>
+                  </TooltipContent>
+                </Tooltip>
+              </li>
+            ))}
+          </ul>
+        </TooltipProvider>
       )}
 
-      {/* Metric strip */}
-      <div className="grid grid-cols-1 gap-3 @sm/main:grid-cols-2 @xl/main:grid-cols-4">
-        <MetricTile
-          icon={<Building2 className="size-4" />}
-          label="Buildings"
-          value={String(buildings.length)}
-        />
-        <MetricTile
-          icon={<ListTodo className="size-4" />}
-          label={`${selectedLawLabel} open tasks`}
-          value={String(visibleOpenTasks.length)}
-        />
-        <MetricTile
-          icon={<CircleDollarSign className="size-4" />}
-          label="Fine basis"
-          value={activeFineBasis.value}
-          sub={activeFineBasis.unit}
-        />
-        <MetricTile
-          icon={<TrendingUp className="size-4" />}
-          label={showLl97Columns ? "2030–2034 exposure" : "Tracked exposure"}
-          value={
-            showLl97Columns
-              ? total2030 > 0
-                ? `${fmtUsd(total2030)}/yr`
-                : "—"
-              : visibleTaskExposure > 0
-                ? `${fmtUsd(visibleTaskExposure)}/yr`
-                : "Tracked"
-          }
-          danger={(showLl97Columns ? total2030 : visibleTaskExposure) > 0}
-          sub={
-            showLl97Columns && total2030 > 0 && totalCurrent > 0
-              ? `${(total2030 / totalCurrent).toFixed(1)}× current`
-              : undefined
-          }
-        />
-      </div>
-
-      {/* Buildings table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Buildings</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          {buildings.length === 0 ? (
-            <EmptyFolder
-              title="No buildings yet"
-              description="Add an address to start building your portfolio."
-            />
-          ) : (
-            <Table className="tabular-nums">
-              <TableHeader>
-                <TableRow className="bg-muted/30 hover:bg-muted/30">
-                  <TableHead className="pl-6">Address</TableHead>
-                  <TableHead className="text-right">Sqft</TableHead>
-                  {showLl97Columns ? (
-                    <>
-                      <TableHead className="text-right">Emissions</TableHead>
-                      <TableHead className="text-right">2024–2029</TableHead>
-                      <TableHead className="text-right">2030–2034</TableHead>
-                      <TableHead className="text-right">2035–2039</TableHead>
-                    </>
-                  ) : (
-                    <>
-                      <TableHead className="text-right">Law tasks</TableHead>
-                      <TableHead className="text-right">Estimated exposure</TableHead>
-                    </>
-                  )}
-                  <TableHead className="pr-6 text-right">Open</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {sorted.map(b => {
-                  const fine0 = ll97Fine(b, 0);
-                  const fine1 = ll97Fine(b, 1);
-                  const fine2 = ll97Fine(b, 2);
-                  const buildingLawTasks = visibleTasks.filter(
-                    task => task.buildingId === b.id,
-                  );
-                  const open = openTaskCount(b.id, visibleTasks);
-                  const buildingExposure = taskExposure(buildingLawTasks);
-
-                  return (
-                    <TableRow
-                      key={String(b.id)}
-                      className="cursor-pointer"
-                      onClick={() => router.push(`/dashboard/buildings/${b.id}`)}
-                    >
-                      <TableCell className="pl-6 font-medium">{b.address}</TableCell>
-                      <TableCell className="text-right text-muted-foreground">
-                        {b.sqft.toLocaleString()}
-                      </TableCell>
-                      {showLl97Columns ? (
-                        <>
-                          <TableCell className="text-right text-muted-foreground">
-                            {b.annualEmissionsTco2E !== undefined ? (
-                              `${b.annualEmissionsTco2E.toLocaleString(undefined, { maximumFractionDigits: 0 })} t`
-                            ) : (
-                              <span className="text-xs italic">missing</span>
-                            )}
-                          </TableCell>
-                          <FineCell fine={fine0} />
-                          <FineCell fine={fine1} highlight />
-                          <FineCell fine={fine2} />
-                        </>
-                      ) : (
-                        <>
-                          <TableCell className="text-right text-muted-foreground">
-                            {buildingLawTasks.length || (
-                              <span className="text-xs italic">missing</span>
-                            )}
-                          </TableCell>
-                          <TableCell className="text-right text-muted-foreground">
-                            {buildingExposure > 0 ? (
-                              fmtUsd(buildingExposure)
-                            ) : buildingLawTasks.length > 0 ? (
-                              <span className="text-xs">Tracked</span>
-                            ) : (
-                              <span className="text-xs italic">missing</span>
-                            )}
-                          </TableCell>
-                        </>
-                      )}
-                      <TableCell className="pr-6 text-right">
-                        {open > 0 ? (
-                          <Badge variant="secondary">{open}</Badge>
-                        ) : (
-                          <span className="text-muted-foreground">—</span>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
-
-      <p className="text-xs text-muted-foreground">
-        Data sourced from NYC LL84 benchmarking submissions and LL97 emission limits (1
-        RCNY §103-14). Not legal advice — official compliance requires a registered design
-        professional.
-      </p>
-    </div>
+      {quietCount > 0 ? (
+        <p className="mt-4 border-t pt-3 text-xs text-muted-foreground">
+          {quietCount} {quietCount === 1 ? "building" : "buildings"} compliant or missing data
+        </p>
+      ) : null}
+    </SectionCard>
   );
 }
 
-function MetricTile({
-  icon,
-  label,
-  value,
-  danger,
-  sub,
+function DeadlinesPanel({
+  tasks,
+  buildings,
+  now,
 }: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  danger?: boolean;
-  sub?: string;
+  tasks: readonly Task[];
+  buildings: readonly Building[];
+  now: Date | null;
 }) {
+  const upcoming = tasks
+    .filter((task) => !TERMINAL_TASK_STATUSES.has(task.status))
+    .sort((a, b) => a.deadline.toDate().getTime() - b.deadline.toDate().getTime())
+    .slice(0, 8);
+
   return (
-    <div className="rounded-xl border bg-background px-5 py-4">
-      <div className="flex items-center gap-2 text-muted-foreground">
-        <span
-          className={`flex size-7 items-center justify-center rounded-full ${danger ? "bg-destructive-subtle text-destructive" : "bg-secondary"}`}
-        >
-          {icon}
-        </span>
-        <p className="text-xs">{label}</p>
-      </div>
-      <p
-        className={`mt-2 text-2xl font-semibold tabular-nums ${danger ? "text-destructive" : ""}`}
-      >
-        {value}
-      </p>
-      {sub && <p className="mt-0.5 text-xs text-muted-foreground">{sub}</p>}
-    </div>
+    <SectionCard
+      title="Deadlines"
+      action={upcoming.length > 0 ? <ActionLink href="/dashboard/tasks">View all tasks</ActionLink> : undefined}
+    >
+      {upcoming.length === 0 ? (
+        <p className="py-6 text-center text-sm text-muted-foreground">No deadlines on file - add a building.</p>
+      ) : (
+        <ul className="divide-y">
+          {upcoming.map((task) => {
+            const building = buildings.find((candidate) => candidate.id === task.buildingId);
+            const deadline = task.deadline.toDate();
+
+            return (
+              <li key={String(task.id)}>
+                <Link
+                  href={building ? `/dashboard/buildings/${building.id}` : "/dashboard/tasks"}
+                  className="flex items-center justify-between gap-2 py-2.5 hover:bg-muted/40"
+                >
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+                        {lawShortName(task.lawId)}
+                      </span>
+                      <span className="truncate text-xs font-medium">
+                        {building ? shortAddress(building.address) : task.title}
+                      </span>
+                    </div>
+                    <p className="mt-0.5 text-[11px] text-muted-foreground">due {formatShortDate(deadline)}</p>
+                  </div>
+                  <DaysLeftPill date={deadline} now={now ?? undefined} />
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </SectionCard>
   );
 }
 
-function FineCell({ fine, highlight }: { fine: number | null; highlight?: boolean }) {
-  if (fine === null) {
-    return (
-      <TableCell className="text-right text-xs italic text-muted-foreground">
-        missing
-      </TableCell>
-    );
+function NeedsAttentionPanel({
+  fines,
+  overdueTasks,
+  buildings,
+}: {
+  fines: FineRow[];
+  overdueTasks: readonly Task[];
+  buildings: readonly Building[];
+}) {
+  const items: { key: string; tone: "destructive" | "warning"; label: string; href: string }[] = [];
+
+  for (const task of overdueTasks) {
+    const building = buildings.find((candidate) => candidate.id === task.buildingId);
+    items.push({
+      key: `task-${task.id}`,
+      tone: "destructive",
+      label: `${task.title} overdue`,
+      href: building ? `/dashboard/buildings/${building.id}` : "/dashboard/tasks",
+    });
   }
-  if (fine === 0) {
-    return (
-      <TableCell className="text-right text-xs font-medium text-success">$0</TableCell>
-    );
+
+  for (const row of fines) {
+    if (!row.hasData) {
+      items.push({
+        key: `missing-${row.building.id}`,
+        tone: "warning",
+        label: `${shortAddress(row.building.address)} - no energy data`,
+        href: `/dashboard/buildings/${row.building.id}`,
+      });
+    }
   }
+
+  const shown = items.slice(0, 6);
+
   return (
-    <TableCell
-      className={`text-right text-xs font-medium ${highlight ? "text-destructive" : ""}`}
+    <SectionCard title="Needs attention">
+      {shown.length === 0 ? (
+        <p className="py-4 text-sm text-success">All clear.</p>
+      ) : (
+        <ul className="space-y-2.5">
+          {shown.map((item) => (
+            <li key={item.key}>
+              <Link href={item.href} className="flex items-center gap-2 text-xs hover:text-foreground">
+                <StatusDot tone={item.tone} label={item.tone === "destructive" ? "Overdue" : "Warning"} />
+                <span className="truncate text-muted-foreground">{item.label}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {items.length > shown.length ? (
+        <Link href="/dashboard/tasks" className="mt-3 block text-xs text-muted-foreground hover:text-foreground">
+          +{items.length - shown.length} more
+        </Link>
+      ) : null}
+    </SectionCard>
+  );
+}
+
+const EVENT_ICON: Record<string, ReactNode> = {
+  task_approved: <BadgeCheck className="size-3.5 text-success" />,
+  task_rejected: <XCircle className="size-3.5 text-destructive" />,
+  sla_breached: <TriangleAlert className="size-3.5 text-destructive" />,
+  worker_reaped: <Skull className="size-3.5 text-destructive" />,
+  worker_killed: <Skull className="size-3.5 text-destructive" />,
+  building_added: <Building2 className="size-3.5" />,
+  building_ingested: <Building2 className="size-3.5" />,
+  work_submitted: <FileText className="size-3.5" />,
+};
+
+function RecentActivityPanel({ events }: { events: readonly Event[] }) {
+  const recent = [...events].sort((a, b) => (a.id > b.id ? -1 : 1)).slice(0, 8);
+
+  return (
+    <SectionCard
+      title="Recent activity"
+      action={recent.length > 0 ? <ActionLink href="/dashboard/activity">View all</ActionLink> : undefined}
     >
-      {fmtUsd(fine)}
-    </TableCell>
+      {recent.length === 0 ? (
+        <p className="py-4 text-sm text-muted-foreground">No activity yet.</p>
+      ) : (
+        <ul className="space-y-2.5">
+          {recent.map((event) => (
+            <li key={String(event.id)} className="flex items-start gap-2 text-xs">
+              <span className="mt-0.5 shrink-0 text-muted-foreground">
+                {EVENT_ICON[event.kind] ?? <Activity className="size-3.5" />}
+              </span>
+              <span className="min-w-0 flex-1 truncate text-muted-foreground">{event.payload}</span>
+              <span className="shrink-0 text-[11px] text-muted-foreground/70">
+                {relativeTimeAgo(event.at.toDate())}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </SectionCard>
+  );
+}
+
+function AgentsPanel({
+  workers,
+  tasks,
+  now,
+}: {
+  workers: readonly Worker[];
+  tasks: readonly Task[];
+  now: Date | null;
+}) {
+  const live = [...workers].filter((worker) => worker.status !== "dead").sort((a, b) => (a.id < b.id ? -1 : 1));
+
+  return (
+    <SectionCard title="Agents" action={<ActionLink href="/dashboard/agents">Manage</ActionLink>}>
+      {live.length === 0 ? (
+        <p className="py-4 text-sm text-muted-foreground">No agents online.</p>
+      ) : (
+        <ul className="space-y-2.5">
+          {live.map((worker) => {
+            const currentTask =
+              worker.currentTaskId !== undefined ? tasks.find((task) => task.id === worker.currentTaskId) : undefined;
+            const working = worker.status === "working";
+
+            return (
+              <li key={String(worker.id)} className="flex items-center gap-2 text-xs">
+                <StatusDot tone={working ? "success" : "muted"} pulse={working} label={worker.status} />
+                <span className="shrink-0 font-medium">{worker.name}</span>
+                <span className="min-w-0 flex-1 truncate text-muted-foreground">
+                  {currentTask ? currentTask.title : "idle"}
+                </span>
+                {now ? (
+                  <span className="shrink-0 text-[11px] text-muted-foreground/70">
+                    {relativeTimeAgo(worker.lastHeartbeat.toDate(), now)}
+                  </span>
+                ) : null}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </SectionCard>
   );
 }

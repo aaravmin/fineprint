@@ -31,6 +31,8 @@ const ingestedBuilding = {
       detail: "2024 filing",
     },
   ]),
+  systemsJson: undefined,
+  compliancePlanJson: undefined,
 };
 
 describe("draftInputFrom", () => {
@@ -70,6 +72,8 @@ describe("draftInputFrom", () => {
       usesJson: undefined,
       ll97Covered: undefined,
       provenanceJson: undefined,
+      systemsJson: undefined,
+      compliancePlanJson: undefined,
     };
 
     const input = draftInputFrom(taskRow, seedBuilding);
@@ -78,6 +82,70 @@ describe("draftInputFrom", () => {
     expect(input.annualEmissionsTco2e).toBeUndefined();
     expect(input.uses).toEqual([]);
     expect(input.provenance).toEqual([]);
+    expect(input.systemDrivers).toEqual([]);
+    expect(input.measureHighlights).toEqual([]);
+  });
+
+  test("parses the systems dossier and personalized measures from their JSON columns", () => {
+    const withDossier = {
+      ...ingestedBuilding,
+      systemsJson: JSON.stringify({
+        systems: [
+          {
+            system: "heating_plant",
+            headline: "No. 4 fuel oil boiler, installed around 1995",
+            condition: "failing",
+            shareOfEmissions: 0.52,
+          },
+          {
+            system: "cooling",
+            headline: "Fixed cooling on record",
+            condition: "unknown",
+            shareOfEmissions: 0.15,
+          },
+          {
+            system: "envelope",
+            headline: "Original envelope",
+            condition: "aging",
+            shareOfEmissions: null,
+          },
+        ],
+      }),
+      compliancePlanJson: JSON.stringify({
+        personalization: {
+          measures: [
+            {
+              name: "Cold-climate heat pump conversion",
+              targetSystem: "heating_plant",
+              applicability: "recommended",
+              capexUsd: 3_300_000,
+              estReductionTco2e: 1_527.5,
+              why: "The heating plant is failing.",
+            },
+            {
+              name: "Rooftop solar PV",
+              targetSystem: "solar_pv",
+              applicability: "already_done",
+              capexUsd: null,
+              estReductionTco2e: null,
+              why: "Solar is already on record.",
+            },
+          ],
+        },
+      }),
+    };
+
+    const input = draftInputFrom(taskRow, withDossier);
+
+    // Only systems with an attributed share become drivers, biggest first.
+    expect(input.systemDrivers.map(driver => driver.system)).toEqual([
+      "heating_plant",
+      "cooling",
+    ]);
+    // Already-done measures are context, not highlights.
+    expect(input.measureHighlights).toHaveLength(1);
+    expect(input.measureHighlights[0].name).toBe("Cold-climate heat pump conversion");
+    expect(input.measureHighlights[0].capexUsd).toBe(3_300_000);
   });
 
   test("a missing building row still yields a usable input", () => {

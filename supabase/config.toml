@@ -1,0 +1,17 @@
+# Minimal Supabase CLI config. `supabase link --project-ref <ref>` then
+# `supabase db push` applies everything in supabase/migrations to the linked
+# project. Run `supabase init` if you want the CLI to fill in the full default
+# config for local development (`supabase start`); it will keep this file's
+# project_id and the existing migrations.
+project_id = "fineprint"
+
+[db]
+# Postgres major version of your Supabase project (17 for projects created in
+# 2025+). Only used by the local dev stack.
+major_version = 17
+
+[realtime]
+enabled = true
+
+[storage]
+enabled = true

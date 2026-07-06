@@ -14,35 +14,9 @@
 // become thin declarations here; the shared math lives in the engine.
 
 import { computeAllPeriods, type FineResult } from "../../engine/src/index.ts";
-import { LAWS, type BuildingProfile } from "../laws.ts";
+import { LAWS } from "../laws.ts";
 import { toEngineInput } from "./engineBridge.ts";
-import {
-  ll84FilingStatus,
-  ll87FilingStatus,
-  ll88FilingStatus,
-  ll33FilingStatus,
-  ll11FilingStatus,
-  ll152FilingStatus,
-  ll55FilingStatus,
-  type FilingStatus,
-} from "./filings.ts";
 import type { BuildingFacts } from "./types.ts";
-
-// The registry reasons over a BuildingProfile of real characteristics; assemble
-// one from the resolved facts so applicability and penalty math see the same
-// PLUTO-backed signals the analyzers below use.
-function profileFromFacts(facts: BuildingFacts): BuildingProfile {
-  const pluto = facts.plutoCharacteristics;
-  return {
-    sqft: facts.grossFloorAreaSqft ?? 0,
-    isAffordable: facts.isArticle321 ?? false,
-    bbl: facts.bbl,
-    numFloors: pluto?.numFloors ?? undefined,
-    unitsResidential: pluto?.unitsResidential ?? undefined,
-    communityDistrict: pluto?.communityDistrict ?? undefined,
-    buildingClass: pluto?.buildingClass ?? undefined,
-  };
-}
 
 // Where the building stands on one obligation. "at_risk" means a penalty is
 // accruing now; "due" means action is needed before a future deadline or cap;
@@ -64,8 +38,8 @@ interface ObligationBase {
 
 export interface ProceduralObligation extends ObligationBase {
   kind: "procedural";
-  // Civil penalty if the deadline is missed. Null when the penalty regime is
-  // too variable to state honestly (e.g. HPD allergen violation classes).
+  // Civil penalty if the deadline is missed. Null when the penalty regime is a
+  // flat statutory amount rather than a priced overage (e.g. Article 321).
   penaltyUsd: number | null;
 }
 
@@ -84,8 +58,7 @@ export interface LawAnalyzer {
   // Whether this law binds this specific building, given everything known.
   appliesTo: (facts: BuildingFacts) => boolean;
   // The obligation(s) this law places on the building. asOf dates every cycle
-  // deadline, so the result is deterministic and testable. A single law may
-  // emit both kinds (LL88: file a lighting plan, and upgrade the lighting).
+  // deadline, so the result is deterministic and testable.
   analyze: (facts: BuildingFacts, asOf: Date) => Obligation[];
 }
 
@@ -204,10 +177,10 @@ function missingDataPerformance(lawId: string, missing: string[]): PerformanceOb
     periods: [],
     findings: [
       `Exposure can't be computed yet: the city has no ${missing.join(", ")} ` +
-        "for this building (usually a missing LL84 benchmarking filing).",
+        "for this building (usually a missing energy benchmarking disclosure).",
     ],
     recommendations: [
-      "File the LL84 benchmarking report so the emissions baseline exists.",
+      "File the energy benchmarking report so the emissions baseline exists.",
     ],
   };
 }
@@ -221,120 +194,7 @@ function ll97Findings(periods: FineResult[]): string[] {
   });
 }
 
-// Procedural laws all reduce to the same shape: a filing cycle plus, where a
-// dataset exists, whether the filing is on record. Each analyzer pairs an
-// applicability test with the filing-status function for its law.
-function proceduralAnalyzer(
-  lawId: string,
-  appliesTo: (facts: BuildingFacts) => boolean,
-  filingStatus: (facts: BuildingFacts, asOf: Date) => FilingStatus,
-): LawAnalyzer {
-  return {
-    lawId,
-    appliesTo,
-    analyze: (facts, asOf) => [proceduralObligation(filingStatus(facts, asOf), facts)],
-  };
-}
-
-function proceduralObligation(
-  filing: FilingStatus,
-  facts: BuildingFacts,
-): ProceduralObligation {
-  const law = LAWS.find(entry => entry.id === filing.lawId);
-  const penaltyUsd = law ? law.penaltyUsd(profileFromFacts(facts)) : null;
-
-  const findings = [
-    filing.cycle + ".",
-    filing.dueDate
-      ? `Next deadline: ${filing.dueDate}.`
-      : "Next deadline can't be dated from the data on record.",
-    filing.onRecord === true
-      ? "A qualifying filing is on record."
-      : filing.onRecord === false
-        ? "No qualifying filing found in city data."
-        : "City filing status is not available for this law.",
-    `Basis: ${filing.basis}.`,
-  ];
-
-  return {
-    kind: "procedural",
-    lawId: filing.lawId,
-    lawName: lawName(filing.lawId),
-    title: filing.title,
-    status: filing.status,
-    penaltyUsd,
-    findings,
-    recommendations: filing.action ? [filing.action] : [],
-  };
-}
-
-const ll84Analyzer = proceduralAnalyzer(
-  "ll84",
-  facts => (facts.grossFloorAreaSqft ?? 0) >= 25_000,
-  ll84FilingStatus,
-);
-
-const ll87Analyzer = proceduralAnalyzer(
-  "ll87",
-  facts => (facts.grossFloorAreaSqft ?? 0) >= 50_000,
-  ll87FilingStatus,
-);
-
-const ll88Analyzer = proceduralAnalyzer(
-  "ll88",
-  facts => (facts.grossFloorAreaSqft ?? 0) >= 25_000,
-  ll88FilingStatus,
-);
-
-// LL33 — the public energy grade rides on the same 25,000 sqft benchmarking
-// floor as LL84, since the grade is derived from the LL84 ENERGY STAR score.
-const ll33Analyzer = proceduralAnalyzer(
-  "ll33",
-  facts => (facts.grossFloorAreaSqft ?? 0) >= 25_000,
-  ll33FilingStatus,
-);
-
-// FISP turns on building height, not floor area. PLUTO's floor count is
-// authoritative when present; the 60k-sqft registry proxy only fills in when
-// the floor count is unknown, so a confirmed-short building never gets FISP.
-const ll11Analyzer = proceduralAnalyzer(
-  "ll11",
-  facts => {
-    const numFloors = facts.plutoCharacteristics?.numFloors;
-    if (numFloors != null) {
-      return numFloors > 6;
-    }
-    return (facts.grossFloorAreaSqft ?? 0) >= 60_000;
-  },
-  ll11FilingStatus,
-);
-
-// Gas service is assumed present until a DOB gas dataset lands (1-2 family
-// homes are exempt, but they never reach intake).
-const ll152Analyzer = proceduralAnalyzer("ll152", () => true, ll152FilingStatus);
-
-// LL55 turns on residential unit count. PLUTO's unitsres is the honest signal;
-// the Article 321 flag is the fallback proxy (rent-regulated housing is
-// residential by definition) when PLUTO is silent.
-const ll55Analyzer = proceduralAnalyzer(
-  "ll55",
-  facts =>
-    (facts.plutoCharacteristics?.unitsResidential ?? 0) >= 3 ||
-    (facts.plutoCharacteristics?.unitsResidential == null && facts.isArticle321 === true),
-  ll55FilingStatus,
-);
-
-export const LAW_ANALYZERS: LawAnalyzer[] = [
-  ll97Analyzer,
-  article321Analyzer,
-  ll84Analyzer,
-  ll87Analyzer,
-  ll88Analyzer,
-  ll33Analyzer,
-  ll11Analyzer,
-  ll152Analyzer,
-  ll55Analyzer,
-];
+export const LAW_ANALYZERS: LawAnalyzer[] = [ll97Analyzer, article321Analyzer];
 
 // One address, every obligation. Resolves nothing itself — callers pass the
 // already-assembled facts so the address is looked up exactly once upstream.
