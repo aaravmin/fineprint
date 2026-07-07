@@ -47,6 +47,19 @@ let db: ReturnType<typeof fleetClient>;
 const inFlight = new Set<number>();
 let sweeping = false;
 
+// Heartbeat failures are throttled to one line per 30s. During a real outage
+// every heartbeat fails; the blind spot we care about is a process that looks
+// healthy but silently stopped heartbeating, so one visible line is enough.
+let lastHeartbeatWarnAt = 0;
+function warnHeartbeatFailure(label: string, error: unknown) {
+  const now = Date.now();
+  if (now - lastHeartbeatWarnAt < 30_000) {
+    return;
+  }
+  lastHeartbeatWarnAt = now;
+  console.warn(`[${label}] heartbeat failed: ${(error as Error).message}`);
+}
+
 async function main() {
   let dispatcherId: number;
   try {
@@ -62,7 +75,9 @@ async function main() {
   console.log(`[dispatcher] watching the queue as worker #${dispatcherId}`);
 
   setInterval(() => {
-    callRpc(db, "heartbeat", { p_worker_id: dispatcherId }).catch(() => {});
+    callRpc(db, "heartbeat", { p_worker_id: dispatcherId }).catch(error =>
+      warnHeartbeatFailure(DISPATCHER_NAME, error),
+    );
   }, HEARTBEAT_MS);
 
   await sweep();
@@ -116,20 +131,31 @@ async function runAgentFor(task: TaskRow) {
   try {
     workerId = await callRpc<number>(db, "register_worker", { p_name: name });
   } catch (error) {
-    console.error(`[${name}] could not register; will retry on a later sweep`);
+    console.error(
+      `[${name}] could not register (${(error as Error).message}); will retry on a later sweep`,
+    );
     return;
   }
 
   try {
     await callRpc(db, "claim_task", { p_worker_id: workerId, p_task_id: task.id });
-  } catch {
-    // Another agent won the race — the function rejected us. That's the point.
+  } catch (error) {
+    // Losing the claim race is expected and silent — another agent got there
+    // first. Any other rejection (unregistered worker, a regressed service-role
+    // gate, a dead connection) fails every claim while the process still looks
+    // healthy, so surface it.
+    const message = (error as Error).message;
+    if (!/already claimed/i.test(message)) {
+      console.warn(`[${name}] claim failed on #${task.id}: ${message}`);
+    }
     return;
   }
 
   console.log(`[${name}] claimed #${task.id}`);
   const heartbeat = setInterval(() => {
-    callRpc(db, "heartbeat", { p_worker_id: workerId }).catch(() => {});
+    callRpc(db, "heartbeat", { p_worker_id: workerId }).catch(error =>
+      warnHeartbeatFailure(name, error),
+    );
   }, HEARTBEAT_MS);
 
   try {
@@ -166,11 +192,16 @@ async function runAgentFor(task: TaskRow) {
 async function draftFor(name: string, task: TaskRow) {
   let building: BuildingRow | undefined;
   if (task.building_id !== null) {
-    const { data } = await db
+    const { data, error } = await db
       .from("building")
       .select("*")
       .eq("id", task.building_id)
       .maybeSingle();
+    if (error) {
+      console.warn(
+        `[${name}] could not load building #${task.building_id}: ${error.message}`,
+      );
+    }
     building = (data as BuildingRow) ?? undefined;
   }
 
@@ -186,7 +217,8 @@ async function draftFor(name: string, task: TaskRow) {
 // is only created when a human approves. A geocode the gate refuses
 // auto-rejects the task; any other failure becomes an honest report.
 type IntakeOutcome =
-  { body: string; payloadJson: string | undefined } | { failed: string };
+  | { body: string; payloadJson: string | undefined }
+  | { failed: string };
 
 async function intakeBuilding(name: string, task: TaskRow): Promise<IntakeOutcome> {
   const address = task.intake_address;

@@ -44,7 +44,8 @@ export function computePeriods(building: Building): FineResult[] | null {
   if (!input) return null;
   try {
     return computeAllPeriods(input);
-  } catch {
+  } catch (error) {
+    console.error(`[engine] fine computation failed for building ${building.id}: ${(error as Error).message}`);
     return null;
   }
 }
@@ -56,7 +57,8 @@ export function computeRetrofit(building: Building): RetrofitAssessment | null {
   if (!input) return null;
   try {
     return optimizeRetrofit(input);
-  } catch {
+  } catch (error) {
+    console.error(`[engine] retrofit optimization failed for building ${building.id}: ${(error as Error).message}`);
     return null;
   }
 }
@@ -68,7 +70,8 @@ export function computeBudgetPlan(building: Building, budgetUsd: number): Retrof
   if (!input) return null;
   try {
     return planForBudget(input, budgetUsd);
-  } catch {
+  } catch (error) {
+    console.error(`[engine] budget plan failed for building ${building.id}: ${(error as Error).message}`);
     return null;
   }
 }
@@ -87,7 +90,8 @@ export function computeFundedPlan(building: Building, fundingByMeasureId: Record
   if (!input) return null;
   try {
     return planFromFunding(input, fundingByMeasureId);
-  } catch {
+  } catch (error) {
+    console.error(`[engine] funded plan failed for building ${building.id}: ${(error as Error).message}`);
     return null;
   }
 }

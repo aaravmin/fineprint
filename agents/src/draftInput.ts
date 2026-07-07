@@ -39,21 +39,32 @@ export function draftInputFrom(
     bbl: building?.bbl ?? undefined,
     annualEmissionsTco2e: building?.annual_emissions_tco2e ?? undefined,
     uses:
-      parseJsonColumn<Array<{ group: string; sqft: number }>>(building?.uses_json) ?? [],
+      parseJsonColumn<Array<{ group: string; sqft: number }>>(
+        building?.uses_json,
+        "uses_json",
+      ) ?? [],
     ll97Covered: building?.ll97_covered ?? undefined,
-    provenance: parseJsonColumn<ProvenanceNote[]>(building?.provenance_json) ?? [],
+    provenance:
+      parseJsonColumn<ProvenanceNote[]>(building?.provenance_json, "provenance_json") ??
+      [],
   };
 }
 
 // Storage corruption must never crash a worker mid-draft.
-function parseJsonColumn<T>(json: string | null | undefined): T | null {
+function parseJsonColumn<T>(
+  json: string | null | undefined,
+  column = "column",
+): T | null {
   if (!json) {
     return null;
   }
 
   try {
     return JSON.parse(json) as T;
-  } catch {
+  } catch (error) {
+    console.warn(
+      `[draftInput] corrupt ${column} JSON, ignoring: ${(error as Error).message}`,
+    );
     return null;
   }
 }

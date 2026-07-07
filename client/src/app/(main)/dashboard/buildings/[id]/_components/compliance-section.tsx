@@ -64,7 +64,10 @@ function dispositionsByLaw(planJson: string | undefined): Map<string, PlanDispos
         byLaw.set(disposition.lawId, disposition);
       }
     }
-  } catch {
+  } catch (error) {
+    console.error(
+      `[compliance] corrupt compliance-plan JSON, falling back to task-derived laws: ${(error as Error).message}`,
+    );
     return byLaw;
   }
 

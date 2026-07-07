@@ -24,6 +24,7 @@ interface DbContextValue {
   client: SupabaseClient;
   snapshots: Partial<Record<TableName, unknown[]>>;
   loadedTables: Partial<Record<TableName, boolean>>;
+  connected: boolean;
 }
 
 const DbContext = createContext<DbContextValue | null>(null);
@@ -34,6 +35,10 @@ export function DbProvider({ children }: { children: ReactNode }) {
   const [loadedTables, setLoadedTables] = useState<Partial<Record<TableName, boolean>>>({});
   const connectionLost = useRef(false);
   const everConnected = useRef(false);
+  // A missable toast can't be the only signal that the database is unreachable:
+  // an empty board would otherwise read as "no buildings / fully compliant".
+  // This drives a persistent banner so an outage never looks like all-clear.
+  const [connected, setConnected] = useState(true);
 
   // One client per signed-in session. The accessToken callback hands every
   // PostgREST and Realtime request the current Clerk JWT, so `auth.jwt()`
@@ -63,6 +68,7 @@ export function DbProvider({ children }: { children: ReactNode }) {
             : "Can't reach the database. Live data is paused until it answers.",
         );
       }
+      setConnected(false);
       return;
     }
 
@@ -71,6 +77,7 @@ export function DbProvider({ children }: { children: ReactNode }) {
     }
     connectionLost.current = false;
     everConnected.current = true;
+    setConnected(true);
 
     const rows = (data ?? []).map((row) => mapRow(table, row as Record<string, unknown>));
     setSnapshots((previous) => ({ ...previous, [table]: rows }));
@@ -100,7 +107,13 @@ export function DbProvider({ children }: { children: ReactNode }) {
         );
       });
     }
-    channel.subscribe();
+    // Realtime failing silently would freeze the board on its first snapshot
+    // with no symptom — surface it the same way a failed refresh does.
+    channel.subscribe((status) => {
+      if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+        setConnected(false);
+      }
+    });
 
     return () => {
       for (const timer of pending.values()) {
@@ -121,7 +134,27 @@ export function DbProvider({ children }: { children: ReactNode }) {
     return <>{children}</>;
   }
 
-  return <DbContext.Provider value={{ client, snapshots, loadedTables }}>{children}</DbContext.Provider>;
+  return (
+    <DbContext.Provider value={{ client, snapshots, loadedTables, connected }}>
+      {!connected && <ConnectionLostBanner />}
+      {children}
+    </DbContext.Provider>
+  );
+}
+
+// Persistent, unmissable outage signal. Shown whenever a live read or the
+// Realtime channel reports the database is unreachable — the empty tables
+// underneath must not be mistaken for "no obligations".
+function ConnectionLostBanner() {
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className="fixed inset-x-0 top-0 z-[100] bg-destructive px-4 py-2 text-center text-sm font-medium text-destructive-foreground shadow-sm"
+    >
+      Can&apos;t reach the live database — the board below may be stale or incomplete.
+    </div>
+  );
 }
 
 function useDb(): DbContextValue {
