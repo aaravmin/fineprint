@@ -24,7 +24,7 @@ const CTA_LETTERS = Array.from("See your building's number", (char, index) => ({
 }));
 
 const rise = {
-  hidden: { opacity: 0, y: 14, filter: "blur(10px)" },
+  hidden: { opacity: 1, y: 0, filter: "blur(0px)" },
   show: {
     opacity: 1,
     y: 0,
