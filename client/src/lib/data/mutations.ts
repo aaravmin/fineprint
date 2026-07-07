@@ -3,6 +3,7 @@
 import { useAuth } from "@clerk/nextjs";
 
 import { useSupabaseClient } from "@/components/supabase-provider";
+import type { Json } from "@/lib/supabase/types";
 
 // The dashboard's mutation hooks. Each returns a function with the signature the
 // components call, resolving on success / rejecting on failure so the existing
@@ -257,4 +258,124 @@ export function useDeleteBuildingDocument() {
     if (error) throw new Error(error.message);
     await supabase.storage.from("evidence").remove([storagePath]);
   };
+}
+
+// --- Tracked categories, owner records, and system overrides ------------------
+
+// Opts a category in or out for the account. The tracked set is opt-out, so a
+// row here only exists once the owner has changed a category away from its
+// default; the unique (owner, category) key makes repeat toggles an upsert.
+export function useToggleCategory() {
+  const supabase = useSupabaseClient();
+  const { userId } = useAuth();
+  return async (category: string, enabled: boolean) => {
+    const { error } = await supabase
+      .from("category_preferences")
+      .upsert({ owner: userId ?? "", category, enabled }, { onConflict: "owner,category" });
+    if (error) throw new Error(error.message);
+  };
+}
+
+// Uploads an owner file into the private evidence bucket under the account's own
+// `<owner>/records/...` prefix (the storage RLS policies key on the first path
+// segment), then records one user_records row. The file is never parsed.
+export function useAddUserRecord() {
+  const supabase = useSupabaseClient();
+  const { userId } = useAuth();
+  return async ({
+    buildingId,
+    systemKey,
+    recordType,
+    file,
+    notes,
+  }: {
+    buildingId: bigint;
+    systemKey?: string;
+    recordType: string;
+    file: File;
+    notes?: string;
+  }) => {
+    // A first-line size cap so a stray large file fails fast with a clear message.
+    // The authoritative limit is the evidence bucket's server-side file_size_limit.
+    const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
+    if (file.size > MAX_UPLOAD_BYTES) {
+      throw new Error("File is larger than 25 MB. Upload a smaller PDF or image.");
+    }
+
+    const owner = userId ?? "";
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]+/g, "_");
+    const storagePath = `${owner}/records/${Number(buildingId)}/${Date.now()}_${safeName}`;
+
+    const { error: uploadError } = await supabase.storage.from("evidence").upload(storagePath, file, { upsert: false });
+    if (uploadError) throw new Error(uploadError.message);
+
+    const { error } = await supabase.from("user_records").insert({
+      owner,
+      building_id: Number(buildingId),
+      system_key: systemKey ?? null,
+      record_type: recordType,
+      file_name: file.name,
+      file_type: file.type,
+      storage_path: storagePath,
+      notes: notes ?? "",
+      uploaded_by: owner,
+    });
+    if (error) throw new Error(error.message);
+  };
+}
+
+// Records the owner's correction to one system field in the building_overrides
+// jsonb, merging into the existing per-building document rather than replacing
+// it, then asks the server to recompute the model against the new value.
+export function useSetSystemOverride() {
+  const supabase = useSupabaseClient();
+  const { userId } = useAuth();
+  return async ({
+    buildingId,
+    systemKey,
+    field,
+    value,
+    recordId,
+  }: {
+    buildingId: bigint;
+    systemKey: string;
+    field: string;
+    value: unknown;
+    recordId?: bigint;
+  }) => {
+    const owner = userId ?? "";
+
+    const { data: existing, error: readError } = await supabase
+      .from("building_overrides")
+      .select("data")
+      .eq("building_id", Number(buildingId))
+      .maybeSingle();
+    if (readError) throw new Error(readError.message);
+
+    const merged = (existing?.data ?? {}) as Record<string, Record<string, unknown>>;
+    const forSystem = { ...(merged[systemKey] ?? {}) };
+    forSystem[field] = {
+      value,
+      recordId: recordId == null ? undefined : Number(recordId),
+      enteredAt: new Date().toISOString(),
+    };
+    merged[systemKey] = forSystem;
+
+    const { error } = await supabase.from("building_overrides").upsert(
+      {
+        building_id: Number(buildingId),
+        owner,
+        data: merged as Json,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "building_id" },
+    );
+    if (error) throw new Error(error.message);
+
+    await postJson(`/api/buildings/${Number(buildingId)}/recompute`, {});
+  };
+}
+
+export function useStartOnboarding() {
+  return (address: string) => postJson("/api/onboarding", { address });
 }

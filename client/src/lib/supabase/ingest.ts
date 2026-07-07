@@ -20,10 +20,25 @@ export interface IngestArgs {
   provenanceJson: string;
   ll97AnnualFineUsd: number | undefined;
   compliancePlanJson: string;
+  systemDeadlinesJson: string;
   numFloors: number | undefined;
   unitsResidential: number | undefined;
   communityDistrict: number | undefined;
   energyStarScore: number | undefined;
+}
+
+// One inspection-driven deadline as assessSystemDeadlines produces it
+// (data/src/systemDeadlines.ts). Persisted per building after the ingest RPC.
+interface SystemDeadlineRow {
+  systemKey: string;
+  kind: string;
+  title: string;
+  dueDate: string;
+  actByDate: string;
+  basis: string;
+  sourceDataset: string;
+  sourceRecordId: string;
+  status: string;
 }
 
 // The TypeScript half of the old ingestFromArgs reducer. The law registry
@@ -98,7 +113,56 @@ export async function ingestBuilding(args: IngestArgs, owner: string): Promise<n
     throw new Error(`ingest_building failed: ${error.message}`);
   }
 
-  return data as number;
+  const buildingId = data as number;
+
+  await persistSystemDeadlines(supabase, buildingId, owner, args.systemDeadlinesJson);
+
+  return buildingId;
+}
+
+// Replace this building's inspection-driven deadlines with the freshly assessed
+// set. A derived artifact, so it is rebuilt wholesale (delete then insert) every
+// time the building is ingested or recomputed - no attempt to reconcile rows.
+async function persistSystemDeadlines(
+  supabase: ReturnType<typeof createAdminSupabase>,
+  buildingId: number,
+  owner: string,
+  systemDeadlinesJson: string,
+): Promise<void> {
+  const deadlines = parseSystemDeadlines(systemDeadlinesJson);
+
+  await supabase.from("system_deadlines").delete().eq("building_id", buildingId);
+
+  if (deadlines.length === 0) {
+    return;
+  }
+
+  const rows = deadlines.map((deadline) => ({
+    owner,
+    building_id: buildingId,
+    system_key: deadline.systemKey,
+    kind: deadline.kind,
+    title: deadline.title,
+    due_date: deadline.dueDate,
+    act_by_date: deadline.actByDate,
+    basis: deadline.basis,
+    source_dataset: deadline.sourceDataset,
+    source_record_id: deadline.sourceRecordId,
+    status: deadline.status,
+  }));
+
+  const { error } = await supabase.from("system_deadlines").insert(rows);
+  if (error) {
+    throw new Error(`persisting system deadlines failed: ${error.message}`);
+  }
+}
+
+function parseSystemDeadlines(systemDeadlinesJson: string): SystemDeadlineRow[] {
+  const parsed = parseJson(systemDeadlinesJson);
+  if (!Array.isArray(parsed)) {
+    return [];
+  }
+  return parsed as SystemDeadlineRow[];
 }
 
 // The task's deadline is the law's real next statutory deadline; when the cycle

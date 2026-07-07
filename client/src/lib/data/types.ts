@@ -19,6 +19,7 @@ export interface Task {
   kind: string;
   title: string;
   status: string;
+  category: string;
   deadline: StdbTimestamp;
   slaBreached: boolean;
   fineEstimateUsd: number | undefined;
@@ -63,6 +64,7 @@ export interface Submission {
 export interface Settings {
   owner: string;
   reviewMode: string;
+  primaryAddress?: string;
 }
 
 export interface Event {
@@ -149,6 +151,48 @@ export interface Worker {
   status: string;
   lastHeartbeat: StdbTimestamp;
   currentTaskId: bigint | undefined;
+}
+
+// A derived per-system inspection or certification deadline computed at intake
+// (boiler inspection, elevator CAT1, ...). Owner-read; the intake pipeline writes
+// it. `actByDate` is `dueDate` minus a per-kind lead time, so the owner acts
+// before the inspection rather than on the day of.
+export interface SystemDeadline {
+  id: bigint;
+  buildingId: bigint;
+  systemKey: string;
+  kind: string;
+  title: string;
+  dueDate: StdbTimestamp;
+  actByDate: StdbTimestamp;
+  basis: string;
+  sourceDataset: string;
+  sourceRecordId: string;
+  status: string;
+}
+
+// Metadata for a file the owner uploaded to adjust or evidence the systems model
+// (blueprint, inspection report, spec sheet, utility bill). The file itself lives
+// in the shared `evidence` storage bucket under <owner>/records/<buildingId>/...
+export interface UserRecord {
+  id: bigint;
+  buildingId: bigint;
+  systemKey?: string;
+  recordType: string;
+  fileName: string;
+  fileType: string;
+  storagePath: string;
+  notes: string;
+  uploadedAt: StdbTimestamp;
+}
+
+// An owner's opt-out for one tracked category. The tracked set is opt-out: a
+// category with no row here counts as tracked, and "compliance" is always
+// tracked regardless.
+export interface CategoryPref {
+  id: bigint;
+  category: string;
+  enabled: boolean;
 }
 
 // One uploaded document in a building's standardized library. Fineprint keeps the

@@ -1,4 +1,11 @@
-import { Activity, Bot, Building2, ClipboardList, LayoutDashboard, type LucideIcon } from "lucide-react";
+import {
+  Activity,
+  Building2,
+  ClipboardList,
+  LayoutDashboard,
+  type LucideIcon,
+  SlidersHorizontal,
+} from "lucide-react";
 
 export interface NavSubItem {
   title: string;
@@ -52,9 +59,9 @@ export const sidebarItems: NavGroup[] = [
         icon: ClipboardList,
       },
       {
-        title: "Agents",
-        url: "/dashboard/agents",
-        icon: Bot,
+        title: "Tracking",
+        url: "/dashboard/tracking",
+        icon: SlidersHorizontal,
       },
       {
         title: "Activity",

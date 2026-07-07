@@ -367,14 +367,17 @@ export type Database = {
       settings: {
         Row: {
           owner: string;
+          primary_address: string | null;
           review_mode: string;
         };
         Insert: {
           owner: string;
+          primary_address?: string | null;
           review_mode?: string;
         };
         Update: {
           owner?: string;
+          primary_address?: string | null;
           review_mode?: string;
         };
         Relationships: [];
@@ -420,6 +423,7 @@ export type Database = {
       tasks: {
         Row: {
           building_id: number | null;
+          category: string;
           created_at: string;
           deadline: string;
           fine_estimate_usd: number | null;
@@ -435,6 +439,7 @@ export type Database = {
         };
         Insert: {
           building_id?: number | null;
+          category?: string;
           created_at?: string;
           deadline: string;
           fine_estimate_usd?: number | null;
@@ -450,6 +455,7 @@ export type Database = {
         };
         Update: {
           building_id?: number | null;
+          category?: string;
           created_at?: string;
           deadline?: string;
           fine_estimate_usd?: number | null;
@@ -514,6 +520,162 @@ export type Database = {
           role_type?: string;
         };
         Relationships: [];
+      };
+      category_preferences: {
+        Row: {
+          category: string;
+          enabled: boolean;
+          id: number;
+          owner: string;
+        };
+        Insert: {
+          category: string;
+          enabled?: boolean;
+          id?: never;
+          owner: string;
+        };
+        Update: {
+          category?: string;
+          enabled?: boolean;
+          id?: never;
+          owner?: string;
+        };
+        Relationships: [];
+      };
+      user_records: {
+        Row: {
+          building_id: number;
+          file_name: string;
+          file_type: string;
+          id: number;
+          notes: string;
+          owner: string;
+          record_type: string;
+          storage_path: string;
+          system_key: string | null;
+          uploaded_at: string;
+          uploaded_by: string;
+        };
+        Insert: {
+          building_id: number;
+          file_name: string;
+          file_type?: string;
+          id?: never;
+          notes?: string;
+          owner: string;
+          record_type: string;
+          storage_path: string;
+          system_key?: string | null;
+          uploaded_at?: string;
+          uploaded_by?: string;
+        };
+        Update: {
+          building_id?: number;
+          file_name?: string;
+          file_type?: string;
+          id?: never;
+          notes?: string;
+          owner?: string;
+          record_type?: string;
+          storage_path?: string;
+          system_key?: string | null;
+          uploaded_at?: string;
+          uploaded_by?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "user_records_building_id_fkey";
+            columns: ["building_id"];
+            isOneToOne: false;
+            referencedRelation: "buildings";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      building_overrides: {
+        Row: {
+          building_id: number;
+          data: Json;
+          owner: string;
+          updated_at: string;
+        };
+        Insert: {
+          building_id: number;
+          data?: Json;
+          owner: string;
+          updated_at?: string;
+        };
+        Update: {
+          building_id?: number;
+          data?: Json;
+          owner?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "building_overrides_building_id_fkey";
+            columns: ["building_id"];
+            isOneToOne: true;
+            referencedRelation: "buildings";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      system_deadlines: {
+        Row: {
+          act_by_date: string;
+          basis: string;
+          building_id: number;
+          created_at: string;
+          due_date: string;
+          id: number;
+          kind: string;
+          owner: string;
+          source_dataset: string;
+          source_record_id: string;
+          status: string;
+          system_key: string;
+          title: string;
+        };
+        Insert: {
+          act_by_date: string;
+          basis?: string;
+          building_id: number;
+          created_at?: string;
+          due_date: string;
+          id?: never;
+          kind: string;
+          owner: string;
+          source_dataset?: string;
+          source_record_id?: string;
+          status?: string;
+          system_key: string;
+          title: string;
+        };
+        Update: {
+          act_by_date?: string;
+          basis?: string;
+          building_id?: number;
+          created_at?: string;
+          due_date?: string;
+          id?: never;
+          kind?: string;
+          owner?: string;
+          source_dataset?: string;
+          source_record_id?: string;
+          status?: string;
+          system_key?: string;
+          title?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "system_deadlines_building_id_fkey";
+            columns: ["building_id"];
+            isOneToOne: false;
+            referencedRelation: "buildings";
+            referencedColumns: ["id"];
+          },
+        ];
       };
     };
     Views: {

@@ -4,9 +4,13 @@ import {
   categoryForSystem,
   // biome-ignore lint/correctness/noUndeclaredDependencies: fineprint-engine is a tsconfig path alias to ../engine/src, resolved by TS and Turbopack, not an npm package.
 } from "fineprint-engine";
+import { Upload } from "lucide-react";
 
 import { InfoHint } from "@/components/dashboard/InfoHint";
 import { SectionCard } from "@/components/dashboard/SectionCard";
+import { StatusPill, type StatusTone } from "@/components/dashboard/StatusPill";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   type BuildingSystems as BuildingSystemsData,
   SYSTEM_DISPLAY_NAME,
@@ -15,15 +19,43 @@ import {
   type SystemKey,
   sourceDisplayName,
 } from "@/lib/compliance/plan";
+import { useSystemDeadlines } from "@/lib/data/hooks";
+import type { SystemDeadline } from "@/lib/data/types";
+import { formatShortDate } from "@/lib/format";
 import { categoryIcon } from "@/lib/retrofit/categoryRegistry";
+
+import { SystemOverrideDialog } from "./system-override-dialog";
+import { UploadRecordDialog } from "./upload-record-dialog";
 
 // The infrastructure dossier: what each of the eight systems is, inferred from
 // public NYC records, so the retrofit plan below can speak to this building
-// rather than a generic one.
-export function BuildingSystems({ systems }: { systems: BuildingSystemsData | null }) {
+// rather than a generic one. Owners correct the inferred facts, attach records,
+// and see each system's inspection deadlines here.
+export function BuildingSystems({ buildingId, systems }: { buildingId: bigint; systems: BuildingSystemsData | null }) {
+  const allDeadlines = useSystemDeadlines();
+
+  const deadlinesBySystem = new Map<string, SystemDeadline[]>();
+  for (const deadline of allDeadlines) {
+    if (deadline.buildingId !== buildingId) {
+      continue;
+    }
+    deadlinesBySystem.set(deadline.systemKey, [...(deadlinesBySystem.get(deadline.systemKey) ?? []), deadline]);
+  }
+
+  const uploadForBuilding = (
+    <UploadRecordDialog
+      buildingId={buildingId}
+      trigger={
+        <Button type="button" variant="outline" size="sm">
+          <Upload className="mr-1 size-3.5" /> Upload record
+        </Button>
+      }
+    />
+  );
+
   if (!systems || systems.systems.length === 0) {
     return (
-      <SectionCard title="Building systems">
+      <SectionCard title="Building systems" action={uploadForBuilding}>
         <p className="py-4 text-sm text-muted-foreground">No system records inferred yet.</p>
       </SectionCard>
     );
@@ -35,6 +67,7 @@ export function BuildingSystems({ systems }: { systems: BuildingSystemsData | nu
   return (
     <SectionCard
       title="Building systems"
+      action={uploadForBuilding}
       sub={
         <span className="inline-flex items-center gap-1">
           Inferred from {systems.generatedFrom.length} NYC record sources
@@ -43,17 +76,27 @@ export function BuildingSystems({ systems }: { systems: BuildingSystemsData | nu
       }
     >
       <div className="grid grid-cols-2 gap-2.5 @md/main:grid-cols-4">
-        {SYSTEM_ORDER.map((key) => {
-          const system = byKey.get(key);
-          if (!system) {
-            return <SystemTile key={key} systemKey={key} assessment={null} />;
-          }
-          return <SystemTile key={key} systemKey={key} assessment={system} />;
-        })}
+        {SYSTEM_ORDER.map((key) => (
+          <SystemTile
+            key={key}
+            buildingId={buildingId}
+            systemKey={key}
+            assessment={byKey.get(key) ?? null}
+            deadlines={deadlinesBySystem.get(key) ?? []}
+          />
+        ))}
       </div>
     </SectionCard>
   );
 }
+
+const DEADLINE_TONE: Record<string, StatusTone> = {
+  overdue: "destructive",
+  due_soon: "warning",
+  scheduled: "muted",
+  satisfied: "success",
+  completed: "success",
+};
 
 function humanizeCondition(condition: string): string {
   return condition.replace(/_/g, " ");
@@ -79,9 +122,21 @@ function emissionsBarWidth(share: number): number {
   return Math.min(100, Math.max(2, percent));
 }
 
-function SystemTile({ systemKey, assessment }: { systemKey: SystemKey; assessment: SystemAssessment | null }) {
+function SystemTile({
+  buildingId,
+  systemKey,
+  assessment,
+  deadlines,
+}: {
+  buildingId: bigint;
+  systemKey: SystemKey;
+  assessment: SystemAssessment | null;
+  deadlines: SystemDeadline[];
+}) {
   const Icon = categoryIcon(categoryForSystem(systemKey));
   const unknown = !assessment || assessment.presence === "unknown";
+  const ownerProvided = assessment?.evidence.some((reference) => reference.datasetId === "user") ?? false;
+  const systemLabel = SYSTEM_DISPLAY_NAME[systemKey];
 
   const subParts: string[] = [];
   if (assessment?.vintageYear) {
@@ -103,10 +158,15 @@ function SystemTile({ systemKey, assessment }: { systemKey: SystemKey; assessmen
   const evidenceHint = evidenceParts.join(" - ");
 
   return (
-    <div className="rounded-lg border bg-card px-3 py-2.5">
+    <div className="flex flex-col rounded-lg border bg-card px-3 py-2.5">
       <div className="flex items-center gap-1.5 text-muted-foreground">
         <Icon className="size-3.5" />
-        <span className="text-xs">{SYSTEM_DISPLAY_NAME[systemKey]}</span>
+        <span className="text-xs">{systemLabel}</span>
+        {ownerProvided ? (
+          <Badge variant="secondary" className="ml-auto text-[10px]">
+            Owner-provided
+          </Badge>
+        ) : null}
       </div>
 
       {unknown ? (
@@ -139,6 +199,52 @@ function SystemTile({ systemKey, assessment }: { systemKey: SystemKey; assessmen
           </div>
         </>
       )}
+
+      {deadlines.length > 0 ? (
+        <ul className="mt-2 space-y-1 border-t pt-2">
+          {deadlines.map((deadline) => (
+            <li key={deadline.id.toString()} className="flex items-center justify-between gap-1.5">
+              <span className="min-w-0 truncate text-[11px] text-muted-foreground" title={deadline.title}>
+                {deadline.title}
+              </span>
+              <StatusPill tone={DEADLINE_TONE[deadline.status] ?? "muted"} className="shrink-0 px-1.5 py-0 text-[10px]">
+                act by {formatShortDate(deadline.actByDate.toDate())}
+              </StatusPill>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+
+      <div className="mt-auto flex items-center gap-2 border-t pt-2">
+        <SystemOverrideDialog
+          buildingId={buildingId}
+          systemKey={systemKey}
+          systemLabel={systemLabel}
+          assessment={assessment}
+          trigger={
+            <button
+              type="button"
+              className="text-[11px] font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Correct facts
+            </button>
+          }
+        />
+        <span className="text-muted-foreground/40">·</span>
+        <UploadRecordDialog
+          buildingId={buildingId}
+          systemKey={systemKey}
+          systemLabel={systemLabel}
+          trigger={
+            <button
+              type="button"
+              className="text-[11px] font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Upload record
+            </button>
+          }
+        />
+      </div>
     </div>
   );
 }

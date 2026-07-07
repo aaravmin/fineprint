@@ -6,6 +6,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 
 import {
+  categoryForSystem,
+  // biome-ignore lint/correctness/noUndeclaredDependencies: fineprint-engine is a tsconfig path alias to ../engine/src, resolved by TS and Turbopack, not an npm package.
+} from "fineprint-engine";
+import {
   Activity,
   BadgeCheck,
   Building2,
@@ -20,19 +24,31 @@ import {
   TriangleAlert,
   XCircle,
 } from "lucide-react";
-import { useBuildings, useEvents, useTasks, useWorkers } from "@/lib/data/hooks";
+import { toast } from "sonner";
 
+import { AddressAutocomplete } from "@/components/address-autocomplete";
 import { AddBuildingDialog } from "@/components/dashboard/AddBuildingDialog";
 import { DaysLeftPill } from "@/components/dashboard/DaysLeftPill";
 import { ActionLink, SectionCard } from "@/components/dashboard/SectionCard";
 import { StatTile } from "@/components/dashboard/StatTile";
 import { StatusDot } from "@/components/dashboard/StatusPill";
+import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useRequestBuilding } from "@/hooks/use-request-building";
+import { categoryLabel } from "@/lib/categories/trackedCategories";
+import {
+  useBuildings,
+  useEvents,
+  useSettingsRows,
+  useSystemDeadlines,
+  useTasks,
+  useTrackedCategories,
+} from "@/lib/data/hooks";
+import { useStartOnboarding } from "@/lib/data/mutations";
+import type { Building, Event, SystemDeadline, Task } from "@/lib/data/types";
 import { computePeriods } from "@/lib/engine";
 import { compactNumber, compactUsd, formatShortDate, relativeTimeAgo, shortAddress } from "@/lib/format";
 import { lawShortName } from "@/lib/laws/lawRegistry";
-import type { Building, Event, Task, Worker } from "@/lib/data/types";
 
 function greetingWord(date: Date): string {
   const hour = date.getHours();
@@ -47,14 +63,29 @@ function greetingWord(date: Date): string {
 
 const TERMINAL_TASK_STATUSES = new Set(["done", "rejected"]);
 
+// The synthetic intake task the pipeline opens while it resolves an address. Its
+// deadline is an arbitrary agent SLA, not a compliance date, so it stays out of
+// the deadline countdown and the Deadlines panel.
+const BUILDING_INTAKE_KIND = "building_intake";
+
 export function PortfolioClient({ firstName }: { firstName?: string | null }) {
   const buildings = useBuildings();
   const tasks = useTasks();
-  const workers = useWorkers();
   const events = useEvents();
+  const systemDeadlines = useSystemDeadlines();
+  const settingsRows = useSettingsRows();
+  const { isTracked } = useTrackedCategories();
 
   const { submit } = useRequestBuilding();
+  const startOnboarding = useStartOnboarding();
   const requestedQueryAddress = useRef<string | null>(null);
+  const autoIntakeAddress = useRef<string | null>(null);
+
+  const primaryAddress = settingsRows[0]?.primaryAddress?.trim() ?? "";
+
+  const pendingIntake = tasks.some(
+    (task) => task.kind === BUILDING_INTAKE_KIND && !TERMINAL_TASK_STATUSES.has(task.status),
+  );
 
   // The homepage CTA deep-links here with ?address=; submit that intake once on
   // arrival, the same optimistic path the dialog uses, minus any inline UI.
@@ -67,6 +98,24 @@ export function PortfolioClient({ firstName }: { firstName?: string | null }) {
     requestedQueryAddress.current = queryAddress;
     submit(queryAddress);
   }, [submit]);
+
+  // A returning owner who set a primary address during signup but has no building
+  // yet gets their intake kicked off automatically, exactly once. The guard ref
+  // plus the pending-intake check keep it from re-firing before the new task
+  // lands in the realtime table.
+  useEffect(() => {
+    if (buildings.length > 0 || pendingIntake || !primaryAddress) {
+      return;
+    }
+    if (autoIntakeAddress.current === primaryAddress) {
+      return;
+    }
+
+    autoIntakeAddress.current = primaryAddress;
+    startOnboarding(primaryAddress).catch((error: Error) => {
+      toast.error(`Setting up ${primaryAddress} failed: ${error.message}`);
+    });
+  }, [buildings.length, pendingIntake, primaryAddress, startOnboarding]);
 
   // Time-of-day greeting and the date chips depend on the wall clock, which the
   // server can't know without risking a hydration mismatch; resolve after mount.
@@ -108,8 +157,33 @@ export function PortfolioClient({ firstName }: { firstName?: string | null }) {
 
   const cliffRatio = totalFine0 > 0 ? (totalFine1 / totalFine0).toFixed(1) : null;
 
+  const countdownTasks = openTasks.filter((task) => task.kind !== BUILDING_INTAKE_KIND);
   const nextDeadline =
-    openTasks.length > 0 ? new Date(Math.min(...openTasks.map((task) => task.deadline.toDate().getTime()))) : null;
+    countdownTasks.length > 0
+      ? new Date(Math.min(...countdownTasks.map((task) => task.deadline.toDate().getTime())))
+      : null;
+
+  // A brand-new owner with no building and no primary address on file gets the
+  // address prompt in place of the empty dashboard. Once an intake is pending or
+  // a building exists, the normal overview takes over.
+  const showFirstRun = buildings.length === 0 && !primaryAddress && !pendingIntake;
+
+  if (showFirstRun) {
+    return (
+      <div className="@container/main flex flex-col gap-6">
+        <div>
+          <h1 className="font-heading text-2xl font-bold tracking-tight">
+            {firstName ? `Welcome, ${firstName}` : "Welcome to Fineprint"}
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Add your first building to see its LL97 exposure and compliance plan.
+          </p>
+        </div>
+
+        <FirstRunIntake onSubmit={startOnboarding} />
+      </div>
+    );
+  }
 
   return (
     <div className="@container/main flex flex-col gap-6">
@@ -135,7 +209,7 @@ export function PortfolioClient({ firstName }: { firstName?: string | null }) {
               <DaysLeftPill date={nextDeadline} now={now ?? undefined} />
             </Chip>
           ) : null}
-          <AddBuildingDialog />
+          {buildings.length > 0 ? <AddBuildingDialog /> : null}
         </div>
       </div>
 
@@ -198,13 +272,18 @@ export function PortfolioClient({ firstName }: { firstName?: string | null }) {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_380px]">
         <ExposureByBuilding fines={fines} />
-        <DeadlinesPanel tasks={tasks} buildings={buildings} now={now} />
+        <DeadlinesPanel
+          tasks={tasks}
+          buildings={buildings}
+          systemDeadlines={systemDeadlines}
+          isTracked={isTracked}
+          now={now}
+        />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <NeedsAttentionPanel fines={fines} overdueTasks={overdueOpen} buildings={buildings} />
         <RecentActivityPanel events={events} />
-        <AgentsPanel workers={workers} tasks={tasks} now={now} />
       </div>
     </div>
   );
@@ -281,57 +360,135 @@ function ExposureByBuilding({ fines }: { fines: FineRow[] }) {
   );
 }
 
+const SYSTEM_STATUS_TONE: Record<string, string> = {
+  upcoming: "text-muted-foreground",
+  act_soon: "text-warning",
+  overdue: "text-destructive",
+};
+
+type DeadlineRow =
+  | { type: "task"; key: string; date: Date; task: Task }
+  | { type: "system"; key: string; date: Date; deadline: SystemDeadline; category: string };
+
 function DeadlinesPanel({
   tasks,
   buildings,
+  systemDeadlines,
+  isTracked,
   now,
 }: {
   tasks: readonly Task[];
   buildings: readonly Building[];
+  systemDeadlines: readonly SystemDeadline[];
+  isTracked: (id: string) => boolean;
   now: Date | null;
 }) {
-  const upcoming = tasks
-    .filter((task) => !TERMINAL_TASK_STATUSES.has(task.status))
-    .sort((a, b) => a.deadline.toDate().getTime() - b.deadline.toDate().getTime())
-    .slice(0, 8);
+  const [showUntracked, setShowUntracked] = useState(false);
+
+  // Tickets are statutory compliance work and always show; the intake task is an
+  // agent SLA, not a compliance date, so it is left out.
+  const taskRows: DeadlineRow[] = tasks
+    .filter((task) => !TERMINAL_TASK_STATUSES.has(task.status) && task.kind !== BUILDING_INTAKE_KIND)
+    .map((task) => ({
+      type: "task",
+      key: `task-${task.id}`,
+      date: task.deadline.toDate(),
+      task,
+    }));
+
+  // Per-system inspection and certification act-by dates carry a retrofit
+  // category; untracked categories hide behind the toggle so the panel reflects
+  // what the owner is actually working on.
+  const systemRows = systemDeadlines.map((deadline) => {
+    const category = categoryForSystem(deadline.systemKey);
+    return { deadline, category, tracked: isTracked(category) };
+  });
+
+  const untrackedCount = systemRows.filter((row) => !row.tracked).length;
+
+  const visibleSystemRows: DeadlineRow[] = systemRows
+    .filter((row) => row.tracked || showUntracked)
+    .map((row) => ({
+      type: "system",
+      key: `system-${row.deadline.id}`,
+      date: row.deadline.actByDate.toDate(),
+      deadline: row.deadline,
+      category: row.category,
+    }));
+
+  const rows = [...taskRows, ...visibleSystemRows].sort((a, b) => a.date.getTime() - b.date.getTime()).slice(0, 8);
 
   return (
     <SectionCard
       title="Deadlines"
-      action={upcoming.length > 0 ? <ActionLink href="/dashboard/tasks">View all tasks</ActionLink> : undefined}
+      action={taskRows.length > 0 ? <ActionLink href="/dashboard/tasks">View all tasks</ActionLink> : undefined}
     >
-      {upcoming.length === 0 ? (
+      {rows.length === 0 ? (
         <p className="py-6 text-center text-sm text-muted-foreground">No deadlines on file - add a building.</p>
       ) : (
         <ul className="divide-y">
-          {upcoming.map((task) => {
-            const building = buildings.find((candidate) => candidate.id === task.buildingId);
-            const deadline = task.deadline.toDate();
+          {rows.map((row) => {
+            if (row.type === "task") {
+              const building = buildings.find((candidate) => candidate.id === row.task.buildingId);
+
+              return (
+                <li key={row.key}>
+                  <Link
+                    href={building ? `/dashboard/buildings/${building.id}` : "/dashboard/tasks"}
+                    className="flex items-center justify-between gap-2 py-2.5 hover:bg-muted/40"
+                  >
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+                          {lawShortName(row.task.lawId)}
+                        </span>
+                        <span className="truncate text-xs font-medium">
+                          {building ? shortAddress(building.address) : row.task.title}
+                        </span>
+                      </div>
+                      <p className="mt-0.5 text-[11px] text-muted-foreground">due {formatShortDate(row.date)}</p>
+                    </div>
+                    <DaysLeftPill date={row.date} now={now ?? undefined} />
+                  </Link>
+                </li>
+              );
+            }
+
+            const building = buildings.find((candidate) => candidate.id === row.deadline.buildingId);
+            const statusTone = SYSTEM_STATUS_TONE[row.deadline.status] ?? "text-muted-foreground";
 
             return (
-              <li key={String(task.id)}>
+              <li key={row.key}>
                 <Link
-                  href={building ? `/dashboard/buildings/${building.id}` : "/dashboard/tasks"}
+                  href={building ? `/dashboard/buildings/${building.id}` : "/dashboard/buildings"}
                   className="flex items-center justify-between gap-2 py-2.5 hover:bg-muted/40"
                 >
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
                       <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
-                        {lawShortName(task.lawId)}
+                        {categoryLabel(row.category)}
                       </span>
-                      <span className="truncate text-xs font-medium">
-                        {building ? shortAddress(building.address) : task.title}
-                      </span>
+                      <span className="truncate text-xs font-medium">{row.deadline.title}</span>
                     </div>
-                    <p className="mt-0.5 text-[11px] text-muted-foreground">due {formatShortDate(deadline)}</p>
+                    <p className={`mt-0.5 text-[11px] ${statusTone}`}>act by {formatShortDate(row.date)}</p>
                   </div>
-                  <DaysLeftPill date={deadline} now={now ?? undefined} />
+                  <DaysLeftPill date={row.date} now={now ?? undefined} />
                 </Link>
               </li>
             );
           })}
         </ul>
       )}
+
+      {untrackedCount > 0 ? (
+        <button
+          type="button"
+          onClick={() => setShowUntracked((previous) => !previous)}
+          className="mt-3 text-xs text-muted-foreground hover:text-foreground"
+        >
+          {showUntracked ? "Hide untracked" : `Show untracked (${untrackedCount})`}
+        </button>
+      ) : null}
     </SectionCard>
   );
 }
@@ -436,45 +593,65 @@ function RecentActivityPanel({ events }: { events: readonly Event[] }) {
   );
 }
 
-function AgentsPanel({
-  workers,
-  tasks,
-  now,
-}: {
-  workers: readonly Worker[];
-  tasks: readonly Task[];
-  now: Date | null;
-}) {
-  const live = [...workers].filter((worker) => worker.status !== "dead").sort((a, b) => (a.id < b.id ? -1 : 1));
+const FIRST_RUN_INPUT_CLASSES =
+  "h-11 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-[3px] focus:ring-ring/20";
+
+// The empty-state intake for an owner who hasn't added a building and has no
+// primary address on file. Submitting kicks off onboarding, which creates the
+// intake task; the parent swaps back to the overview once that task appears.
+function FirstRunIntake({ onSubmit }: { onSubmit: (address: string) => Promise<void> }) {
+  const [address, setAddress] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async () => {
+    const trimmed = address.trim();
+    if (!trimmed) {
+      toast.error("Enter a street address with the borough");
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      await onSubmit(trimmed);
+      toast.success("Setting up your building. An agent is pulling the city's records now");
+    } catch (error) {
+      toast.error(`Setup failed: ${(error as Error).message}`);
+      setSubmitting(false);
+    }
+  };
 
   return (
-    <SectionCard title="Agents" action={<ActionLink href="/dashboard/agents">Manage</ActionLink>}>
-      {live.length === 0 ? (
-        <p className="py-4 text-sm text-muted-foreground">No agents online.</p>
-      ) : (
-        <ul className="space-y-2.5">
-          {live.map((worker) => {
-            const currentTask =
-              worker.currentTaskId !== undefined ? tasks.find((task) => task.id === worker.currentTaskId) : undefined;
-            const working = worker.status === "working";
+    <SectionCard title="Add your first building">
+      <div className="flex flex-col items-center gap-5 py-8 text-center">
+        <div className="rounded-full bg-primary/10 p-3 text-primary">
+          <Building2 className="size-6" />
+        </div>
 
-            return (
-              <li key={String(worker.id)} className="flex items-center gap-2 text-xs">
-                <StatusDot tone={working ? "success" : "muted"} pulse={working} label={worker.status} />
-                <span className="shrink-0 font-medium">{worker.name}</span>
-                <span className="min-w-0 flex-1 truncate text-muted-foreground">
-                  {currentTask ? currentTask.title : "idle"}
-                </span>
-                {now ? (
-                  <span className="shrink-0 text-[11px] text-muted-foreground/70">
-                    {relativeTimeAgo(worker.lastHeartbeat.toDate(), now)}
-                  </span>
-                ) : null}
-              </li>
-            );
-          })}
-        </ul>
-      )}
+        <p className="max-w-md text-sm text-muted-foreground">
+          Enter your building&apos;s NYC address and an agent pulls the city&apos;s records to build its LL97 compliance
+          plan.
+        </p>
+
+        <form
+          className="flex w-full max-w-md flex-col gap-2 sm:flex-row"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void handleSubmit();
+          }}
+        >
+          <AddressAutocomplete
+            value={address}
+            onValueChange={setAddress}
+            placeholder="Street address with borough"
+            className="flex-1"
+            inputClassName={FIRST_RUN_INPUT_CLASSES}
+          />
+          <Button type="submit" disabled={submitting}>
+            {submitting ? "Setting up..." : "Get started"}
+          </Button>
+        </form>
+      </div>
     </SectionCard>
   );
 }

@@ -1,5 +1,5 @@
-import { AgentsClient } from "./_components/agents-client";
+import { redirect } from "next/navigation";
 
 export default function AgentsPage() {
-  return <AgentsClient />;
+  redirect("/dashboard/tracking");
 }

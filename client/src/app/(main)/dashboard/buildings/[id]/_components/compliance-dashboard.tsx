@@ -5,8 +5,11 @@ import { useEffect, useMemo, useState } from "react";
 
 import Link from "next/link";
 
+import {
+  categoryForSystem,
+  // biome-ignore lint/correctness/noUndeclaredDependencies: fineprint-engine is a tsconfig path alias to ../engine/src, resolved by TS and Turbopack, not an npm package.
+} from "fineprint-engine";
 import { ArrowLeft, Download, Flame, Leaf, Printer, Ruler, Star } from "lucide-react";
-import { useTasks } from "@/lib/data/hooks";
 
 import { DaysLeftPill } from "@/components/dashboard/DaysLeftPill";
 import { InfoHint } from "@/components/dashboard/InfoHint";
@@ -17,6 +20,8 @@ import { StatusPill } from "@/components/dashboard/StatusPill";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { type CompliancePlan, dedash, parseBuildingSystems, parseCompliancePlan } from "@/lib/compliance/plan";
+import { useTasks, useTrackedCategories } from "@/lib/data/hooks";
+import type { Building } from "@/lib/data/types";
 import {
   computeFundedPlan,
   computePeriods,
@@ -32,7 +37,6 @@ import {
 import { buildComplianceCsv, downloadCsv, type LawExposureRow, slugForBuilding } from "@/lib/export-compliance";
 import { capSeverity, compactUsd, formatShortDate } from "@/lib/format";
 import { LAW_REGISTRY } from "@/lib/laws/lawRegistry";
-import type { Building } from "@/lib/data/types";
 
 import { BuildingDocuments, type OpenDoc } from "./building-documents";
 import { BuildingSystems } from "./building-systems";
@@ -57,9 +61,7 @@ function optimizerFunding(
 
   const picks = new Set(assessment.best.measureIds);
   const costs = measureFullCosts(building, measures);
-  return Object.fromEntries(
-    Object.entries(costs).map(([id, cost]) => [id, picks.has(id) ? cost : 0]),
-  );
+  return Object.fromEntries(Object.entries(costs).map(([id, cost]) => [id, picks.has(id) ? cost : 0]));
 }
 
 // The whole building compliance view: everything glanceable on one screen, with
@@ -94,6 +96,21 @@ export function ComplianceDashboard({ building }: { building: Building }) {
   );
   const finesAvoidedUsd =
     fundedPlan && assessment ? Math.max(0, assessment.doNothing.horizonFinesUsd - fundedPlan.horizonFinesUsd) : null;
+
+  // The retrofit plan speaks to the categories this owner tracks: tracked ones
+  // stay expanded, untracked ones collapse behind a toggle. The building's full
+  // systems breakdown above is never filtered - it always lists every system.
+  const personalizedMeasures = useMemo(() => plan?.personalization?.measures ?? [], [plan]);
+  const { isTracked } = useTrackedCategories();
+  const [showAllSystems, setShowAllSystems] = useState(false);
+
+  const trackedMeasures = useMemo(
+    () =>
+      personalizedMeasures.filter((measure) => isTracked(measure.category ?? categoryForSystem(measure.targetSystem))),
+    [personalizedMeasures, isTracked],
+  );
+  const untrackedCount = personalizedMeasures.length - trackedMeasures.length;
+  const shownMeasures = showAllSystems ? personalizedMeasures : trackedMeasures;
 
   const [openDoc, setOpenDoc] = useState<OpenDoc>(null);
   const [printRequested, setPrintRequested] = useState(false);
@@ -154,18 +171,34 @@ export function ComplianceDashboard({ building }: { building: Building }) {
           <CompliancePlanPanel plan={plan} fallbackRows={lawRows} />
         </div>
 
-        <BuildingSystems systems={systems} />
+        <BuildingSystems buildingId={building.id} systems={systems} />
 
-        <RetrofitPlan
-          personalizedMeasures={plan?.personalization?.measures ?? []}
-          fundedPlan={fundedPlan}
-          finesAvoidedUsd={finesAvoidedUsd}
-          funding={funding}
-          onFundingChange={setFunding}
-          onResetOptimizer={
-            assessment ? () => setFunding(optimizerFunding(building, assessment, engineMeasures)) : undefined
-          }
-        />
+        <div className="flex flex-col gap-2">
+          {untrackedCount > 0 ? (
+            <div className="flex justify-end">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="text-xs text-muted-foreground"
+                onClick={() => setShowAllSystems((shown) => !shown)}
+              >
+                {showAllSystems ? "Show tracked only" : `Show all systems (${untrackedCount} more)`}
+              </Button>
+            </div>
+          ) : null}
+
+          <RetrofitPlan
+            personalizedMeasures={shownMeasures}
+            fundedPlan={fundedPlan}
+            finesAvoidedUsd={finesAvoidedUsd}
+            funding={funding}
+            onFundingChange={setFunding}
+            onResetOptimizer={
+              assessment ? () => setFunding(optimizerFunding(building, assessment, engineMeasures)) : undefined
+            }
+          />
+        </div>
       </div>
 
       <BuildingDocuments

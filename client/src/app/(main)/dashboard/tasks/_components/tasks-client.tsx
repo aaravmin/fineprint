@@ -6,9 +6,6 @@ import Link from "next/link";
 
 import { toast } from "sonner";
 
-import { useApprove, useMarkDone, useReject, useSetReviewMode } from "@/lib/data/mutations";
-import { useBuildings, useSettingsRows, useSubmissions, useTasks, useWorkers } from "@/lib/data/hooks";
-
 import { DaysLeftPill } from "@/components/dashboard/DaysLeftPill";
 import { StatusDot, type StatusTone } from "@/components/dashboard/StatusPill";
 import { Badge } from "@/components/ui/badge";
@@ -19,9 +16,19 @@ import { Label } from "@/components/ui/label";
 import { LoadingDots } from "@/components/ui/loading-dots";
 import MultipleSelector, { type Option } from "@/components/ui/multiselect";
 import { Switch } from "@/components/ui/switch";
+import { categoryIconFor, categoryLabel } from "@/lib/categories/trackedCategories";
+import {
+  useBuildings,
+  useSettingsRows,
+  useSubmissions,
+  useTasks,
+  useTrackedCategories,
+  useWorkers,
+} from "@/lib/data/hooks";
+import { useApprove, useMarkDone, useReject, useSetReviewMode } from "@/lib/data/mutations";
+import type { Task } from "@/lib/data/types";
 import { fmtUsd } from "@/lib/engine";
 import { withAck } from "@/lib/reducer-call";
-import type { Task } from "@/lib/data/types";
 
 const TERMINAL_TASK_STATUSES = new Set(["done", "rejected"]);
 
@@ -53,12 +60,14 @@ export function TasksClient() {
   const submissions = useSubmissions();
   const workers = useWorkers();
   const settingsRows = useSettingsRows();
+  const { isTracked } = useTrackedCategories();
   const approve = useApprove();
   const reject = useReject();
   const markDone = useMarkDone();
   const setReviewMode = useSetReviewMode();
   const [pendingTaskId, setPendingTaskId] = useState<bigint | null>(null);
   const [statusFilter, setStatusFilter] = useState<Option[]>([]);
+  const [showUntracked, setShowUntracked] = useState(false);
 
   const reviewMode = settingsRows[0]?.reviewMode ?? "manual";
 
@@ -130,7 +139,10 @@ export function TasksClient() {
     });
   }
 
-  const filtered = activeStatuses.length === 0 ? tasks : tasks.filter((task) => activeStatuses.includes(task.status));
+  const statusFiltered =
+    activeStatuses.length === 0 ? tasks : tasks.filter((task) => activeStatuses.includes(task.status));
+
+  const filtered = showUntracked ? statusFiltered : statusFiltered.filter((task) => isTracked(task.category));
 
   const sorted = [...filtered].sort((a, b) => {
     const statusOrder: Record<string, number> = {
@@ -153,12 +165,20 @@ export function TasksClient() {
     <div className="@container/main flex flex-col gap-4 md:gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-heading text-2xl font-bold tracking-tight">Tasks</h1>
-        <div className="flex items-center gap-2">
-          <Switch id="auto-approve" checked={reviewMode === "auto"} onCheckedChange={toggleReviewMode} />
-          <Label htmlFor="auto-approve" className="text-sm text-muted-foreground">
-            Auto-approve drafts
-            <span className="hidden text-xs sm:inline"> (intakes always manual)</span>
-          </Label>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Switch id="show-untracked" checked={showUntracked} onCheckedChange={setShowUntracked} />
+            <Label htmlFor="show-untracked" className="text-sm text-muted-foreground">
+              Show untracked
+            </Label>
+          </div>
+          <div className="flex items-center gap-2">
+            <Switch id="auto-approve" checked={reviewMode === "auto"} onCheckedChange={toggleReviewMode} />
+            <Label htmlFor="auto-approve" className="text-sm text-muted-foreground">
+              Auto-approve drafts
+              <span className="hidden text-xs sm:inline"> (intakes always manual)</span>
+            </Label>
+          </div>
         </div>
       </div>
 
@@ -209,11 +229,13 @@ export function TasksClient() {
                 const building = buildings.find((b) => b.id === task.buildingId);
                 const claimedWorker =
                   task.claimedBy !== undefined ? workers.find((w) => w.id === task.claimedBy) : undefined;
+                const trackedRow = isTracked(task.category);
+                const CategoryIcon = categoryIconFor(task.category);
 
                 return (
                   <div
                     key={String(task.id)}
-                    className="grid grid-cols-[1fr_auto] items-center gap-3 px-6 py-3.5 transition-colors duration-200 hover:bg-muted/40 sm:grid-cols-[7.5rem_1fr_7rem_6.5rem_auto]"
+                    className={`grid grid-cols-[1fr_auto] items-center gap-3 px-6 py-3.5 transition-colors duration-200 hover:bg-muted/40 sm:grid-cols-[7.5rem_1fr_7rem_6.5rem_auto] ${trackedRow ? "" : "opacity-50"}`}
                   >
                     <span className="hidden items-center gap-1.5 text-xs text-muted-foreground sm:flex">
                       <StatusDot tone={taskTone(task.status)} label={task.status.replace("_", " ")} />
@@ -223,6 +245,10 @@ export function TasksClient() {
                     <div className="min-w-0">
                       <p className="flex items-center gap-2 truncate text-sm font-medium">
                         <span className="truncate">{task.title}</span>
+                        <Badge variant="outline" className="shrink-0 gap-1 text-[10px] font-normal">
+                          <CategoryIcon className="size-3" />
+                          {categoryLabel(task.category)}
+                        </Badge>
                         {task.slaBreached && (
                           <Badge variant="destructive" className="shrink-0 text-[10px]">
                             SLA

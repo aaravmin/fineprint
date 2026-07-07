@@ -22,6 +22,7 @@
     "paths": {
       "@/*": ["./src/*"],
       "fineprint-engine": ["../engine/src/index.ts"],
+      "fineprint-data": ["../data/src/index.ts"],
       "fineprint-laws": ["../data/laws.ts"]
     }
   },

@@ -10,12 +10,15 @@ import type {
   BinderEvent,
   Building,
   BuildingDocument,
+  CategoryPref,
   Evidence,
   Obligation,
   Settings,
   Event as StdbEvent,
   Submission,
+  SystemDeadline,
   Task,
+  UserRecord,
   Vendor,
   Worker,
 } from "@/lib/data/types";
@@ -52,6 +55,7 @@ export function mapTask(row: Row<"tasks">): Task {
     kind: row.kind,
     title: row.title,
     status: row.status,
+    category: row.category ?? "compliance",
     deadline: ts(row.deadline),
     slaBreached: row.sla_breached,
     fineEstimateUsd: opt(row.fine_estimate_usd),
@@ -106,6 +110,7 @@ export function mapSettings(row: Row<"settings">): Settings {
   return {
     owner: row.owner,
     reviewMode: row.review_mode,
+    primaryAddress: opt(row.primary_address),
   } as unknown as Settings;
 }
 
@@ -195,6 +200,44 @@ export function mapBuildingDocument(row: Row<"building_documents">): BuildingDoc
     referenceNumber: row.reference_number,
     note: row.note,
     uploadedAt: ts(row.uploaded_at),
+  };
+}
+
+export function mapSystemDeadline(row: Row<"system_deadlines">): SystemDeadline {
+  return {
+    id: BigInt(row.id),
+    buildingId: BigInt(row.building_id),
+    systemKey: row.system_key,
+    kind: row.kind,
+    title: row.title,
+    dueDate: ts(row.due_date),
+    actByDate: ts(row.act_by_date),
+    basis: row.basis,
+    sourceDataset: row.source_dataset,
+    sourceRecordId: row.source_record_id,
+    status: row.status,
+  };
+}
+
+export function mapUserRecord(row: Row<"user_records">): UserRecord {
+  return {
+    id: BigInt(row.id),
+    buildingId: BigInt(row.building_id),
+    systemKey: opt(row.system_key),
+    recordType: row.record_type,
+    fileName: row.file_name,
+    fileType: row.file_type,
+    storagePath: row.storage_path,
+    notes: row.notes,
+    uploadedAt: ts(row.uploaded_at),
+  };
+}
+
+export function mapCategoryPref(row: Row<"category_preferences">): CategoryPref {
+  return {
+    id: BigInt(row.id),
+    category: row.category,
+    enabled: row.enabled,
   };
 }
 

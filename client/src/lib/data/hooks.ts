@@ -2,16 +2,20 @@
 
 import { useMemo } from "react";
 
+import { TRACKED_CATEGORIES } from "@/lib/categories/trackedCategories";
 import type {
   BinderEvent,
   Building,
   BuildingDocument,
+  CategoryPref,
   Evidence,
   Obligation,
   Settings,
   Event as StdbEvent,
   Submission,
+  SystemDeadline,
   Task,
+  UserRecord,
   Vendor,
   Worker,
 } from "@/lib/data/types";
@@ -20,12 +24,15 @@ import {
   mapBinderEvent,
   mapBuilding,
   mapBuildingDocument,
+  mapCategoryPref,
   mapEvent,
   mapEvidence,
   mapObligation,
   mapSettings,
   mapSubmission,
+  mapSystemDeadline,
   mapTask,
+  mapUserRecord,
   mapVendor,
   syntheticWorkers,
 } from "./shape";
@@ -83,6 +90,50 @@ export function useBinderEvents(): readonly BinderEvent[] {
 export function useBuildingDocuments(): readonly BuildingDocument[] {
   const { rows } = useRealtimeTable("building_documents");
   return useMemo(() => rows.map(mapBuildingDocument), [rows]);
+}
+
+export function useSystemDeadlines(): readonly SystemDeadline[] {
+  const { rows } = useRealtimeTable("system_deadlines");
+  return useMemo(() => rows.map(mapSystemDeadline), [rows]);
+}
+
+export function useUserRecords(): readonly UserRecord[] {
+  const { rows } = useRealtimeTable("user_records");
+  return useMemo(() => rows.map(mapUserRecord), [rows]);
+}
+
+export function useCategoryPrefs(): readonly CategoryPref[] {
+  const { rows } = useRealtimeTable("category_preferences");
+  return useMemo(() => rows.map(mapCategoryPref), [rows]);
+}
+
+// The tracked-category set under an opt-out model: a category is tracked unless
+// the owner has a preference row explicitly disabling it, and "compliance" is
+// always tracked. `tracked` covers only the trackable categories (compliance
+// plus the enabled retrofit categories); `isTracked` answers for any id.
+export function useTrackedCategories(): {
+  isTracked(id: string): boolean;
+  tracked: Set<string>;
+  prefs: readonly CategoryPref[];
+} {
+  const prefs = useCategoryPrefs();
+
+  return useMemo(() => {
+    const disabledByPref = new Set(prefs.filter((pref) => !pref.enabled).map((pref) => pref.category));
+
+    const isTracked = (id: string): boolean => {
+      if (id === "compliance") {
+        return true;
+      }
+      return !disabledByPref.has(id);
+    };
+
+    const tracked = new Set(
+      TRACKED_CATEGORIES.filter((category) => isTracked(category.id)).map((category) => category.id),
+    );
+
+    return { isTracked, tracked, prefs };
+  }, [prefs]);
 }
 
 // No persistent worker fleet under Trigger.dev — synthesize one agent per task
