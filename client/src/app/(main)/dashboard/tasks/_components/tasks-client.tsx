@@ -5,7 +5,6 @@ import { useState } from "react";
 import Link from "next/link";
 
 import { toast } from "sonner";
-import { useReducer, useTable } from "spacetimedb/react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,10 +14,11 @@ import { Label } from "@/components/ui/label";
 import { LoadingDots } from "@/components/ui/loading-dots";
 import MultipleSelector, { type Option } from "@/components/ui/multiselect";
 import { Switch } from "@/components/ui/switch";
+import { reducers, tables } from "@/lib/db";
+import { useReducer, useTable } from "@/lib/db/react";
+import type { Task } from "@/lib/db/types";
 import { fmtUsd } from "@/lib/engine";
 import { withAck } from "@/lib/reducer-call";
-import { reducers, tables } from "@/module_bindings/index";
-import type { Task } from "@/module_bindings/types";
 
 // Same dot-and-word treatment as the building page's compliance ledger.
 const STATUS_DOT: Record<string, string> = {
@@ -49,7 +49,7 @@ export function TasksClient() {
   const reject = useReducer(reducers.reject);
   const markDone = useReducer(reducers.markDone);
   const setReviewMode = useReducer(reducers.setReviewMode);
-  const [pendingTaskId, setPendingTaskId] = useState<bigint | null>(null);
+  const [pendingTaskId, setPendingTaskId] = useState<number | null>(null);
   const [statusFilter, setStatusFilter] = useState<Option[]>([]);
 
   const reviewMode = settingsRows[0]?.reviewMode ?? "manual";
@@ -69,7 +69,7 @@ export function TasksClient() {
   function review(task: Task, verdict: "approve" | "reject") {
     if (verdict === "approve" && task.kind === "building_intake") {
       const latestSubmission = submissions
-        .filter(submission => submission.taskId === task.id)
+        .filter((submission) => submission.taskId === task.id)
         .sort((a, b) => (a.id > b.id ? -1 : 1))[0];
 
       if (!latestSubmission?.payloadJson) {
@@ -99,33 +99,30 @@ export function TasksClient() {
       .finally(() => setPendingTaskId(null));
   }
 
-  function confirmFiled(taskId: bigint) {
+  function confirmFiled(taskId: number) {
     setPendingTaskId(taskId);
-    toast.success("Filing confirmed");
 
     withAck(markDone({ taskId, note: "filing confirmed" }), "The filing")
+      .then(() => toast.success("Filing confirmed"))
       .catch((error: Error) => toast.error(`Could not close out: ${error.message}`))
       .finally(() => setPendingTaskId(null));
   }
 
-  const activeStatuses = statusFilter.map(option => option.value);
+  const activeStatuses = statusFilter.map((option) => option.value);
 
   function toggleStatus(status: string) {
-    setStatusFilter(current => {
-      const alreadyActive = current.some(option => option.value === status);
+    setStatusFilter((current) => {
+      const alreadyActive = current.some((option) => option.value === status);
       if (alreadyActive) {
-        return current.filter(option => option.value !== status);
+        return current.filter((option) => option.value !== status);
       }
 
-      const option = STATUS_OPTIONS.find(candidate => candidate.value === status);
+      const option = STATUS_OPTIONS.find((candidate) => candidate.value === status);
       return option ? [...current, option] : current;
     });
   }
 
-  const filtered =
-    activeStatuses.length === 0
-      ? tasks
-      : tasks.filter(task => activeStatuses.includes(task.status));
+  const filtered = activeStatuses.length === 0 ? tasks : tasks.filter((task) => activeStatuses.includes(task.status));
 
   const sorted = [...filtered].sort((a, b) => {
     const statusOrder: Record<string, number> = {
@@ -149,11 +146,7 @@ export function TasksClient() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-heading text-2xl font-bold tracking-tight">Task Queue</h1>
         <div className="flex items-center gap-2">
-          <Switch
-            id="auto-approve"
-            checked={reviewMode === "auto"}
-            onCheckedChange={toggleReviewMode}
-          />
+          <Switch id="auto-approve" checked={reviewMode === "auto"} onCheckedChange={toggleReviewMode} />
           <Label htmlFor="auto-approve" className="text-sm text-muted-foreground">
             Auto-approve drafts
             <span className="hidden text-xs sm:inline"> (intakes always manual)</span>
@@ -169,13 +162,18 @@ export function TasksClient() {
             <Card
               key={status}
               role="button"
+              tabIndex={0}
               aria-pressed={isActive}
               onClick={() => toggleStatus(status)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  toggleStatus(status);
+                }
+              }}
               className="flex cursor-pointer items-center gap-2 px-4 py-3 transition-colors hover:bg-muted/40"
             >
-              <Badge variant={isActive ? "default" : "outline"}>
-                {status.replace("_", " ")}
-              </Badge>
+              <Badge variant={isActive ? "default" : "outline"}>{status.replace("_", " ")}</Badge>
               <span className="font-semibold">{count}</span>
             </Card>
           );
@@ -191,21 +189,14 @@ export function TasksClient() {
             defaultOptions={STATUS_OPTIONS}
             placeholder="Filter by status…"
             hidePlaceholderWhenSelected
-            emptyIndicator={
-              <p className="text-center text-sm text-muted-foreground">
-                No matching status
-              </p>
-            }
+            emptyIndicator={<p className="text-center text-sm text-muted-foreground">No matching status</p>}
             className="max-w-md"
           />
         </CardHeader>
         <CardContent className="p-0">
           {sorted.length === 0 ? (
             tasks.length === 0 ? (
-              <EmptyFolder
-                title="No tasks in the queue"
-                description="Tasks will appear as buildings are analyzed."
-              />
+              <EmptyFolder title="No tasks in the queue" description="Tasks will appear as buildings are analyzed." />
             ) : (
               <div className="px-6 py-10 text-center text-sm text-muted-foreground">
                 No tasks match the selected statuses.
@@ -213,12 +204,10 @@ export function TasksClient() {
             )
           ) : (
             <div className="divide-y">
-              {sorted.map(task => {
-                const building = buildings.find(b => b.id === task.buildingId);
+              {sorted.map((task) => {
+                const building = buildings.find((b) => b.id === task.buildingId);
                 const claimedWorker =
-                  task.claimedBy !== undefined
-                    ? workers.find(w => w.id === task.claimedBy)
-                    : undefined;
+                  task.claimedBy !== undefined ? workers.find((w) => w.id === task.claimedBy) : undefined;
 
                 return (
                   <div
@@ -256,9 +245,7 @@ export function TasksClient() {
                     </span>
 
                     <span className="hidden text-right text-xs text-muted-foreground tabular-nums sm:inline">
-                      {task.fineEstimateUsd !== undefined
-                        ? `${fmtUsd(task.fineEstimateUsd)}/yr`
-                        : ""}
+                      {task.fineEstimateUsd !== undefined ? `${fmtUsd(task.fineEstimateUsd)}/yr` : ""}
                     </span>
 
                     <div className="flex shrink-0 justify-end gap-2">

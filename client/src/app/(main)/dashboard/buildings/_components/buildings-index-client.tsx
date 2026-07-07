@@ -3,11 +3,11 @@
 import Link from "next/link";
 
 import { ArrowUpRight, Plus } from "lucide-react";
-import { useTable } from "spacetimedb/react";
 
+import { tables } from "@/lib/db";
+import { useTable } from "@/lib/db/react";
+import type { Building, Task } from "@/lib/db/types";
 import { computePeriods, fmtUsd } from "@/lib/engine";
-import { tables } from "@/module_bindings/index";
-import type { Building, Task } from "@/module_bindings/types";
 
 interface BuildingView {
   building: Building;

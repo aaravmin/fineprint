@@ -1,12 +1,7 @@
 import { createStore } from "zustand/vanilla";
 
 import type { FontKey } from "@/lib/fonts/registry";
-import type {
-  ContentLayout,
-  NavbarStyle,
-  SidebarCollapsible,
-  SidebarVariant,
-} from "@/lib/preferences/layout";
+import type { ContentLayout, NavbarStyle, SidebarCollapsible, SidebarVariant } from "@/lib/preferences/layout";
 import { PREFERENCE_DEFAULTS } from "@/lib/preferences/preferences-config";
 import type { ResolvedThemeMode, ThemeMode, ThemePreset } from "@/lib/preferences/theme";
 
@@ -32,7 +27,7 @@ export type PreferencesState = {
 };
 
 export const createPreferencesStore = (init?: Partial<PreferencesState>) =>
-  createStore<PreferencesState>()(set => ({
+  createStore<PreferencesState>()((set) => ({
     themeMode: init?.themeMode ?? PREFERENCE_DEFAULTS.theme_mode,
     resolvedThemeMode: init?.resolvedThemeMode ?? "light",
     themePreset: init?.themePreset ?? PREFERENCE_DEFAULTS.theme_preset,
@@ -40,16 +35,15 @@ export const createPreferencesStore = (init?: Partial<PreferencesState>) =>
     contentLayout: init?.contentLayout ?? PREFERENCE_DEFAULTS.content_layout,
     navbarStyle: init?.navbarStyle ?? PREFERENCE_DEFAULTS.navbar_style,
     sidebarVariant: init?.sidebarVariant ?? PREFERENCE_DEFAULTS.sidebar_variant,
-    sidebarCollapsible:
-      init?.sidebarCollapsible ?? PREFERENCE_DEFAULTS.sidebar_collapsible,
-    setThemeMode: mode => set({ themeMode: mode }),
-    setResolvedThemeMode: mode => set({ resolvedThemeMode: mode }),
-    setThemePreset: preset => set({ themePreset: preset }),
-    setFont: font => set({ font }),
-    setContentLayout: layout => set({ contentLayout: layout }),
-    setNavbarStyle: style => set({ navbarStyle: style }),
-    setSidebarVariant: variant => set({ sidebarVariant: variant }),
-    setSidebarCollapsible: mode => set({ sidebarCollapsible: mode }),
+    sidebarCollapsible: init?.sidebarCollapsible ?? PREFERENCE_DEFAULTS.sidebar_collapsible,
+    setThemeMode: (mode) => set({ themeMode: mode }),
+    setResolvedThemeMode: (mode) => set({ resolvedThemeMode: mode }),
+    setThemePreset: (preset) => set({ themePreset: preset }),
+    setFont: (font) => set({ font }),
+    setContentLayout: (layout) => set({ contentLayout: layout }),
+    setNavbarStyle: (style) => set({ navbarStyle: style }),
+    setSidebarVariant: (variant) => set({ sidebarVariant: variant }),
+    setSidebarCollapsible: (mode) => set({ sidebarCollapsible: mode }),
     isSynced: init?.isSynced ?? false,
-    setIsSynced: val => set({ isSynced: val }),
+    setIsSynced: (val) => set({ isSynced: val }),
   }));

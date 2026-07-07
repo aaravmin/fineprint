@@ -3,18 +3,20 @@
 import Link from "next/link";
 
 import { ArrowLeft, Flame, Leaf } from "lucide-react";
-import { useTable } from "spacetimedb/react";
 
-import { computePeriods, type FineResult, fmtTco2e, fmtUsd } from "@/lib/engine";
-import { tables } from "@/module_bindings/index";
-import type { Building } from "@/module_bindings/types";
+import { ComplianceBinder } from "@/components/compliance/ComplianceBinder";
+import { ComplianceReport } from "@/components/dashboard/ComplianceReport";
+import { tables } from "@/lib/db";
+import { useTable, useTableLoaded } from "@/lib/db/react";
+import type { Building } from "@/lib/db/types";
+import { computePeriods, computeRetrofit, type FineResult, fmtTco2e, fmtUsd } from "@/lib/engine";
 
 import { ComplianceSection } from "./compliance-section";
 import { FineTimeline } from "./fine-timeline";
 import { InvestmentPlanner } from "./investment-planner";
 
 interface Props {
-  buildingId: bigint;
+  buildingId: number;
 }
 
 interface BuildingUse {
@@ -24,8 +26,14 @@ interface BuildingUse {
 
 export function BuildingClient({ buildingId }: Props) {
   const [buildings] = useTable(tables.building);
+  const buildingsLoaded = useTableLoaded(tables.building);
 
   const building = buildings.find((b) => b.id === buildingId);
+  if (!building && !buildingsLoaded) {
+    return (
+      <div className="flex items-center justify-center py-24 text-sm text-muted-foreground">Loading building...</div>
+    );
+  }
   if (!building) {
     return (
       <div className="flex items-center justify-center gap-2 py-24 text-sm text-muted-foreground">
@@ -38,7 +46,8 @@ export function BuildingClient({ buildingId }: Props) {
   }
 
   const periods = computePeriods(building);
-  const uses: BuildingUse[] = building.usesJson ? JSON.parse(building.usesJson) : [];
+  const assessment = computeRetrofit(building);
+  const uses = parseBuildingUses(building.usesJson);
 
   return (
     <div className="@container/main mx-auto flex w-full max-w-5xl flex-col gap-10">
@@ -50,9 +59,29 @@ export function BuildingClient({ buildingId }: Props) {
 
       <InvestmentPlanner building={building} />
 
+      <ComplianceBinder building={building} />
+
+      <ComplianceReport building={building} assessment={assessment} />
+
       <ProvenanceFootnotes />
     </div>
   );
+}
+
+function parseBuildingUses(raw: string | undefined): BuildingUse[] {
+  if (!raw) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+    return parsed.filter((use): use is BuildingUse => typeof use?.group === "string" && typeof use?.sqft === "number");
+  } catch {
+    return [];
+  }
 }
 
 function BuildingHeader({ building, uses }: { building: Building; uses: BuildingUse[] }) {
@@ -93,10 +122,10 @@ function BuildingHeader({ building, uses }: { building: Building; uses: Building
             <Flame className="size-3" />
             {ll97Status}
           </span>
-          {building.annualEmissionsTco2E !== undefined && (
+          {building.annualEmissionsTco2e !== undefined && (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1 text-xs font-medium text-muted-foreground">
               <Leaf className="size-3" />
-              {fmtTco2e(building.annualEmissionsTco2E)}/yr
+              {fmtTco2e(building.annualEmissionsTco2e)}/yr
             </span>
           )}
         </div>

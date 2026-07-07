@@ -18,6 +18,10 @@ import { TextRotate } from "@/components/ui/text-rotate";
 const DASH = "/dashboard/portfolio";
 
 const EASE = [0.23, 1, 0.32, 1] as const;
+const CTA_LETTERS = Array.from("See your building's number", (char, index) => ({
+  char,
+  key: `${char}-${index}`,
+}));
 
 const rise = {
   hidden: { opacity: 0, y: 14, filter: "blur(10px)" },
@@ -423,9 +427,9 @@ export default function Home() {
               <motion.h2 variants={rise} className="font-heading text-4xl font-bold tracking-tight sm:text-5xl">
                 <span className="sr-only">See your building&apos;s number</span>
                 <span aria-hidden="true">
-                  {"See your building's number".split("").map((ch, i) => (
-                    <span key={`${ch}-${i}`} className="transition-colors duration-150 hover:text-destructive">
-                      {ch}
+                  {CTA_LETTERS.map((letter) => (
+                    <span key={letter.key} className="transition-colors duration-150 hover:text-destructive">
+                      {letter.char}
                     </span>
                   ))}
                 </span>

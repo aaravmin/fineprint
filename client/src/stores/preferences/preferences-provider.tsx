@@ -20,10 +20,7 @@ const PreferencesStoreContext = createContext<StoreApi<PreferencesState> | null>
 
 const FONT_VALUES = Object.keys(fontRegistry) as FontKey[];
 
-function getSafeValue<T extends string>(
-  raw: string | null,
-  allowed: readonly T[],
-): T | undefined {
+function getSafeValue<T extends string>(raw: string | null, allowed: readonly T[]): T | undefined {
   if (!raw) return undefined;
   return allowed.includes(raw as T) ? (raw as T) : undefined;
 }
@@ -31,36 +28,18 @@ function getSafeValue<T extends string>(
 function readDomState(): Partial<PreferencesState> {
   const root = document.documentElement;
 
-  const themeModeAttr = getSafeValue(
-    root.getAttribute("data-theme-mode"),
-    THEME_MODE_VALUES,
-  );
+  const themeModeAttr = getSafeValue(root.getAttribute("data-theme-mode"), THEME_MODE_VALUES);
   const resolvedMode = root.classList.contains("dark") ? "dark" : "light";
 
   return {
     themeMode: themeModeAttr ?? resolvedMode,
     resolvedThemeMode: resolvedMode,
-    themePreset: getSafeValue(
-      root.getAttribute("data-theme-preset"),
-      THEME_PRESET_VALUES,
-    ),
+    themePreset: getSafeValue(root.getAttribute("data-theme-preset"), THEME_PRESET_VALUES),
     font: getSafeValue(root.getAttribute("data-font"), FONT_VALUES),
-    contentLayout: getSafeValue(
-      root.getAttribute("data-content-layout"),
-      CONTENT_LAYOUT_VALUES,
-    ),
-    navbarStyle: getSafeValue(
-      root.getAttribute("data-navbar-style"),
-      NAVBAR_STYLE_VALUES,
-    ),
-    sidebarVariant: getSafeValue(
-      root.getAttribute("data-sidebar-variant"),
-      SIDEBAR_VARIANT_VALUES,
-    ),
-    sidebarCollapsible: getSafeValue(
-      root.getAttribute("data-sidebar-collapsible"),
-      SIDEBAR_COLLAPSIBLE_VALUES,
-    ),
+    contentLayout: getSafeValue(root.getAttribute("data-content-layout"), CONTENT_LAYOUT_VALUES),
+    navbarStyle: getSafeValue(root.getAttribute("data-navbar-style"), NAVBAR_STYLE_VALUES),
+    sidebarVariant: getSafeValue(root.getAttribute("data-sidebar-variant"), SIDEBAR_VARIANT_VALUES),
+    sidebarCollapsible: getSafeValue(root.getAttribute("data-sidebar-collapsible"), SIDEBAR_COLLAPSIBLE_VALUES),
   };
 }
 
@@ -95,7 +74,7 @@ export const PreferencesStoreProvider = ({
     const domState = readDomState();
     domSnapshotRef.current = domState;
 
-    store.setState(prev => ({
+    store.setState((prev) => ({
       ...prev,
       ...domState,
       isSynced: true,
@@ -108,12 +87,12 @@ export const PreferencesStoreProvider = ({
     const applyFromMode = (mode: PreferencesState["themeMode"]) => {
       unsubscribeMedia?.();
       const resolved = applyThemeMode(mode);
-      store.setState(prev => ({ ...prev, resolvedThemeMode: resolved }));
+      store.setState((prev) => ({ ...prev, resolvedThemeMode: resolved }));
 
       if (mode === "system") {
         unsubscribeMedia = subscribeToSystemTheme(() => {
           const next = applyThemeMode("system");
-          store.setState(prev => ({ ...prev, resolvedThemeMode: next }));
+          store.setState((prev) => ({ ...prev, resolvedThemeMode: next }));
         });
       }
     };
@@ -131,11 +110,7 @@ export const PreferencesStoreProvider = ({
     };
   }, [store]);
 
-  return (
-    <PreferencesStoreContext.Provider value={store}>
-      {children}
-    </PreferencesStoreContext.Provider>
-  );
+  return <PreferencesStoreContext.Provider value={store}>{children}</PreferencesStoreContext.Provider>;
 };
 
 export const usePreferencesStore = <T,>(selector: (state: PreferencesState) => T): T => {

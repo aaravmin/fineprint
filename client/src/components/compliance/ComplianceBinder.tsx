@@ -4,37 +4,53 @@ import { useState } from "react";
 
 import { Download, FileCheck2, FolderOpen, Plus } from "lucide-react";
 import { toast } from "sonner";
-import { useReducer, useTable } from "spacetimedb/react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
-  buildBinderExport,
-  obligationCoverage,
   type BinderEvidence,
   type BinderHistoryEvent,
   type BinderObligation,
   type BinderVendor,
+  buildBinderExport,
+  obligationCoverage,
 } from "@/lib/compliance/binder";
+import { reducers, tables } from "@/lib/db";
+import { useReducer, useTable } from "@/lib/db/react";
+import type { Building, Evidence, Obligation, Vendor } from "@/lib/db/types";
 import { lawById } from "@/lib/laws/lawRegistry";
 import { withAck } from "@/lib/reducer-call";
-import { reducers, tables } from "@/module_bindings/index";
-import type { Building, Evidence, Obligation, Vendor } from "@/module_bindings/types";
 
 const OBLIGATION_STATUSES = [
-  "not_started", "in_progress", "submitted", "filed", "completed",
-  "overdue", "blocked", "not_applicable", "missing_data",
+  "not_started",
+  "in_progress",
+  "submitted",
+  "filed",
+  "completed",
+  "overdue",
+  "blocked",
+  "not_applicable",
+  "missing_data",
 ];
 const VENDOR_ROLES = [
-  "QEWI", "LMP", "energy_auditor", "retro_commissioning_agent", "contractor",
-  "engineer", "architect", "expeditor", "property_manager", "elevator_vendor",
-  "sprinkler_vendor", "general_vendor", "other",
+  "QEWI",
+  "LMP",
+  "energy_auditor",
+  "retro_commissioning_agent",
+  "contractor",
+  "engineer",
+  "architect",
+  "expeditor",
+  "property_manager",
+  "elevator_vendor",
+  "sprinkler_vendor",
+  "general_vendor",
+  "other",
 ];
 
-const iso = (ts: { toDate(): Date } | undefined): string | null =>
-  ts ? ts.toDate().toISOString() : null;
+const iso = (ts: Date | undefined): string | null => (ts ? ts.toISOString() : null);
 
 // Map live binding rows to the binder's plain shapes (used for both the UI and
 // the JSON export, so the screen and the file never disagree).
@@ -95,12 +111,10 @@ export function ComplianceBinder({ building }: { building: Building }) {
 
   const [showVendorForm, setShowVendorForm] = useState(false);
 
-  const obligations = obligationRows.filter(o => o.buildingId === building.id);
-  const evidence = evidenceRows.filter(e => e.buildingId === building.id);
+  const obligations = obligationRows.filter((o) => o.buildingId === building.id);
+  const evidence = evidenceRows.filter((e) => e.buildingId === building.id);
   const vendors = [...vendorRows];
-  const history = historyRows
-    .filter(h => h.buildingId === building.id)
-    .sort((a, b) => (a.at.toDate() > b.at.toDate() ? -1 : 1));
+  const history = historyRows.filter((h) => h.buildingId === building.id).sort((a, b) => (a.at > b.at ? -1 : 1));
 
   const exportInputs = {
     building: {
@@ -121,7 +135,7 @@ export function ComplianceBinder({ building }: { building: Building }) {
         kind: h.kind,
         summary: h.summary,
         lawId: h.lawId,
-        at: h.at.toDate().toISOString(),
+        at: h.at.toISOString(),
       }),
     ),
   };
@@ -138,8 +152,13 @@ export function ComplianceBinder({ building }: { building: Building }) {
     toast.success("Compliance binder exported");
   };
 
-  const call = (promise: Promise<void>, label: string) =>
-    withAck(promise, label).catch((error: Error) => toast.error(`${label} failed: ${error.message}`));
+  // Success side-effects belong in onSuccess so they only fire when the RPC
+  // actually resolved — a swallowed rejection must never let a "saved" toast
+  // run after a "failed" one.
+  const call = (promise: Promise<void>, label: string, onSuccess?: () => void) =>
+    withAck(promise, label)
+      .then(() => onSuccess?.())
+      .catch((error: Error) => toast.error(`${label} failed: ${error.message}`));
 
   if (obligations.length === 0) {
     return (
@@ -149,15 +168,15 @@ export function ComplianceBinder({ building }: { building: Building }) {
             <FolderOpen className="size-4" /> Compliance binder
           </CardTitle>
           <p className="text-sm text-muted-foreground">
-            Open an obligation for every law that binds this building, then file proof, assign
-            vendors, and export a defensible record.
+            Open an obligation for every law that binds this building, then file proof, assign vendors, and export a
+            defensible record.
           </p>
         </CardHeader>
         <CardContent>
           <Button
             size="sm"
             onClick={() =>
-              call(seedObligations({ buildingId: building.id }), "Setting up the binder").then(() =>
+              call(seedObligations({ buildingId: building.id }), "Setting up the binder", () =>
                 toast.success("Binder set up"),
               )
             }
@@ -181,8 +200,8 @@ export function ComplianceBinder({ building }: { building: Building }) {
           </Button>
         </div>
         <p className="text-sm text-muted-foreground">
-          One obligation per applicable law. File proof, assign the responsible vendor, and track
-          completion — missing required proof is shown, not hidden.
+          One obligation per applicable law. File proof, assign the responsible vendor, and track completion — missing
+          required proof is shown, not hidden.
         </p>
       </CardHeader>
       <CardContent className="space-y-5">
@@ -190,15 +209,11 @@ export function ComplianceBinder({ building }: { building: Building }) {
           {obligations
             .slice()
             .sort((a, b) => (lawById(a.lawId)?.sort_order ?? 99) - (lawById(b.lawId)?.sort_order ?? 99))
-            .map(obligation => {
+            .map((obligation) => {
               const law = lawById(obligation.lawId);
-              const own = evidence
-                .filter(e => e.obligationId === obligation.id)
-                .map(toEvidence);
+              const own = evidence.filter((e) => e.obligationId === obligation.id).map(toEvidence);
               const coverage = obligationCoverage(obligation.lawId, own);
-              const vendor = obligation.vendorId
-                ? vendors.find(v => v.id === obligation.vendorId)
-                : undefined;
+              const vendor = obligation.vendorId ? vendors.find((v) => v.id === obligation.vendorId) : undefined;
 
               return (
                 <ObligationRow
@@ -206,18 +221,16 @@ export function ComplianceBinder({ building }: { building: Building }) {
                   shortName={law?.short_name ?? obligation.lawId}
                   title={law?.display_name ?? obligation.title}
                   status={obligation.status}
-                  dueDate={obligation.dueDate?.toDate() ?? null}
+                  dueDate={obligation.dueDate ?? null}
                   vendorLabel={vendor ? `${vendor.name} · ${vendor.roleType.replace(/_/g, " ")}` : null}
                   evidenceCount={own.length}
                   missingRequired={coverage.missingRequired}
                   vendors={vendors}
-                  onStatus={status =>
-                    call(setStatus({ obligationId: obligation.id, status }), "Updating status")
-                  }
-                  onAssign={vendorId =>
+                  onStatus={(status) => call(setStatus({ obligationId: obligation.id, status }), "Updating status")}
+                  onAssign={(vendorId) =>
                     call(assignVendor({ obligationId: obligation.id, vendorId }), "Assigning vendor")
                   }
-                  onAddProof={(fileName, issuer) =>
+                  onAddProof={(fileName, issuer, onFiled) =>
                     call(
                       addEvidence({
                         obligationId: obligation.id,
@@ -230,7 +243,11 @@ export function ComplianceBinder({ building }: { building: Building }) {
                         notes: "",
                       }),
                       "Filing proof",
-                    ).then(() => toast.success("Proof filed"))
+                      () => {
+                        toast.success("Proof filed");
+                        onFiled();
+                      },
+                    )
                   }
                 />
               );
@@ -240,11 +257,12 @@ export function ComplianceBinder({ building }: { building: Building }) {
         <VendorSection
           vendors={vendors.map(toVendor)}
           open={showVendorForm}
-          onToggle={() => setShowVendorForm(v => !v)}
-          onAdd={fields =>
-            call(addVendor(fields), "Adding vendor").then(() => {
+          onToggle={() => setShowVendorForm((v) => !v)}
+          onAdd={(fields, onSaved) =>
+            call(addVendor(fields), "Adding vendor", () => {
               toast.success("Vendor added");
               setShowVendorForm(false);
+              onSaved();
             })
           }
         />
@@ -254,9 +272,9 @@ export function ComplianceBinder({ building }: { building: Building }) {
             <FileCheck2 className="size-3.5" /> Compliance history
           </p>
           <ul className="space-y-1 text-xs text-muted-foreground">
-            {history.slice(0, 12).map(event => (
+            {history.slice(0, 12).map((event) => (
               <li key={event.id.toString()} className="flex gap-2">
-                <span className="tabular-nums">{event.at.toDate().toLocaleDateString()}</span>
+                <span className="tabular-nums">{event.at.toLocaleDateString()}</span>
                 <span className="text-foreground/80">{event.summary}</span>
               </li>
             ))}
@@ -268,8 +286,17 @@ export function ComplianceBinder({ building }: { building: Building }) {
 }
 
 function ObligationRow({
-  shortName, title, status, dueDate, vendorLabel, evidenceCount, missingRequired,
-  vendors, onStatus, onAssign, onAddProof,
+  shortName,
+  title,
+  status,
+  dueDate,
+  vendorLabel,
+  evidenceCount,
+  missingRequired,
+  vendors,
+  onStatus,
+  onAssign,
+  onAddProof,
 }: {
   shortName: string;
   title: string;
@@ -280,8 +307,8 @@ function ObligationRow({
   missingRequired: string[];
   vendors: Vendor[];
   onStatus: (status: string) => void;
-  onAssign: (vendorId: bigint) => void;
-  onAddProof: (fileName: string, issuer: string) => void;
+  onAssign: (vendorId: number) => void;
+  onAddProof: (fileName: string, issuer: string, onFiled: () => void) => void;
 }) {
   const [proofName, setProofName] = useState("");
   const [issuer, setIssuer] = useState("");
@@ -301,10 +328,11 @@ function ObligationRow({
         </div>
         <select
           value={status}
-          onChange={event => onStatus(event.target.value)}
+          onChange={(event) => onStatus(event.target.value)}
+          aria-label="Obligation status"
           className={`rounded-md border bg-background px-2 py-1 text-xs ${STATUS_TONE[status] ?? ""}`}
         >
-          {OBLIGATION_STATUSES.map(option => (
+          {OBLIGATION_STATUSES.map((option) => (
             <option key={option} value={option}>
               {option.replace(/_/g, " ")}
             </option>
@@ -314,7 +342,7 @@ function ObligationRow({
 
       {missingRequired.length > 0 && (
         <div className="flex flex-wrap gap-1">
-          {missingRequired.map(item => (
+          {missingRequired.map((item) => (
             <Badge key={item} variant="outline" className="text-[10px] text-amber-600">
               missing: {item}
             </Badge>
@@ -325,13 +353,15 @@ function ObligationRow({
       <div className="flex flex-wrap items-center gap-2">
         <Input
           value={proofName}
-          onChange={e => setProofName(e.target.value)}
+          onChange={(e) => setProofName(e.target.value)}
+          aria-label="Proof file name"
           placeholder="Proof file name (e.g. LL84_2024_confirmation.pdf)"
           className="h-8 w-64 text-xs"
         />
         <Input
           value={issuer}
-          onChange={e => setIssuer(e.target.value)}
+          onChange={(e) => setIssuer(e.target.value)}
+          aria-label="Proof issuer"
           placeholder="Issuer"
           className="h-8 w-32 text-xs"
         />
@@ -339,22 +369,24 @@ function ObligationRow({
           size="sm"
           variant="outline"
           disabled={proofName.trim() === ""}
-          onClick={() => {
-            onAddProof(proofName.trim(), issuer.trim());
-            setProofName("");
-            setIssuer("");
-          }}
+          onClick={() =>
+            onAddProof(proofName.trim(), issuer.trim(), () => {
+              setProofName("");
+              setIssuer("");
+            })
+          }
         >
           File proof
         </Button>
         {vendors.length > 0 && (
           <select
             defaultValue=""
-            onChange={event => event.target.value && onAssign(BigInt(event.target.value))}
+            onChange={(event) => event.target.value && onAssign(Number(event.target.value))}
+            aria-label="Assign a vendor"
             className="rounded-md border bg-background px-2 py-1 text-xs"
           >
             <option value="">Assign vendor…</option>
-            {vendors.map(vendor => (
+            {vendors.map((vendor) => (
               <option key={vendor.id.toString()} value={vendor.id.toString()}>
                 {vendor.name} ({vendor.roleType.replace(/_/g, " ")})
               </option>
@@ -367,15 +399,27 @@ function ObligationRow({
 }
 
 function VendorSection({
-  vendors, open, onToggle, onAdd,
+  vendors,
+  open,
+  onToggle,
+  onAdd,
 }: {
   vendors: BinderVendor[];
   open: boolean;
   onToggle: () => void;
-  onAdd: (fields: {
-    name: string; company: string; roleType: string; email: string;
-    phone: string; licenseNumber: string; licenseType: string; notes: string;
-  }) => void;
+  onAdd: (
+    fields: {
+      name: string;
+      company: string;
+      roleType: string;
+      email: string;
+      phone: string;
+      licenseNumber: string;
+      licenseType: string;
+      notes: string;
+    },
+    onSaved: () => void,
+  ) => void;
 }) {
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
@@ -384,9 +428,7 @@ function VendorSection({
   return (
     <div className="rounded-xl border bg-muted/30 px-4 py-3">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-medium text-muted-foreground">
-          Vendors & professionals ({vendors.length})
-        </p>
+        <p className="text-xs font-medium text-muted-foreground">Vendors & professionals ({vendors.length})</p>
         <Button size="sm" variant="ghost" onClick={onToggle}>
           <Plus className="mr-1 size-3.5" /> Add vendor
         </Button>
@@ -394,7 +436,7 @@ function VendorSection({
 
       {vendors.length > 0 && (
         <ul className="mt-2 space-y-0.5 text-xs text-muted-foreground">
-          {vendors.map(vendor => (
+          {vendors.map((vendor) => (
             <li key={vendor.id}>
               <span className="text-foreground/80">{vendor.name}</span>
               {vendor.company ? ` · ${vendor.company}` : ""} · {vendor.roleType.replace(/_/g, " ")}
@@ -405,14 +447,27 @@ function VendorSection({
 
       {open && (
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <Input value={name} onChange={e => setName(e.target.value)} placeholder="Name" className="h-8 w-40 text-xs" />
-          <Input value={company} onChange={e => setCompany(e.target.value)} placeholder="Company" className="h-8 w-40 text-xs" />
+          <Input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            aria-label="Vendor name"
+            placeholder="Name"
+            className="h-8 w-40 text-xs"
+          />
+          <Input
+            value={company}
+            onChange={(e) => setCompany(e.target.value)}
+            aria-label="Vendor company"
+            placeholder="Company"
+            className="h-8 w-40 text-xs"
+          />
           <select
             value={roleType}
-            onChange={e => setRoleType(e.target.value)}
+            onChange={(e) => setRoleType(e.target.value)}
+            aria-label="Vendor role"
             className="rounded-md border bg-background px-2 py-1 text-xs"
           >
-            {VENDOR_ROLES.map(role => (
+            {VENDOR_ROLES.map((role) => (
               <option key={role} value={role}>
                 {role.replace(/_/g, " ")}
               </option>
@@ -421,14 +476,24 @@ function VendorSection({
           <Button
             size="sm"
             disabled={name.trim() === ""}
-            onClick={() => {
-              onAdd({
-                name: name.trim(), company: company.trim(), roleType,
-                email: "", phone: "", licenseNumber: "", licenseType: "", notes: "",
-              });
-              setName("");
-              setCompany("");
-            }}
+            onClick={() =>
+              onAdd(
+                {
+                  name: name.trim(),
+                  company: company.trim(),
+                  roleType,
+                  email: "",
+                  phone: "",
+                  licenseNumber: "",
+                  licenseType: "",
+                  notes: "",
+                },
+                () => {
+                  setName("");
+                  setCompany("");
+                },
+              )
+            }
           >
             Save
           </Button>

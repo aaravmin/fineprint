@@ -1,22 +1,12 @@
 // The compliance binder: the owner's exportable, defensible compliance record
 // (Phase 7). This module is pure — plain shapes in, a structured export out — so
-// the dashboard (live SpacetimeDB rows mapped to these shapes) and a script (a
+// the dashboard (live database rows mapped to these shapes) and a script (a
 // sample building) can both produce a binder the same way. It is deliberately
 // not the internal event log: the history here is the owner's plain-language
 // trail, assembled from binder_event rows.
 
-import {
-  evidenceForLaw,
-  lawById,
-  lawsInOrder,
-  type LawEvidence,
-} from "../laws/lawRegistry";
-import {
-  exportEnvelope,
-  standardCitations,
-  type ExportEnvelope,
-  type SourceCitation,
-} from "../output/exportEnvelope";
+import { evidenceForLaw, type LawEvidence, lawById, lawsInOrder } from "../laws/lawRegistry";
+import { type ExportEnvelope, exportEnvelope, type SourceCitation, standardCitations } from "../output/exportEnvelope";
 
 // Plain shapes (a row from each binder table, decoupled from the bindings).
 export interface BinderBuilding {
@@ -90,25 +80,20 @@ export interface EvidenceCoverage {
   missingRequired: string[];
 }
 
-function coverageFor(
-  lawId: string,
-  obligationEvidence: BinderEvidence[],
-): EvidenceCoverage {
+function coverageFor(lawId: string, obligationEvidence: BinderEvidence[]): EvidenceCoverage {
   const checklist: LawEvidence = evidenceForLaw(lawId);
   // A checklist item counts as present if any uploaded file's name or type
   // mentions it loosely; this is a best-effort match an owner can override.
   const present = (type: string) =>
-    obligationEvidence.some(e =>
-      `${e.fileName} ${e.fileType} ${e.issuer}`.toLowerCase().includes(
-        type.toLowerCase().split(" ")[0],
-      ),
+    obligationEvidence.some((e) =>
+      `${e.fileName} ${e.fileType} ${e.issuer}`.toLowerCase().includes(type.toLowerCase().split(" ")[0]),
     );
-  const required = checklist.required.map(type => ({ type, present: present(type) }));
-  const recommended = checklist.recommended.map(type => ({ type, present: present(type) }));
+  const required = checklist.required.map((type) => ({ type, present: present(type) }));
+  const recommended = checklist.recommended.map((type) => ({ type, present: present(type) }));
   return {
     required,
     recommended,
-    missingRequired: required.filter(r => !r.present).map(r => r.type),
+    missingRequired: required.filter((r) => !r.present).map((r) => r.type),
   };
 }
 
@@ -147,7 +132,7 @@ export interface BinderExport extends ExportEnvelope {
 
 export function buildBinderExport(inputs: BinderInputs): BinderExport {
   const { building, obligations, evidence, vendors } = inputs;
-  const vendorById = new Map(vendors.map(v => [v.id, v]));
+  const vendorById = new Map(vendors.map((v) => [v.id, v]));
 
   const obligationExports: BinderObligationExport[] = obligations
     .slice()
@@ -155,9 +140,9 @@ export function buildBinderExport(inputs: BinderInputs): BinderExport {
       const order = (id: string) => lawById(id)?.sort_order ?? 99;
       return order(a.lawId) - order(b.lawId);
     })
-    .map(obligation => {
+    .map((obligation) => {
       const law = lawById(obligation.lawId);
-      const own = evidence.filter(e => e.obligationId === obligation.id);
+      const own = evidence.filter((e) => e.obligationId === obligation.id);
       const coverage = coverageFor(obligation.lawId, own);
       const vendor = obligation.vendorId ? vendorById.get(obligation.vendorId) : undefined;
 
@@ -168,27 +153,23 @@ export function buildBinderExport(inputs: BinderInputs): BinderExport {
         status: obligation.status,
         due_date: obligation.dueDate,
         responsible_party: obligation.responsibleParty,
-        assigned_vendor: vendor
-          ? { name: vendor.name, company: vendor.company, role: vendor.roleType }
-          : null,
+        assigned_vendor: vendor ? { name: vendor.name, company: vendor.company, role: vendor.roleType } : null,
         filing_reference_number: obligation.filingReferenceNumber,
-        evidence_on_file: own.map(e => ({
+        evidence_on_file: own.map((e) => ({
           file_name: e.fileName,
           issuer: e.issuer,
           verification_status: e.verificationStatus,
         })),
         missing_required_evidence: coverage.missingRequired,
-        recommended_evidence_not_on_file: coverage.recommended
-          .filter(r => !r.present)
-          .map(r => r.type),
+        recommended_evidence_not_on_file: coverage.recommended.filter((r) => !r.present).map((r) => r.type),
         completion_date: obligation.completedAt,
         notes: obligation.notes,
       };
     });
 
-  const openItems = obligationExports.filter(o => !SETTLED.has(o.status));
+  const openItems = obligationExports.filter((o) => !SETTLED.has(o.status));
   const dueDates = obligationExports
-    .map(o => o.due_date)
+    .map((o) => o.due_date)
     .filter((d): d is string => !!d)
     .sort();
 
@@ -197,31 +178,24 @@ export function buildBinderExport(inputs: BinderInputs): BinderExport {
     document_type: "compliance_binder",
     building_summary: {
       ...building,
-      source_note:
-        "Building facts from NYC public records (PLUTO, LL84 disclosure, DOB) where available.",
+      source_note: "Building facts from NYC public records (PLUTO, LL84 disclosure, DOB) where available.",
     },
     compliance_snapshot: {
       obligations_total: obligationExports.length,
       open_items: openItems.length,
       settled_items: obligationExports.length - openItems.length,
-      obligations_missing_required_evidence: obligationExports.filter(
-        o => o.missing_required_evidence.length > 0,
-      ).length,
+      obligations_missing_required_evidence: obligationExports.filter((o) => o.missing_required_evidence.length > 0)
+        .length,
       nearest_due_date: dueDates[0] ?? null,
     },
     law_by_law_obligations: obligationExports,
     open_items: openItems.map(
-      o =>
+      (o) =>
         `${o.short}: ${o.status.replace(/_/g, " ")}` +
-        (o.missing_required_evidence.length
-          ? ` — missing ${o.missing_required_evidence.join(", ")}`
-          : ""),
+        (o.missing_required_evidence.length ? ` — missing ${o.missing_required_evidence.join(", ")}` : ""),
     ),
     compliance_history: inputs.history,
-    source_citations: standardCitations(
-      { bbl: building.bbl, bin: building.bin },
-      inputs.ll84Year ?? null,
-    ),
+    source_citations: standardCitations({ bbl: building.bbl, bin: building.bin }, inputs.ll84Year ?? null),
     assumptions_and_limitations: [
       "This binder is an owner record, not a legal determination or a filed report.",
       "Penalty and deadline figures are estimates from available records; professional verification is recommended before filing or capital decisions.",
@@ -232,15 +206,12 @@ export function buildBinderExport(inputs: BinderInputs): BinderExport {
 
 // The evidence checklist coverage for one obligation — used by the UI to show
 // what proof is on file vs missing, without rebuilding the whole export.
-export function obligationCoverage(
-  lawId: string,
-  obligationEvidence: BinderEvidence[],
-): EvidenceCoverage {
+export function obligationCoverage(lawId: string, obligationEvidence: BinderEvidence[]): EvidenceCoverage {
   return coverageFor(lawId, obligationEvidence);
 }
 
 // All laws that bind nothing yet still deserve a binder template, in order — the
 // UI seeds an obligation per applicable law, so the binder mirrors the registry.
 export function binderLawOrder() {
-  return lawsInOrder().filter(law => law.law_id !== "ll96" && law.law_id !== "art321");
+  return lawsInOrder().filter((law) => law.law_id !== "ll96" && law.law_id !== "art321");
 }

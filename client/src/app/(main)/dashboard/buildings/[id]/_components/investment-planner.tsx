@@ -7,8 +7,8 @@ import { Banknote, ChevronDown, ChevronUp, Leaf, TrendingDown } from "lucide-rea
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
+import type { Building } from "@/lib/db/types";
 import { computeBudgetPlan, computeRetrofit, DEFAULT_MEASURES, fmtTco2e, fmtUsd, maxRetrofitCapex } from "@/lib/engine";
-import type { Building } from "@/module_bindings/types";
 
 const measureById = new Map(DEFAULT_MEASURES.map((measure) => [measure.id, measure]));
 

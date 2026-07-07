@@ -34,7 +34,7 @@ export function NavDocuments({
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Documents</SidebarGroupLabel>
       <SidebarMenu>
-        {items.map(item => (
+        {items.map((item) => (
           <SidebarMenuItem key={item.name}>
             <SidebarMenuButton asChild>
               <a href={item.url}>
@@ -44,10 +44,7 @@ export function NavDocuments({
             </SidebarMenuButton>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <SidebarMenuAction
-                  showOnHover
-                  className="rounded-sm data-[state=open]:bg-accent"
-                >
+                <SidebarMenuAction showOnHover className="rounded-sm data-[state=open]:bg-accent">
                   <Ellipsis />
                   <span className="sr-only">More</span>
                 </SidebarMenuAction>

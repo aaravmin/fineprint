@@ -30,18 +30,16 @@ type SearchItem = {
   newTab?: boolean;
 };
 
-const sidebarGroupLabels = new Set(
-  sidebarItems.flatMap(group => (group.label ? [group.label] : [])),
-);
+const sidebarGroupLabels = new Set(sidebarItems.flatMap((group) => (group.label ? [group.label] : [])));
 
 function getSubItemGroup(groupLabel: string | undefined, itemTitle: string) {
   return sidebarGroupLabels.has(itemTitle) ? (groupLabel ?? "Other") : itemTitle;
 }
 
-const searchItems: SearchItem[] = sidebarItems.flatMap(group =>
-  group.items.flatMap(item => {
+const searchItems: SearchItem[] = sidebarItems.flatMap((group) =>
+  group.items.flatMap((item) => {
     if (item.subItems) {
-      return item.subItems.map(sub => ({
+      return item.subItems.map((sub) => ({
         group: getSubItemGroup(group.label, item.title),
         label: sub.title,
         url: sub.url,
@@ -64,16 +62,16 @@ const searchItems: SearchItem[] = sidebarItems.flatMap(group =>
 );
 
 function getAvailableItems(items: SearchItem[]) {
-  return items.filter(item => !item.disabled && !item.url.includes("coming-soon"));
+  return items.filter((item) => !item.disabled && !item.url.includes("coming-soon"));
 }
 
 const recommendations = getAvailableItems(searchItems);
 
 function groupBy(items: SearchItem[]) {
-  const groups = [...new Set(items.map(item => item.group))];
-  return groups.map(group => ({
+  const groups = [...new Set(items.map((item) => item.group))];
+  return groups.map((group) => ({
     group,
-    items: items.filter(item => item.group === group),
+    items: items.filter((item) => item.group === group),
   }));
 }
 
@@ -86,7 +84,7 @@ export function SearchDialog() {
     const down = (e: KeyboardEvent) => {
       if (e.key === "j" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        setOpen(prev => !prev);
+        setOpen((prev) => !prev);
       }
     };
     document.addEventListener("keydown", down);
@@ -113,7 +111,7 @@ export function SearchDialog() {
       <React.Fragment key={group}>
         {index > 0 && <CommandSeparator />}
         <CommandGroup heading={group}>
-          {groupItems.map(item => (
+          {groupItems.map((item) => (
             <CommandItem
               disabled={item.disabled}
               key={`${group}-${item.url}-${item.label}`}
@@ -149,11 +147,7 @@ export function SearchDialog() {
       </Button>
       <CommandDialog open={open} onOpenChange={handleOpenChange}>
         <Command>
-          <CommandInput
-            placeholder="Search dashboards, users, and more…"
-            value={query}
-            onValueChange={setQuery}
-          />
+          <CommandInput placeholder="Search dashboards, users, and more…" value={query} onValueChange={setQuery} />
           <CommandList>
             <CommandEmpty>No results found.</CommandEmpty>
             {query ? renderGroups(searchItems) : renderGroups(recommendations)}

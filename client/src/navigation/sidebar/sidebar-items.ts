@@ -1,11 +1,4 @@
-import {
-  Activity,
-  Bot,
-  Building2,
-  type LucideIcon,
-  LayoutDashboard,
-  ClipboardList,
-} from "lucide-react";
+import { Activity, Bot, Building2, ClipboardList, LayoutDashboard, type LucideIcon } from "lucide-react";
 
 export interface NavSubItem {
   title: string;

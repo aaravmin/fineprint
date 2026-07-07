@@ -6,5 +6,5 @@ interface Props {
 
 export default async function BuildingPage({ params }: Props) {
   const { id } = await params;
-  return <BuildingClient buildingId={BigInt(id)} />;
+  return <BuildingClient buildingId={Number(id)} />;
 }

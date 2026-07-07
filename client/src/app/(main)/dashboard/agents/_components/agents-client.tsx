@@ -3,22 +3,16 @@
 import { useState } from "react";
 
 import { Bot, CircleDot, Skull, Zap } from "lucide-react";
-import { toast } from "sonner";
-import { useReducer, useTable } from "spacetimedb/react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyFolder } from "@/components/ui/empty-folder";
-import { LoadingDots } from "@/components/ui/loading-dots";
-import { withAck } from "@/lib/reducer-call";
-import { reducers, tables } from "@/module_bindings/index";
+import { tables } from "@/lib/db";
+import { useTable } from "@/lib/db/react";
 
-const STATUS_VARIANT: Record<
-  string,
-  "default" | "secondary" | "destructive" | "outline"
-> = {
+const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
   idle: "secondary",
   working: "default",
   dead: "destructive",
@@ -27,34 +21,15 @@ const STATUS_VARIANT: Record<
 export function AgentsClient() {
   const [workers] = useTable(tables.worker);
   const [tasks] = useTable(tables.task);
-  const killWorker = useReducer(reducers.killWorker);
-  const pruneDeadWorkers = useReducer(reducers.pruneDeadWorkers);
-  const [killingId, setKillingId] = useState<bigint | null>(null);
   const [showDead, setShowDead] = useState(false);
 
-  function kill(workerId: bigint, name: string) {
-    setKillingId(workerId);
-    toast(`${name} killed. Its task returns to the queue`);
-
-    withAck(killWorker({ workerId }), "The kill order")
-      .catch((error: Error) => toast.error(`Kill failed: ${error.message}`))
-      .finally(() => setKillingId(null));
-  }
-
-  function clearDead() {
-    toast("Clearing dead agents");
-    withAck(pruneDeadWorkers(), "The cleanup").catch((error: Error) =>
-      toast.error(`Cleanup failed: ${error.message}`),
-    );
-  }
-
   // Per-task agents leave one dead row each; hide them unless asked.
-  const visibleWorkers = showDead ? workers : workers.filter(w => w.status !== "dead");
+  const visibleWorkers = showDead ? workers : workers.filter((w) => w.status !== "dead");
   const sorted = [...visibleWorkers].sort((a, b) => (a.id < b.id ? -1 : 1));
 
-  const idle = workers.filter(w => w.status === "idle").length;
-  const working = workers.filter(w => w.status === "working").length;
-  const dead = workers.filter(w => w.status === "dead").length;
+  const idle = workers.filter((w) => w.status === "idle").length;
+  const working = workers.filter((w) => w.status === "working").length;
+  const dead = workers.filter((w) => w.status === "dead").length;
 
   return (
     <div className="@container/main flex flex-col gap-4 md:gap-6">
@@ -88,51 +63,28 @@ export function AgentsClient() {
           <div className="flex flex-wrap items-center justify-between gap-2">
             <CardTitle>Fleet</CardTitle>
             <div className="flex items-center gap-2">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowDead(previous => !previous)}
-              >
+              <Button type="button" variant="ghost" size="sm" onClick={() => setShowDead((previous) => !previous)}>
                 {showDead ? "Hide dead" : `Show dead (${dead})`}
               </Button>
-              {dead > 0 && (
-                <Button type="button" variant="outline" size="sm" onClick={clearDead}>
-                  Clear dead
-                </Button>
-              )}
             </div>
           </div>
         </CardHeader>
         <CardContent className="p-0">
           {sorted.length === 0 ? (
-            <EmptyFolder
-              title="No agents connected"
-              description="Connected agents will appear here in real time."
-            />
+            <EmptyFolder title="No agents connected" description="Connected agents will appear here in real time." />
           ) : (
             <div className="divide-y">
-              {sorted.map(w => {
+              {sorted.map((w) => {
                 const currentTask =
-                  w.currentTaskId !== undefined
-                    ? tasks.find(t => t.id === w.currentTaskId)
-                    : undefined;
+                  w.currentTaskId !== undefined ? tasks.find((t) => t.id === w.currentTaskId) : undefined;
 
                 return (
                   <div key={String(w.id)} className="flex items-center gap-4 px-6 py-4">
                     <Avatar className="size-9">
                       <AvatarFallback
-                        className={
-                          w.status === "dead"
-                            ? "bg-destructive-subtle text-destructive"
-                            : "bg-secondary"
-                        }
+                        className={w.status === "dead" ? "bg-destructive-subtle text-destructive" : "bg-secondary"}
                       >
-                        {w.status === "dead" ? (
-                          <Skull className="size-4" />
-                        ) : (
-                          <Bot className="size-4" />
-                        )}
+                        {w.status === "dead" ? <Skull className="size-4" /> : <Bot className="size-4" />}
                       </AvatarFallback>
                     </Avatar>
 
@@ -147,31 +99,11 @@ export function AgentsClient() {
                         </Badge>
                       </div>
                       {currentTask && (
-                        <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                          {currentTask.title}
-                        </p>
+                        <p className="mt-0.5 truncate text-xs text-muted-foreground">{currentTask.title}</p>
                       )}
                     </div>
 
-                    <span className="hidden font-mono text-xs text-muted-foreground sm:inline">
-                      {w.identity.toHexString().slice(0, 8)}
-                    </span>
-                    {w.status !== "dead" && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        disabled={killingId === w.id}
-                        onClick={() => kill(w.id, w.name)}
-                      >
-                        {killingId === w.id ? (
-                          <LoadingDots />
-                        ) : (
-                          <>
-                            <Skull className="size-3.5" /> Kill
-                          </>
-                        )}
-                      </Button>
-                    )}
+                    <span className="hidden font-mono text-xs text-muted-foreground sm:inline">#{String(w.id)}</span>
                   </div>
                 );
               })}
@@ -211,9 +143,7 @@ function StatCard({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <p className={`text-3xl font-semibold tabular-nums ${valueClassName ?? ""}`}>
-          {value}
-        </p>
+        <p className={`text-3xl font-semibold tabular-nums ${valueClassName ?? ""}`}>{value}</p>
       </CardContent>
     </Card>
   );

@@ -23,8 +23,7 @@ export function LawFindingCard({ finding }: { finding: ReportFinding }) {
     <div className="space-y-2 rounded-xl border bg-background px-4 py-3">
       <div className="flex items-baseline justify-between gap-3">
         <p className="text-sm font-semibold">
-          <span className="font-mono text-xs text-muted-foreground">{finding.short}</span>{" "}
-          {finding.law}
+          <span className="font-mono text-xs text-muted-foreground">{finding.short}</span> {finding.law}
         </p>
         <Badge variant="outline" className={`text-[10px] ${STATUS_TONE[finding.status] ?? ""}`}>
           {finding.status_label}
@@ -32,10 +31,7 @@ export function LawFindingCard({ finding }: { finding: ReportFinding }) {
       </div>
 
       {field("Requirement", finding.requirement)}
-      {field(
-        "Next deadline",
-        finding.next_deadline ?? finding.cadence ?? "Not dated from available records",
-      )}
+      {field("Next deadline", finding.next_deadline ?? finding.cadence ?? "Not dated from available records")}
       {field("Estimated exposure", finding.estimated_exposure)}
       {finding.missing_data.length > 0 && (
         <div className="grid grid-cols-[8.5rem_1fr] gap-2 text-sm">

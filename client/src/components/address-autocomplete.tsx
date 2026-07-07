@@ -2,9 +2,8 @@
 
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 
-import { createPortal } from "react-dom";
-
 import { MapPin } from "lucide-react";
+import { createPortal } from "react-dom";
 
 import { cn } from "@/lib/utils";
 
@@ -57,6 +56,7 @@ export function AddressAutocomplete({
   const listboxId = useId();
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [highlighted, setHighlighted] = useState(-1);
   const [position, setPosition] = useState<ListPosition | null>(null);
 
@@ -83,9 +83,7 @@ export function AddressAutocomplete({
     setPosition({
       left: rect.left + 8,
       width: rect.width - 16,
-      ...(opensUpward
-        ? { bottom: window.innerHeight - rect.top + GAP }
-        : { top: rect.bottom + GAP }),
+      ...(opensUpward ? { bottom: window.innerHeight - rect.top + GAP } : { top: rect.bottom + GAP }),
     });
   }, []);
 
@@ -94,29 +92,40 @@ export function AddressAutocomplete({
       abortRef.current?.abort();
       const controller = new AbortController();
       abortRef.current = controller;
+      setLoading(true);
 
       try {
         const url = `${GEOSEARCH_URL}?text=${encodeURIComponent(query)}`;
         const response = await fetch(url, { signal: controller.signal });
-        if (!response.ok) {
+        const data = response.ok ? ((await response.json()) as { features?: GeoSearchFeature[] }) : { features: [] };
+
+        // A newer keystroke already aborted this request; let it win.
+        if (controller.signal.aborted) {
           return;
         }
 
-        const data = (await response.json()) as { features?: GeoSearchFeature[] };
         const labels = (data.features ?? [])
-          .map(feature => feature.properties?.label)
+          .map((feature) => feature.properties?.label)
           .filter((label): label is string => Boolean(label))
           .map(cleanLabel)
           .slice(0, MAX_SUGGESTIONS);
 
         setSuggestions(labels);
-        setOpen(labels.length > 0);
         setHighlighted(-1);
-        if (labels.length > 0) {
-          measure(labels.length);
-        }
+        setLoading(false);
+        // Stay open even with zero results so the list can say "No matches"
+        // instead of vanishing silently.
+        setOpen(true);
+        measure(Math.max(labels.length, 1));
       } catch {
-        // Network/abort failures just mean no suggestions — typing still works.
+        // A live request that errored (not an abort) means no matches to show;
+        // keep the box open so the user sees that, not silence.
+        if (!controller.signal.aborted) {
+          setSuggestions([]);
+          setLoading(false);
+          setOpen(true);
+          measure(1);
+        }
       }
     },
     [measure],
@@ -135,18 +144,25 @@ export function AddressAutocomplete({
     const query = value.trim();
     if (query.length < MIN_QUERY_LENGTH) {
       setSuggestions([]);
+      setLoading(false);
       setOpen(false);
       return;
     }
 
+    setLoading(true);
+    setOpen(true);
+    measure(1);
     debounceRef.current = setTimeout(() => fetchSuggestions(query), DEBOUNCE_MS);
 
     return () => {
       if (debounceRef.current) {
         clearTimeout(debounceRef.current);
       }
+      // Cancel the in-flight request too, so a resolve after unmount can't
+      // setState on a dead component.
+      abortRef.current?.abort();
     };
-  }, [value, fetchSuggestions]);
+  }, [value, fetchSuggestions, measure]);
 
   // Keep the fixed-position list glued to the input through scroll and resize.
   useLayoutEffect(() => {
@@ -154,7 +170,7 @@ export function AddressAutocomplete({
       return;
     }
 
-    const sync = () => measure(suggestions.length);
+    const sync = () => measure(Math.max(suggestions.length, 1));
     window.addEventListener("scroll", sync, { capture: true, passive: true });
     window.addEventListener("resize", sync);
 
@@ -179,10 +195,10 @@ export function AddressAutocomplete({
 
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setHighlighted(prev => (prev + 1) % suggestions.length);
+      setHighlighted((prev) => (prev + 1) % suggestions.length);
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setHighlighted(prev => (prev <= 0 ? suggestions.length - 1 : prev - 1));
+      setHighlighted((prev) => (prev <= 0 ? suggestions.length - 1 : prev - 1));
     } else if (e.key === "Enter" && highlighted >= 0) {
       e.preventDefault();
       pick(suggestions[highlighted]);
@@ -196,7 +212,7 @@ export function AddressAutocomplete({
       <input
         ref={inputRef}
         value={value}
-        onChange={e => onValueChange(e.target.value)}
+        onChange={(e) => onValueChange(e.target.value)}
         onKeyDown={handleKeyDown}
         onBlur={() => setOpen(false)}
         onFocus={() => {
@@ -210,9 +226,7 @@ export function AddressAutocomplete({
         aria-label={placeholder}
         aria-expanded={open}
         aria-controls={listboxId}
-        aria-activedescendant={
-          highlighted >= 0 ? `${listboxId}-option-${highlighted}` : undefined
-        }
+        aria-activedescendant={highlighted >= 0 ? `${listboxId}-option-${highlighted}` : undefined}
         aria-autocomplete="list"
         autoComplete="off"
         placeholder={placeholder}
@@ -223,7 +237,7 @@ export function AddressAutocomplete({
         position &&
         typeof document !== "undefined" &&
         createPortal(
-          <ul
+          <div
             id={listboxId}
             role="listbox"
             aria-label="Address suggestions"
@@ -236,28 +250,36 @@ export function AddressAutocomplete({
             }}
             className="z-[999] overflow-hidden rounded-2xl border border-border bg-card py-1.5 shadow-[0_2px_4px_rgba(20,20,20,0.04),0_12px_32px_-8px_rgba(20,20,20,0.16)]"
           >
-            {suggestions.map((suggestion, index) => (
-              <li
-                key={suggestion}
-                id={`${listboxId}-option-${index}`}
-                role="option"
-                aria-selected={index === highlighted}
-                // mousedown beats the input's blur, so the click still lands
-                onMouseDown={e => {
-                  e.preventDefault();
-                  pick(suggestion);
-                }}
-                onMouseEnter={() => setHighlighted(index)}
-                className={cn(
-                  "flex cursor-pointer items-center gap-2.5 px-4 py-2.5 text-sm text-foreground transition-colors",
-                  index === highlighted && "bg-secondary",
-                )}
-              >
-                <MapPin className="size-3.5 shrink-0 text-muted-foreground" />
-                <span className="truncate">{suggestion}</span>
-              </li>
-            ))}
-          </ul>,
+            {suggestions.length > 0 ? (
+              suggestions.map((suggestion, index) => (
+                <div
+                  key={suggestion}
+                  id={`${listboxId}-option-${index}`}
+                  role="option"
+                  tabIndex={-1}
+                  aria-selected={index === highlighted}
+                  // mousedown beats the input's blur, so the click still lands
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    pick(suggestion);
+                  }}
+                  onMouseEnter={() => setHighlighted(index)}
+                  className={cn(
+                    "flex cursor-pointer items-center gap-2.5 px-4 py-2.5 text-sm text-foreground transition-colors",
+                    index === highlighted && "bg-secondary",
+                  )}
+                >
+                  <MapPin className="size-3.5 shrink-0 text-muted-foreground" />
+                  <span className="truncate">{suggestion}</span>
+                </div>
+              ))
+            ) : (
+              <div className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-muted-foreground">
+                <MapPin className="size-3.5 shrink-0" />
+                <span>{loading ? "Searching…" : "No matches"}</span>
+              </div>
+            )}
+          </div>,
           document.body,
         )}
     </div>

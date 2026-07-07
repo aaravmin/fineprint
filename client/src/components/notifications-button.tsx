@@ -3,13 +3,13 @@
 import { useEffect, useState } from "react";
 
 import { Bell } from "lucide-react";
-import { useTable } from "spacetimedb/react";
 
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { tables } from "@/module_bindings/index";
-import type { Event } from "@/module_bindings/types";
+import { tables } from "@/lib/db";
+import { useTable } from "@/lib/db/react";
+import type { Event } from "@/lib/db/types";
 
 const SEEN_STORAGE_KEY = "fp_notifications_seen_id";
 
@@ -52,12 +52,12 @@ export function NotificationsButton() {
   const [events] = useTable(tables.event);
   const [workers] = useTable(tables.worker);
 
-  const [seenId, setSeenId] = useState<bigint>(BigInt(0));
+  const [seenId, setSeenId] = useState<number>(0);
 
   useEffect(() => {
     const stored = window.localStorage.getItem(SEEN_STORAGE_KEY);
     if (stored) {
-      setSeenId(BigInt(stored));
+      setSeenId(Number(stored));
     }
   }, []);
 
@@ -66,7 +66,7 @@ export function NotificationsButton() {
     .sort((a, b) => (a.id > b.id ? -1 : 1))
     .slice(0, 20);
 
-  const latestId = visible.reduce((max, event) => (event.id > max ? event.id : max), BigInt(0));
+  const latestId = visible.reduce((max, event) => (event.id > max ? event.id : max), 0);
   const unread = visible.filter((event) => event.id > seenId).length;
 
   const agentsOnline = workers.filter((worker) => worker.status !== "dead").length;
@@ -122,7 +122,7 @@ export function NotificationsButton() {
                   <div className="min-w-0 flex-1">
                     <p className="text-sm leading-snug text-foreground">{event.payload}</p>
                     <p className="mt-0.5 font-mono text-[11px] text-muted-foreground tabular-nums">
-                      {timeAgo(event.at.toDate())}
+                      {timeAgo(event.at)}
                     </p>
                   </div>
                 </li>

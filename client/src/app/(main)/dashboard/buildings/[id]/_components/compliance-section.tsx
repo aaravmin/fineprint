@@ -3,28 +3,19 @@
 import { useState } from "react";
 
 import { toast } from "sonner";
-import { useReducer, useTable } from "spacetimedb/react";
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { reducers, tables } from "@/lib/db";
+import { useReducer, useTable } from "@/lib/db/react";
+import type { Task } from "@/lib/db/types";
 import { fmtUsd } from "@/lib/engine";
+import { lawsInOrder } from "@/lib/laws/lawRegistry";
 import { withAck } from "@/lib/reducer-call";
-import { reducers, tables } from "@/module_bindings/index";
-import type { Task } from "@/module_bindings/types";
 
-// Mirrors the canonical registry in spacetimedb/src/laws.ts — task lawId values.
-const LAW_REGISTRY = [
-  { id: "ll97", short: "LL97", name: "Building Emissions Cap" },
-  { id: "art321", short: "Art 321", name: "Affordable-Housing Emissions Pathway" },
-  { id: "ll84", short: "LL84", name: "Energy & Water Benchmarking" },
-  { id: "ll87", short: "LL87", name: "Energy Audit & Retro-commissioning" },
-  { id: "ll11", short: "LL11", name: "Facade Inspection (FISP)" },
-  { id: "ll88", short: "LL88", name: "Lighting Upgrades & Submetering" },
-  { id: "ll152", short: "LL152", name: "Gas Piping Inspection & Certification" },
-  { id: "ll55", short: "LL55", name: "Indoor Allergen Hazards" },
-];
+const TASK_LAWS = lawsInOrder().filter((law) => law.law_id !== "ll96");
 
 // Status reads as a dot + word, one fixed-width column, so every row lines
 // up no matter the state. Dot carries the color; text stays quiet.
@@ -90,6 +81,21 @@ type DraftBlock =
   | { kind: "data"; label: string; rows: string[] }
   | { kind: "deadline"; date: string }
   | { kind: "sources"; items: string[] };
+
+function draftBlockKey(block: DraftBlock): string {
+  switch (block.kind) {
+    case "paragraph":
+      return `paragraph:${block.text}`;
+    case "steps":
+      return `steps:${block.items.join("|")}`;
+    case "data":
+      return `data:${block.label}:${block.rows.join("|")}`;
+    case "deadline":
+      return `deadline:${block.date}`;
+    case "sources":
+      return `sources:${block.items.join("|")}`;
+  }
+}
 
 function parseDraft(body: string): DraftBlock[] {
   const lines = body.split("\n");
@@ -166,28 +172,28 @@ function DraftBody({ body }: { body: string }) {
 
   return (
     <div className="space-y-3">
-      {blocks.map((block, blockIndex) => {
+      {blocks.map((block) => {
         switch (block.kind) {
           case "paragraph":
             return (
-              <p key={blockIndex} className="text-sm leading-relaxed">
+              <p key={draftBlockKey(block)} className="text-sm leading-relaxed">
                 {block.text}
               </p>
             );
           case "steps":
             return (
               <ol
-                key={blockIndex}
+                key={draftBlockKey(block)}
                 className="list-decimal space-y-1.5 pl-5 text-sm leading-relaxed marker:text-xs marker:text-muted-foreground"
               >
-                {block.items.map((item, itemIndex) => (
-                  <li key={itemIndex}>{item}</li>
+                {block.items.map((item) => (
+                  <li key={item}>{item}</li>
                 ))}
               </ol>
             );
           case "data":
             return (
-              <div key={blockIndex}>
+              <div key={draftBlockKey(block)}>
                 <p className="mb-1.5 text-xs font-medium text-muted-foreground">{block.label}</p>
                 <pre className="overflow-x-auto rounded-lg bg-muted/50 px-3 py-2.5 font-mono text-xs leading-relaxed">
                   {block.rows.join("\n")}
@@ -196,43 +202,45 @@ function DraftBody({ body }: { body: string }) {
             );
           case "deadline":
             return (
-              <p key={blockIndex} className="text-sm">
+              <p key={draftBlockKey(block)} className="text-sm">
                 <span className="text-muted-foreground">Due</span> <span className="font-medium">{block.date}</span>
               </p>
             );
           case "sources":
             return (
-              <div key={blockIndex} className="text-xs text-muted-foreground">
+              <div key={draftBlockKey(block)} className="text-xs text-muted-foreground">
                 <p className="mb-1 font-medium">Sources</p>
                 <ul className="list-disc space-y-0.5 pl-4">
-                  {block.items.map((item, itemIndex) => (
-                    <li key={itemIndex}>{item}</li>
+                  {block.items.map((item) => (
+                    <li key={item}>{item}</li>
                   ))}
                 </ul>
               </div>
             );
+          default:
+            return null;
         }
       })}
     </div>
   );
 }
 
-export function ComplianceSection({ buildingId, planJson }: { buildingId: bigint; planJson?: string }) {
+export function ComplianceSection({ buildingId, planJson }: { buildingId: number; planJson?: string }) {
   const [tasks] = useTable(tables.task);
   const [submissions] = useTable(tables.submission);
   const [workers] = useTable(tables.worker);
   const approve = useReducer(reducers.approve);
   const reject = useReducer(reducers.reject);
   const markDone = useReducer(reducers.markDone);
-  const [pendingTaskId, setPendingTaskId] = useState<bigint | null>(null);
+  const [pendingTaskId, setPendingTaskId] = useState<number | null>(null);
 
   const buildingTasks = tasks.filter((task) => task.buildingId === buildingId);
   const dispositions = dispositionsByLaw(planJson);
 
-  const applicableLaws = LAW_REGISTRY.filter(
-    (law) => buildingTasks.some((task) => task.lawId === law.id) || dispositions.has(law.id),
+  const applicableLaws = TASK_LAWS.filter(
+    (law) => buildingTasks.some((task) => task.lawId === law.law_id) || dispositions.has(law.law_id),
   );
-  const inapplicableLaws = LAW_REGISTRY.filter((law) => !applicableLaws.includes(law));
+  const inapplicableLaws = TASK_LAWS.filter((law) => !applicableLaws.includes(law));
 
   function review(task: Task, verdict: "approve" | "reject") {
     setPendingTaskId(task.id);
@@ -242,22 +250,23 @@ export function ComplianceSection({ buildingId, planJson }: { buildingId: bigint
         ? approve({ taskId: task.id, note: "approved from the building page" })
         : reject({ taskId: task.id, note: "rejected from the building page" });
 
-    if (verdict === "approve") {
-      toast.success("Draft approved");
-    } else {
-      toast("Draft rejected. Task returned to the queue");
-    }
-
     withAck(call, "The review verdict")
+      .then(() => {
+        if (verdict === "approve") {
+          toast.success("Draft approved");
+        } else {
+          toast("Draft rejected. Task returned to the queue");
+        }
+      })
       .catch((error: Error) => toast.error(`Review failed: ${error.message}`))
       .finally(() => setPendingTaskId(null));
   }
 
   function confirmFiled(task: Task) {
     setPendingTaskId(task.id);
-    toast.success("Filing confirmed");
 
     withAck(markDone({ taskId: task.id, note: "filing confirmed" }), "The filing")
+      .then(() => toast.success("Filing confirmed"))
       .catch((error: Error) => toast.error(`Could not close out: ${error.message}`))
       .finally(() => setPendingTaskId(null));
   }
@@ -273,8 +282,8 @@ export function ComplianceSection({ buildingId, planJson }: { buildingId: bigint
       <CardContent className="p-0">
         <Accordion type="multiple" className="w-full">
           {applicableLaws.map((law) => {
-            const lawTask = buildingTasks.find((task) => task.lawId === law.id);
-            const disposition = dispositions.get(law.id);
+            const lawTask = buildingTasks.find((task) => task.lawId === law.law_id);
+            const disposition = dispositions.get(law.law_id);
             const latestSubmission = lawTask
               ? [...submissions]
                   .filter((submission) => submission.taskId === lawTask.id)
@@ -286,10 +295,10 @@ export function ComplianceSection({ buildingId, planJson }: { buildingId: bigint
 
             const row = (
               <div className="grid w-full grid-cols-[4.5rem_1fr_auto] items-center gap-3 @md/main:grid-cols-[4.5rem_1fr_7rem_8rem]">
-                <span className="font-mono text-xs font-medium text-muted-foreground">{law.short}</span>
+                <span className="font-mono text-xs font-medium text-muted-foreground">{law.short_name}</span>
 
                 <span className="flex min-w-0 items-center gap-2 text-sm font-medium">
-                  <span className="truncate">{law.name}</span>
+                  <span className="truncate">{law.display_name}</span>
                   {disposition && (
                     <Badge
                       variant={HANDLING_VARIANT[disposition.handledBy] ?? "secondary"}
@@ -325,7 +334,7 @@ export function ComplianceSection({ buildingId, planJson }: { buildingId: bigint
             );
 
             return (
-              <AccordionItem key={law.id} value={law.id} className="group border-b last:border-b-0">
+              <AccordionItem key={law.law_id} value={law.law_id} className="group border-b last:border-b-0">
                 <AccordionTrigger className="items-center px-6 py-3.5 transition-colors duration-200 hover:bg-muted/40 hover:no-underline">
                   {row}
                 </AccordionTrigger>
@@ -343,7 +352,7 @@ export function ComplianceSection({ buildingId, planJson }: { buildingId: bigint
                           <p className="min-w-0 truncate text-xs text-muted-foreground">
                             Drafted by{" "}
                             <span className="font-medium text-foreground/70">{draftingAgent?.name ?? "an agent"}</span>{" "}
-                            · {latestSubmission.submittedAt.toDate().toLocaleString()}
+                            · {latestSubmission.submittedAt.toLocaleString()}
                           </p>
 
                           {lawTask.status === "in_review" && (
@@ -393,7 +402,7 @@ export function ComplianceSection({ buildingId, planJson }: { buildingId: bigint
 
         {inapplicableLaws.length > 0 && (
           <p className="border-t px-6 py-3 text-xs text-muted-foreground">
-            Not applicable to this building: {inapplicableLaws.map((law) => law.short).join(", ")}.
+            Not applicable to this building: {inapplicableLaws.map((law) => law.short_name).join(", ")}.
           </p>
         )}
       </CardContent>

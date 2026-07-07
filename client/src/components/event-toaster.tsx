@@ -3,9 +3,9 @@
 import { useEffect, useRef } from "react";
 
 import { toast } from "sonner";
-import { useTable } from "spacetimedb/react";
 
-import { tables } from "@/module_bindings/index";
+import { tables } from "@/lib/db";
+import { useTable } from "@/lib/db/react";
 
 // Every reducer writes an event row; this turns the rows that matter into
 // toasts. The audit trail is the single source: nothing toasts here unless a
@@ -19,20 +19,23 @@ const ERROR_KINDS = new Set(["task_rejected", "worker_killed", "worker_reaped", 
 
 const SUCCESS_KINDS = new Set(["task_approved", "building_ingested"]);
 
+// Cap the de-dupe set so a long-lived session can't grow it without bound.
+const ANNOUNCED_CAP = 500;
+
 export function EventToaster() {
   const [events] = useTable(tables.event);
 
   // Everything already in the table at mount is history, not news. Only rows
   // with a higher id than the baseline toast.
-  const baselineId = useRef<bigint | null>(null);
-  const announced = useRef<Set<bigint>>(new Set());
+  const baselineId = useRef<number | null>(null);
+  const announced = useRef<Set<number>>(new Set());
 
   useEffect(() => {
     if (events.length === 0) {
       return;
     }
 
-    const maxId = events.reduce((max, e) => (e.id > max ? e.id : max), BigInt(0));
+    const maxId = events.reduce((max, e) => (e.id > max ? e.id : max), 0);
 
     if (baselineId.current === null) {
       baselineId.current = maxId;
@@ -54,6 +57,12 @@ export function EventToaster() {
       } else {
         toast(event.payload, { description: label });
       }
+    }
+
+    // Keep the de-dupe set bounded; baselineId already blocks anything older,
+    // so dropping the oldest ids is safe.
+    if (announced.current.size > ANNOUNCED_CAP) {
+      announced.current = new Set([...announced.current].slice(-ANNOUNCED_CAP));
     }
 
     baselineId.current = maxId;

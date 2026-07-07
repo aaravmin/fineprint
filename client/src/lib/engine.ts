@@ -12,20 +12,29 @@ import {
   type RetrofitPlan,
 } from "fineprint-engine";
 
-import type { Building } from "@/module_bindings/types";
+import type { Building } from "@/lib/db/types";
 
 export type { BuildingInput, FineResult, FundedPlan, RetrofitAssessment, RetrofitPlan };
 export { computeAllPeriods, DEFAULT_MEASURES };
 
 export function toBuildingInput(building: Building): BuildingInput | null {
-  if (building.annualEmissionsTco2E === undefined || building.usesJson === undefined) {
+  if (building.annualEmissionsTco2e === undefined || building.usesJson === undefined) {
     return null;
   }
-  const occupancyGroups: Array<{ group: string; sqft: number }> = JSON.parse(building.usesJson);
+
+  // usesJson is city-sourced text; a malformed payload must degrade to null,
+  // not throw past every compute guard and white-screen the page.
+  let occupancyGroups: Array<{ group: string; sqft: number }>;
+  try {
+    occupancyGroups = JSON.parse(building.usesJson);
+  } catch {
+    return null;
+  }
+
   return {
     grossFloorAreaSqft: building.sqft,
     occupancyGroups,
-    annualEmissionsTco2e: building.annualEmissionsTco2E,
+    annualEmissionsTco2e: building.annualEmissionsTco2e,
     isArticle321: building.isAffordable,
   };
 }

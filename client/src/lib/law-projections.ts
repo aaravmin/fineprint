@@ -90,8 +90,7 @@ export const LAW_PROJECTIONS: Record<string, LawProjection> = {
   },
   ll33: {
     cadence: "Annual — post the energy efficiency label (A-F) near every public entrance",
-    basis:
-      "LL33 of 2018 (amended by LL95) / Admin Code 28-309.12.2 — $1,250 for failure to post the grade",
+    basis: "LL33 of 2018 (amended by LL95) / Admin Code 28-309.12.2 — $1,250 for failure to post the grade",
     accrual: [
       { label: "Label not posted", cumulativeUsd: 1_250 },
       { label: "+ continued non-posting", cumulativeUsd: 2_500 },
@@ -104,8 +103,7 @@ export const LAW_PROJECTIONS: Record<string, LawProjection> = {
   },
   ll96: {
     cadence: "Optional financing — no deadline",
-    basis:
-      "LL96 of 2019 — Property Assessed Clean Energy (PACE) financing for energy and water improvements",
+    basis: "LL96 of 2019 — Property Assessed Clean Energy (PACE) financing for energy and water improvements",
     accrual: [],
     variableNote:
       "PACE is a financing pathway, not a penalty: it funds the energy retrofits LL97 and LL87 " +

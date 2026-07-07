@@ -4,8 +4,7 @@
 // The JSON Schema for the whole export lives at docs/compliance-export-schema.json.
 
 export const EXPORT_SCHEMA_VERSION = "fineprint.compliance-export/v1";
-export const EXPORT_SCHEMA_URL =
-  "https://fineprint.app/schema/compliance-export/v1.json";
+export const EXPORT_SCHEMA_URL = "https://fineprint.app/schema/compliance-export/v1.json";
 
 export interface BuildingIdentifiers {
   // NYC Borough-Block-Lot and Building Identification Number — the two stable
@@ -30,10 +29,7 @@ export interface ExportEnvelope {
   building_identifiers: BuildingIdentifiers;
 }
 
-export function exportEnvelope(
-  ids: BuildingIdentifiers,
-  generatedAt?: string,
-): ExportEnvelope {
+export function exportEnvelope(ids: BuildingIdentifiers, generatedAt?: string): ExportEnvelope {
   return {
     $schema: EXPORT_SCHEMA_URL,
     schema_version: EXPORT_SCHEMA_VERSION,
@@ -49,10 +45,7 @@ export function exportEnvelope(
 // The standing dataset citations behind a Fineprint export. The caller passes
 // the building identifiers and, where known, the LL84 benchmarking year so the
 // emissions provenance carries a real as-of.
-export function standardCitations(
-  ids: BuildingIdentifiers,
-  ll84Year: number | null,
-): SourceCitation[] {
+export function standardCitations(ids: BuildingIdentifiers, ll84Year: number | null): SourceCitation[] {
   return [
     {
       dataset: "NYC PLUTO (tax-lot characteristics)",

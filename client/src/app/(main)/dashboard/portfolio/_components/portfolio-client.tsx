@@ -2,12 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Building2, Check, CircleDollarSign, ListTodo, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
-import { useReducer, useTable } from "spacetimedb/react";
 
 import { AddressAutocomplete } from "@/components/address-autocomplete";
 import { Badge } from "@/components/ui/badge";
@@ -15,13 +15,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyFolder } from "@/components/ui/empty-folder";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { reducers, tables } from "@/lib/db";
+import { useReducer, useTable } from "@/lib/db/react";
+import type { Building, Task } from "@/lib/db/types";
 import { computePeriods, fmtUsd } from "@/lib/engine";
+import { lawsInOrder } from "@/lib/laws/lawRegistry";
 import { getLocalStorageValue, setLocalStorageValue } from "@/lib/local-storage.client";
 import { withAck } from "@/lib/reducer-call";
-import { reducers, tables } from "@/module_bindings/index";
-import type { Building, Task } from "@/module_bindings/types";
 
-type LawScope = "all" | "ll97" | "art321" | "ll84" | "ll87" | "ll11" | "ll88" | "ll152" | "ll55";
+type LawScope = string;
 
 interface LawOption {
   id: LawScope;
@@ -41,13 +43,13 @@ interface FineBasis {
 
 const LAW_OPTIONS: LawOption[] = [
   { id: "all", label: "All laws", taskLawIds: [] },
-  { id: "ll97", label: "Local Law 97", taskLawIds: ["ll97", "art321"] },
-  { id: "ll84", label: "Local Law 84", taskLawIds: ["ll84"] },
-  { id: "ll87", label: "Local Law 87", taskLawIds: ["ll87"] },
-  { id: "ll11", label: "Local Law 11", taskLawIds: ["ll11"] },
-  { id: "ll88", label: "Local Law 88", taskLawIds: ["ll88"] },
-  { id: "ll152", label: "Local Law 152", taskLawIds: ["ll152"] },
-  { id: "ll55", label: "Local Law 55", taskLawIds: ["ll55"] },
+  ...lawsInOrder()
+    .filter((law) => law.law_id !== "art321" && law.law_id !== "ll96")
+    .map((law) => ({
+      id: law.law_id,
+      label: law.law_id === "ll97" ? "Local Law 97" : law.short_name,
+      taskLawIds: law.law_id === "ll97" ? ["ll97", "art321"] : [law.law_id],
+    })),
 ];
 
 const FINE_BASES: FineBasis[] = [
@@ -106,6 +108,15 @@ const FINE_BASES: FineBasis[] = [
     detail: "No per-ton rate is modeled; the dashboard tracks the upgrade/report obligation.",
   },
   {
+    id: "ll33-grade",
+    lawId: "ll33",
+    label: "LL33 grade",
+    type: "Fine type",
+    value: "$1,250",
+    unit: "failure-to-post exposure",
+    detail: "Energy-grade posting is tracked from the LL84 score and public-label posting task.",
+  },
+  {
     id: "ll152-gas",
     lawId: "ll152",
     label: "LL152 gas piping",
@@ -154,7 +165,7 @@ function ll97Fine(building: Building, periodIndex: number): number | null {
   return periods?.[periodIndex]?.annualFineUsd ?? null;
 }
 
-function openTaskCount(buildingId: bigint, tasks: readonly Task[]): number {
+function openTaskCount(buildingId: number, tasks: readonly Task[]): number {
   return tasks.filter((t) => t.buildingId === buildingId && t.status === "open").length;
 }
 
@@ -222,20 +233,24 @@ export function PortfolioClient() {
         return;
       }
 
-      // Optimistic: confirm immediately, surface a failure if the ack comes
-      // back negative. The reducer is the source of truth either way.
+      // Flash optimistically while the reducer runs, but keep the typed address
+      // until the intake actually lands — a failed call must leave it in the box
+      // to retry, not clear it behind a premature success toast.
       setRecentAddresses(rememberAddress(trimmed));
-      setAddress("");
-      toast.success("Intake queued. An agent is pulling the city's records now");
 
       setJustQueued(true);
       if (queuedFlashTimer.current) clearTimeout(queuedFlashTimer.current);
       queuedFlashTimer.current = setTimeout(() => setJustQueued(false), 2_200);
 
-      withAck(requestBuilding({ address: trimmed }), `Intake for "${trimmed}"`).catch((error: Error) => {
-        setJustQueued(false);
-        toast.error(`Intake for "${trimmed}" failed: ${error.message}`);
-      });
+      withAck(requestBuilding({ address: trimmed }), `Intake for "${trimmed}"`)
+        .then(() => {
+          setAddress("");
+          toast.success("Intake queued. An agent is pulling the city's records now");
+        })
+        .catch((error: Error) => {
+          setJustQueued(false);
+          toast.error(`Intake for "${trimmed}" failed: ${error.message}`);
+        });
     },
     [address, requestBuilding],
   );
@@ -319,16 +334,23 @@ export function PortfolioClient() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 @sm/main:flex-row">
+      <form
+        className="flex flex-col gap-2 @sm/main:flex-row"
+        onSubmit={(e) => {
+          e.preventDefault();
+          submitAddress();
+        }}
+      >
         <AddressAutocomplete
           value={address}
           onValueChange={setAddress}
+          onSelect={submitAddress}
           placeholder="Street address with borough"
           className="flex-1"
           inputClassName="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-[3px] focus:ring-ring/20 disabled:cursor-not-allowed disabled:opacity-50"
         />
         <span className="flex shrink-0 items-center gap-2">
-          <Button onClick={() => submitAddress()} className="h-10">
+          <Button type="submit" className="h-10">
             Get my number
           </Button>
           <AnimatePresence>
@@ -346,7 +368,7 @@ export function PortfolioClient() {
             )}
           </AnimatePresence>
         </span>
-      </div>
+      </form>
 
       {recentAddresses.length > 0 && (
         <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
@@ -442,13 +464,17 @@ export function PortfolioClient() {
                       className="cursor-pointer"
                       onClick={() => router.push(`/dashboard/buildings/${b.id}`)}
                     >
-                      <TableCell className="pl-6 font-medium">{b.address}</TableCell>
+                      <TableCell className="pl-6 font-medium">
+                        <Link href={`/dashboard/buildings/${b.id}`} className="hover:underline">
+                          {b.address}
+                        </Link>
+                      </TableCell>
                       <TableCell className="text-right text-muted-foreground">{b.sqft.toLocaleString()}</TableCell>
                       {showLl97Columns ? (
                         <>
                           <TableCell className="text-right text-muted-foreground">
-                            {b.annualEmissionsTco2E !== undefined ? (
-                              `${b.annualEmissionsTco2E.toLocaleString(undefined, { maximumFractionDigits: 0 })} t`
+                            {b.annualEmissionsTco2e !== undefined ? (
+                              `${b.annualEmissionsTco2e.toLocaleString(undefined, { maximumFractionDigits: 0 })} t`
                             ) : (
                               <span className="text-xs italic">missing</span>
                             )}
