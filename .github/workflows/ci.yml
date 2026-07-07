@@ -40,7 +40,7 @@ jobs:
         env:
           # Placeholder build-time keys: Clerk and Supabase are runtime
           # concerns; the build only needs well-formed values.
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k' }}
-          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY || 'sk_test_placeholder' }}
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || 'ci-clerk-publishable-key' }}
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY || 'ci-clerk-secret-key' }}
           NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
           NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
