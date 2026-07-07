@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Prepared by Fineprint — preview</title>
+<style>
+  :root{
+    --bg:#faf9f6; --card:#ffffff; --fg:#141414; --muted:#f2f0ea; --muted-fg:#6b6862;
+    --border:#e7e3db; --primary:#141414; --primary-fg:#faf9f6; --success:#15a34a;
+    --destructive:#e5342b; --amber:#d97706; --blue:#2563eb;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.45;padding:34px 30px 40px}
+  .wrap{max-width:940px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+  .muted{color:var(--muted-fg)}
+  .tabnum{font-variant-numeric:tabular-nums}
+  svg{display:block}
+
+  /* section heading */
+  .sec-h{font-size:14px;font-weight:600;letter-spacing:-.01em}
+  .sec-sub{font-size:12px;color:var(--muted-fg);margin-top:2px}
+
+  /* deliverable cards */
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:8px}
+  .card{border:1px solid var(--border);background:var(--card);border-radius:12px;
+    padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+  .card-title{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:500}
+  .card-title .ic{color:var(--muted-fg)}
+  .card-purpose{font-size:12px;color:var(--muted-fg)}
+  .chips{display:flex;flex-wrap:wrap;gap:4px 16px}
+  .chip .k{font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted-fg)}
+  .chip .v{font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
+  .v.bad{color:var(--destructive)} .v.ok{color:var(--success)} .v.amber{color:var(--amber)}
+  .card-actions{display:flex;gap:8px;margin-top:auto;padding-top:2px}
+  .btn{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;
+    height:32px;padding:0 11px;border-radius:8px;border:1px solid var(--border);
+    background:var(--card);color:var(--fg);cursor:default}
+  .btn.primary{background:var(--primary);color:var(--primary-fg);border-color:var(--primary)}
+  .btn.icon svg{width:14px;height:14px}
+
+  /* open document panel */
+  .panel{border:1px solid var(--border);background:var(--card);border-radius:12px;padding:22px 22px 20px}
+  .toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:18px}
+  .toolbar .t{font-size:14px;font-weight:500}
+  .toolbar .acts{display:flex;gap:8px}
+
+  /* the deliverable document */
+  .doc{display:flex;flex-direction:column;gap:20px;font-size:14px;color:var(--fg)}
+  .doc header{border-bottom:1px solid var(--border);padding-bottom:12px;display:flex;flex-direction:column;gap:4px}
+  .brand{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.16em;color:var(--muted-fg)}
+  .doc h3{font-size:18px;font-weight:700;letter-spacing:-.01em}
+  .doc .ident{font-size:12px;color:var(--muted-fg)}
+  .doc .purpose{font-size:12px;font-style:italic;color:var(--muted-fg)}
+  .doc .prep{font-size:11px;color:var(--muted-fg)}
+
+  .statrow{display:flex;flex-wrap:wrap;gap:12px 34px;border:1px solid var(--border);
+    background:rgba(242,240,234,.5);border-radius:10px;padding:13px 18px}
+  .stat .k{font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted-fg)}
+  .stat .v{font-size:16px;font-weight:600;font-variant-numeric:tabular-nums;margin-top:2px}
+
+  .doc section{display:flex;flex-direction:column;gap:9px}
+  .doc h4{font-size:14px;font-weight:600;letter-spacing:-.01em;border-bottom:1px solid var(--border);padding-bottom:5px}
+  dl.rows{display:grid;grid-template-columns:1fr 1fr;gap:6px 34px}
+  dl.rows .r{display:flex;justify-content:space-between;gap:12px;border-bottom:1px dashed rgba(231,227,219,.9);padding-bottom:4px}
+  dl.rows dt{font-size:12px;color:var(--muted-fg)}
+  dl.rows dd{font-size:12px;font-weight:500;text-align:right}
+
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  thead th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.04em;
+    color:var(--muted-fg);font-weight:500;padding:6px 16px 6px 0;border-bottom:1px solid var(--border)}
+  tbody td{padding:6px 16px 6px 0;border-bottom:1px solid var(--border);font-variant-numeric:tabular-nums;vertical-align:top}
+  tbody tr:last-child td{border-bottom:0}
+  td.over{color:var(--destructive)}
+  .tnote{font-size:10px;color:var(--muted-fg)}
+  .notes{border-top:1px solid var(--border);padding-top:12px;display:flex;flex-direction:column;gap:3px}
+  .notes p{font-size:10px;color:var(--muted-fg)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div>
+    <div class="sec-h">Prepared by Fineprint</div>
+    <div class="sec-sub">Everything we've put together for this building - open it, then export wherever you submit for LL97 compliance.</div>
+  </div>
+
+  <div class="cards">
+    <!-- Emissions -->
+    <div class="card">
+      <div class="card-title"><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/></svg></span>LL97 emissions position</div>
+      <div class="card-purpose">For your annual Article 320 emissions report in DOB NOW: BEAM, and for your Registered Design Professional.</div>
+      <div class="chips">
+        <div class="chip"><span class="k">Status</span> <span class="v bad">Over the cap</span></div>
+        <div class="chip"><span class="k">Over cap</span> <span class="v bad">495 tCO2e</span></div>
+        <div class="chip"><span class="k">Penalty</span> <span class="v bad">$132,660/yr</span></div>
+      </div>
+      <div class="card-actions">
+        <span class="btn primary">Close</span>
+        <span class="btn icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>CSV</span>
+      </div>
+    </div>
+    <!-- Decarbonization -->
+    <div class="card">
+      <div class="card-title"><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/></svg></span>Decarbonization plan</div>
+      <div class="card-purpose">Your recommended path to reduce emissions and LL97 penalty exposure - for planning, capital budgeting, and your consultants.</div>
+      <div class="chips">
+        <div class="chip"><span class="k">Measures</span> <span class="v">5</span></div>
+        <div class="chip"><span class="k">Emissions cut</span> <span class="v ok">-520 tCO2e/yr</span></div>
+        <div class="chip"><span class="k">Projected</span> <span class="v ok">Under the cap</span></div>
+      </div>
+      <div class="card-actions">
+        <span class="btn">Open</span>
+        <span class="btn icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>CSV</span>
+      </div>
+    </div>
+    <!-- Documents -->
+    <div class="card">
+      <div class="card-title"><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.94 14.06A2 2 0 0 0 8.5 12.6l-4.6-1.19a.5.5 0 0 1 0-.96l4.6-1.19A2 2 0 0 0 9.94 7.8l1.19-4.6a.5.5 0 0 1 .96 0l1.19 4.6a2 2 0 0 0 1.44 1.44l4.6 1.19a.5.5 0 0 1 0 .96l-4.6 1.19a2 2 0 0 0-1.44 1.44l-1.19 4.6a.5.5 0 0 1-.96 0z"/></svg></span>Document library</div>
+      <div class="card-purpose">A standardized index of the documents on file for this building, ready to hand off with any submission.</div>
+      <div class="chips">
+        <div class="chip"><span class="k">Documents</span> <span class="v">3</span></div>
+      </div>
+      <div class="card-actions">
+        <span class="btn">Open</span>
+        <span class="btn icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>CSV</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- open: emissions document -->
+  <div class="panel">
+    <div class="toolbar">
+      <div class="t">LL97 emissions position</div>
+      <div class="acts">
+        <span class="btn icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>Export CSV</span>
+        <span class="btn icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Print / PDF</span>
+      </div>
+    </div>
+
+    <div class="doc">
+      <header>
+        <div class="brand">Fineprint</div>
+        <h3>LL97 emissions position</h3>
+        <div class="ident">1240 Atlantic Avenue, Brooklyn NY &nbsp;·&nbsp; BBL 3012340056 &nbsp;·&nbsp; BIN 3001234</div>
+        <div class="purpose">For your annual Article 320 emissions report in DOB NOW: BEAM, and for your Registered Design Professional.</div>
+        <div class="prep">Prepared 7/6/2026</div>
+      </header>
+
+      <div class="statrow">
+        <div class="stat"><div class="k">Status</div><div class="v" style="color:var(--destructive)">Over the cap</div></div>
+        <div class="stat"><div class="k">Over cap</div><div class="v" style="color:var(--destructive)">495 tCO2e</div></div>
+        <div class="stat"><div class="k">Penalty</div><div class="v" style="color:var(--destructive)">$132,660/yr</div></div>
+        <div class="stat"><div class="k">Pathway</div><div class="v">Article 320</div></div>
+      </div>
+
+      <section>
+        <h4>Building</h4>
+        <dl class="rows">
+          <div class="r"><dt>Address</dt><dd>1240 Atlantic Avenue, Brooklyn NY</dd></div>
+          <div class="r"><dt>Borough-Block-Lot (BBL)</dt><dd>3012340056</dd></div>
+          <div class="r"><dt>Building Identification Number (BIN)</dt><dd>3001234</dd></div>
+          <div class="r"><dt>Gross floor area</dt><dd>60,000 ft²</dd></div>
+          <div class="r" style="grid-column:1 / -1"><dt>Occupancy</dt><dd>Multifamily Housing (60,000 ft²)</dd></div>
+        </dl>
+      </section>
+
+      <section>
+        <h4>Emissions against the limit</h4>
+        <table>
+          <thead><tr>
+            <th>Compliance period</th><th>Limit</th><th>Emissions</th><th>Over cap</th><th>Penalty / yr</th><th>Status</th>
+          </tr></thead>
+          <tbody>
+            <tr><td>2024-2029</td><td>405 tCO2e</td><td>900 tCO2e</td><td class="over">495 tCO2e</td><td>$132,660</td><td>Over</td></tr>
+            <tr><td>2030-2034</td><td>228 tCO2e</td><td>900 tCO2e</td><td class="over">672 tCO2e</td><td>$180,096</td><td>Over</td></tr>
+            <tr><td>2035-2039</td><td>90 tCO2e</td><td>900 tCO2e</td><td class="over">810 tCO2e</td><td>$217,080</td><td>Over</td></tr>
+          </tbody>
+        </table>
+        <div class="tnote">Limit = each occupancy area × its emissions coefficient (Admin Code 28-320.3). Penalty = $268 per tCO2e over the limit (1 RCNY 103-14(h)).</div>
+      </section>
+
+      <div class="notes">
+        <p>Prepared by Fineprint from NYC public records and the LL97 emissions model. Figures are estimates for planning; your RDP verifies and attests the filed report.</p>
+        <p>Gross floor area for LL97 differs from the Dept. of Finance gross square footage - confirm the GFA your RDP will file.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

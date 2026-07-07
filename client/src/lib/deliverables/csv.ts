@@ -10,7 +10,7 @@ import type { Deliverable } from "./types";
 export function deliverableToCsv(deliverable: Deliverable): string {
   const lines: string[] = [];
 
-  lines.push(row([`Fineprint - ${deliverable.title}`]));
+  lines.push(row([`Fineprint ${deliverable.title}`]));
   lines.push(row([deliverable.purpose]));
   lines.push(row(["Address", deliverable.building.address]));
   lines.push(row(["BBL", deliverable.building.bbl ?? ""]));

@@ -3,9 +3,9 @@
 import type { Deliverable, DeliverableSection, StatTone } from "@/lib/deliverables/types";
 import { cn } from "@/lib/utils";
 
-// Renders a Deliverable as a clean, print-ready one-page document: a letterhead
-// header, an at-a-glance stat row, then tidy sections. No form boxes, no blanks to
-// fill — everything shown is already prepared.
+// Renders a Deliverable as a clean, print-ready one-page document. A letterhead
+// header, an at-a-glance stat row, then tidy sections. No form boxes and no blanks
+// to fill, since everything shown is already prepared.
 
 const TONE_CLASS: Record<StatTone, string> = {
   ok: "text-success",

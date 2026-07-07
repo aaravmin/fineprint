@@ -13,7 +13,7 @@ import type { Building } from "@/lib/data/types";
 import { DOC_TYPES, docTypeLabel } from "@/lib/deliverables/documentLibrary";
 
 // Upload a document, tag it with standardized cover fields, and keep the building's
-// library in one place. Fineprint stores and indexes the file; it never re-keys it.
+// library in one place. Fineprint stores and indexes the file and never re-keys it.
 export function DocumentLibrary({ building }: { building: Building }) {
   const allDocuments = useBuildingDocuments();
   const upload = useUploadBuildingDocument();
@@ -54,7 +54,7 @@ export function DocumentLibrary({ building }: { building: Building }) {
       toast.success(`Added ${file.name}`);
       reset();
     } catch (error) {
-      toast.error(`Upload failed: ${(error as Error).message}`);
+      toast.error(`Upload failed. ${(error as Error).message}`);
     } finally {
       setUploading(false);
     }
@@ -63,7 +63,7 @@ export function DocumentLibrary({ building }: { building: Building }) {
   const onDelete = (id: bigint, storagePath: string, fileName: string) => {
     remove({ id, storagePath }).then(
       () => toast.success(`Removed ${fileName}`),
-      (error: Error) => toast.error(`Remove failed: ${error.message}`),
+      (error: Error) => toast.error(`Remove failed. ${error.message}`),
     );
   };
 
@@ -137,7 +137,7 @@ export function DocumentLibrary({ building }: { building: Building }) {
         <Input
           value={referenceNumber}
           onChange={(event) => setReferenceNumber(event.target.value)}
-          placeholder="Reference / job no."
+          placeholder="Reference number"
           className="h-8 w-40 text-xs"
         />
 

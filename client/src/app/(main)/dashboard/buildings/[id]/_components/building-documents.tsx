@@ -30,9 +30,9 @@ const STAT_TONE: Record<NonNullable<DeliverableStat["tone"]>, string> = {
   muted: "text-foreground",
 };
 
-// Everything Fineprint has prepared for a building — the emissions position, the
-// decarbonization plan, and the standardized document library — each ready to open
-// and export wherever the owner submits for LL97 compliance. The wordy compliance
+// Everything Fineprint has prepared for a building. The emissions position, the
+// decarbonization plan, and the standardized document library, each ready to open
+// and export wherever the owner submits for LL97 compliance. The fuller compliance
 // report and evidence binder stay available underneath.
 export function BuildingDocuments({
   building,
@@ -89,7 +89,7 @@ export function BuildingDocuments({
         <div className="print-hide mb-2">
           <h3 className="font-semibold text-sm tracking-tight">Prepared by Fineprint</h3>
           <p className="text-muted-foreground text-xs">
-            Everything we&apos;ve put together for this building - open it, then export wherever you submit for LL97
+            Everything we&apos;ve put together for this building. Open it, then export wherever you submit for LL97
             compliance.
           </p>
         </div>
@@ -135,12 +135,16 @@ export function BuildingDocuments({
             </div>
 
             {openKind === "documents" ? (
-              <div className="print-hide">
+              <>
                 <DocumentLibrary building={building} />
-              </div>
-            ) : null}
-
-            <DeliverableDocument deliverable={deliverableFor(openKind)} />
+                {/* The standardized index is what prints and exports; on screen the library above is enough. */}
+                <div className="hidden print:block">
+                  <DeliverableDocument deliverable={library} />
+                </div>
+              </>
+            ) : (
+              <DeliverableDocument deliverable={deliverableFor(openKind)} />
+            )}
           </CardContent>
         </Card>
       ) : null}
@@ -151,7 +155,7 @@ export function BuildingDocuments({
           <DocCard
             icon={<FileText className="size-4" />}
             title="Compliance report"
-            description="The full findings, action plan and sources - print-ready."
+            description="The full findings, action plan, and sources. Print ready."
             actions={
               <>
                 <Button
@@ -191,10 +195,10 @@ export function BuildingDocuments({
 
       <div className="print-hide space-y-1 border-t pt-3 text-muted-foreground text-xs">
         <p>
-          Estimates from public disclosures. Not legal advice - official compliance requires a registered design
+          Estimates from public disclosures. Not legal advice. Official compliance requires a registered design
           professional.
         </p>
-        <p>1 RCNY 103-14(h) - penalty at $268/tCO₂e over the building emissions limit.</p>
+        <p>Penalty is $268 per tCO₂e over the building emissions limit (1 RCNY 103-14(h)).</p>
       </div>
     </section>
   );

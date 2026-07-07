@@ -1,9 +1,9 @@
-// The model behind the things Fineprint hands an owner for a building: the LL97
-// emissions position, the decarbonization plan, and their standardized document
-// library. Each is built entirely from what Fineprint already knows (records +
-// the engine) or from files the owner uploaded — nothing to fill in. A Deliverable
-// renders as a clean one-page document and exports to CSV, ready to submit wherever
-// the owner files for LL97 compliance.
+// The model behind the things Fineprint hands an owner for a building. These are
+// the LL97 emissions position, the decarbonization plan, and their standardized
+// document library. Each is built entirely from what Fineprint already knows
+// (records plus the engine) or from files the owner uploaded, so there is nothing
+// to fill in. A Deliverable renders as a clean one-page document and exports to
+// CSV, ready to submit wherever the owner files for LL97 compliance.
 
 export type DeliverableKind = "emissions" | "decarbonization" | "documents";
 
