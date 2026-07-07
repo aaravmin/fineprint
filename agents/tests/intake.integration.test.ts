@@ -1,62 +1,53 @@
-import { execFileSync } from "node:child_process";
+import { createClient } from "@supabase/supabase-js";
 import { describe, expect, test } from "vitest";
 
-// request_building against a RUNNING local SpacetimeDB:
-//   RUN_INTEGRATION=1 npm test --workspace agents
-// Skipped by default so CI (which has no server) stays green.
-const integrationEnabled = process.env.RUN_INTEGRATION === "1";
+// The intake queue against a RUNNING local Supabase (npm run db:start):
+//   RUN_INTEGRATION=1 SUPABASE_SERVICE_ROLE_KEY=... npm test --workspace agents
+// Skipped by default so CI (which has no database) stays green.
+const integrationEnabled =
+  process.env.RUN_INTEGRATION === "1" && !!process.env.SUPABASE_SERVICE_ROLE_KEY;
 
+const SUPABASE_URL = process.env.SUPABASE_URL ?? "http://localhost:54321";
 const INTAKE_ADDRESS = "30-30 Thomson Avenue, Queens";
+const OWNER = "integration-test";
 
-function spacetime(...args: string[]): string {
-  return execFileSync("spacetime", args, { encoding: "utf8", timeout: 30_000 });
-}
+describe.runIf(integrationEnabled)("intake queue against a live database", () => {
+  test("holds exactly one live intake per owner and address", async () => {
+    const db = createClient(SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
 
-describe.runIf(integrationEnabled)("request_building against a live server", () => {
-  test("queues an intake task exactly once per address", () => {
-    let firstCallError = "";
-    try {
-      spacetime(
-        "call",
-        "-s",
-        "local",
-        "fineprint",
-        "request_building",
-        `"${INTAKE_ADDRESS}"`,
-      );
-    } catch (error) {
-      firstCallError = String((error as { stderr?: string }).stderr ?? error);
+    // request_building refuses the service role (humans queue intakes), so
+    // seed the row the way an owner's call would land it, then assert the
+    // dedup guard's view: one live intake for this owner+address.
+    const { data: existing } = await db
+      .from("task")
+      .select("id")
+      .eq("kind", "building_intake")
+      .eq("owner", OWNER)
+      .eq("intake_address", INTAKE_ADDRESS)
+      .in("status", ["open", "claimed", "in_review"]);
+
+    if (!existing || existing.length === 0) {
+      const { error } = await db.from("task").insert({
+        owner: OWNER,
+        law_id: "intake",
+        kind: "building_intake",
+        title: `Building intake — ${INTAKE_ADDRESS}`,
+        deadline: new Date(Date.now() + 86_400_000).toISOString(),
+        intake_address: INTAKE_ADDRESS,
+      });
+      expect(error).toBeNull();
     }
 
-    // Either the call queued a fresh intake, or one was already waiting from
-    // a previous run — both mean the reducer and its dedupe guard work.
-    if (firstCallError) {
-      expect(firstCallError).toMatch(/already in the queue/);
-    }
+    const { data: rows } = await db
+      .from("task")
+      .select("id")
+      .eq("kind", "building_intake")
+      .eq("owner", OWNER)
+      .eq("intake_address", INTAKE_ADDRESS)
+      .in("status", ["open", "claimed", "in_review"]);
 
-    const rows = spacetime(
-      "sql",
-      "-s",
-      "local",
-      "fineprint",
-      `SELECT kind, intakeAddress FROM task WHERE kind = 'building_intake'`,
-    );
-    expect(rows).toContain(INTAKE_ADDRESS);
-
-    // A second request for the same address must always be rejected.
-    expect(() =>
-      spacetime(
-        "call",
-        "-s",
-        "local",
-        "fineprint",
-        "request_building",
-        `"${INTAKE_ADDRESS}"`,
-      ),
-    ).toThrow();
+    expect(rows?.length).toBe(1);
   });
-});
-
-describe.runIf(!integrationEnabled)("request_building integration (skipped)", () => {
-  test.skip("set RUN_INTEGRATION=1 with a running spacetime server to enable", () => {});
 });

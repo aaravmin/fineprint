@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { LAWS } from "../../spacetimedb/src/laws.ts";
+import { LAWS } from "../../data/src/laws.ts";
 import { draftScripted } from "../src/policies/scripted.ts";
 import type { DraftInput } from "../src/policies/types.ts";
 
@@ -33,7 +33,9 @@ function draftInput(overrides: Partial<DraftInput> = {}): DraftInput {
 
 describe("draftScripted", () => {
   test("every law in the registry has a real template, not the fallback", () => {
-    for (const law of LAWS) {
+    // PACE financing is surfaced as an opportunity, never spawned as a task,
+    // so it is the one registry entry that legitimately has no playbook.
+    for (const law of LAWS.filter(entry => entry.kind !== "pace_financing")) {
       const draft = draftScripted(draftInput({ kind: law.kind, lawId: law.id }));
 
       expect(

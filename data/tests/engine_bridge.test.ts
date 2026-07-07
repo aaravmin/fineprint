@@ -56,4 +56,29 @@ describe("toEngineInput", () => {
 
     expect(input!.isArticle321).toBe(false);
   });
+
+  test("a use the engine can't price degrades to null with the use named", () => {
+    const { input, missing } = toEngineInput({
+      ...completeFacts,
+      occupancyGroups: [{ group: "Marina", sqft: 100_000 }],
+    });
+
+    expect(input).toBeNull();
+    expect(missing.join(" ")).toMatch(/no emissions factor.*Marina/);
+  });
+
+  test("use areas exceeding the gross floor area lift the GFA rather than throw", () => {
+    // Self-reported use areas can total more than the calculated GFA; the engine
+    // rejects that, so the bridge raises the GFA to the summed area. The limit is
+    // computed from the per-use areas, so no figure changes.
+    const { input } = toEngineInput({
+      ...completeFacts,
+      grossFloorAreaSqft: 50_000,
+      occupancyGroups: [{ group: "Office", sqft: 100_000 }],
+    });
+
+    expect(input).not.toBeNull();
+    expect(input!.grossFloorAreaSqft).toBe(100_000);
+    expect(() => computeFine(input!, "2024-2029")).not.toThrow();
+  });
 });

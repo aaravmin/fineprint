@@ -84,6 +84,17 @@ const TEMPLATES: Record<string, (i: DraftInput) => string> = {
       `  3. File the GPS2 certification through DOB NOW before the cycle deadline.`,
       `  4. Calendar the next cycle; certification recurs every four years.`,
     ].join("\n"),
+  energy_grade_posting: input =>
+    [
+      `LL33 ENERGY GRADE POSTING · ${input.address}`,
+      ``,
+      `The building's energy label must be posted near every public entrance.`,
+      `Failure-to-post exposure: $${fmt(input.fineEstimateUsd)}.`,
+      `  1. Confirm the LL84 benchmarking filing is in — the grade rides on its ENERGY STAR score.`,
+      `  2. Download the current label from DOB when grades are issued in October.`,
+      `  3. Post the label within 30 days at each public entrance; photograph the posting.`,
+      `  4. Calendar the annual refresh; last year's label does not carry over.`,
+    ].join("\n"),
   mold_pest_remediation: input =>
     [
       `LL55 INDOOR ALLERGEN HAZARDS · ${input.address}`,

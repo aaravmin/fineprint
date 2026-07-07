@@ -2,29 +2,29 @@ import { describe, expect, test } from "vitest";
 import { draftInputFrom } from "../src/draftInput.ts";
 
 // draftInputFrom turns a task row + its building row into the DraftInput a
-// policy consumes — including the real-data columns ingest fills (usesJson,
-// provenanceJson, emissions, coverage). Pure and testable; the worker just
+// policy consumes — including the real-data columns ingest fills (uses_json,
+// provenance_json, emissions, coverage). Pure and testable; the worker just
 // calls it.
 const taskRow = {
   title: "LL97 — Building Emissions Cap — 350 5 AVENUE",
   kind: "emissions_fine_analysis",
-  lawId: "ll97",
-  fineEstimateUsd: 1_102_986,
-  deadline: { toDate: () => new Date("2027-05-01T00:00:00Z") },
+  law_id: "ll97",
+  fine_estimate_usd: 1_102_986,
+  deadline: "2027-05-01T00:00:00Z",
 };
 
 const ingestedBuilding = {
   address: "350 5 AVENUE, New York, NY, USA",
   bbl: "1008350041",
   sqft: 2_852_257,
-  isAffordable: false,
-  annualEmissionsTco2E: 12_096.78,
-  usesJson: JSON.stringify([
+  is_affordable: false,
+  annual_emissions_tco2e: 12_096.78,
+  uses_json: JSON.stringify([
     { group: "Office", sqft: 2_692_475.1 },
     { group: "Restaurant", sqft: 50_021 },
   ]),
-  ll97Covered: true,
-  provenanceJson: JSON.stringify([
+  ll97_covered: true,
+  provenance_json: JSON.stringify([
     {
       field: "annualEmissionsTco2e",
       source: "LL84 benchmarking disclosure",
@@ -55,7 +55,7 @@ describe("draftInputFrom", () => {
   });
 
   test("a task without a deadline leaves the field undefined", () => {
-    const input = draftInputFrom({ ...taskRow, deadline: undefined }, ingestedBuilding);
+    const input = draftInputFrom({ ...taskRow, deadline: null }, ingestedBuilding);
 
     expect(input.deadline).toBeUndefined();
   });
@@ -63,13 +63,13 @@ describe("draftInputFrom", () => {
   test("a seed building without real-data columns degrades to empty fields", () => {
     const seedBuilding = {
       address: "123 Example Street",
-      bbl: undefined,
+      bbl: null,
       sqft: 80_000,
-      isAffordable: false,
-      annualEmissionsTco2E: undefined,
-      usesJson: undefined,
-      ll97Covered: undefined,
-      provenanceJson: undefined,
+      is_affordable: false,
+      annual_emissions_tco2e: null,
+      uses_json: null,
+      ll97_covered: null,
+      provenance_json: null,
     };
 
     const input = draftInputFrom(taskRow, seedBuilding);
@@ -90,7 +90,10 @@ describe("draftInputFrom", () => {
   });
 
   test("corrupt JSON columns degrade to empty, never throw", () => {
-    const input = draftInputFrom(taskRow, { ...ingestedBuilding, usesJson: "{not json" });
+    const input = draftInputFrom(taskRow, {
+      ...ingestedBuilding,
+      uses_json: "{not json",
+    });
 
     expect(input.uses).toEqual([]);
   });

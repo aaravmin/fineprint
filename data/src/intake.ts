@@ -65,9 +65,10 @@ export async function prepareIntake(
 
   const sizeApplicableLawIds =
     knownSqft > 0
-      ? applicableLaws({ sqft: knownSqft, isAffordable: facts.isArticle321 ?? false }).map(
-          law => law.id,
-        )
+      ? applicableLaws({
+          sqft: knownSqft,
+          isAffordable: facts.isArticle321 ?? false,
+        }).map(law => law.id)
       : [];
 
   const ll97PathwayLawIds = cbl

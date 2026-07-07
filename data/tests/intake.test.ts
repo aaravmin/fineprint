@@ -244,7 +244,11 @@ describe("prepareIntake coverage", () => {
   });
 
   test("an affordable residential building maps to art321 and the allergen law", async () => {
-    const article321Cbl = (): CblEntry => ({ ...cblEntry, ll97: false, article321: true });
+    const article321Cbl = (): CblEntry => ({
+      ...cblEntry,
+      ll97: false,
+      article321: true,
+    });
 
     const coverage = await coverageFor(
       buildingOf(100_000, { numFloors: 20, unitsResidential: 200, isArticle321: true }),

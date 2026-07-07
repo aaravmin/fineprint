@@ -1,7 +1,7 @@
 # Fineprint agents
 
 Worker processes that drain the compliance task queue. Each process opens one
-WebSocket to SpacetimeDB, registers as one `worker` row, and loops:
+Supabase with the service-role key, registers as one `worker` row, and loops:
 subscribe → claim → draft → submit for review. Run a fleet by starting more
 terminals:
 
@@ -94,13 +94,15 @@ guard run without the SDK or a key.
 
 ## Environment
 
-| Variable                  | Default               | Meaning                                                           |
-| ------------------------- | --------------------- | ----------------------------------------------------------------- |
-| `SPACETIME_URI`           | `ws://localhost:3011` | database WebSocket                                                |
-| `DB_NAME`                 | `fineprint`           | module name                                                       |
-| `WORKER_NAME`             | `agent-<pid>`         | name on the board                                                 |
-| `USE_LLM`                 | unset (scripted)      | `true` enables the tool loop                                      |
-| `ANTHROPIC_API_KEY`       | —                     | required when `USE_LLM=true`                                      |
-| `ANTHROPIC_MODEL`         | `claude-haiku-4-5`    | drafting model override (advise/ask default to `claude-opus-4-8`) |
-| `FINEPRINT_LLM_CACHE_DIR` | `agents/cache/llm`    | replayable draft location                                         |
-| `FINEPRINT_CACHE_DIR`     | `data/cache`          | data snapshot location                                            |
+| Variable                    | Default            | Meaning                                                           |
+| --------------------------- | ------------------ | ----------------------------------------------------------------- |
+| `SUPABASE_URL`              | —                  | Supabase API URL, local default is printed by `npm run db:start`  |
+| `SUPABASE_SERVICE_ROLE_KEY` | —                  | service-role key used by workers and ingest scripts               |
+| `WORKER_NAME`               | `dispatcher`       | dispatcher name on the board                                      |
+| `AGENT_CONCURRENCY`         | `4`                | maximum task agents dispatched at once                            |
+| `WORKER_KINDS`              | unset              | optional comma-separated task-kind filter                         |
+| `USE_LLM`                   | unset (scripted)   | `true` enables the tool loop                                      |
+| `ANTHROPIC_API_KEY`         | —                  | required when `USE_LLM=true`                                      |
+| `ANTHROPIC_MODEL`           | `claude-haiku-4-5` | drafting model override (advise/ask default to `claude-opus-4-8`) |
+| `FINEPRINT_LLM_CACHE_DIR`   | `agents/cache/llm` | replayable draft location                                         |
+| `FINEPRINT_CACHE_DIR`       | `data/cache`       | data snapshot location                                            |

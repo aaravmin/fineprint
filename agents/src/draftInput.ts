@@ -1,5 +1,5 @@
 // Turns a task row + its building row into the DraftInput a policy consumes.
-// The building's JSON columns (usesJson, provenanceJson) are parsed here so
+// The building's JSON columns (uses_json, provenance_json) are parsed here so
 // policies never see raw storage. Pure; the worker just calls it.
 
 import type { DraftInput, ProvenanceNote } from "./policies/types.ts";
@@ -7,20 +7,20 @@ import type { DraftInput, ProvenanceNote } from "./policies/types.ts";
 interface TaskLike {
   title: string;
   kind: string;
-  lawId: string;
-  fineEstimateUsd: number | undefined;
-  deadline?: { toDate(): Date };
+  law_id: string;
+  fine_estimate_usd: number | null;
+  deadline?: string | null;
 }
 
 interface BuildingLike {
   address: string;
-  bbl: string | undefined;
+  bbl: string | null;
   sqft: number;
-  isAffordable: boolean;
-  annualEmissionsTco2E: number | undefined; // codegen capitalizes the trailing "e"
-  usesJson: string | undefined;
-  ll97Covered: boolean | undefined;
-  provenanceJson: string | undefined;
+  is_affordable: boolean;
+  annual_emissions_tco2e: number | null;
+  uses_json: string | null;
+  ll97_covered: boolean | null;
+  provenance_json: string | null;
 }
 
 export function draftInputFrom(
@@ -30,23 +30,23 @@ export function draftInputFrom(
   return {
     title: task.title,
     kind: task.kind,
-    lawId: task.lawId,
+    lawId: task.law_id,
     address: building?.address ?? "unknown",
     sqft: building?.sqft ?? 0,
-    isAffordable: building?.isAffordable ?? false,
-    fineEstimateUsd: task.fineEstimateUsd,
-    deadline: task.deadline?.toDate(),
-    bbl: building?.bbl,
-    annualEmissionsTco2e: building?.annualEmissionsTco2E,
+    isAffordable: building?.is_affordable ?? false,
+    fineEstimateUsd: task.fine_estimate_usd ?? undefined,
+    deadline: task.deadline ? new Date(task.deadline) : undefined,
+    bbl: building?.bbl ?? undefined,
+    annualEmissionsTco2e: building?.annual_emissions_tco2e ?? undefined,
     uses:
-      parseJsonColumn<Array<{ group: string; sqft: number }>>(building?.usesJson) ?? [],
-    ll97Covered: building?.ll97Covered,
-    provenance: parseJsonColumn<ProvenanceNote[]>(building?.provenanceJson) ?? [],
+      parseJsonColumn<Array<{ group: string; sqft: number }>>(building?.uses_json) ?? [],
+    ll97Covered: building?.ll97_covered ?? undefined,
+    provenance: parseJsonColumn<ProvenanceNote[]>(building?.provenance_json) ?? [],
   };
 }
 
 // Storage corruption must never crash a worker mid-draft.
-function parseJsonColumn<T>(json: string | undefined): T | null {
+function parseJsonColumn<T>(json: string | null | undefined): T | null {
   if (!json) {
     return null;
   }

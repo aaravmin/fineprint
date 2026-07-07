@@ -2,11 +2,12 @@ import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { describe, expect, test } from "vitest";
 
-// End-to-end ingest against a RUNNING local SpacetimeDB:
-//   RUN_INTEGRATION=1 npm test --workspace data
-// Skipped by default so CI (which has no server) stays green. Uses the
+// End-to-end ingest against a RUNNING local Supabase (npm run db:start):
+//   RUN_INTEGRATION=1 SUPABASE_SERVICE_ROLE_KEY=... npm test --workspace data
+// Skipped by default so CI (which has no database) stays green. Uses the
 // local dev database; ingest is idempotent, so re-runs only refresh rows.
-const integrationEnabled = process.env.RUN_INTEGRATION === "1";
+const integrationEnabled =
+  process.env.RUN_INTEGRATION === "1" && !!process.env.SUPABASE_SERVICE_ROLE_KEY;
 const repoRoot = fileURLToPath(new URL("../..", import.meta.url));
 
 function runIngest(address: string): string {
@@ -65,5 +66,5 @@ describe.runIf(integrationEnabled)("ingest.ts against a live server", () => {
 });
 
 describe.runIf(!integrationEnabled)("ingest.ts integration (skipped)", () => {
-  test.skip("set RUN_INTEGRATION=1 with a running spacetime server to enable", () => {});
+  test.skip("set RUN_INTEGRATION=1 with a running local Supabase to enable", () => {});
 });
