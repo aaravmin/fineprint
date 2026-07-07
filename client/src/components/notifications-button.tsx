@@ -10,13 +10,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { tables } from "@/lib/db";
 import { useTable } from "@/lib/db/react";
 import type { Event } from "@/lib/db/types";
+import { ERROR_KINDS, NOISE_KINDS, SUCCESS_KINDS } from "@/lib/events";
 
 const SEEN_STORAGE_KEY = "fp_notifications_seen_id";
-
-// Heartbeats and module-lifecycle rows are noise; the inbox never shows them.
-const SILENT_KINDS = new Set(["heartbeat", "system"]);
-const ERROR_KINDS = new Set(["task_rejected", "worker_killed", "worker_reaped", "sla_breached", "intake_failed"]);
-const SUCCESS_KINDS = new Set(["task_approved", "building_ingested"]);
 
 function dotColor(kind: string): string {
   if (ERROR_KINDS.has(kind)) {
@@ -62,7 +58,7 @@ export function NotificationsButton() {
   }, []);
 
   const visible: Event[] = [...events]
-    .filter((event) => !SILENT_KINDS.has(event.kind))
+    .filter((event) => !NOISE_KINDS.has(event.kind))
     .sort((a, b) => (a.id > b.id ? -1 : 1))
     .slice(0, 20);
 

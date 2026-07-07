@@ -21,6 +21,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyFolder } from "@/components/ui/empty-folder";
 import { tables } from "@/lib/db";
 import { useTable } from "@/lib/db/react";
+import { eventLabel } from "@/lib/events";
 
 interface KindStyle {
   icon: React.ReactNode;
@@ -138,7 +139,7 @@ export function ActivityClient() {
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <Badge variant={style.variant} className="text-[10px]">
-                          {e.kind.replace(/_/g, " ")}
+                          {eventLabel(e.kind)}
                         </Badge>
                         <span className="font-mono text-[11px] text-muted-foreground tabular-nums">
                           {e.at.toLocaleTimeString([], {

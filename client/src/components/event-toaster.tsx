@@ -6,18 +6,11 @@ import { toast } from "sonner";
 
 import { tables } from "@/lib/db";
 import { useTable } from "@/lib/db/react";
+import { ERROR_KINDS, eventLabel, NOISE_KINDS, SUCCESS_KINDS } from "@/lib/events";
 
 // Every reducer writes an event row; this turns the rows that matter into
 // toasts. The audit trail is the single source: nothing toasts here unless a
 // reducer logged it, and the activity page shows the same record.
-
-// Heartbeats fire every few seconds and system rows describe module
-// lifecycle. Neither is worth an interruption.
-const SILENT_KINDS = new Set(["heartbeat", "system"]);
-
-const ERROR_KINDS = new Set(["task_rejected", "worker_killed", "worker_reaped", "sla_breached"]);
-
-const SUCCESS_KINDS = new Set(["task_approved", "building_ingested"]);
 
 // Cap the de-dupe set so a long-lived session can't grow it without bound.
 const ANNOUNCED_CAP = 500;
@@ -47,9 +40,9 @@ export function EventToaster() {
       if (announced.current.has(event.id)) continue;
       announced.current.add(event.id);
 
-      if (SILENT_KINDS.has(event.kind)) continue;
+      if (NOISE_KINDS.has(event.kind)) continue;
 
-      const label = event.kind.replace(/_/g, " ");
+      const label = eventLabel(event.kind);
       if (ERROR_KINDS.has(event.kind)) {
         toast.error(event.payload, { description: label });
       } else if (SUCCESS_KINDS.has(event.kind)) {
