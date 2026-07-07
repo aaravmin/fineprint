@@ -84,12 +84,21 @@ function coverageFor(lawId: string, obligationEvidence: BinderEvidence[]): Evide
   const checklist: LawEvidence = evidenceForLaw(lawId);
   // A checklist item counts as present if any uploaded file's name or type
   // mentions it loosely; this is a best-effort match an owner can override.
-  const present = (type: string) =>
-    obligationEvidence.some((e) =>
-      `${e.fileName} ${e.fileType} ${e.issuer}`.toLowerCase().includes(type.toLowerCase().split(" ")[0]),
-    );
+  const present = (type: string) => {
+    const tokens = type
+      .toLowerCase()
+      .split(/\s+/)
+      .filter((token) => token.length > 2);
+    return obligationEvidence.some((e) => {
+      const haystack = `${e.fileName} ${e.fileType} ${e.issuer}`.toLowerCase();
+      return tokens.length > 0 && tokens.every((token) => haystack.includes(token));
+    });
+  };
   const required = checklist.required.map((type) => ({ type, present: present(type) }));
-  const recommended = checklist.recommended.map((type) => ({ type, present: present(type) }));
+  const recommended = checklist.recommended.map((type) => ({
+    type,
+    present: present(type),
+  }));
   return {
     required,
     recommended,
