@@ -7,12 +7,11 @@
     "worker": "tsx src/worker.ts",
     "test": "vitest run",
     "test:watch": "vitest",
-    "reviewer": "tsx src/reviewer.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.39.0",
-    "spacetimedb": "^2.4.1"
+    "@anthropic-ai/sdk": "^0.110.0",
+    "@supabase/supabase-js": "^2.49.4"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

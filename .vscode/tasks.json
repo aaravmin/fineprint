@@ -2,9 +2,9 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Start SpacetimeDB",
+      "label": "Start Supabase",
       "type": "shell",
-      "command": "${env:HOME}/.local/bin/spacetime start",
+      "command": "npx supabase start",
       "isBackground": true,
       "runOptions": {
         "runOn": "folderOpen"

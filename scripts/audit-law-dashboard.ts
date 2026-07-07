@@ -39,7 +39,8 @@ interface Check {
   detail: string;
 }
 const checks: Check[] = [];
-const check = (name: string, ok: boolean, detail: string) => checks.push({ name, ok, detail });
+const check = (name: string, ok: boolean, detail: string) =>
+  checks.push({ name, ok, detail });
 
 // 1. Unique law_id, slug, and dashboard_output_key; all non-empty.
 const dup = (values: string[]) => {
@@ -57,58 +58,90 @@ const dupKeys = dup(LAW_REGISTRY.map(l => l.dashboard_output_key));
 const emptyKey = LAW_REGISTRY.filter(l => !l.dashboard_output_key).map(l => l.law_id);
 check("no duplicate law_ids", dupIds.length === 0, dupIds.join(", "));
 check("no duplicate slugs", dupSlugs.length === 0, dupSlugs.join(", "));
-check("every law has a unique, non-empty dashboard_output_key",
+check(
+  "every law has a unique, non-empty dashboard_output_key",
   dupKeys.length === 0 && emptyKey.length === 0,
-  [...dupKeys, ...emptyKey].join(", "));
+  [...dupKeys, ...emptyKey].join(", "),
+);
 
 // 2. Registry law_id set matches the canonical module registry, with matching
 // short codes — so a law is never named two ways across module and dashboard.
-const moduleSrc = read("spacetimedb/src/laws.ts");
-const moduleEntries = [...moduleSrc.matchAll(/id:\s*"([^"]+)",[\s\S]*?short:\s*"([^"]+)"/g)];
+const moduleSrc = read("data/src/laws.ts");
+const moduleEntries = [
+  ...moduleSrc.matchAll(/id:\s*"([^"]+)",[\s\S]*?short:\s*"([^"]+)"/g),
+];
 const moduleShortById = new Map(moduleEntries.map(m => [m[1], m[2]]));
 const registryIds = new Set(LAW_REGISTRY.map(l => l.law_id));
 const moduleIds = new Set(moduleShortById.keys());
 const missingFromRegistry = [...moduleIds].filter(id => !registryIds.has(id));
 const extraInRegistry = [...registryIds].filter(id => !moduleIds.has(id));
-check("registry law_ids match the module registry",
+check(
+  "registry law_ids match the module registry",
   missingFromRegistry.length === 0 && extraInRegistry.length === 0,
-  `missing: [${missingFromRegistry.join(", ")}], extra: [${extraInRegistry.join(", ")}]`);
-const shortMismatch = LAW_REGISTRY.filter(l => moduleShortById.get(l.law_id) !== l.short_name)
-  .map(l => `${l.law_id} (registry ${l.short_name} vs module ${moduleShortById.get(l.law_id)})`);
-check("short codes match the module registry", shortMismatch.length === 0, shortMismatch.join("; "));
+  `missing: [${missingFromRegistry.join(", ")}], extra: [${extraInRegistry.join(", ")}]`,
+);
+const shortMismatch = LAW_REGISTRY.filter(
+  l => moduleShortById.get(l.law_id) !== l.short_name,
+).map(
+  l =>
+    `${l.law_id} (registry ${l.short_name} vs module ${moduleShortById.get(l.law_id)})`,
+);
+check(
+  "short codes match the module registry",
+  shortMismatch.length === 0,
+  shortMismatch.join("; "),
+);
 
 // 3. Exactly one LAW_REGISTRY definition — no second hardcoded law list.
 const files = clientSourceFiles();
-const registryDefs = files.filter(f => /export const LAW_REGISTRY\b/.test(readFileSync(f, "utf8")));
-check("exactly one LAW_REGISTRY definition in client/src",
+const registryDefs = files.filter(f =>
+  /export const LAW_REGISTRY\b/.test(readFileSync(f, "utf8")),
+);
+check(
+  "exactly one LAW_REGISTRY definition in client/src",
   registryDefs.length === 1,
-  registryDefs.map(f => f.replace(repoRoot + "/", "")).join(", "));
+  registryDefs.map(f => f.replace(repoRoot + "/", "")).join(", "),
+);
 
 // 4. The dashboard components consume the registry rather than a local list.
 const dashboardFiles = [
-  "client/src/app/(main)/dashboard/buildings/[id]/_components/compliance-dashboard.tsx",
-  "client/src/app/(main)/dashboard/buildings/[id]/_components/compliance-section.tsx",
+  "client/src/components/compliance/ComplianceBinder.tsx",
+  "client/src/components/dashboard/ComplianceReport.tsx",
 ];
-const notImporting = dashboardFiles.filter(f => !read(f).includes("@/lib/laws/lawRegistry"));
-check("dashboard components import the canonical registry",
-  notImporting.length === 0, notImporting.join(", "));
+const notImporting = dashboardFiles.filter(
+  f => !read(f).includes("@/lib/laws/lawRegistry"),
+);
+check(
+  "dashboard components import the canonical registry",
+  notImporting.length === 0,
+  notImporting.join(", "),
+);
 
 // 5. Every source_data_key is a real Building field.
-const buildingBinding = read("client/src/module_bindings/building_table.ts");
-const unknownKeys = [
-  ...new Set(LAW_REGISTRY.flatMap(l => l.source_data_keys)),
-].filter(key => !new RegExp(`\\b${key}\\b`).test(buildingBinding));
-check("every source_data_key exists on the Building row",
-  unknownKeys.length === 0, unknownKeys.join(", "));
+const buildingBinding = read("client/src/lib/db/types.ts");
+const unknownKeys = [...new Set(LAW_REGISTRY.flatMap(l => l.source_data_keys))].filter(
+  key => !new RegExp(`\\b${key}\\b`).test(buildingBinding),
+);
+check(
+  "every source_data_key exists on the Building row",
+  unknownKeys.length === 0,
+  unknownKeys.join(", "),
+);
 
 // 6. Tasks/compliance records are joined to laws by law_id, never display_name.
-const joinByName = dashboardFiles.filter(f => /lawId\s*===\s*law\.display_name/.test(read(f)));
-check("tasks are joined by law_id, not display_name", joinByName.length === 0, joinByName.join(", "));
+const joinByName = dashboardFiles.filter(f =>
+  /lawId\s*===\s*law\.display_name/.test(read(f)),
+);
+check(
+  "tasks are joined by law_id, not display_name",
+  joinByName.length === 0,
+  joinByName.join(", "),
+);
 
 // --- report ------------------------------------------------------------------
 
-const undefinedKeys = [...new Set(LAW_REGISTRY.flatMap(l => l.source_data_keys))].filter(key =>
-  !new RegExp(`\\b${key}\\b`).test(buildingBinding),
+const undefinedKeys = [...new Set(LAW_REGISTRY.flatMap(l => l.source_data_keys))].filter(
+  key => !new RegExp(`\\b${key}\\b`).test(buildingBinding),
 );
 
 function renderReport(): string {
@@ -151,7 +184,7 @@ ${checkRows}
   compliance-section.tsx and the standalone \`LAW_TABS\` / \`TRACKED_SCOPES\` lists in
   compliance-dashboard.tsx now derive from the canonical registry. Task records
   reference \`law_id\` (task.lawId); display names come only from the registry.
-- The module registry (\`spacetimedb/src/laws.ts\`) remains the source of runtime
+- The canonical registry (\`data/src/laws.ts\`) remains the source of runtime
   applicability/deadline/penalty logic; this audit confirms its law_id and short
   sets match the dashboard registry.
 

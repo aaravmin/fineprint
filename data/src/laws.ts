@@ -174,9 +174,11 @@ export const LAWS: Law[] = [
     cadence: "Annual emissions report due May 1 for the prior calendar year",
     appliesTo: profile => isLl97Covered(profile) && !profile.isAffordable,
     nextDeadline: asOf => nextAnnualDeadline(asOf, 5, 1),
-    // $268 per tCO2e over cap; stub assumes an office-like overage of ~0.5
-    // kgCO2e/sqft. The engine's real per-building fine overrides this at intake.
-    penaltyUsd: profile => Math.round(profile.sqft * 0.0005 * 268),
+    // The engine computes the real per-building fine from actual emissions and
+    // passes it in at intake. Without emissions there is no honest way to guess a
+    // fine, so absent that input this carries no figure (null) rather than a
+    // fabricated stub — matching the building row, which stores null.
+    penaltyUsd: () => null,
   },
   {
     id: "art321",
@@ -201,8 +203,9 @@ export const LAWS: Law[] = [
     cadence: "Annual, due May 1 for the prior calendar year",
     appliesTo: profile => profile.sqft >= 25_000,
     nextDeadline: asOf => nextAnnualDeadline(asOf, 5, 1),
-    // $500 per quarter not benchmarked, capped at $2,000/yr — a flat statutory
-    // penalty that does not scale with building size.
+    // $500 per quarter not benchmarked, to an annual maximum of $2,000. This is
+    // the worst-case yearly exposure (all four quarters missed), not an amount
+    // currently owed; it is flat and does not scale with building size.
     penaltyUsd: () => 2_000,
   },
   {
@@ -212,13 +215,14 @@ export const LAWS: Law[] = [
     kind: "audit_filing",
     version: 1,
     effectiveDate: "2013-01-01",
-    cadence: "ASHRAE Level II audit + retro-commissioning once per 10-year cycle, by tax-block year",
+    cadence:
+      "ASHRAE Level II audit + retro-commissioning once per 10-year cycle, by tax-block year",
     appliesTo: profile => profile.sqft >= 50_000,
     nextDeadline: ll87Deadline,
-    // Audit and retro-commissioning scope scales with the systems audited, i.e.
-    // floor area. Rate is anchored so a building at the 50k applicability
-    // threshold sees ~$3,000 and exposure grows from there.
-    penaltyUsd: profile => Math.max(3_000, Math.round(profile.sqft * 0.06)),
+    // No statute sets a floor-area civil penalty for a late audit, and the
+    // audit's own cost varies by building. Any per-sqft figure here would be
+    // invented, so no monetary exposure is modeled (null), as with LL55.
+    penaltyUsd: () => null,
   },
   {
     id: "ll11",
@@ -233,10 +237,10 @@ export const LAWS: Law[] = [
     appliesTo: profile =>
       profile.numFloors !== undefined ? profile.numFloors > 6 : profile.sqft >= 60_000,
     nextDeadline: ll11Deadline,
-    // Facade inspection scope and unsafe-condition penalty risk grow with the
-    // building's envelope; sqft is the available proxy. Rate is anchored so a
-    // building at the 60k applicability threshold sees ~$5,000 and grows up.
-    penaltyUsd: profile => Math.max(5_000, Math.round(profile.sqft * 0.083)),
+    // FISP civil penalties turn on filing lateness and unsafe-condition findings,
+    // not floor area, and vary case by case. A per-sqft figure here would be
+    // invented, so no monetary exposure is modeled (null), as with LL55.
+    penaltyUsd: () => null,
   },
   {
     id: "ll88",
@@ -248,12 +252,11 @@ export const LAWS: Law[] = [
     cadence: "One-time upgrade (deadline Jan 1, 2025); report due May 1, 2025",
     appliesTo: profile => profile.sqft >= 25_000,
     nextDeadline: () => new Date(Date.UTC(2025, 0, 1)),
-    // Lighting upgrade and tenant-submetering scope scale with floor area. Rate
-    // is anchored so a building at the 25k applicability threshold sees ~$1,500
-    // and exposure grows from there. The statute adds $500 per covered tenant
-    // space over 5,000 sqft left unsubmetered, which we can't count without a
-    // tenant-space inventory, so it is not included here.
-    penaltyUsd: profile => Math.max(1_500, Math.round(profile.sqft * 0.06)),
+    // The statute's penalty is $500 per covered tenant space over 5,000 sqft left
+    // unsubmetered — a count we don't have without a tenant-space inventory. Any
+    // floor-area proxy would be invented, so no monetary exposure is modeled
+    // (null), as with LL55.
+    penaltyUsd: () => null,
   },
   {
     id: "ll33",
@@ -338,10 +341,11 @@ export function daysUntil(deadline: Date, asOf: Date): number {
   return (deadline.getTime() - asOf.getTime()) / MS_PER_DAY;
 }
 
-// The LL33 letter grade for an ENERGY STAR score. Thresholds are the statutory
-// bands of LL33/LL95 (Admin Code 28-309.12.2): A 85+, B 70-84, C 55-69,
-// D 20-54, F under 20. A building with no score (not ENERGY STAR eligible)
-// posts an "N". Pass null for an unscored building.
+// The LL33 letter grade for an ENERGY STAR score. Statutory bands
+// (Admin Code 28-309.12.2): A 85+, B 70-84, C 55-69, D under 55. A filed score
+// never grades below D — the F grade is reserved for buildings that failed to
+// submit required benchmarking, which is a filing signal, not a low score. A
+// building with no score (not ENERGY STAR eligible) posts an "N"; pass null for it.
 export function energyGradeForScore(score: number | null | undefined): string {
   if (score === null || score === undefined) {
     return "N";
@@ -355,8 +359,5 @@ export function energyGradeForScore(score: number | null | undefined): string {
   if (score >= 55) {
     return "C";
   }
-  if (score >= 20) {
-    return "D";
-  }
-  return "F";
+  return "D";
 }

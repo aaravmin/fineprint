@@ -1,5 +1,5 @@
-import { fileURLToPath } from "url";
-import { resolve, dirname } from "path";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -7,7 +7,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const nextConfig = {
   reactCompiler: true,
   compiler: {
-    removeConsole: process.env.NODE_ENV === "production",
+    // Strip console noise from production, but keep errors — a dead database
+    // connection must stay diagnosable in the field.
+    removeConsole: process.env.NODE_ENV === "production" ? { exclude: ["error"] } : false,
   },
   // tsconfig.json paths handles the fineprint-engine alias for Turbopack automatically.
   // Root silences the multi-lockfile workspace warning.

@@ -1,6 +1,6 @@
 // The canonical law registry for the dashboard. One object per supported NYC
 // law, keyed by the same law_id the module spawns on tasks (task.lawId) and that
-// the canonical module registry in spacetimedb/src/laws.ts defines. The module
+// the canonical module registry in data/src/laws.ts defines. The module
 // registry owns the runtime logic (applicability, deadlines, penalties); this
 // one owns how a law is named and surfaced in the UI. They are joined by law_id,
 // and scripts/audit-law-dashboard.ts checks that the id and short-code sets stay
@@ -36,12 +36,11 @@ export const LAW_REGISTRY: LawRegistryEntry[] = [
     short_name: "LL97",
     jurisdiction: "NYC",
     category: "Emissions cap",
-    description:
-      "Annual carbon-emissions limits for large buildings, with a $268/tCO2e penalty on the overage.",
+    description: "Annual carbon-emissions limits for large buildings, with a $268/tCO2e penalty on the overage.",
     applies_to_logic:
       "Buildings over 25,000 ft² (or a tax lot whose buildings total over 50,000 ft²), excluding the affordable-housing Article 321 pathway and houses of worship.",
     dashboard_output_key: "law-card:ll97",
-    source_data_keys: ["sqft", "annualEmissionsTco2E", "usesJson"],
+    source_data_keys: ["sqft", "annualEmissionsTco2e", "usesJson"],
     enabled: true,
     sort_order: 0,
   },
@@ -57,7 +56,7 @@ export const LAW_REGISTRY: LawRegistryEntry[] = [
     applies_to_logic:
       "Covered buildings flagged as affordable / rent-regulated (35%+ regulated units), on a compliance timeline beginning 2026.",
     dashboard_output_key: "law-card:art321",
-    source_data_keys: ["sqft", "isAffordable", "annualEmissionsTco2E"],
+    source_data_keys: ["sqft", "isAffordable", "annualEmissionsTco2e"],
     enabled: true,
     sort_order: 1,
   },
@@ -68,8 +67,7 @@ export const LAW_REGISTRY: LawRegistryEntry[] = [
     short_name: "LL84",
     jurisdiction: "NYC",
     category: "Benchmarking",
-    description:
-      "Annual energy and water benchmarking through ENERGY STAR Portfolio Manager, due May 1.",
+    description: "Annual energy and water benchmarking through ENERGY STAR Portfolio Manager, due May 1.",
     applies_to_logic: "Buildings over 25,000 ft².",
     dashboard_output_key: "law-card:ll84",
     source_data_keys: ["sqft"],
@@ -83,8 +81,7 @@ export const LAW_REGISTRY: LawRegistryEntry[] = [
     short_name: "LL87",
     jurisdiction: "NYC",
     category: "Energy audit",
-    description:
-      "ASHRAE Level II energy audit and retro-commissioning once per 10-year cycle, scheduled by tax block.",
+    description: "ASHRAE Level II energy audit and retro-commissioning once per 10-year cycle, scheduled by tax block.",
     applies_to_logic: "Buildings over 50,000 ft².",
     dashboard_output_key: "law-card:ll87",
     source_data_keys: ["sqft", "bbl"],
@@ -114,8 +111,7 @@ export const LAW_REGISTRY: LawRegistryEntry[] = [
     short_name: "LL88",
     jurisdiction: "NYC",
     category: "Lighting & submetering",
-    description:
-      "Lighting upgrades to the NYC Energy Conservation Code and tenant-space submetering.",
+    description: "Lighting upgrades to the NYC Energy Conservation Code and tenant-space submetering.",
     applies_to_logic: "Buildings over 25,000 ft².",
     dashboard_output_key: "law-card:ll88",
     source_data_keys: ["sqft"],
@@ -146,8 +142,7 @@ export const LAW_REGISTRY: LawRegistryEntry[] = [
     category: "Gas safety",
     description:
       "Periodic gas-piping inspection and certification by a Licensed Master Plumber, on a 4-year community-district cycle.",
-    applies_to_logic:
-      "Buildings with gas service (assumed present until a DOB gas dataset lands).",
+    applies_to_logic: "Buildings with gas service (assumed present until a DOB gas dataset lands).",
     dashboard_output_key: "law-card:ll152",
     source_data_keys: ["communityDistrict"],
     enabled: true,
@@ -162,8 +157,7 @@ export const LAW_REGISTRY: LawRegistryEntry[] = [
     category: "Clean energy financing",
     description:
       "Property Assessed Clean Energy financing for efficiency and renewable retrofits — an opportunity, not an obligation, so it carries no deadline or penalty.",
-    applies_to_logic:
-      "Available to covered buildings (over 25,000 ft²) to fund the retrofits LL97 and LL87 call for.",
+    applies_to_logic: "Available to covered buildings (over 25,000 ft²) to fund the retrofits LL97 and LL87 call for.",
     dashboard_output_key: "law-card:ll96",
     source_data_keys: ["sqft"],
     enabled: true,
@@ -187,7 +181,7 @@ export const LAW_REGISTRY: LawRegistryEntry[] = [
   },
 ];
 
-const byId = new Map(LAW_REGISTRY.map(law => [law.law_id, law]));
+const byId = new Map(LAW_REGISTRY.map((law) => [law.law_id, law]));
 
 export function lawById(lawId: string): LawRegistryEntry | undefined {
   return byId.get(lawId);
@@ -205,9 +199,7 @@ export function lawShortName(lawId: string): string {
 
 // Registry laws in display order, optionally only the enabled ones.
 export function lawsInOrder(onlyEnabled = true): LawRegistryEntry[] {
-  return LAW_REGISTRY.filter(law => !onlyEnabled || law.enabled).sort(
-    (a, b) => a.sort_order - b.sort_order,
-  );
+  return LAW_REGISTRY.filter((law) => !onlyEnabled || law.enabled).sort((a, b) => a.sort_order - b.sort_order);
 }
 
 // Evidence checklist per law (Phase 7.6). `required` is proof the law's own
@@ -254,7 +246,11 @@ export const LAW_EVIDENCE: Record<string, LawEvidence> = {
     recommended: ["ENERGY STAR score record (from LL84)"],
   },
   ll152: {
-    required: ["Gas piping inspection report (GPS1)", "Licensed Master Plumber certification", "DOB submission confirmation"],
+    required: [
+      "Gas piping inspection report (GPS1)",
+      "Licensed Master Plumber certification",
+      "DOB submission confirmation",
+    ],
     recommended: ["Correction documentation (GPS2) if repairs were required"],
   },
   ll96: {

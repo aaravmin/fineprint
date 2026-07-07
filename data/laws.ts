@@ -1,3 +1,3 @@
-// Canonical registry lives inside the module (the module cannot import outside
-// its own src/). This re-export exists for scripts and future client use.
-export * from "../spacetimedb/src/laws";
+// The canonical law registry lives in data/src/laws.ts. This re-export keeps
+// the old import path working for scripts and the client.
+export * from "./src/laws";

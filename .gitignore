@@ -15,9 +15,9 @@ coverage/
 .env.*
 !.env.example
 
-# spacetime local state
-spacetime.local.json
-.spacetime/
+# supabase local state
+supabase/.branches/
+supabase/.temp/
 
 # logs
 *.log
@@ -26,6 +26,7 @@ npm-debug.log*
 # os / editor
 .DS_Store
 Thumbs.db
+.claude/
 .idea/
 *.swp
 

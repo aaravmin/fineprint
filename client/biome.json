@@ -33,6 +33,7 @@
     "ignoreUnknown": true,
     "includes": [
       "**",
+      "!.agents",
       "!.github",
       "!.husky",
       "!node_modules",
@@ -65,7 +66,7 @@
         "noUndeclaredDependencies": "error"
       },
       "nursery": {
-        "useSortedClasses": "on",
+        "useSortedClasses": "off",
         "useNullishCoalescing": "error",
         "noUnnecessaryConditions": "warn",
         "noFloatingPromises": "error",

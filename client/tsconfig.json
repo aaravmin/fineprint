@@ -21,15 +21,10 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "fineprint-engine": ["../engine/src/index.ts"]
+      "fineprint-engine": ["../engine/src/index.ts"],
+      "fineprint-laws": ["../data/src/laws.ts"]
     }
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
-  ],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".next/dev/types/**/*.ts"],
   "exclude": ["node_modules"]
 }

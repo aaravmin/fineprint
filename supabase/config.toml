@@ -1,0 +1,33 @@
+# Local Supabase stack for fineprint. `npm run db:start` boots it (Docker
+# required); `npm run db:reset` reapplies migrations after a schema change.
+
+project_id = "fineprint"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+max_rows = 5000
+
+[db]
+port = 54322
+major_version = 17
+
+[studio]
+enabled = true
+port = 54323
+
+[realtime]
+enabled = true
+
+[auth]
+enabled = true
+site_url = "http://localhost:3001"
+
+# Local DB smoke tests do not need Clerk and a fake Clerk domain makes
+# `supabase start` fail during provider validation. Enable this only when
+# testing real dashboard auth with an actual Clerk frontend API domain, and
+# mirror the same setting in the hosted project's Auth settings.
+[auth.third_party.clerk]
+enabled = false
+domain = "env(CLERK_DOMAIN)"
