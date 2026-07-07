@@ -61,7 +61,7 @@ export function computeFine(building: BuildingInput, period: Period): FineResult
     actualEmissionsTco2e: building.annualEmissionsTco2e,
     overageTco2e: roundTco2e(overageTco2e),
     annualFineUsd: fineCents / 100,
-    compliant: fineCents === 0,
+    compliant: overageTco2e <= 0,
     pathway: "standard",
     notes,
   };

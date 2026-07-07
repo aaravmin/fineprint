@@ -1,11 +1,12 @@
 import { describe, expect, test } from "vitest";
 import {
   applicableLaws,
+  energyGradeForScore,
   lawById,
   LAW_REGISTRY_VERSION,
   LAWS,
   type BuildingProfile,
-} from "../../spacetimedb/src/laws.ts";
+} from "../src/laws.ts";
 
 function profile(overrides: Partial<BuildingProfile> = {}): BuildingProfile {
   return { sqft: 80_000, isAffordable: false, ...overrides };
@@ -43,7 +44,9 @@ describe("applicability uses real building characteristics, not floor-area proxi
   test("LL11 turns on story count when PLUTO knows it, over the sqft proxy", () => {
     // A short but sprawling building: under six stories, so no FISP, even though
     // its floor area clears the old 60k proxy.
-    const lowRise = applicableLaws(profile({ sqft: 90_000, numFloors: 4 })).map(l => l.id);
+    const lowRise = applicableLaws(profile({ sqft: 90_000, numFloors: 4 })).map(
+      l => l.id,
+    );
     expect(lowRise).not.toContain("ll11");
 
     // A slim tower: over six stories on a small footprint still files FISP.
@@ -62,7 +65,9 @@ describe("applicability uses real building characteristics, not floor-area proxi
   });
 
   test("LL97 covers a small building sharing a 50k+ tax lot, and exempts houses of worship", () => {
-    const onSharedLot = applicableLaws(profile({ sqft: 15_000, lotAggregateSqft: 60_000 }));
+    const onSharedLot = applicableLaws(
+      profile({ sqft: 15_000, lotAggregateSqft: 60_000 }),
+    );
     expect(onSharedLot.map(l => l.id)).toContain("ll97");
 
     const church = applicableLaws(profile({ sqft: 90_000, buildingClass: "M1" }));
@@ -81,15 +86,20 @@ describe("penalty estimates", () => {
     expect(lawById("ll33")!.penaltyUsd(large)).toBe(1_250);
   });
 
-  test("scope-based exposure grows with floor area", () => {
-    const ll11 = lawById("ll11")!;
-    expect(ll11.penaltyUsd(profile({ sqft: 60_000 }))).toBeLessThan(
-      ll11.penaltyUsd(profile({ sqft: 600_000 }))!,
-    );
+  test("audit, facade, and lighting laws model no fabricated dollar penalty", () => {
+    // These once returned per-sqft "penalties" reverse-engineered from round
+    // numbers, not statute. Like LL55, they now model no monetary exposure.
+    const large = profile({ sqft: 600_000 });
 
-    const ll87 = lawById("ll87")!;
-    expect(ll87.penaltyUsd(profile({ sqft: 50_000 }))).toBe(3_000); // floor at threshold
-    expect(ll87.penaltyUsd(profile({ sqft: 500_000 }))).toBe(30_000);
+    expect(lawById("ll87")!.penaltyUsd(large)).toBeNull();
+    expect(lawById("ll11")!.penaltyUsd(large)).toBeNull();
+    expect(lawById("ll88")!.penaltyUsd(large)).toBeNull();
+  });
+
+  test("LL97 carries no stub penalty — the engine supplies the real fine", () => {
+    // The old $0.0005/sqft x $268 stub fabricated exposure when emissions were
+    // unknown; without emissions the registry now returns null.
+    expect(lawById("ll97")!.penaltyUsd(profile({ sqft: 600_000 }))).toBeNull();
   });
 });
 
@@ -114,7 +124,9 @@ describe("statutory deadlines are real cycle dates, not fixed offsets", () => {
   });
 
   test("laws with no datable cycle return null", () => {
-    expect(lawById("ll55")!.nextDeadline(asOf, profile({ isAffordable: true }))).toBeNull();
+    expect(
+      lawById("ll55")!.nextDeadline(asOf, profile({ isAffordable: true })),
+    ).toBeNull();
     expect(lawById("ll96")!.nextDeadline(asOf, profile())).toBeNull();
     // LL87 can't be dated without a tax block.
     expect(lawById("ll87")!.nextDeadline(asOf, profile())).toBeNull();
@@ -128,5 +140,27 @@ describe("registry versioning", () => {
       expect(law.version).toBeGreaterThan(0);
       expect(law.effectiveDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     }
+  });
+});
+
+describe("LL33 energy grade from an ENERGY STAR score", () => {
+  test("a filed score never grades below D — F is only for non-submitters", () => {
+    // A low but real score is a D, not an F. The F grade is reserved for a
+    // building that failed to submit benchmarking, a filing signal, not a score.
+    expect(energyGradeForScore(12)).toBe("D");
+    expect(energyGradeForScore(0)).toBe("D");
+    expect(energyGradeForScore(54)).toBe("D");
+  });
+
+  test("the statutory bands map to the right letters", () => {
+    expect(energyGradeForScore(90)).toBe("A");
+    expect(energyGradeForScore(85)).toBe("A");
+    expect(energyGradeForScore(70)).toBe("B");
+    expect(energyGradeForScore(55)).toBe("C");
+  });
+
+  test("no score posts an N, not a letter grade", () => {
+    expect(energyGradeForScore(null)).toBe("N");
+    expect(energyGradeForScore(undefined)).toBe("N");
   });
 });

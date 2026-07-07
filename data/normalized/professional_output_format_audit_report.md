@@ -6,7 +6,7 @@ compliance/audit deliverable, and what is still generic.
 ## Sources reviewed
 
 See `professional_output_format_research.md` for the full list — ASHRAE
-*Procedures for Commercial Building Energy Audits* and sample Level II reports
+_Procedures for Commercial Building Energy Audits_ and sample Level II reports
 (SUNY, PNNL), and NYC Local Law 97 consultant deliverables (Milrose, AEI, ENPG,
 Henson). The conventions distilled there drove the changes below.
 

@@ -90,7 +90,10 @@ export type MeasureField = (typeof MEASURE_FIELDS)[number];
 
 // A blank measure: identity set, every other field null. Normalizers start
 // here and fill only what their source actually provides.
-export function emptyMeasure(measure_id: string, measure_name: string): NormalizedMeasure {
+export function emptyMeasure(
+  measure_id: string,
+  measure_name: string,
+): NormalizedMeasure {
   return {
     measure_id,
     measure_name,

@@ -224,7 +224,10 @@ export function planForBudget(
 }
 
 // The full cost of implementing a measure across the whole building.
-export function fullCostFor(measure: RetrofitMeasure, grossFloorAreaSqft: number): number {
+export function fullCostFor(
+  measure: RetrofitMeasure,
+  grossFloorAreaSqft: number,
+): number {
   return round2(measure.capexUsdPerSqft * grossFloorAreaSqft);
 }
 
@@ -284,7 +287,10 @@ export function planFromFunding(
     computeFine(adjusted, period),
   );
   const horizonFinesUsd = round2(
-    results.reduce((sum, result) => sum + result.annualFineUsd * PERIOD_YEARS[result.period], 0),
+    results.reduce(
+      (sum, result) => sum + result.annualFineUsd * PERIOD_YEARS[result.period],
+      0,
+    ),
   );
 
   // A filing obligation is only retired once the measure that covers it is
@@ -346,10 +352,7 @@ function evaluatePlan(
 }
 
 // Each law is credited once, no matter how many chosen measures satisfy it.
-function proceduralCredit(
-  chosen: RetrofitMeasure[],
-  options: OptimizeOptions,
-): number {
+function proceduralCredit(chosen: RetrofitMeasure[], options: OptimizeOptions): number {
   const savings = options.proceduralPenaltySavingsByLaw;
   if (!savings) {
     return 0;

@@ -9,11 +9,13 @@
 import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { format, resolveConfig } from "prettier";
 
 import { LAW_REGISTRY } from "../client/src/lib/laws/lawRegistry.ts";
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (rel: string) => readFileSync(join(repoRoot, rel), "utf8");
+const prettierOptions = (await resolveConfig(join(repoRoot, ".prettierrc"))) ?? {};
 
 // Recursively collect client source files, skipping generated bindings.
 function clientSourceFiles(): string[] {
@@ -208,7 +210,10 @@ ${checkRows}
 
 const reportPath = join(repoRoot, "data", "normalized", "law_dashboard_audit_report.md");
 mkdirSync(dirname(reportPath), { recursive: true });
-writeFileSync(reportPath, renderReport());
+writeFileSync(
+  reportPath,
+  await format(renderReport(), { ...prettierOptions, parser: "markdown" }),
+);
 
 const failures = checks.filter(c => !c.ok);
 for (const c of checks) {

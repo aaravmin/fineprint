@@ -46,7 +46,11 @@ async function main(): Promise<void> {
       continue;
     }
     const facts = parseLl84Rows([row] as Parameters<typeof parseLl84Rows>[0], bbl);
-    if (!facts || facts.grossFloorAreaSqft === null || facts.occupancyGroups.length === 0) {
+    if (
+      !facts ||
+      facts.grossFloorAreaSqft === null ||
+      facts.occupancyGroups.length === 0
+    ) {
       continue;
     }
     const emissions = facts.recomputedEmissionsTco2e ?? facts.annualEmissionsTco2e;
@@ -118,7 +122,9 @@ async function main(): Promise<void> {
     ...candidates.filter(c => c.residential),
   ];
   for (const c of ordered.slice(0, 18)) {
-    console.log(`${c.address}${c.borough ? `, ${c.borough}` : ""}  [${c.use}${c.residential ? ", residential→Art321 risk" : ""}]`);
+    console.log(
+      `${c.address}${c.borough ? `, ${c.borough}` : ""}  [${c.use}${c.residential ? ", residential→Art321 risk" : ""}]`,
+    );
     console.log(
       `  ${c.label ? `${c.label} · ` : ""}BBL ${c.bbl} · ${c.sqft.toLocaleString()} sqft (LL84) · ${c.emissions.toLocaleString()} tCO2e (${c.intensity} tCO2e/sqft)`,
     );

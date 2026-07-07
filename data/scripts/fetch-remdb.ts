@@ -99,7 +99,10 @@ async function main(): Promise<void> {
       `REMDB workbook has no "${REMDB_SHEET}" sheet (found: ${workbook.SheetNames.join(", ")})`,
     );
   }
-  const rows = XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1, blankrows: false });
+  const rows = XLSX.utils.sheet_to_json<unknown[]>(sheet, {
+    header: 1,
+    blankrows: false,
+  });
 
   const { measures, report } = normalizeRemdbSheet(rows);
 

@@ -11,6 +11,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { format, resolveConfig } from "prettier";
 
 import {
   LAW_EVIDENCE,
@@ -25,6 +26,7 @@ import {
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (rel: string) => readFileSync(join(repoRoot, rel), "utf8");
+const prettierOptions = (await resolveConfig(join(repoRoot, ".prettierrc"))) ?? {};
 
 interface Check {
   name: string;
@@ -32,37 +34,64 @@ interface Check {
   detail: string;
 }
 const checks: Check[] = [];
-const check = (name: string, ok: boolean, detail = "") => checks.push({ name, ok, detail });
+const check = (name: string, ok: boolean, detail = "") =>
+  checks.push({ name, ok, detail });
+const sampleGeneratedAt = "1970-01-01T00:00:00.000Z";
 
-const schema = read("spacetimedb/src/schema.ts");
-const reducers = read("spacetimedb/src/reducers.ts");
+const migration = read("supabase/migrations/20260706120000_init.sql");
 const dashboard = read(
-  "client/src/app/(main)/dashboard/buildings/[id]/_components/compliance-dashboard.tsx",
+  "client/src/app/(main)/dashboard/buildings/[id]/_components/building-client.tsx",
 );
 
 // 1. The four binder tables exist.
 for (const tableName of ["vendor", "obligation", "evidence", "binder_event"]) {
-  check(`table "${tableName}" exists`, new RegExp(`name:\\s*"${tableName}"`).test(schema));
+  check(
+    `table "${tableName}" exists`,
+    new RegExp(`create table ${tableName}\\b`).test(migration),
+  );
 }
 
 // 2. Obligations can be assigned a vendor; evidence can store proof and maps to
 // an obligation + law.
-check("obligation can be assigned a vendor (vendorId column)", /obligation[\s\S]*?vendorId/.test(schema));
-check("evidence stores proof files (fileName / fileUrlOrKey)", /evidence[\s\S]*?fileUrlOrKey/.test(schema));
-check("evidence maps to an obligation and a law", /evidence[\s\S]*?obligationId[\s\S]*?lawId/.test(schema));
+check(
+  "obligation can be assigned a vendor (vendor_id column)",
+  /create table obligation[\s\S]*?vendor_id/.test(migration),
+);
+check(
+  "evidence stores proof files (file_name / file_url_or_key)",
+  /create table evidence[\s\S]*?file_url_or_key/.test(migration),
+);
+check(
+  "evidence maps to an obligation and a law",
+  /create table evidence[\s\S]*?obligation_id[\s\S]*?law_id/.test(migration),
+);
 
 // 3. The binder reducers exist.
 for (const reducer of [
-  "seed_obligations", "add_vendor", "assign_vendor", "set_obligation_status",
-  "add_evidence", "set_evidence_verification", "add_binder_note",
+  "seed_obligations",
+  "add_vendor",
+  "assign_vendor",
+  "set_obligation_status",
+  "add_evidence",
+  "set_evidence_verification",
+  "add_binder_note",
 ]) {
-  check(`reducer "${reducer}" exists`, new RegExp(`export const ${reducer}\\b`).test(reducers));
+  check(
+    `function "${reducer}" exists`,
+    new RegExp(`create or replace function ${reducer}\\(`).test(migration),
+  );
 }
 
 // 4. Every registry law has an obligation/evidence template (or is explicitly
 // empty — a "no template yet" law, never a missing one).
-const lawsMissingTemplate = LAW_REGISTRY.filter(l => !(l.law_id in LAW_EVIDENCE)).map(l => l.law_id);
-check("every law has an evidence checklist entry", lawsMissingTemplate.length === 0, lawsMissingTemplate.join(", "));
+const lawsMissingTemplate = LAW_REGISTRY.filter(l => !(l.law_id in LAW_EVIDENCE)).map(
+  l => l.law_id,
+);
+check(
+  "every law has an evidence checklist entry",
+  lawsMissingTemplate.length === 0,
+  lawsMissingTemplate.join(", "),
+);
 
 // 5. The dashboard links law cards to a binder section.
 check("dashboard renders the compliance binder", dashboard.includes("ComplianceBinder"));
@@ -95,34 +124,65 @@ const sampleExport = buildBinderExport({
   obligations: sampleObligations,
   evidence: [],
   vendors: [],
-  history: [{ kind: "obligation_created", summary: "Binder set up", lawId: "ll97", at: new Date().toISOString() }],
-  generatedAt: "1970-01-01T00:00:00.000Z",
+  history: [
+    {
+      kind: "obligation_created",
+      summary: "Binder set up",
+      lawId: "ll97",
+      at: sampleGeneratedAt,
+    },
+  ],
+  generatedAt: sampleGeneratedAt,
 });
 const requiredSections = [
-  "building_summary", "compliance_snapshot", "law_by_law_obligations",
-  "open_items", "compliance_history", "source_citations", "assumptions_and_limitations",
+  "building_summary",
+  "compliance_snapshot",
+  "law_by_law_obligations",
+  "open_items",
+  "compliance_history",
+  "source_citations",
+  "assumptions_and_limitations",
 ];
 const missingSections = requiredSections.filter(s => !(s in sampleExport));
-check("export produces every required section", missingSections.length === 0, missingSections.join(", "));
-check("export surfaces missing required evidence",
-  sampleExport.law_by_law_obligations.some(o => o.missing_required_evidence.length > 0));
-check("every exported obligation maps to a known law",
-  sampleExport.law_by_law_obligations.every(o => LAW_REGISTRY.some(l => l.law_id === o.law_id)));
+check(
+  "export produces every required section",
+  missingSections.length === 0,
+  missingSections.join(", "),
+);
+check(
+  "export surfaces missing required evidence",
+  sampleExport.law_by_law_obligations.some(o => o.missing_required_evidence.length > 0),
+);
+check(
+  "every exported obligation maps to a known law",
+  sampleExport.law_by_law_obligations.every(o =>
+    LAW_REGISTRY.some(l => l.law_id === o.law_id),
+  ),
+);
 
 // --- outputs -----------------------------------------------------------------
 
 const exportPath = join(repoRoot, "data", "exports", "compliance_binder_sample.json");
 mkdirSync(dirname(exportPath), { recursive: true });
-writeFileSync(exportPath, `${JSON.stringify(sampleExport, null, 2)}\n`);
+writeFileSync(
+  exportPath,
+  await format(JSON.stringify(sampleExport), { ...prettierOptions, parser: "json" }),
+);
 
 function renderReport(): string {
-  const list = (items: string[]) => (items.length ? items.map(i => `- ${i}`).join("\n") : "- (none)");
+  const list = (items: string[]) =>
+    items.length ? items.map(i => `- ${i}`).join("\n") : "- (none)";
   const evidenceRows = LAW_REGISTRY.map(l => {
     const e = evidenceForLaw(l.law_id);
-    const template = e.required.length === 0 && e.recommended.length === 0 ? "no_obligation_template_yet" : "templated";
+    const template =
+      e.required.length === 0 && e.recommended.length === 0
+        ? "no_obligation_template_yet"
+        : "templated";
     return `| ${l.law_id} | ${template} | ${e.required.length} | ${e.recommended.length} |`;
   }).join("\n");
-  const checkRows = checks.map(c => `- ${c.ok ? "PASS" : "FAIL"} — ${c.name}${c.ok ? "" : ` (${c.detail})`}`).join("\n");
+  const checkRows = checks
+    .map(c => `- ${c.ok ? "PASS" : "FAIL"} — ${c.name}${c.ok ? "" : ` (${c.detail})`}`)
+    .join("\n");
 
   return `# Compliance binder audit report
 
@@ -130,7 +190,7 @@ _Generated by \`npm run audit:binder\`._
 
 ## Data models created or updated
 
-- SpacetimeDB tables: \`vendor\`, \`obligation\`, \`evidence\`, \`binder_event\` (owner-scoped, RLS owner views).
+- Postgres tables: \`vendor\`, \`obligation\`, \`evidence\`, \`binder_event\` (owner-scoped by RLS).
 - Reducers: seed_obligations, add_vendor, assign_vendor, set_obligation_status, add_evidence, set_evidence_verification, add_binder_note — each appends a customer-facing binder_event.
 - Export model: \`client/src/lib/compliance/binder.ts\` (buildBinderExport).
 
@@ -170,9 +230,17 @@ ${checkRows}
 `;
 }
 
-const reportPath = join(repoRoot, "data", "normalized", "compliance_binder_audit_report.md");
+const reportPath = join(
+  repoRoot,
+  "data",
+  "normalized",
+  "compliance_binder_audit_report.md",
+);
 mkdirSync(dirname(reportPath), { recursive: true });
-writeFileSync(reportPath, renderReport());
+writeFileSync(
+  reportPath,
+  await format(renderReport(), { ...prettierOptions, parser: "markdown" }),
+);
 
 const failures = checks.filter(c => !c.ok);
 for (const c of checks) {

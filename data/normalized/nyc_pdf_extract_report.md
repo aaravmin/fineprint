@@ -48,7 +48,7 @@ Fields null across every measure:
 - Costs are capital costs as the tables state them. Where a table gives only a
   range, cost_mid is null; where it gives a single point, cost_low/high are null;
   a +/- band fills cost_low/high around cost_mid.
-- Steam Table 6B costs are *incremental* (vs a like-for-like boiler) and are often
+- Steam Table 6B costs are _incremental_ (vs a like-for-like boiler) and are often
   negative because right-sizing to a smaller boiler costs less than replacement.
 - energy_savings, carbon_savings, and lifetime_years are null throughout: these
   tables report savings as $/ft² or simple payback (kept in notes), not energy,

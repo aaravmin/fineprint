@@ -2,22 +2,22 @@
 
 InspectMind AI builds AI for construction and field inspections — turning photos,
 voice notes, and field observations into structured inspection reports. Fineprint
-owns the *compliance* layer (which laws bind a building, what's due, what proof is
+owns the _compliance_ layer (which laws bind a building, what's due, what proof is
 missing, what it costs to fix). The two are complementary: compliance defines the
 work; inspection produces the proof. The strongest expansion directions, ordered
 by how directly they reuse what already exists.
 
 ## 1. Inspection-driven evidence (the tightest fit)
 
-Several NYC obligations are *satisfied by a licensed inspection*, and the binder
+Several NYC obligations are _satisfied by a licensed inspection_, and the binder
 already names the exact proof each one needs:
 
-| Law | Required inspection proof (already in the registry) | Inspector role |
-|---|---|---|
-| LL11 / FISP | "QEWI facade safety report (FISP) filing confirmation" | QEWI |
-| LL152 | "Gas piping inspection report (GPS1)", "LMP certification" | LMP |
-| LL87 | "ASHRAE Level II energy audit report" | energy auditor |
-| (boiler / elevator) | inspection report + correction proof | elevator/general vendor |
+| Law                 | Required inspection proof (already in the registry)        | Inspector role          |
+| ------------------- | ---------------------------------------------------------- | ----------------------- |
+| LL11 / FISP         | "QEWI facade safety report (FISP) filing confirmation"     | QEWI                    |
+| LL152               | "Gas piping inspection report (GPS1)", "LMP certification" | LMP                     |
+| LL87                | "ASHRAE Level II energy audit report"                      | energy auditor          |
+| (boiler / elevator) | inspection report + correction proof                       | elevator/general vendor |
 
 An InspectMind inspection report becomes the **evidence** for exactly that
 obligation. The plumbing is already there: the binder's `add_evidence` reducer,
@@ -29,8 +29,8 @@ Fineprint files it against the obligation and flips the missing-evidence flag.
 
 The binder carries each law's statutory cycle (FISP sub-cycle window, LL152
 community-district year, LL87 tax-block decade) and a per-obligation due date.
-That tells an inspection product *when* an inspection is due and *which* building
-needs it; the missing-required-evidence list tells it *what* to inspect. A daily
+That tells an inspection product _when_ an inspection is due and _which_ building
+needs it; the missing-required-evidence list tells it _what_ to inspect. A daily
 "what's due in the next 90 days, by inspection type" feed is a direct query over
 the obligation table.
 
@@ -38,7 +38,7 @@ the obligation table.
 
 Phase 8's professional report template + Phase 7's evidence binder + an inspection
 report engine combine into a single owner/lender/regulator-grade document:
-compliance findings, the retrofit recommendations, *and* the field inspection
+compliance findings, the retrofit recommendations, _and_ the field inspection
 evidence behind them — exported through the same versioned schema.
 
 ## 4. The export schema is the integration surface

@@ -43,6 +43,11 @@ function snapshotPath(service: string, key: string): string {
   return join(root, service.toLowerCase().replace(/[^a-z0-9]+/g, "-"), `${digest}.json`);
 }
 
-function stripToken(key: string): string {
-  return key.replace(/[?&]\$\$app_token=[^&]*/g, "").replace(/^([^?]*)&/, "$1?");
+// The token parameter appears literally ($$app_token=) when the URL was
+// concatenated by hand and percent-encoded (%24%24app_token=) when it went
+// through URLSearchParams — strip both, or the secret lands on disk.
+export function stripToken(key: string): string {
+  return key
+    .replace(/[?&](?:\$\$|%24%24)app_token=[^&]*/gi, "")
+    .replace(/^([^?]*)&/, "$1?");
 }

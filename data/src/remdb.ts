@@ -18,8 +18,7 @@ import {
   type NormalizedMeasure,
 } from "./normalized/measureSchema.ts";
 
-export const REMDB_XLSX_URL =
-  "https://data.openei.org/files/8336/REMDB_2024.12.23.xlsx";
+export const REMDB_XLSX_URL = "https://data.openei.org/files/8336/REMDB_2024.12.23.xlsx";
 export const REMDB_XLSX_FILENAME = "REMDB_2024.12.23.xlsx";
 export const REMDB_SHEET = "Machine Read";
 
@@ -156,22 +155,39 @@ function normalizeRow(row: Row, sheetRowNumber: number): NormalizedMeasure | nul
   const installAdder = num(row[COL.installAdderRetrofit]) ?? 0;
 
   measure.cost_low = installedCost(
-    num(row[COL.m1CoefLow]), num(row[COL.m2CoefLow]), num(row[COL.intLow]),
-    m1, m2, installMult, installAdder,
+    num(row[COL.m1CoefLow]),
+    num(row[COL.m2CoefLow]),
+    num(row[COL.intLow]),
+    m1,
+    m2,
+    installMult,
+    installAdder,
   );
   measure.cost_mid = installedCost(
-    num(row[COL.m1CoefMid]), num(row[COL.m2CoefMid]), num(row[COL.intMid]),
-    m1, m2, installMult, installAdder,
+    num(row[COL.m1CoefMid]),
+    num(row[COL.m2CoefMid]),
+    num(row[COL.intMid]),
+    m1,
+    m2,
+    installMult,
+    installAdder,
   );
   measure.cost_high = installedCost(
-    num(row[COL.m1CoefHigh]), num(row[COL.m2CoefHigh]), num(row[COL.intHigh]),
-    m1, m2, installMult, installAdder,
+    num(row[COL.m1CoefHigh]),
+    num(row[COL.m2CoefHigh]),
+    num(row[COL.intHigh]),
+    m1,
+    m2,
+    installMult,
+    installAdder,
   );
   measure.cost_unit = str(row[COL.outputUnits]);
 
   const rawLifetime = num(row[COL.lifetime]);
   measure.lifetime_years =
-    rawLifetime === null || rawLifetime === LIFETIME_SENTINEL ? null : round2(rawLifetime);
+    rawLifetime === null || rawLifetime === LIFETIME_SENTINEL
+      ? null
+      : round2(rawLifetime);
 
   // Source-level facts about REMDB (the national *residential* database). We
   // assert residential, but leave commercial unknown rather than claim it.
@@ -224,7 +240,9 @@ function buildNotes(
     parts.push(`Qualitative rank: ${rank}.`);
   }
   if (rawLifetime === LIFETIME_SENTINEL) {
-    parts.push("Lifetime 999 in source is a 'life of building' sentinel, recorded as null.");
+    parts.push(
+      "Lifetime 999 in source is a 'life of building' sentinel, recorded as null.",
+    );
   }
   const rowNotes = str(row[COL.rowNotes]);
   if (rowNotes) {

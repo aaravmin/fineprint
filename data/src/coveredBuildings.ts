@@ -9,7 +9,7 @@
 // HPD lookup needed.
 //
 // Node-only (reads the snapshot from disk). The browser never imports this;
-// it sees building facts through SpacetimeDB.
+// it sees building facts through the database.
 
 import { readFileSync } from "node:fs";
 import { gunzipSync } from "node:zlib";

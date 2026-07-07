@@ -15,9 +15,7 @@
       "median": 213.25,
       "p75": 670.14
     },
-    "affected_end_uses": [
-      "heating"
-    ],
+    "affected_end_uses": ["heating"],
     "applicable_building_types": [
       "Mobile Home",
       "Multi-Family with 2 - 4 Units",
@@ -43,9 +41,7 @@
       "median": 237.19,
       "p75": 380.63
     },
-    "affected_end_uses": [
-      "heating"
-    ],
+    "affected_end_uses": ["heating"],
     "applicable_building_types": [
       "Mobile Home",
       "Multi-Family with 2 - 4 Units",
@@ -71,10 +67,7 @@
       "median": 31.44,
       "p75": 91.74
     },
-    "affected_end_uses": [
-      "heating",
-      "cooling"
-    ],
+    "affected_end_uses": ["heating", "cooling"],
     "applicable_building_types": [
       "Mobile Home",
       "Multi-Family with 2 - 4 Units",
@@ -100,9 +93,7 @@
       "median": 97.6,
       "p75": 506.05
     },
-    "affected_end_uses": [
-      "heating"
-    ],
+    "affected_end_uses": ["heating"],
     "applicable_building_types": [
       "Mobile Home",
       "Multi-Family with 2 - 4 Units",
@@ -128,9 +119,7 @@
       "median": 8.32,
       "p75": 167.74
     },
-    "affected_end_uses": [
-      "heating"
-    ],
+    "affected_end_uses": ["heating"],
     "applicable_building_types": [
       "Mobile Home",
       "Multi-Family with 2 - 4 Units",
@@ -156,9 +145,7 @@
       "median": -27.22,
       "p75": 256.17
     },
-    "affected_end_uses": [
-      "heating"
-    ],
+    "affected_end_uses": ["heating"],
     "applicable_building_types": [
       "Mobile Home",
       "Multi-Family with 2 - 4 Units",
@@ -184,9 +171,7 @@
       "median": 155.44,
       "p75": 587.22
     },
-    "affected_end_uses": [
-      "heating"
-    ],
+    "affected_end_uses": ["heating"],
     "applicable_building_types": [
       "Mobile Home",
       "Multi-Family with 2 - 4 Units",
@@ -212,10 +197,7 @@
       "median": 386.83,
       "p75": 945.21
     },
-    "affected_end_uses": [
-      "heating",
-      "cooling"
-    ],
+    "affected_end_uses": ["heating", "cooling"],
     "applicable_building_types": [
       "Mobile Home",
       "Multi-Family with 2 - 4 Units",
@@ -241,10 +223,7 @@
       "median": 99.71,
       "p75": 213.12
     },
-    "affected_end_uses": [
-      "hot water",
-      "heating"
-    ],
+    "affected_end_uses": ["hot water", "heating"],
     "applicable_building_types": [
       "Mobile Home",
       "Multi-Family with 2 - 4 Units",
@@ -270,10 +249,7 @@
       "median": 94.9,
       "p75": 191.74
     },
-    "affected_end_uses": [
-      "hot water",
-      "heating"
-    ],
+    "affected_end_uses": ["hot water", "heating"],
     "applicable_building_types": [
       "Mobile Home",
       "Multi-Family with 2 - 4 Units",
@@ -299,9 +275,7 @@
       "median": 167.03,
       "p75": 446.51
     },
-    "affected_end_uses": [
-      "heating"
-    ],
+    "affected_end_uses": ["heating"],
     "applicable_building_types": [
       "Mobile Home",
       "Multi-Family with 2 - 4 Units",
@@ -327,13 +301,8 @@
       "median": 67.39,
       "p75": 147.59
     },
-    "affected_end_uses": [
-      "heating"
-    ],
-    "applicable_building_types": [
-      "Single-Family Attached",
-      "Single-Family Detached"
-    ],
+    "affected_end_uses": ["heating"],
+    "applicable_building_types": ["Single-Family Attached", "Single-Family Detached"],
     "notes": "Per-building savings vs the ResStock Baseline scenario (positive = reduction). Energy is total site energy (kWh). Only completed, applicable dwellings in climate zone 4A are counted. Affected end uses are those whose net savings is at least 5% of the upgrade's total end-use savings."
   },
   {
@@ -352,10 +321,7 @@
       "median": 315.8,
       "p75": 590.41
     },
-    "affected_end_uses": [
-      "heating",
-      "cooling"
-    ],
+    "affected_end_uses": ["heating", "cooling"],
     "applicable_building_types": [
       "Multi-Family with 2 - 4 Units",
       "Multi-Family with 5+ Units",
@@ -380,9 +346,7 @@
       "median": 234.45,
       "p75": 651.66
     },
-    "affected_end_uses": [
-      "heating"
-    ],
+    "affected_end_uses": ["heating"],
     "applicable_building_types": [
       "Mobile Home",
       "Multi-Family with 2 - 4 Units",
@@ -408,9 +372,7 @@
       "median": 187.32,
       "p75": 561.3
     },
-    "affected_end_uses": [
-      "heating"
-    ],
+    "affected_end_uses": ["heating"],
     "applicable_building_types": [
       "Mobile Home",
       "Multi-Family with 2 - 4 Units",
@@ -436,9 +398,7 @@
       "median": 252.31,
       "p75": 740
     },
-    "affected_end_uses": [
-      "heating"
-    ],
+    "affected_end_uses": ["heating"],
     "applicable_building_types": [
       "Mobile Home",
       "Multi-Family with 2 - 4 Units",
@@ -464,9 +424,7 @@
       "median": 110.02,
       "p75": 221.2
     },
-    "affected_end_uses": [
-      "heating"
-    ],
+    "affected_end_uses": ["heating"],
     "applicable_building_types": [
       "Mobile Home",
       "Multi-Family with 2 - 4 Units",
@@ -492,9 +450,7 @@
       "median": 645.12,
       "p75": 1460.1
     },
-    "affected_end_uses": [
-      "heating"
-    ],
+    "affected_end_uses": ["heating"],
     "applicable_building_types": [
       "Mobile Home",
       "Multi-Family with 2 - 4 Units",
@@ -520,9 +476,7 @@
       "median": -280.55,
       "p75": -63
     },
-    "affected_end_uses": [
-      "EV charging"
-    ],
+    "affected_end_uses": ["EV charging"],
     "applicable_building_types": [
       "Mobile Home",
       "Multi-Family with 2 - 4 Units",
@@ -548,9 +502,7 @@
       "median": -272.73,
       "p75": -62.31
     },
-    "affected_end_uses": [
-      "EV charging"
-    ],
+    "affected_end_uses": ["EV charging"],
     "applicable_building_types": [
       "Mobile Home",
       "Multi-Family with 2 - 4 Units",
@@ -576,9 +528,7 @@
       "median": -237.03,
       "p75": -54.17
     },
-    "affected_end_uses": [
-      "EV charging"
-    ],
+    "affected_end_uses": ["EV charging"],
     "applicable_building_types": [
       "Mobile Home",
       "Multi-Family with 2 - 4 Units",
@@ -604,9 +554,7 @@
       "median": -272.67,
       "p75": -62.31
     },
-    "affected_end_uses": [
-      "EV charging"
-    ],
+    "affected_end_uses": ["EV charging"],
     "applicable_building_types": [
       "Mobile Home",
       "Multi-Family with 2 - 4 Units",
@@ -632,9 +580,7 @@
       "median": -237.03,
       "p75": -54.17
     },
-    "affected_end_uses": [
-      "EV charging"
-    ],
+    "affected_end_uses": ["EV charging"],
     "applicable_building_types": [
       "Mobile Home",
       "Multi-Family with 2 - 4 Units",
@@ -660,10 +606,7 @@
       "median": 16.2,
       "p75": 32.81
     },
-    "affected_end_uses": [
-      "heating",
-      "cooling"
-    ],
+    "affected_end_uses": ["heating", "cooling"],
     "applicable_building_types": [
       "Mobile Home",
       "Multi-Family with 2 - 4 Units",
@@ -689,10 +632,7 @@
       "median": -21.31,
       "p75": -9.44
     },
-    "affected_end_uses": [
-      "heating",
-      "cooling"
-    ],
+    "affected_end_uses": ["heating", "cooling"],
     "applicable_building_types": [
       "Mobile Home",
       "Multi-Family with 2 - 4 Units",
@@ -718,10 +658,7 @@
       "median": 27.48,
       "p75": 56.65
     },
-    "affected_end_uses": [
-      "heating",
-      "cooling"
-    ],
+    "affected_end_uses": ["heating", "cooling"],
     "applicable_building_types": [
       "Mobile Home",
       "Multi-Family with 2 - 4 Units",
@@ -747,9 +684,7 @@
       "median": -42.59,
       "p75": -19.77
     },
-    "affected_end_uses": [
-      "heating"
-    ],
+    "affected_end_uses": ["heating"],
     "applicable_building_types": [
       "Mobile Home",
       "Multi-Family with 2 - 4 Units",
@@ -775,9 +710,7 @@
       "median": -8.26,
       "p75": -1.73
     },
-    "affected_end_uses": [
-      "heating"
-    ],
+    "affected_end_uses": ["heating"],
     "applicable_building_types": [
       "Mobile Home",
       "Multi-Family with 2 - 4 Units",
@@ -803,9 +736,7 @@
       "median": 59.41,
       "p75": 155.53
     },
-    "affected_end_uses": [
-      "heating"
-    ],
+    "affected_end_uses": ["heating"],
     "applicable_building_types": [
       "Mobile Home",
       "Multi-Family with 2 - 4 Units",
@@ -831,9 +762,7 @@
       "median": 68.63,
       "p75": 247.36
     },
-    "affected_end_uses": [
-      "heating"
-    ],
+    "affected_end_uses": ["heating"],
     "applicable_building_types": [
       "Mobile Home",
       "Multi-Family with 2 - 4 Units",
@@ -859,9 +788,7 @@
       "median": 413.42,
       "p75": 1064.49
     },
-    "affected_end_uses": [
-      "heating"
-    ],
+    "affected_end_uses": ["heating"],
     "applicable_building_types": [
       "Mobile Home",
       "Multi-Family with 2 - 4 Units",
@@ -887,10 +814,7 @@
       "median": 673.63,
       "p75": 1421.73
     },
-    "affected_end_uses": [
-      "heating",
-      "cooling"
-    ],
+    "affected_end_uses": ["heating", "cooling"],
     "applicable_building_types": [
       "Mobile Home",
       "Multi-Family with 2 - 4 Units",

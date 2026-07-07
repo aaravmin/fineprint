@@ -48,8 +48,12 @@ interface ResstockCurve {
   applicable_building_types: string[];
 }
 
-const remdb: RemdbRow[] = JSON.parse(readFileSync(join(dataDir, "remdb", "remdb_measures.json"), "utf8"));
-const nyc: NycRow[] = JSON.parse(readFileSync(join(dataDir, "normalized", "nyc_retrofit_cost_tables.json"), "utf8"));
+const remdb: RemdbRow[] = JSON.parse(
+  readFileSync(join(dataDir, "remdb", "remdb_measures.json"), "utf8"),
+);
+const nyc: NycRow[] = JSON.parse(
+  readFileSync(join(dataDir, "normalized", "nyc_retrofit_cost_tables.json"), "utf8"),
+);
 const resstock: ResstockCurve[] = JSON.parse(
   readFileSync(join(dataDir, "normalized", "resstock_upgrade_curves.json"), "utf8"),
 );
@@ -76,104 +80,180 @@ interface CatalogEntry {
 
 const CATALOG: CatalogEntry[] = [
   {
-    id: "air_source_heat_pump", name: "Air-source heat pump (cold climate)", category: "Heating & cooling",
-    applies_to_residential: true, applies_to_commercial: null,
+    id: "air_source_heat_pump",
+    name: "Air-source heat pump (cold climate)",
+    category: "Heating & cooling",
+    applies_to_residential: true,
+    applies_to_commercial: null,
     cost_nyc_names: ["Air-source heat pump and AC"],
     cost_remdb_ids: ["remdb:air_source_heat_pump_centrally_ducted"],
-    resstock_upgrade: 4, supports_law_ids: ["ll97", "ll87"],
+    resstock_upgrade: 4,
+    supports_law_ids: ["ll97", "ll87"],
     note: "Cost is the single-family heat-pump/AC line; savings from the cold-climate ducted ASHP upgrade.",
   },
   {
-    id: "ground_source_heat_pump", name: "Ground-source (geothermal) heat pump", category: "Heating & cooling",
-    applies_to_residential: true, applies_to_commercial: null,
+    id: "ground_source_heat_pump",
+    name: "Ground-source (geothermal) heat pump",
+    category: "Heating & cooling",
+    applies_to_residential: true,
+    applies_to_commercial: null,
     cost_nyc_names: ["Ground-source heat pump and AC"],
     cost_remdb_ids: ["remdb:ground_source_heat_pump_gshp"],
-    resstock_upgrade: 7, supports_law_ids: ["ll97", "ll87"],
+    resstock_upgrade: 7,
+    supports_law_ids: ["ll97", "ll87"],
     note: "Savings from the dual-speed geothermal upgrade (representative of ResStock geothermal variants 6/7/8).",
   },
   {
-    id: "heat_pump_water_heater", name: "Heat-pump water heater", category: "Water heating",
-    applies_to_residential: true, applies_to_commercial: null,
+    id: "heat_pump_water_heater",
+    name: "Heat-pump water heater",
+    category: "Water heating",
+    applies_to_residential: true,
+    applies_to_commercial: null,
     cost_nyc_names: ["Heat-pump water heater"],
     cost_remdb_ids: ["remdb:water_heater_hp_tank"],
-    resstock_upgrade: 9, supports_law_ids: ["ll97"],
+    resstock_upgrade: 9,
+    supports_law_ids: ["ll97"],
     note: "",
   },
   {
-    id: "gas_tankless_water_heater", name: "High-efficiency gas tankless water heater", category: "Water heating",
-    applies_to_residential: true, applies_to_commercial: null,
-    cost_nyc_names: [], cost_remdb_ids: ["remdb:water_heater_gas_inst"],
-    resstock_upgrade: 10, supports_law_ids: ["ll97"],
+    id: "gas_tankless_water_heater",
+    name: "High-efficiency gas tankless water heater",
+    category: "Water heating",
+    applies_to_residential: true,
+    applies_to_commercial: null,
+    cost_nyc_names: [],
+    cost_remdb_ids: ["remdb:water_heater_gas_inst"],
+    resstock_upgrade: 10,
+    supports_law_ids: ["ll97"],
     note: "Efficiency measure, not electrification; cost from REMDB (no NYC-specific figure).",
   },
   {
-    id: "gas_furnace_95_afue", name: "95% AFUE natural gas furnace", category: "Heating & cooling",
-    applies_to_residential: true, applies_to_commercial: null,
-    cost_nyc_names: [], cost_remdb_ids: ["remdb:furnaces_gas_furnace"],
-    resstock_upgrade: 1, supports_law_ids: ["ll97"],
+    id: "gas_furnace_95_afue",
+    name: "95% AFUE natural gas furnace",
+    category: "Heating & cooling",
+    applies_to_residential: true,
+    applies_to_commercial: null,
+    cost_nyc_names: [],
+    cost_remdb_ids: ["remdb:furnaces_gas_furnace"],
+    resstock_upgrade: 1,
+    supports_law_ids: ["ll97"],
     note: "Efficiency upgrade for gas-heated homes with ducts.",
   },
   {
-    id: "air_sealing", name: "Envelope air sealing", category: "Envelope",
-    applies_to_residential: true, applies_to_commercial: null,
-    cost_nyc_names: [], cost_remdb_ids: ["remdb:air_sealing_40_reduction", "remdb:air_sealing_40_reduction_2"],
-    resstock_upgrade: 11, supports_law_ids: ["ll97", "ll87"],
+    id: "air_sealing",
+    name: "Envelope air sealing",
+    category: "Envelope",
+    applies_to_residential: true,
+    applies_to_commercial: null,
+    cost_nyc_names: [],
+    cost_remdb_ids: [
+      "remdb:air_sealing_40_reduction",
+      "remdb:air_sealing_40_reduction_2",
+    ],
+    resstock_upgrade: 11,
+    supports_law_ids: ["ll97", "ll87"],
     note: "Cost aggregates REMDB's <40% and >40% leakage-reduction rows ($/sqft).",
   },
   {
-    id: "attic_floor_insulation", name: "Attic floor insulation", category: "Envelope",
-    applies_to_residential: true, applies_to_commercial: null,
-    cost_nyc_names: [], cost_remdb_ids: ["remdb:unfinished_attic_ceiling_loose_fill"],
-    resstock_upgrade: 12, supports_law_ids: ["ll97"],
+    id: "attic_floor_insulation",
+    name: "Attic floor insulation",
+    category: "Envelope",
+    applies_to_residential: true,
+    applies_to_commercial: null,
+    cost_nyc_names: [],
+    cost_remdb_ids: ["remdb:unfinished_attic_ceiling_loose_fill"],
+    resstock_upgrade: 12,
+    supports_law_ids: ["ll97"],
     note: "Cost from REMDB loose-fill attic ceiling insulation.",
   },
   {
-    id: "duct_sealing_insulation", name: "Duct sealing and insulation", category: "Heating & cooling",
-    applies_to_residential: true, applies_to_commercial: null,
-    cost_nyc_names: [], cost_remdb_ids: ["remdb:duct_duct_sealing", "remdb:duct_duct_insulation"],
-    resstock_upgrade: 13, supports_law_ids: ["ll97"],
+    id: "duct_sealing_insulation",
+    name: "Duct sealing and insulation",
+    category: "Heating & cooling",
+    applies_to_residential: true,
+    applies_to_commercial: null,
+    cost_nyc_names: [],
+    cost_remdb_ids: ["remdb:duct_duct_sealing", "remdb:duct_duct_insulation"],
+    resstock_upgrade: 13,
+    supports_law_ids: ["ll97"],
     note: "Cost aggregates REMDB duct sealing and duct insulation.",
   },
   {
-    id: "wall_insulation_drill_fill", name: "Drill-and-fill wall insulation", category: "Envelope",
-    applies_to_residential: true, applies_to_commercial: null,
-    cost_nyc_names: [], cost_remdb_ids: [],
-    resstock_upgrade: 14, supports_law_ids: ["ll97"],
+    id: "wall_insulation_drill_fill",
+    name: "Drill-and-fill wall insulation",
+    category: "Envelope",
+    applies_to_residential: true,
+    applies_to_commercial: null,
+    cost_nyc_names: [],
+    cost_remdb_ids: [],
+    resstock_upgrade: 14,
+    supports_law_ids: ["ll97"],
     note: "No cost source: REMDB has no cavity drill-and-fill row and the NYC PDFs have none, so cost stays null. Savings only.",
   },
   {
-    id: "energy_star_windows", name: "ENERGY STAR window replacement", category: "Envelope",
-    applies_to_residential: true, applies_to_commercial: null,
-    cost_nyc_names: [], cost_remdb_ids: ["remdb:window_vinyl", "remdb:window_metal", "remdb:window_storm"],
-    resstock_upgrade: 17, supports_law_ids: ["ll97"],
+    id: "energy_star_windows",
+    name: "ENERGY STAR window replacement",
+    category: "Envelope",
+    applies_to_residential: true,
+    applies_to_commercial: null,
+    cost_nyc_names: [],
+    cost_remdb_ids: ["remdb:window_vinyl", "remdb:window_metal", "remdb:window_storm"],
+    resstock_upgrade: 17,
+    supports_law_ids: ["ll97"],
     note: "Cost aggregates REMDB vinyl, metal, and storm window rows.",
   },
   {
-    id: "steam_distribution_improvements", name: "Steam distribution improvements package", category: "Heating & cooling",
-    applies_to_residential: true, applies_to_commercial: true,
-    cost_nyc_names: ["Steam distribution improvements package"], cost_remdb_ids: [],
-    resstock_upgrade: null, supports_law_ids: ["ll97", "ll87"],
+    id: "steam_distribution_improvements",
+    name: "Steam distribution improvements package",
+    category: "Heating & cooling",
+    applies_to_residential: true,
+    applies_to_commercial: true,
+    cost_nyc_names: ["Steam distribution improvements package"],
+    cost_remdb_ids: [],
+    resstock_upgrade: null,
+    supports_law_ids: ["ll97", "ll87"],
     note: "Cost spans the NYC PDF's building-size cases (per building). No ResStock savings (commercial/steam is outside the residential ResStock set).",
   },
   {
-    id: "steam_boiler_right_sizing", name: "Right-sized steam boiler replacement", category: "Heating & cooling",
-    applies_to_residential: true, applies_to_commercial: true,
-    cost_nyc_names: ["Right-sized steam boiler replacement"], cost_remdb_ids: [],
-    resstock_upgrade: null, supports_law_ids: ["ll97"],
+    id: "steam_boiler_right_sizing",
+    name: "Right-sized steam boiler replacement",
+    category: "Heating & cooling",
+    applies_to_residential: true,
+    applies_to_commercial: true,
+    cost_nyc_names: ["Right-sized steam boiler replacement"],
+    cost_remdb_ids: [],
+    resstock_upgrade: null,
+    supports_law_ids: ["ll97"],
     note: "Incremental cost vs like-for-like replacement (often negative). No ResStock savings.",
   },
   {
-    id: "office_shell_upgrade", name: "Office building envelope (shell) upgrade", category: "Envelope",
-    applies_to_residential: false, applies_to_commercial: true,
-    cost_nyc_names: ["Building envelope, basic shell upgrade", "Building envelope, deep shell upgrade"], cost_remdb_ids: [],
-    resstock_upgrade: null, supports_law_ids: ["ll97", "ll87"],
+    id: "office_shell_upgrade",
+    name: "Office building envelope (shell) upgrade",
+    category: "Envelope",
+    applies_to_residential: false,
+    applies_to_commercial: true,
+    cost_nyc_names: [
+      "Building envelope, basic shell upgrade",
+      "Building envelope, deep shell upgrade",
+    ],
+    cost_remdb_ids: [],
+    resstock_upgrade: null,
+    supports_law_ids: ["ll97", "ll87"],
     note: "Cost spans basic and deep shell ($/ft²). Commercial; no residential ResStock savings.",
   },
   {
-    id: "radiator_vent_control", name: "Radiator vent heat-loss control", category: "Heating & cooling",
-    applies_to_residential: true, applies_to_commercial: true,
-    cost_nyc_names: ["Cover radiator vents with storm/annealed glass", "Install mechanical damper on radiator vents"], cost_remdb_ids: [],
-    resstock_upgrade: null, supports_law_ids: ["ll97"],
+    id: "radiator_vent_control",
+    name: "Radiator vent heat-loss control",
+    category: "Heating & cooling",
+    applies_to_residential: true,
+    applies_to_commercial: true,
+    cost_nyc_names: [
+      "Cover radiator vents with storm/annealed glass",
+      "Install mechanical damper on radiator vents",
+    ],
+    cost_remdb_ids: [],
+    resstock_upgrade: null,
+    supports_law_ids: ["ll97"],
     note: "Cost spans the storm-glass and mechanical-damper options (per building).",
   },
 ];
@@ -249,8 +329,12 @@ function buildMeasure(entry: CatalogEntry): MasterMeasure {
   measure.sources = [];
 
   // Cost: NYC PDF first, then REMDB.
-  const nycRows = entry.cost_nyc_names.flatMap(name => nyc.filter(row => row.measure_name === name));
-  const remdbRows = entry.cost_remdb_ids.map(id => remdbById.get(id)).filter((r): r is RemdbRow => !!r);
+  const nycRows = entry.cost_nyc_names.flatMap(name =>
+    nyc.filter(row => row.measure_name === name),
+  );
+  const remdbRows = entry.cost_remdb_ids
+    .map(id => remdbById.get(id))
+    .filter((r): r is RemdbRow => !!r);
 
   let costDecision = "none (no cost source)";
   let lifetime: number | null = null;
@@ -266,8 +350,15 @@ function buildMeasure(entry: CatalogEntry): MasterMeasure {
     measure.source_page = first.page_number;
     for (const row of nycRows) {
       measure.sources.push({
-        role: "cost", source: "nyc_pdf", ref: `${row.source_pdf} p.${row.page_number} — ${row.building_type ?? ""}`.trim(),
-        original: { cost_low: row.cost_low, cost_mid: row.cost_mid, cost_high: row.cost_high, cost_unit: row.cost_unit },
+        role: "cost",
+        source: "nyc_pdf",
+        ref: `${row.source_pdf} p.${row.page_number} — ${row.building_type ?? ""}`.trim(),
+        original: {
+          cost_low: row.cost_low,
+          cost_mid: row.cost_mid,
+          cost_high: row.cost_high,
+          cost_unit: row.cost_unit,
+        },
       });
     }
     costDecision = `NYC PDF (${nycRows.length} row${nycRows.length > 1 ? "s" : ""})`;
@@ -282,8 +373,16 @@ function buildMeasure(entry: CatalogEntry): MasterMeasure {
     lifetime = median(remdbRows.map(r => r.lifetime_years).filter(isNum));
     for (const row of remdbRows) {
       measure.sources.push({
-        role: "cost", source: "remdb", ref: row.measure_id,
-        original: { cost_low: row.cost_low, cost_mid: row.cost_mid, cost_high: row.cost_high, cost_unit: row.cost_unit, lifetime_years: row.lifetime_years },
+        role: "cost",
+        source: "remdb",
+        ref: row.measure_id,
+        original: {
+          cost_low: row.cost_low,
+          cost_mid: row.cost_mid,
+          cost_high: row.cost_high,
+          cost_unit: row.cost_unit,
+          lifetime_years: row.lifetime_years,
+        },
       });
     }
     costDecision = `REMDB (${remdbRows.length} row${remdbRows.length > 1 ? "s" : ""}); no NYC-specific cost`;
@@ -294,7 +393,10 @@ function buildMeasure(entry: CatalogEntry): MasterMeasure {
 
   // Savings: ResStock.
   let savingsDecision = "none (no residential ResStock curve)";
-  const curve = entry.resstock_upgrade !== null ? resstockById.get(entry.resstock_upgrade) : undefined;
+  const curve =
+    entry.resstock_upgrade !== null
+      ? resstockById.get(entry.resstock_upgrade)
+      : undefined;
   if (curve) {
     measure.savings_source = "resstock";
     if (curve.annual_energy_savings_kwh) {
@@ -308,7 +410,9 @@ function buildMeasure(entry: CatalogEntry): MasterMeasure {
       measure.annual_utility_savings_high = curve.annual_utility_cost_savings_usd.p75;
     }
     measure.sources.push({
-      role: "savings", source: "resstock", ref: `ResStock upgrade ${curve.upgrade_id}: ${curve.upgrade_name}`,
+      role: "savings",
+      source: "resstock",
+      ref: `ResStock upgrade ${curve.upgrade_id}: ${curve.upgrade_name}`,
       original: {
         buildings_applicable: curve.buildings_applicable,
         annual_energy_savings_kwh: curve.annual_energy_savings_kwh,
@@ -348,10 +452,13 @@ const duplicateNames = (() => {
 })();
 
 const missingCost = master.filter(m => m.cost_source === null).map(m => m.measure_name);
-const missingSavings = master.filter(m => m.savings_source === null).map(m => m.measure_name);
+const missingSavings = master
+  .filter(m => m.savings_source === null)
+  .map(m => m.measure_name);
 
 function renderReport(): string {
-  const list = (items: string[]) => (items.length ? items.map(i => `- ${i}`).join("\n") : "- (none)");
+  const list = (items: string[]) =>
+    items.length ? items.map(i => `- ${i}`).join("\n") : "- (none)";
   return `# Master retrofit measure merge report
 
 _Generated by \`npm run merge:measures\`._
@@ -406,7 +513,14 @@ writeFileSync(reportPath, renderReport());
 
 // Emit a client-importable module so the compliance report can show real
 // Phase 5 cost ranges + savings without the client reaching into data/.
-const clientModulePath = join(repoRoot, "client", "src", "lib", "output", "masterMeasures.ts");
+const clientModulePath = join(
+  repoRoot,
+  "client",
+  "src",
+  "lib",
+  "output",
+  "masterMeasures.ts",
+);
 const clientMeasures = master.map(m => ({
   measure_id: m.measure_id,
   measure_name: m.measure_name,

@@ -12,7 +12,13 @@
 // comma split misaligns columns (some fields are quoted and contain commas), so
 // the CSV parser below is quote-aware.
 
-import { createReadStream, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import {
+  createReadStream,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { StringDecoder } from "node:string_decoder";
@@ -74,7 +80,10 @@ function parseCsvLine(line: string, maxFields = Number.POSITIVE_INFINITY): strin
 
 // Stream the single CSV member out of a gzipped tar, line by line. The first 512
 // bytes are the tar header; the member's byte length lives at octal offset 124.
-async function forEachCsvLine(filePath: string, onLine: (line: string) => void): Promise<void> {
+async function forEachCsvLine(
+  filePath: string,
+  onLine: (line: string) => void,
+): Promise<void> {
   const gunzip = createReadStream(filePath).pipe(createGunzip());
   const decoder = new StringDecoder("utf8");
 
@@ -165,7 +174,17 @@ function endUseCategory(token: string): string | null {
   if (token === "pv") return "solar PV";
   if (token === "ev_charging") return "EV charging";
   if (token === "mech_vent") return "ventilation";
-  if (["clothes_dryer", "clothes_washer", "dishwasher", "range_oven", "refrigerator", "freezer", "cooking"].includes(token)) {
+  if (
+    [
+      "clothes_dryer",
+      "clothes_washer",
+      "dishwasher",
+      "range_oven",
+      "refrigerator",
+      "freezer",
+      "cooking",
+    ].includes(token)
+  ) {
     return "appliances";
   }
   return null;
@@ -233,8 +252,12 @@ async function parseUpgrade(
       });
 
       maxIdx = Math.max(
-        idxBldgStatus, idxApplicability, idxClimate, idxBuildingType,
-        idxEnergySavings, idxBillSavings,
+        idxBldgStatus,
+        idxApplicability,
+        idxClimate,
+        idxBuildingType,
+        idxEnergySavings,
+        idxBillSavings,
         ...[...endUseCols.values()].flat(),
       );
       return;
@@ -273,7 +296,10 @@ async function parseUpgrade(
     }
   });
 
-  const totalAbs = [...categorySums.values()].reduce((sum, value) => sum + Math.abs(value), 0);
+  const totalAbs = [...categorySums.values()].reduce(
+    (sum, value) => sum + Math.abs(value),
+    0,
+  );
   const affectedEndUses =
     totalAbs === 0
       ? []
@@ -314,7 +340,8 @@ interface ParseReport {
 }
 
 function renderReport(report: ParseReport, curves: UpgradeCurve[]): string {
-  const list = (items: string[]) => (items.length > 0 ? items.map(i => `- ${i}`).join("\n") : "- (none)");
+  const list = (items: string[]) =>
+    items.length > 0 ? items.map(i => `- ${i}`).join("\n") : "- (none)";
   const withCost = curves.filter(c => c.annual_utility_cost_savings_usd !== null).length;
   const totalBuildings = curves.reduce((sum, c) => sum + c.buildings_applicable, 0);
 
@@ -357,7 +384,9 @@ async function main(): Promise<void> {
     readFileSync(join(resstockDir, "upgrades_lookup.json"), "utf8"),
   );
   if (lookup["0"] !== "Baseline") {
-    throw new Error(`upgrades_lookup.json does not confirm upgrade 0 is the baseline (got "${lookup["0"]}")`);
+    throw new Error(
+      `upgrades_lookup.json does not confirm upgrade 0 is the baseline (got "${lookup["0"]}")`,
+    );
   }
 
   const filesFound: string[] = [];

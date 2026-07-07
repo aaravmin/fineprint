@@ -3,10 +3,7 @@
   "schema_version": "fineprint.compliance-export/v1",
   "jurisdiction": "NYC",
   "generated_at": "1970-01-01T00:00:00.000Z",
-  "building_identifiers": {
-    "bbl": "1008350041",
-    "bin": "1083900"
-  },
+  "building_identifiers": { "bbl": "1008350041", "bin": "1083900" },
   "document_type": "compliance_binder",
   "building_summary": {
     "id": "sample",
@@ -122,9 +119,7 @@
       "assigned_vendor": null,
       "filing_reference_number": "",
       "evidence_on_file": [],
-      "missing_required_evidence": [
-        "LL88 lighting/submetering compliance filing"
-      ],
+      "missing_required_evidence": ["LL88 lighting/submetering compliance filing"],
       "recommended_evidence_not_on_file": [
         "Lighting upgrade documentation",
         "Submetering documentation",
@@ -146,9 +141,7 @@
       "missing_required_evidence": [
         "Photo of the posted energy label near a public entrance"
       ],
-      "recommended_evidence_not_on_file": [
-        "ENERGY STAR score record (from LL84)"
-      ],
+      "recommended_evidence_not_on_file": ["ENERGY STAR score record (from LL84)"],
       "completion_date": null,
       "notes": ""
     },
@@ -208,7 +201,7 @@
       "kind": "obligation_created",
       "summary": "Binder set up",
       "lawId": "ll97",
-      "at": "2026-06-10T05:58:15.514Z"
+      "at": "1970-01-01T00:00:00.000Z"
     }
   ],
   "source_citations": [
@@ -225,29 +218,19 @@
       "dataset": "NYC LL84 Energy & Water Benchmarking disclosure",
       "identifier": "1008350041",
       "as_of": "latest filing on record",
-      "fields": [
-        "annual emissions",
-        "ENERGY STAR score (LL33 grade)"
-      ]
+      "fields": ["annual emissions", "ENERGY STAR score (LL33 grade)"]
     },
     {
       "dataset": "NYC Local Law 97 emissions limits (Admin Code 28-320)",
       "identifier": null,
       "as_of": "2024-2029 / 2030-2034 / 2035-2039 compliance periods",
-      "fields": [
-        "LL97 cap",
-        "estimated_exposure"
-      ]
+      "fields": ["LL97 cap", "estimated_exposure"]
     },
     {
       "dataset": "Fineprint law registry",
       "identifier": "fineprint.compliance-export/v1",
       "as_of": "compiled with this export",
-      "fields": [
-        "law applicability",
-        "statutory deadlines",
-        "penalty rates"
-      ]
+      "fields": ["law applicability", "statutory deadlines", "penalty rates"]
     }
   ],
   "assumptions_and_limitations": [

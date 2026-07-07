@@ -5,19 +5,20 @@ honestly: success is claimed only where the check actually passes.
 
 ## Verification results
 
-| Check | Command | Result |
-|---|---|---|
-| Typecheck (all workspaces) | `npm run typecheck` | **pass** |
-| Production build | `npm run build --workspace client` | **pass** (all routes compile) |
-| Law dashboard audit | `npm run audit:laws` | **pass — 9/9** |
-| Compliance binder audit | `npm run audit:binder` | **pass — 19/19** |
-| Data-layer tests | `vitest run --root data` | **pass — 147 passed, 5 skipped** |
-| Lint | `npm run lint --workspace client` | **fails — 10 errors, all pre-existing** |
+| Check                      | Command                            | Result                                 |
+| -------------------------- | ---------------------------------- | -------------------------------------- |
+| Typecheck (all workspaces) | `npm run typecheck`                | **pass**                               |
+| Production build           | `npm run build --workspace client` | **pass** (all routes compile)          |
+| Law dashboard audit        | `npm run audit:laws`               | **pass — 9/9**                         |
+| Compliance binder audit    | `npm run audit:binder`             | **pass — 19/19**                       |
+| Tests (all workspaces)     | `npm test`                         | **pass — 229 passed, 6 skipped**       |
+| Lint                       | `npm run lint --workspace client`  | **4 errors, all pre-existing (biome)** |
 
-Lint note: the 10 errors are in files untouched by this work — `src/lib/engine.ts`,
-`src/components/address-autocomplete.tsx`, the unchanged `DraftBody` in
-`compliance-section.tsx`, and vendored `.agents/skills/**` templates. None are in
-the Phase 1–8 deliverables. They are pre-existing and out of this roadmap's scope.
+Lint note: the 4 errors are pre-existing and sit outside this work's diff hunks —
+three a11y roles on the combobox list in `src/components/address-autocomplete.tsx`
+(224, 236, 239) and one non-exhaustive `map()` return in the unchanged `DraftBody`
+of `compliance-section.tsx` (169). None block the build or typecheck, and none are
+in the Phase 1–8 deliverables. Biome also reports 12 warnings and 187 infos.
 
 ## Data sources successfully parsed
 
@@ -38,7 +39,7 @@ the Phase 1–8 deliverables. They are pre-existing and out of this roadmap's sc
 All 10 registry laws (ll97, art321, ll84, ll87, ll11, ll88, ll33, ll152, ll96,
 ll55) render on the dashboard and use the canonical name from
 `client/src/lib/laws/lawRegistry.ts`. The audit confirms the registry's id/short
-sets match the module registry (`spacetimedb/src/laws.ts`).
+sets match the canonical module registry (`data/src/laws.ts`).
 
 - **Laws missing calculations**: none for the modeled set — LL97/art321 use the
   emissions engine; filing laws use statutory penalty/cycle figures. (Elevator,
@@ -50,9 +51,9 @@ sets match the module registry (`spacetimedb/src/laws.ts`).
 
 ## Compliance binder implemented (Phase 7)
 
-- Models (SpacetimeDB, owner-scoped with RLS): `vendor`, `obligation`, `evidence`,
-  `binder_event`. Obligation statuses, evidence verification statuses, and 13
-  vendor roles per the roadmap.
+- Models (Postgres tables on Supabase, owner-scoped by RLS): `vendor`, `obligation`,
+  `evidence`, `binder_event`. Obligation statuses, evidence verification statuses,
+  and 13 vendor roles per the roadmap.
 - Reducers: seed_obligations, add_vendor, assign_vendor, set_obligation_status,
   add_evidence, set_evidence_verification, add_binder_note — each appends a
   customer-facing `binder_event` (kept separate from the internal `event` log).

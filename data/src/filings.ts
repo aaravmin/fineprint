@@ -150,7 +150,8 @@ export function ll33FilingStatus(facts: BuildingFacts, asOf: Date): FilingStatus
         : `Post the energy label (grade ${grade}, score ${score}) near every public entrance.`,
     basis:
       "LL33 of 2018 (amended by LL95) / Admin Code 28-309.12.2; grade thresholds " +
-      "A 85+, B 70-84, C 55-69, D 20-54, F under 20, N when not score-eligible. " +
+      "A 85+, B 70-84, C 55-69, D under 55, N when not score-eligible (F is " +
+      "reserved for buildings that did not submit required benchmarking). " +
       "No dataset confirms the label is posted",
   };
 }

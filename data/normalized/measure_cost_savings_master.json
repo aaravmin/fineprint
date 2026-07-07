@@ -24,10 +24,7 @@
     "source_page": 10,
     "confidence_level": "high",
     "notes": "Cost is the single-family heat-pump/AC line; savings from the cold-climate ducted ASHP upgrade. Cost source: NYC PDF (1 row). Savings source: ResStock upgrade 4 (energy + utility, 7388 dwellings).",
-    "supports_law_ids": [
-      "ll97",
-      "ll87"
-    ],
+    "supports_law_ids": ["ll97", "ll87"],
     "sources": [
       {
         "role": "cost",
@@ -56,9 +53,7 @@
             "median": 97.6,
             "p75": 506.05
           },
-          "affected_end_uses": [
-            "heating"
-          ]
+          "affected_end_uses": ["heating"]
         }
       }
     ],
@@ -90,10 +85,7 @@
     "source_page": 10,
     "confidence_level": "high",
     "notes": "Savings from the dual-speed geothermal upgrade (representative of ResStock geothermal variants 6/7/8). Cost source: NYC PDF (1 row). Savings source: ResStock upgrade 7 (energy + utility, 7198 dwellings).",
-    "supports_law_ids": [
-      "ll97",
-      "ll87"
-    ],
+    "supports_law_ids": ["ll97", "ll87"],
     "sources": [
       {
         "role": "cost",
@@ -122,9 +114,7 @@
             "median": 155.44,
             "p75": 587.22
           },
-          "affected_end_uses": [
-            "heating"
-          ]
+          "affected_end_uses": ["heating"]
         }
       }
     ],
@@ -156,9 +146,7 @@
     "source_page": 11,
     "confidence_level": "high",
     "notes": "Cost source: NYC PDF (1 row). Savings source: ResStock upgrade 9 (energy + utility, 19782 dwellings).",
-    "supports_law_ids": [
-      "ll97"
-    ],
+    "supports_law_ids": ["ll97"],
     "sources": [
       {
         "role": "cost",
@@ -187,10 +175,7 @@
             "median": 99.71,
             "p75": 213.12
           },
-          "affected_end_uses": [
-            "hot water",
-            "heating"
-          ]
+          "affected_end_uses": ["hot water", "heating"]
         }
       }
     ],
@@ -222,9 +207,7 @@
     "source_page": "Machine Read row 124",
     "confidence_level": "medium",
     "notes": "Efficiency measure, not electrification; cost from REMDB (no NYC-specific figure). Cost source: REMDB (1 row); no NYC-specific cost. Savings source: ResStock upgrade 10 (energy + utility, 15546 dwellings).",
-    "supports_law_ids": [
-      "ll97"
-    ],
+    "supports_law_ids": ["ll97"],
     "sources": [
       {
         "role": "cost",
@@ -254,10 +237,7 @@
             "median": 94.9,
             "p75": 191.74
           },
-          "affected_end_uses": [
-            "hot water",
-            "heating"
-          ]
+          "affected_end_uses": ["hot water", "heating"]
         }
       }
     ],
@@ -289,9 +269,7 @@
     "source_page": "Machine Read row 74",
     "confidence_level": "medium",
     "notes": "Efficiency upgrade for gas-heated homes with ducts. Cost source: REMDB (1 row); no NYC-specific cost. Savings source: ResStock upgrade 1 (energy + utility, 7099 dwellings).",
-    "supports_law_ids": [
-      "ll97"
-    ],
+    "supports_law_ids": ["ll97"],
     "sources": [
       {
         "role": "cost",
@@ -321,9 +299,7 @@
             "median": 213.25,
             "p75": 670.14
           },
-          "affected_end_uses": [
-            "heating"
-          ]
+          "affected_end_uses": ["heating"]
         }
       }
     ],
@@ -355,10 +331,7 @@
     "source_page": "Machine Read row 5",
     "confidence_level": "medium",
     "notes": "Cost aggregates REMDB's <40% and >40% leakage-reduction rows ($/sqft). Cost source: REMDB (2 rows); no NYC-specific cost. Savings source: ResStock upgrade 11 (energy + utility, 19442 dwellings).",
-    "supports_law_ids": [
-      "ll97",
-      "ll87"
-    ],
+    "supports_law_ids": ["ll97", "ll87"],
     "sources": [
       {
         "role": "cost",
@@ -400,9 +373,7 @@
             "median": 167.03,
             "p75": 446.51
           },
-          "affected_end_uses": [
-            "heating"
-          ]
+          "affected_end_uses": ["heating"]
         }
       }
     ],
@@ -434,9 +405,7 @@
     "source_page": "Machine Read row 100",
     "confidence_level": "medium",
     "notes": "Cost from REMDB loose-fill attic ceiling insulation. Cost source: REMDB (1 row); no NYC-specific cost. Savings source: ResStock upgrade 12 (energy + utility, 3703 dwellings).",
-    "supports_law_ids": [
-      "ll97"
-    ],
+    "supports_law_ids": ["ll97"],
     "sources": [
       {
         "role": "cost",
@@ -466,9 +435,7 @@
             "median": 67.39,
             "p75": 147.59
           },
-          "affected_end_uses": [
-            "heating"
-          ]
+          "affected_end_uses": ["heating"]
         }
       }
     ],
@@ -500,9 +467,7 @@
     "source_page": "Machine Read row 48",
     "confidence_level": "medium",
     "notes": "Cost aggregates REMDB duct sealing and duct insulation. Cost source: REMDB (2 rows); no NYC-specific cost. Savings source: ResStock upgrade 13 (energy + utility, 4065 dwellings).",
-    "supports_law_ids": [
-      "ll97"
-    ],
+    "supports_law_ids": ["ll97"],
     "sources": [
       {
         "role": "cost",
@@ -544,10 +509,7 @@
             "median": 315.8,
             "p75": 590.41
           },
-          "affected_end_uses": [
-            "heating",
-            "cooling"
-          ]
+          "affected_end_uses": ["heating", "cooling"]
         }
       }
     ],
@@ -579,9 +541,7 @@
     "source_page": null,
     "confidence_level": "medium",
     "notes": "No cost source: REMDB has no cavity drill-and-fill row and the NYC PDFs have none, so cost stays null. Savings only. Cost source: none (no cost source). Savings source: ResStock upgrade 14 (energy + utility, 19561 dwellings).",
-    "supports_law_ids": [
-      "ll97"
-    ],
+    "supports_law_ids": ["ll97"],
     "sources": [
       {
         "role": "savings",
@@ -599,9 +559,7 @@
             "median": 234.45,
             "p75": 651.66
           },
-          "affected_end_uses": [
-            "heating"
-          ]
+          "affected_end_uses": ["heating"]
         }
       }
     ],
@@ -633,9 +591,7 @@
     "source_page": "Machine Read row 126",
     "confidence_level": "medium",
     "notes": "Cost aggregates REMDB vinyl, metal, and storm window rows. Cost source: REMDB (3 rows); no NYC-specific cost. Savings source: ResStock upgrade 17 (energy + utility, 19869 dwellings).",
-    "supports_law_ids": [
-      "ll97"
-    ],
+    "supports_law_ids": ["ll97"],
     "sources": [
       {
         "role": "cost",
@@ -689,9 +645,7 @@
             "median": 110.02,
             "p75": 221.2
           },
-          "affected_end_uses": [
-            "heating"
-          ]
+          "affected_end_uses": ["heating"]
         }
       }
     ],
@@ -723,10 +677,7 @@
     "source_page": 28,
     "confidence_level": "high",
     "notes": "Cost spans the NYC PDF's building-size cases (per building). No ResStock savings (commercial/steam is outside the residential ResStock set). Cost source: NYC PDF (9 rows). Savings source: none (no residential ResStock curve).",
-    "supports_law_ids": [
-      "ll97",
-      "ll87"
-    ],
+    "supports_law_ids": ["ll97", "ll87"],
     "sources": [
       {
         "role": "cost",
@@ -856,9 +807,7 @@
     "source_page": 29,
     "confidence_level": "high",
     "notes": "Incremental cost vs like-for-like replacement (often negative). No ResStock savings. Cost source: NYC PDF (9 rows). Savings source: none (no residential ResStock curve).",
-    "supports_law_ids": [
-      "ll97"
-    ],
+    "supports_law_ids": ["ll97"],
     "sources": [
       {
         "role": "cost",
@@ -988,10 +937,7 @@
     "source_page": 14,
     "confidence_level": "high",
     "notes": "Cost spans basic and deep shell ($/ft²). Commercial; no residential ResStock savings. Cost source: NYC PDF (2 rows). Savings source: none (no residential ResStock curve).",
-    "supports_law_ids": [
-      "ll97",
-      "ll87"
-    ],
+    "supports_law_ids": ["ll97", "ll87"],
     "sources": [
       {
         "role": "cost",
@@ -1044,9 +990,7 @@
     "source_page": 17,
     "confidence_level": "high",
     "notes": "Cost spans the storm-glass and mechanical-damper options (per building). Cost source: NYC PDF (2 rows). Savings source: none (no residential ResStock curve).",
-    "supports_law_ids": [
-      "ll97"
-    ],
+    "supports_law_ids": ["ll97"],
     "sources": [
       {
         "role": "cost",

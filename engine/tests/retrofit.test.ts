@@ -1,8 +1,10 @@
 import { describe, expect, test } from "vitest";
 import {
   DEFAULT_MEASURES,
+  fullCostFor,
   optimizeArticle321,
   optimizeRetrofit,
+  planFromFunding,
   planForBudget,
 } from "../src/retrofit.ts";
 import type { BuildingInput } from "../src/index.ts";
@@ -306,14 +308,80 @@ describe("planForBudget", () => {
   });
 
   test("an Article 321 building has no modeled fine to spend against", () => {
-    const plan = planForBudget(
-      { ...overCapOffice, isArticle321: true },
-      5_000_000,
-    );
+    const plan = planForBudget({ ...overCapOffice, isArticle321: true }, 5_000_000);
 
     // Article 321 faces flat penalties, not the $268/tCO2e fine the engine
     // models, so there is no fine for capex to chase — the plan stays empty.
     expect(plan.horizonFinesUsd).toBe(0);
     expect(plan.measureIds).toEqual([]);
+  });
+});
+
+describe("planFromFunding", () => {
+  const partialCatalog = [
+    {
+      id: "controls",
+      name: "controls",
+      capexUsdPerSqft: 1,
+      emissionsReductionFraction: 0.1,
+      basis: "test",
+      satisfiesLaws: ["ll88"],
+    },
+    {
+      id: "zero_cost",
+      name: "zero cost",
+      capexUsdPerSqft: 0,
+      emissionsReductionFraction: 0.2,
+      basis: "test",
+    },
+  ];
+
+  test("fullCostFor rounds whole-building measure cost", () => {
+    expect(fullCostFor(partialCatalog[0], 12_345.678)).toBe(12_345.68);
+  });
+
+  test("partial funding scales cuts and does not retire procedural laws", () => {
+    const plan = planFromFunding(overCapOffice, { controls: 50_000 }, partialCatalog, {
+      proceduralPenaltySavingsByLaw: { ll88: 1_500 },
+    });
+
+    expect(plan.capexUsd).toBe(50_000);
+    expect(plan.measures[0]).toMatchObject({
+      id: "controls",
+      fullCostUsd: 100_000,
+      fundedUsd: 50_000,
+      fundedFraction: 0.5,
+      emissionsCutTco2e: 75,
+    });
+    expect(plan.projectedEmissionsTco2e).toBe(1_425);
+    expect(plan.proceduralCreditUsd).toBe(0);
+  });
+
+  test("funding is clamped to the measure cost and full funding earns one credit", () => {
+    const plan = planFromFunding(
+      overCapOffice,
+      { controls: 999_999, zero_cost: 100 },
+      partialCatalog,
+      { proceduralPenaltySavingsByLaw: { ll88: 1_500 } },
+    );
+
+    expect(plan.capexUsd).toBe(100_000);
+    expect(plan.measures[0].fundedUsd).toBe(100_000);
+    expect(plan.measures[1].fundedUsd).toBe(0);
+    expect(plan.proceduralCreditUsd).toBe(1_500);
+  });
+});
+
+describe("optimizeArticle321 guardrails", () => {
+  test("rejects a catalog too large to enumerate", () => {
+    const big = Array.from({ length: 13 }, (_, index) => ({
+      id: `m${index}`,
+      name: `m${index}`,
+      capexUsdPerSqft: 1,
+      emissionsReductionFraction: 0.01,
+      basis: "test",
+    }));
+
+    expect(() => optimizeArticle321(overCapOffice, big)).toThrow(/catalog/);
   });
 });

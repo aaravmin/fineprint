@@ -6,8 +6,8 @@ like a credible owner/property-manager record rather than a consumer app.
 
 ## Sources reviewed
 
-- ASHRAE *Procedures for Commercial Building Energy Audits* (Level I–III report
-  structure) and sample Level II reports (SUNY, PNNL *A Guide to Energy Audits*).
+- ASHRAE _Procedures for Commercial Building Energy Audits_ (Level I–III report
+  structure) and sample Level II reports (SUNY, PNNL _A Guide to Energy Audits_).
 - NYC Local Law 97 compliance consultant deliverables (Milrose, AEI Consultants,
   ENPG, Comply NYC, Henson Architecture).
 - NYSERDA / Urban Green / NYC Accelerator program reporting style (from the
@@ -27,7 +27,7 @@ A consistent spine appears across ASHRAE audits and LL97 consultant deliverables
    applicability basis, the requirement in one line, the deadline, the exposure,
    the source data used, what data is missing, and the next action.
 4. **Recommended measures** — each measure with the issue it addresses, an
-   estimated cost *range*, estimated annual savings, energy/carbon impact,
+   estimated cost _range_, estimated annual savings, energy/carbon impact,
    priority, complexity, expected useful life, and the source/assumption. Ordered
    by economic priority (simple payback) and interactive effects noted.
 5. **Evidence / compliance record** — obligations, who is responsible, what is

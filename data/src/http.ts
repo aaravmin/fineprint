@@ -1,7 +1,7 @@
 // Shared fetch helper: one place for timeouts, JSON parsing, and errors that
 // say which service failed and why. Every API client goes through this.
 
-import { cacheRead, cacheWrite } from "./cache.ts";
+import { cacheRead, cacheWrite, stripToken } from "./cache.ts";
 
 export interface FetchJsonOptions {
   service: string; // human name for error messages ("GeoSearch", "LL84")
@@ -48,7 +48,7 @@ export async function fetchJson<T>(url: string, options: FetchJsonOptions): Prom
 
   if (!response.ok) {
     throw new Error(
-      `${service} responded ${response.status} ${response.statusText} for ${url}`,
+      `${service} responded ${response.status} ${response.statusText} for ${stripToken(url)}`,
     );
   }
 

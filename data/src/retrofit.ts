@@ -105,7 +105,8 @@ function tailorMeasures(profile: InfrastructureProfile | null): {
       excluded.push({
         id: measure.id,
         name: measure.name,
-        reason: "building is already all-electric — there is no combustion heating to convert",
+        reason:
+          "building is already all-electric — there is no combustion heating to convert",
       });
       return false;
     }
