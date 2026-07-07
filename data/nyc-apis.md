@@ -22,4 +22,4 @@ Seeded JSON is the P0 path. These are the real lookups to wire next.
 - SODA endpoints allow ~1000 req/hr unauthenticated; an app token raises limits.
 - BBL is the join key across all of these.
 - Fine math: LL97 = $268/tCO2e over limit; LL84 = $500/quarter; FISP failure-to-file
-  has its own civil penalty schedule. Keep formulas in `spacetimedb/src/laws.ts`.
+  has its own civil penalty schedule. Keep formulas in `data/src/laws.ts`.

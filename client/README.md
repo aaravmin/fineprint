@@ -29,7 +29,7 @@ doesn't either sharpen the number or advance the plan, it doesn't ship.
   dollar exposure, one-line "what this is."
 - **Deadline horizon** — every obligation on one timeline, nearest first.
 - **The plan** — what to do, in order, and what each step saves versus the
-  fine. (Powered by agents in M4+; UI renders task state from SpacetimeDB.)
+  fine. (Powered by the agent fleet; UI renders task state live from Supabase.)
 
 ## The laws
 
@@ -42,20 +42,21 @@ doesn't either sharpen the number or advance the plan, it doesn't ship.
 | LL11/FISP | Facade inspection every 5 years, >6 stories    | Escalating penalties, shed costs, liability                   |
 | LL88      | Lighting upgrades + submetering                | Bundles with LL97 retrofit work                               |
 
-Registry: `spacetimedb/src/laws.ts` (canonical), re-exported by
-`data/laws.ts`. LL97 fine math: `engine/` (pure, tested, frozen interface —
+Registry: `data/src/laws.ts` (canonical), re-exported by `data/laws.ts`.
+LL97 fine math: `engine/` (pure, tested, frozen interface —
 `computeFine` / `computeAllPeriods`).
 
 ## Architecture
 
-No API server. The browser subscribes to SpacetimeDB tables over WebSocket
-(port 3000) and calls reducers for writes. Building/task/worker state is
-live; the engine runs client-side for what-if math. Bindings in
-`src/module_bindings/` are generated — never hand-edit, `npm run generate`.
+No API server. The browser talks straight to Supabase Postgres: reads are
+RLS-scoped Realtime subscriptions, writes are `security definer` SQL functions
+("reducers"). Clerk issues the JWT; Supabase RLS scopes every row to its owner.
+Building/task/worker state is live; the engine runs client-side for what-if math.
+The typed data layer lives in `src/lib/db/` — no generated bindings.
 
-Data wiring (next up, see `data/nyc-apis.md`): GeoSearch for address→BBL,
-LL84 Socrata dataset for sqft/emissions, DOB covered-buildings list for LL97
-applicability, HPD datasets for the Article 321 flag. BBL joins everything.
+Data wiring (see `data/nyc-apis.md`): GeoSearch for address→BBL, LL84 Socrata
+dataset for sqft/emissions, DOB covered-buildings list for LL97 applicability,
+HPD datasets for the Article 321 flag. BBL joins everything.
 
 ## Design bar
 
@@ -65,18 +66,17 @@ SaaS landing page: numbers carry the drama, type does the talking. Light +
 dark intentional from day one. Every estimate labeled as one. No emoji
 decor, no gradient soup, no bento-for-bento's-sake.
 
-Stack: Vite + React 18, Tailwind v4 (CSS-based config), framer-motion,
-lucide-react, shadcn-style components in `src/components/ui/`.
+Stack: Next.js 16 (App Router) + React 19, Tailwind v4 (CSS-based config),
+framer-motion, lucide-react, shadcn-style components in `src/components/ui/`.
 
 ## Status
 
-Placeholder shell (`src/App.tsx`) renders connection state and table counts.
-Board components (TicketBoard, AgentRail, ApprovalQueue, EventFeed,
-BuildingSearch) land in M4. Next milestone: real data wiring (the APIs
-above), then the exposure views.
+Live. The dashboard runs the full loop: address intake, per-law exposure, the
+compliance board (tasks, agents, activity), and the compliance binder — all
+reading Supabase in real time.
 
 ```bash
-npm run dashboard    # Vite dev server, port 5173 (spacetime start first)
+npm run dashboard    # Next.js dev server, port 3001 (npm run db:start first)
 npm run typecheck --workspace client
 npm run build --workspace client
 ```
