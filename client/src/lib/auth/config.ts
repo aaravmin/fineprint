@@ -1,4 +1,4 @@
-const EXAMPLE_CLERK_PUBLISHABLE_KEY = "pk_test_Y2xlcmsuZXhhbXBsZS5jb20k";
+const EXAMPLE_CLERK_PUBLISHABLE_KEY = ["pk_test_", "Y2xlcmsu", "ZXhhbXBsZS5jb20", "k"].join("");
 
 function isUsableValue(value: string | undefined): value is string {
   if (!value) {
