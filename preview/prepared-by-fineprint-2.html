@@ -1,83 +1,58 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Fineprint — document library & decarbonization plan</title>
+<html lang="en"><head><meta charset="utf-8" /><title>Fineprint fixed</title>
 <style>
-  :root{
-    --bg:#faf9f6; --card:#ffffff; --fg:#141414; --muted:#f2f0ea; --muted-fg:#6b6862;
-    --border:#e7e3db; --primary:#141414; --primary-fg:#faf9f6; --success:#15a34a;
-    --destructive:#e5342b; --amber:#d97706;
-  }
+  :root{--bg:#faf9f6;--card:#fff;--fg:#141414;--muted:#f2f0ea;--muted-fg:#6b6862;--border:#e7e3db;--primary:#141414;--primary-fg:#faf9f6;--success:#15a34a;--destructive:#e5342b}
   *{box-sizing:border-box;margin:0;padding:0}
-  body{background:var(--bg);color:var(--fg);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
-    -webkit-font-smoothing:antialiased;line-height:1.45;padding:34px 30px 40px}
-  .wrap{max-width:940px;margin:0 auto;display:flex;flex-direction:column;gap:26px}
+  body{background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.45;padding:30px}
+  .wrap{max-width:940px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
   svg{display:block}
-  .label{font-size:12px;font-weight:600;color:var(--muted-fg);text-transform:uppercase;letter-spacing:.06em}
-
+  .label{font-size:12px;font-weight:600;color:var(--muted-fg);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
   .panel{border:1px solid var(--border);background:var(--card);border-radius:12px;padding:22px}
   .toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}
   .toolbar .t{font-size:14px;font-weight:500}
   .toolbar .acts{display:flex;gap:8px}
-  .btn{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;height:32px;
-    padding:0 11px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--fg);cursor:default}
+  .btn{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;height:32px;padding:0 11px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--fg)}
   .btn.primary{background:var(--primary);color:var(--primary-fg);border-color:var(--primary)}
   .btn svg{width:14px;height:14px}
-  .btn.sm{height:30px;font-size:12px}
-
-  /* document library interactive */
-  .lib{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
-  .doclist{border:1px solid var(--border);border-radius:10px;overflow:hidden}
+  .doclist{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:12px}
   .docrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 12px;border-bottom:1px solid var(--border)}
   .docrow:last-child{border-bottom:0}
-  .docrow .left{display:flex;align-items:center;gap:9px;min-width:0}
+  .docrow .left{display:flex;align-items:center;gap:9px}
   .docrow .name{font-size:13px;font-weight:500}
   .docrow .meta{font-size:12px;color:var(--muted-fg);margin-top:1px}
   .trash{color:var(--muted-fg)}
-  .uploadbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;border:1px solid var(--border);
-    background:rgba(242,240,234,.5);border-radius:10px;padding:10px 12px}
-  select,input.f{height:32px;border:1px solid var(--border);border-radius:8px;background:var(--card);
-    color:var(--fg);font-size:12px;padding:0 8px;font-family:inherit}
-
-  /* deliverable document (same as emissions view) */
-  .doc{display:flex;flex-direction:column;gap:20px;font-size:14px;color:var(--fg)}
+  .uploadbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;border:1px solid var(--border);background:rgba(242,240,234,.5);border-radius:10px;padding:10px 12px}
+  select,input.f{height:32px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--fg);font-size:12px;padding:0 8px;font-family:inherit}
+  .doc{display:flex;flex-direction:column;gap:20px;font-size:14px}
   .doc header{border-bottom:1px solid var(--border);padding-bottom:12px;display:flex;flex-direction:column;gap:4px}
   .brand{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.16em;color:var(--muted-fg)}
   .doc h3{font-size:18px;font-weight:700;letter-spacing:-.01em}
   .doc .ident{font-size:12px;color:var(--muted-fg)}
   .doc .purpose{font-size:12px;font-style:italic;color:var(--muted-fg)}
   .doc .prep{font-size:11px;color:var(--muted-fg)}
-  .statrow{display:flex;flex-wrap:wrap;gap:12px 34px;border:1px solid var(--border);
-    background:rgba(242,240,234,.5);border-radius:10px;padding:13px 18px}
+  .statrow{display:flex;flex-wrap:wrap;gap:12px 34px;border:1px solid var(--border);background:rgba(242,240,234,.5);border-radius:10px;padding:13px 18px}
   .stat .k{font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted-fg)}
-  .stat .v{font-size:16px;font-weight:600;font-variant-numeric:tabular-nums;margin-top:2px}
+  .stat .v{font-size:16px;font-weight:600;margin-top:2px}
+  .ok{color:var(--success)}
+  .doc h4{font-size:14px;font-weight:600;border-bottom:1px solid var(--border);padding-bottom:5px}
   .doc section{display:flex;flex-direction:column;gap:9px}
-  .doc h4{font-size:14px;font-weight:600;letter-spacing:-.01em;border-bottom:1px solid var(--border);padding-bottom:5px}
   dl.rows{display:grid;grid-template-columns:1fr 1fr;gap:6px 34px}
   dl.rows .r{display:flex;justify-content:space-between;gap:12px;border-bottom:1px dashed rgba(231,227,219,.9);padding-bottom:4px}
   dl.rows dt{font-size:12px;color:var(--muted-fg)}
   dl.rows dd{font-size:12px;font-weight:500;text-align:right}
   table{width:100%;border-collapse:collapse;font-size:12px}
-  thead th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted-fg);
-    font-weight:500;padding:6px 14px 6px 0;border-bottom:1px solid var(--border)}
+  thead th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted-fg);font-weight:500;padding:6px 14px 6px 0;border-bottom:1px solid var(--border)}
   tbody td{padding:6px 14px 6px 0;border-bottom:1px solid var(--border);vertical-align:top}
   tbody tr:last-child td{border-bottom:0}
-  td.num{font-variant-numeric:tabular-nums}
   .tnote{font-size:10px;color:var(--muted-fg)}
-  .notes{border-top:1px solid var(--border);padding-top:12px;display:flex;flex-direction:column;gap:3px}
+  .notes{border-top:1px solid var(--border);padding-top:12px}
   .notes p{font-size:10px;color:var(--muted-fg)}
-  .ok{color:var(--success)}
-</style>
-</head>
-<body>
-<div class="wrap">
+  .badge{display:inline-block;font-size:11px;color:var(--success);background:rgba(21,163,74,.1);border-radius:6px;padding:1px 7px;margin-left:8px}
+</style></head>
+<body><div class="wrap">
 
-  <!-- ===================== DOCUMENT LIBRARY (open) ===================== -->
   <div>
-    <div class="label" style="margin-bottom:8px">Document library — open</div>
+    <div class="label">Document library, open <span class="badge">one library now, index moved to print only</span></div>
     <div class="panel">
       <div class="toolbar">
         <div class="t">Document library</div>
@@ -86,125 +61,63 @@
           <span class="btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Print / PDF</span>
         </div>
       </div>
-
-      <!-- interactive library (upload + list) -->
-      <div class="lib">
-        <div class="doclist">
-          <div class="docrow">
-            <div class="left">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b6862" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
-              <div><div class="name">boiler_permit_2023.pdf</div><div class="meta">DOB permit / work application · 2023-03-01 · 321234567</div></div>
-            </div>
-            <svg class="trash" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-          </div>
-          <div class="docrow">
-            <div class="left">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b6862" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
-              <div><div class="name">ll84_benchmarking_2024.pdf</div><div class="meta">Prior LL97 / benchmarking report · 2024-05-01</div></div>
-            </div>
-            <svg class="trash" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-          </div>
-          <div class="docrow">
-            <div class="left">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b6862" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
-              <div><div class="name">boiler_inspection_2024.pdf</div><div class="meta">Inspection report · 2024-11-12 · BI-2024-0456</div></div>
-            </div>
-            <svg class="trash" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-          </div>
-        </div>
-
-        <div class="uploadbar">
-          <span class="btn sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>Choose file</span>
-          <select><option>DOB permit / work application</option><option>Prior LL97 / benchmarking report</option><option>Inspection report</option><option>Equipment cut sheet / invoice</option><option>Other</option></select>
-          <input class="f" type="text" placeholder="mm/dd/yyyy" style="width:120px" />
-          <input class="f" type="text" placeholder="Reference / job no." style="width:150px" />
-          <span class="btn sm primary">Add to library</span>
-        </div>
+      <div class="doclist">
+        <div class="docrow"><div class="left"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b6862" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg><div><div class="name">boiler_permit_2023.pdf</div><div class="meta">DOB permit · 2023-03-01 · 321234567</div></div></div><svg class="trash" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div>
+        <div class="docrow"><div class="left"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b6862" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg><div><div class="name">ll84_benchmarking_2024.pdf</div><div class="meta">Prior LL97 report · 2024-05-01</div></div></div><svg class="trash" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div>
+        <div class="docrow"><div class="left"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b6862" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg><div><div class="name">boiler_inspection_2024.pdf</div><div class="meta">Inspection report · 2024-11-12 · BI-2024-0456</div></div></div><svg class="trash" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div>
       </div>
-
-      <!-- the standardized index document -->
-      <div class="doc">
-        <header>
-          <div class="brand">Fineprint</div>
-          <h3>Document library</h3>
-          <div class="ident">1240 Atlantic Avenue, Brooklyn NY &nbsp;·&nbsp; BBL 3012340056 &nbsp;·&nbsp; BIN 3001234</div>
-          <div class="purpose">A standardized index of the documents on file for this building, ready to hand off with any submission.</div>
-          <div class="prep">Prepared 7/6/2026</div>
-        </header>
-        <div class="statrow"><div class="stat"><div class="k">Documents</div><div class="v">3</div></div></div>
-        <section>
-          <h4>Documents on file</h4>
-          <table>
-            <thead><tr><th>Document</th><th>Type</th><th>Date</th><th>Reference</th><th>Notes</th></tr></thead>
-            <tbody>
-              <tr><td>boiler_permit_2023.pdf</td><td>DOB permit / work application</td><td class="num">3/1/2023</td><td class="num">321234567</td><td>—</td></tr>
-              <tr><td>ll84_benchmarking_2024.pdf</td><td>Prior LL97 / benchmarking report</td><td class="num">5/1/2024</td><td>—</td><td>—</td></tr>
-              <tr><td>boiler_inspection_2024.pdf</td><td>Inspection report</td><td class="num">11/12/2024</td><td class="num">BI-2024-0456</td><td>—</td></tr>
-            </tbody>
-          </table>
-        </section>
-        <div class="notes"><p>Prepared by Fineprint. Files are stored privately in your account; only you can access them.</p></div>
+      <div class="uploadbar">
+        <span class="btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>Choose file</span>
+        <select><option>DOB permit</option><option>Prior LL97 report</option><option>Inspection report</option><option>Equipment cut sheet</option><option>Other</option></select>
+        <input class="f" type="text" placeholder="mm/dd/yyyy" style="width:120px" />
+        <input class="f" type="text" placeholder="Reference number" style="width:150px" />
+        <span class="btn primary">Add to library</span>
       </div>
     </div>
   </div>
 
-  <!-- ===================== DECARBONIZATION PLAN (open) ===================== -->
   <div>
-    <div class="label" style="margin-bottom:8px">Decarbonization plan — open</div>
+    <div class="label">Decarbonization plan, open</div>
     <div class="panel">
-      <div class="toolbar">
-        <div class="t">Decarbonization plan</div>
-        <div class="acts">
-          <span class="btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>Export CSV</span>
-          <span class="btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Print / PDF</span>
-        </div>
-      </div>
-
+      <div class="toolbar"><div class="t">Decarbonization plan</div><div class="acts"><span class="btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>Export CSV</span><span class="btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Print / PDF</span></div></div>
       <div class="doc">
         <header>
-          <div class="brand">Fineprint</div>
-          <h3>Decarbonization plan</h3>
+          <div class="brand">Fineprint</div><h3>Decarbonization plan</h3>
           <div class="ident">1240 Atlantic Avenue, Brooklyn NY &nbsp;·&nbsp; BBL 3012340056 &nbsp;·&nbsp; BIN 3001234</div>
-          <div class="purpose">Your recommended path to reduce emissions and LL97 penalty exposure - for planning, capital budgeting, and your consultants.</div>
+          <div class="purpose">Your recommended path to lower emissions and LL97 penalty exposure, for planning and capital budgeting.</div>
           <div class="prep">Prepared 7/6/2026</div>
         </header>
-
         <div class="statrow">
           <div class="stat"><div class="k">Measures</div><div class="v">5</div></div>
-          <div class="stat"><div class="k">Emissions cut</div><div class="v ok">-520 tCO2e/yr</div></div>
+          <div class="stat"><div class="k">Emissions cut</div><div class="v ok">520 tCO2e a year</div></div>
           <div class="stat"><div class="k">Est. capital</div><div class="v">$125,900</div></div>
           <div class="stat"><div class="k">Projected</div><div class="v ok">Under the cap</div></div>
         </div>
-
         <section>
           <h4>Recommended measures</h4>
           <table>
-            <thead><tr><th>Measure</th><th>Est. capital</th><th>Emissions cut / yr</th><th>Why it fits this building</th></tr></thead>
+            <thead><tr><th>Measure</th><th>Est. capital</th><th>Emissions cut a year</th><th>Why it fits this building</th></tr></thead>
             <tbody>
-              <tr><td>Air-source heat pump (cold climate)</td><td class="num">$16,500</td><td class="num ok">-310 tCO2e</td><td>Electrifies the gas-fired heating plant - the building's largest emissions source.</td></tr>
-              <tr><td>Heat-pump water heater</td><td class="num">$2,400</td><td class="num ok">-90 tCO2e</td><td>Replaces the gas domestic hot water system.</td></tr>
-              <tr><td>Envelope air sealing</td><td class="num">$39,000</td><td class="num ok">-70 tCO2e</td><td>Cuts heating load across a leaky pre-war envelope.</td></tr>
-              <tr><td>Steam distribution improvements</td><td class="num">$56,000</td><td class="num ok">-30 tCO2e</td><td>Balances the existing steam riser network.</td></tr>
-              <tr><td>LED lighting retrofit</td><td class="num">$12,000</td><td class="num ok">-20 tCO2e</td><td>Lowers common-area electrical and lighting load.</td></tr>
+              <tr><td>Air-source heat pump (cold climate)</td><td>$16,500</td><td class="ok">310 tCO2e</td><td>Electrifies the gas-fired heating plant, the building's largest emissions source.</td></tr>
+              <tr><td>Heat-pump water heater</td><td>$2,400</td><td class="ok">90 tCO2e</td><td>Replaces the gas domestic hot water system.</td></tr>
+              <tr><td>Envelope air sealing</td><td>$39,000</td><td class="ok">70 tCO2e</td><td>Cuts heating load across a leaky pre-war envelope.</td></tr>
+              <tr><td>Steam distribution improvements</td><td>$56,000</td><td class="ok">30 tCO2e</td><td>Balances the existing steam riser network.</td></tr>
+              <tr><td>LED lighting retrofit</td><td>$12,000</td><td class="ok">20 tCO2e</td><td>Lowers common-area electrical and lighting load.</td></tr>
             </tbody>
           </table>
           <div class="tnote">Ordered by cost per tonne avoided. Costs are sourced estimates for typical buildings, not engineering quotes.</div>
         </section>
-
         <section>
           <h4>Compliance impact</h4>
           <dl class="rows">
             <div class="r"><dt>Emissions over the cap now</dt><dd>495 tCO2e</dd></div>
-            <div class="r"><dt>Reduction from these measures</dt><dd>-520 tCO2e/yr</dd></div>
+            <div class="r"><dt>Reduction from these measures</dt><dd>520 tCO2e a year</dd></div>
             <div class="r" style="grid-column:1 / -1"><dt>Projected position</dt><dd>Under the cap after these measures</dd></div>
           </dl>
         </section>
-
         <div class="notes"><p>Prepared by Fineprint from the building's systems dossier and the LL97 emissions model. Preliminary recommendations, not final engineering scopes.</p></div>
       </div>
     </div>
   </div>
 
-</div>
-</body>
-</html>
+</div></body></html>
