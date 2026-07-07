@@ -7,6 +7,7 @@ import { GlobalErrorToaster } from "@/components/global-error-toaster";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { APP_CONFIG } from "@/config/app-config";
+import { isClerkConfigured } from "@/lib/auth/config";
 import { DbProvider } from "@/lib/db/react";
 import { fontVars } from "@/lib/fonts/registry";
 import { PREFERENCE_DEFAULTS } from "@/lib/preferences/preferences-config";
@@ -23,6 +24,23 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   const { theme_mode, theme_preset, content_layout, navbar_style, sidebar_variant, sidebar_collapsible, font } =
     PREFERENCE_DEFAULTS;
+  const clerkConfigured = isClerkConfigured();
+  const content = (
+    <TooltipProvider>
+      <PreferencesStoreProvider
+        themeMode={theme_mode}
+        themePreset={theme_preset}
+        contentLayout={content_layout}
+        navbarStyle={navbar_style}
+        font={font}
+      >
+        {clerkConfigured ? <DbProvider>{children}</DbProvider> : children}
+        <Toaster />
+        <GlobalErrorToaster />
+      </PreferencesStoreProvider>
+    </TooltipProvider>
+  );
+
   return (
     <html
       lang="en"
@@ -40,21 +58,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
         <ThemeBootScript />
       </head>
       <body className={`${fontVars} min-h-screen antialiased`}>
-        <ClerkProvider>
-          <TooltipProvider>
-            <PreferencesStoreProvider
-              themeMode={theme_mode}
-              themePreset={theme_preset}
-              contentLayout={content_layout}
-              navbarStyle={navbar_style}
-              font={font}
-            >
-              <DbProvider>{children}</DbProvider>
-              <Toaster />
-              <GlobalErrorToaster />
-            </PreferencesStoreProvider>
-          </TooltipProvider>
-        </ClerkProvider>
+        {clerkConfigured ? <ClerkProvider>{content}</ClerkProvider> : content}
       </body>
     </html>
   );

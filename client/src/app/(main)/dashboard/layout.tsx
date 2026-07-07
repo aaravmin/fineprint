@@ -10,6 +10,7 @@ import { EventToaster } from "@/components/event-toaster";
 import { NotificationsButton } from "@/components/notifications-button";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { isClerkConfigured } from "@/lib/auth/config";
 import { SIDEBAR_COLLAPSIBLE_VALUES, SIDEBAR_VARIANT_VALUES } from "@/lib/preferences/layout";
 import { cn } from "@/lib/utils";
 import { getPreference } from "@/server/server-actions";
@@ -19,6 +20,10 @@ import { SearchDialog } from "./_components/sidebar/search-dialog";
 import { ThemeSwitcher } from "./_components/sidebar/theme-switcher";
 
 export default async function Layout({ children }: Readonly<{ children: ReactNode }>) {
+  if (!isClerkConfigured()) {
+    redirect("/sign-in");
+  }
+
   const clerkUser = await currentUser();
 
   if (!clerkUser) {

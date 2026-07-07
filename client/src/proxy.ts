@@ -1,14 +1,29 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextRequest, NextResponse } from "next/server";
+
+import { isClerkConfigured } from "@/lib/auth/config";
 
 // The landing page and legal pages are the marketing front door — signed-out
 // visitors must reach them. Only the dashboard lives behind the gate.
 const isPublicRoute = createRouteMatcher(["/", "/sign-in(.*)", "/sign-up(.*)", "/privacy", "/terms"]);
 
-export default clerkMiddleware(async (auth, req) => {
-  if (!isPublicRoute(req)) {
-    await auth.protect();
+function authUnavailableMiddleware(req: NextRequest) {
+  if (isPublicRoute(req)) {
+    return NextResponse.next();
   }
-});
+
+  return NextResponse.redirect(new URL("/sign-in", req.url));
+}
+
+const middleware = isClerkConfigured()
+  ? clerkMiddleware(async (auth, req) => {
+      if (!isPublicRoute(req)) {
+        await auth.protect();
+      }
+    })
+  : authUnavailableMiddleware;
+
+export default middleware;
 
 export const config = {
   matcher: [
