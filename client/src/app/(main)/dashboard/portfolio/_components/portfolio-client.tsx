@@ -218,13 +218,6 @@ export function PortfolioClient() {
     setRecentAddresses(readRecentAddresses());
   }, []);
 
-  useEffect(() => {
-    const visibleBases = fineBasesForScope(lawScope);
-    if (!visibleBases.some((basis) => basis.id === fineBasisId)) {
-      setFineBasisId(visibleBases[0]?.id ?? ALL_FINE_BASIS.id);
-    }
-  }, [fineBasisId, lawScope]);
-
   const submitAddress = useCallback(
     (nextAddress = address) => {
       const trimmed = nextAddress.trim();
@@ -269,9 +262,20 @@ export function PortfolioClient() {
   const visibleTaskExposure = taskExposure(visibleTasks);
   const totalCurrent = lawScope === "ll97" ? buildings.reduce((sum, b) => sum + (ll97Fine(b, 0) ?? 0), 0) : 0;
   const total2030 = lawScope === "ll97" ? buildings.reduce((sum, b) => sum + (ll97Fine(b, 1) ?? 0), 0) : 0;
+  // LL97-covered buildings whose fine couldn't be computed (missing emissions
+  // data or an engine error) contribute $0 above and would silently understate
+  // the exposure total — surface how many are excluded rather than hide them.
+  const ll97Excluded =
+    lawScope === "ll97" ? buildings.filter((b) => b.ll97Covered === true && ll97Fine(b, 1) === null).length : 0;
   const visibleFineBases = fineBasesForScope(lawScope);
+  // Derive the effective basis during render instead of resetting state in an
+  // effect: when the scope changes the selected basis may no longer be visible,
+  // and correcting it here avoids a one-frame "nothing selected" flash.
+  const effectiveFineBasisId = visibleFineBases.some((basis) => basis.id === fineBasisId)
+    ? fineBasisId
+    : (visibleFineBases[0]?.id ?? ALL_FINE_BASIS.id);
   const activeFineBasis =
-    [ALL_FINE_BASIS, ...FINE_BASES].find((basis) => basis.id === fineBasisId) ?? visibleFineBases[0];
+    [ALL_FINE_BASIS, ...FINE_BASES].find((basis) => basis.id === effectiveFineBasisId) ?? visibleFineBases[0];
 
   const sorted = [...buildings].sort((a, b) => {
     if (lawScope === "ll97") return (ll97Fine(b, 1) ?? 0) - (ll97Fine(a, 1) ?? 0);
@@ -313,7 +317,7 @@ export function PortfolioClient() {
                   key={basis.id}
                   type="button"
                   size="sm"
-                  variant={fineBasisId === basis.id ? "default" : "outline"}
+                  variant={effectiveFineBasisId === basis.id ? "default" : "outline"}
                   onClick={() => setFineBasisId(basis.id)}
                 >
                   {basis.label}
@@ -409,8 +413,15 @@ export function PortfolioClient() {
           }
           danger={(showLl97Columns ? total2030 : visibleTaskExposure) > 0}
           sub={
-            showLl97Columns && total2030 > 0 && totalCurrent > 0
-              ? `${(total2030 / totalCurrent).toFixed(1)}× current`
+            showLl97Columns
+              ? [
+                  total2030 > 0 && totalCurrent > 0 ? `${(total2030 / totalCurrent).toFixed(1)}× current` : null,
+                  ll97Excluded > 0
+                    ? `excludes ${ll97Excluded} building${ll97Excluded > 1 ? "s" : ""} without emissions data`
+                    : null,
+                ]
+                  .filter(Boolean)
+                  .join(" · ") || undefined
               : undefined
           }
         />

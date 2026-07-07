@@ -36,12 +36,10 @@ function accrue(perPeriod: number, count: number, unit: string): AccrualPoint[] 
 export const LAW_PROJECTIONS: Record<string, LawProjection> = {
   art321: {
     cadence: "One-time pathway — comply by 2030",
-    basis: "DOB Article 321 Filing Guide — $10,000 flat non-compliance penalties",
-    accrual: [
-      { label: "Year 1 unmet", cumulativeUsd: 10_000 },
-      { label: "Year 2 unmet", cumulativeUsd: 20_000 },
-      { label: "Year 3 unmet", cumulativeUsd: 30_000 },
-    ],
+    basis: "Admin Code 28-321 — Article 321 affordable-housing compliance pathway",
+    accrual: [],
+    variableNote:
+      "Article 321 non-compliance carries flat DOB penalties rather than an escalating schedule, and the canonical law registry models no per-building figure, so no accrual is projected here. The filing plan below is what satisfies it.",
     steps: [
       "Confirm the building qualifies for the affordable-housing pathway (rent-regulated, HDFC, or project-based housing).",
       "Implement the prescribed energy conservation measures of Admin Code 28-321.2.2, or hold emissions under the 2030 limit (28-321.2.1).",
@@ -61,7 +59,9 @@ export const LAW_PROJECTIONS: Record<string, LawProjection> = {
   ll87: {
     cadence: "Once per 10-year cycle — by the building's tag year",
     basis: "Admin Code 28-308.5 — civil penalties for a late Energy Efficiency Report",
-    accrual: accrue(3_000, 3, "year"),
+    accrual: [],
+    variableNote:
+      "The late-EER civil penalty is not a fixed per-period figure that can be projected without a DOB determination, so the canonical law registry models no exposure and none is accrued here. The filing plan still applies.",
     steps: [
       "Retain an approved energy auditor and retro-commissioning agent.",
       "Complete the ASHRAE Level II audit and retro-commissioning of base building systems.",
@@ -70,8 +70,10 @@ export const LAW_PROJECTIONS: Record<string, LawProjection> = {
   },
   ll11: {
     cadence: "5-year FISP cycle by sub-cycle",
-    basis: "1 RCNY 103-04 — ~$1,000/month for a late facade (FISP) report",
-    accrual: accrue(1_000, 6, "month"),
+    basis: "1 RCNY 103-04 — civil penalties for a late facade (FISP) report",
+    accrual: [],
+    variableNote:
+      "FISP/LL11 late-report penalties depend on DOB's determination and the conditions found, so the canonical law registry models no flat figure and none is accrued here. The inspection plan still applies.",
     steps: [
       "Retain a Qualified Exterior Wall Inspector (QEWI).",
       "Complete the close-up facade inspection for the current sub-cycle.",
@@ -81,7 +83,9 @@ export const LAW_PROJECTIONS: Record<string, LawProjection> = {
   ll88: {
     cadence: "One-time upgrade — deadline passed Jan 1, 2025",
     basis: "Admin Code 28-310 / 28-311 — penalties for missing lighting and submetering",
-    accrual: accrue(1_500, 3, "year"),
+    accrual: [],
+    variableNote:
+      "LL88 penalties depend on the count of non-compliant fixtures and unsubmetered tenant spaces, which can't be projected without an inventory, so the canonical law registry models no figure and none is accrued here. The upgrade plan still applies.",
     steps: [
       "Upgrade all covered lighting to meet the current NYC Energy Conservation Code.",
       "Install tenant-space submetering and provide monthly usage statements.",
