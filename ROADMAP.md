@@ -119,16 +119,16 @@ now presents.
 
 ### Coverage today
 
-| Law         | Kind        | Status                                                       |
-| ----------- | ----------- | ------------------------------------------------------------ |
-| LL97        | performance | full — fine projections + building-aware optimizer           |
-| Article 321 | performance | full — constrained optimizer, both pathways                  |
-| LL84        | procedural  | full — cycle + on-record currency                            |
-| LL87        | procedural  | cycle dated; city dataset is a file blob, not queryable      |
-| LL88        | procedural  | deadline + LL97 cross-credit, credited in measure selection  |
-| LL11        | procedural  | full — sub-cycle windows dated, filings from xubg-57si       |
-| LL152       | procedural  | CD schedule dated (1 RCNY 103-10); no filing dataset exists  |
-| LL55        | procedural  | analyzed — annual allergen duty keyed to PLUTO unit counts   |
+| Law         | Kind        | Status                                                      |
+| ----------- | ----------- | ----------------------------------------------------------- |
+| LL97        | performance | full — fine projections + building-aware optimizer          |
+| Article 321 | performance | full — constrained optimizer, both pathways                 |
+| LL84        | procedural  | full — cycle + on-record currency                           |
+| LL87        | procedural  | cycle dated; city dataset is a file blob, not queryable     |
+| LL88        | procedural  | deadline + LL97 cross-credit, credited in measure selection |
+| LL11        | procedural  | full — sub-cycle windows dated, filings from xubg-57si      |
+| LL152       | procedural  | CD schedule dated (1 RCNY 103-10); no filing dataset exists |
+| LL55        | procedural  | analyzed — annual allergen duty keyed to PLUTO unit counts  |
 
 ## Forward roadmap
 

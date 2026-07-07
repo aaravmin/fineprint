@@ -8,7 +8,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/TypeScript-everywhere-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/SpacetimeDB-database_%2B_backend-5C6BC0" alt="SpacetimeDB" />
+  <img src="https://img.shields.io/badge/Supabase-database_%2B_backend-3FCF8E?logo=supabase&logoColor=white" alt="Supabase" />
   <img src="https://img.shields.io/badge/Next.js-dashboard-000000?logo=nextdotjs&logoColor=white" alt="Next.js" />
   <img src="https://img.shields.io/badge/Claude-AI_workers-D97757?logo=anthropic&logoColor=white" alt="Claude" />
   <img src="https://img.shields.io/badge/Clerk-auth-6C47FF?logo=clerk&logoColor=white" alt="Clerk" />
@@ -28,7 +28,7 @@ Kill a worker mid-ticket. Within 15 seconds the ticket is back in the queue and 
   <tr>
     <td width="33%" valign="top">
       <h3>Live ticket queue</h3>
-      <p>Each obligation is a ticket with its statutory deadline on a timer. The dashboard reads live table subscriptions — no polling, no refresh.</p>
+      <p>Each obligation is a ticket with its statutory deadline on a timer. The dashboard reads Supabase Realtime row changes — no refresh button.</p>
     </td>
     <td width="33%" valign="top">
       <h3>AI workers</h3>
@@ -36,13 +36,13 @@ Kill a worker mid-ticket. Within 15 seconds the ticket is back in the queue and 
     </td>
     <td width="33%" valign="top">
       <h3>Crash recovery</h3>
-      <p>A 5-second reaper marks workers with stale heartbeats dead and returns their tickets to the queue. No ticket is ever stranded.</p>
+      <p>A 5-second reaper (pg_cron) marks workers with stale heartbeats dead and returns their tickets to the queue. No ticket is ever stranded.</p>
     </td>
   </tr>
   <tr>
     <td width="33%" valign="top">
       <h3>Human approval gate</h3>
-      <p>Every draft waits for an explicit approve or reject. Building intakes always wait, even in auto-review mode. Workers cannot approve anything.</p>
+      <p>Every draft waits for an explicit approve or reject. Building intakes always wait, even in auto-review mode. The review functions refuse the fleet's role outright — workers cannot approve anything.</p>
     </td>
     <td width="33%" valign="top">
       <h3>Deterministic fine engine</h3>
@@ -59,9 +59,9 @@ Kill a worker mid-ticket. Within 15 seconds the ticket is back in the queue and 
 
 ## How it works
 
-The entire backend is one SpacetimeDB module (`spacetimedb/src/`). There is no API server. The React dashboard and the Node workers connect straight to the database over WebSocket: reads are live subscriptions, writes go through reducers, and each reducer appends to an `event` audit table.
+The entire backend is one Postgres schema on Supabase (`supabase/migrations/`). There is no API server. The dashboard and the Node workers talk to the database directly: reads are RLS-scoped selects kept live by Realtime, writes go through SQL functions (the old "reducers"), and each function appends to an `event` audit table.
 
-The part worth stealing: `claim_task` runs check-then-set inside one transaction, so two workers racing for a ticket can't both win. The queue, the locks, the crash reaper, the audit log: zero infrastructure code, all rows and reducers.
+The part worth stealing: `claim_task` is a single `UPDATE … WHERE status = 'open'` — the check-then-set is one atomic statement, so two workers racing for a ticket can't both win. The queue, the locks, the crash reaper, the audit log, the per-account visibility: zero infrastructure code, all rows, functions, and policies.
 
 ```mermaid
 flowchart LR
@@ -76,28 +76,30 @@ flowchart LR
     G --> E
 ```
 
-| Step | What happens |
-|------|--------------|
-| **Intake** | `request_building` queues a ticket; a worker resolves the address through NYC GeoSearch, and a geocode gate rejects wrong-street and wrong-borough matches |
-| **Ingest** | Approval replays the worker's payload: the building row, its per-law obligations, and their tickets are created in one transaction |
-| **Claim** | `claim_task` checks and sets ownership inside a single transaction — exactly one worker per ticket |
-| **Draft** | The worker writes the remediation or filing draft and submits it for review |
-| **Review** | A human approves or rejects each draft from the dashboard; every reducer writes to the audit log |
-| **Recover** | The scheduled reaper returns tickets from dead workers to the open queue within seconds |
+| Step        | What happens                                                                                                                                               |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Intake**  | `request_building` queues a ticket; a worker resolves the address through NYC GeoSearch, and a geocode gate rejects wrong-street and wrong-borough matches |
+| **Ingest**  | Approval replays the worker's payload: the building row, its per-law obligations, and their tickets are created in one transaction                         |
+| **Claim**   | `claim_task` checks and sets ownership in one atomic UPDATE — exactly one worker per ticket                                                                |
+| **Draft**   | The worker writes the remediation or filing draft and submits it for review                                                                                |
+| **Review**  | A human approves or rejects each draft from the dashboard; every function writes to the audit log                                                          |
+| **Recover** | The pg_cron reaper returns tickets from dead workers to the open queue within seconds                                                                      |
+
+**Identity.** Humans sign in with Clerk; Supabase validates the Clerk JWT as third-party auth, and row-level security scopes every table to `auth.jwt()->>'sub'` — the same login sees the same buildings on any machine. The worker fleet connects with the service-role key (it processes every account's tickets), and the functions that sign off work refuse that role: approval is a human's alone.
 
 ---
 
 ## Tech stack
 
-| Layer | Tools |
-|-------|-------|
-| **Database + backend** | SpacetimeDB (tables, reducers, scheduler — no API server) |
-| **Dashboard** | Next.js, React, Tailwind CSS, shadcn/ui, Recharts |
-| **Workers** | Node.js, Anthropic SDK (Claude drafts when `USE_LLM=true`) |
-| **Fine engine** | Pure TypeScript, no I/O, golden-tested (`engine/`) |
-| **Building data** | NYC GeoSearch, PLUTO, LL84 benchmarking (NYC Open Data) |
-| **Auth** | Clerk |
-| **Hosting** | Vercel (dashboard); SpacetimeDB runs locally |
+| Layer                  | Tools                                                                     |
+| ---------------------- | ------------------------------------------------------------------------- |
+| **Database + backend** | Supabase Postgres (SQL functions, RLS, Realtime, pg_cron — no API server) |
+| **Dashboard**          | Next.js, React, Tailwind CSS, shadcn/ui, Recharts                         |
+| **Workers**            | Node.js, supabase-js, Anthropic SDK (Claude drafts when `USE_LLM=true`)   |
+| **Fine engine**        | Pure TypeScript, no I/O, golden-tested (`engine/`)                        |
+| **Building data**      | NYC GeoSearch, PLUTO, LL84 benchmarking (NYC Open Data)                   |
+| **Auth**               | Clerk (dashboard) + Supabase third-party auth (RLS)                       |
+| **Hosting**            | Vercel (dashboard); Supabase (database)                                   |
 
 ---
 
@@ -105,61 +107,67 @@ flowchart LR
 
 ```
 building    (id, owner, address, bbl, bin, sqft, uses_json, annual_emissions_tco2e, compliance_plan_json, ...)
-task        (id, building_id, law_id, kind, title, status, deadline, fine_estimate_usd, claimed_by)
-worker      (id, identity, name, status, last_heartbeat, current_task_id)
-submission  (id, task_id, worker_id, body, payload_json)
-approval    (id, task_id, approved_by, verdict, note)
-event       (append-only audit log — every reducer writes one row)
-reaper_tick (scheduled row driving the crash reaper)
+task        (id, owner, building_id, law_id, kind, title, status, deadline, fine_estimate_usd, claimed_by)
+worker      (id, name, status, last_heartbeat, current_task_id)
+submission  (id, owner, task_id, worker_id, body, payload_json)
+approval    (id, owner, task_id, approved_by, verdict, note)
+settings    (owner, review_mode — manual | auto)
+event       (append-only audit log — every function writes one row)
 
 obligation / evidence / vendor / binder_event   — the owner's exportable compliance binder
 ```
 
-Statuses are plain strings validated in reducers: tasks move through `open → claimed → in_review → approved | rejected → done`; workers are `idle | working | dead`. The law registry is canonical in `spacetimedb/src/laws.ts`.
+Statuses are plain strings validated by CHECK constraints and functions: tasks move through `open → claimed → in_review → approved | rejected → done`; workers are `idle | working | dead`. The law registry is canonical in `data/src/laws.ts` (published to the client as the `fineprint-laws` workspace package).
 
 ---
 
 ## Running it locally
 
 ```bash
-curl -sSf https://install.spacetimedb.com | sh   # CLI, once
 npm install
-spacetime start --listen-addr 127.0.0.1:3011     # terminal 1, keep open
-npm run publish:local
-WORKER_NAME=atlas npm run worker                  # terminal 2, repeat for a fleet
-npm run dashboard                                 # terminal 3, port 3000
+npm run db:start
+WORKER_NAME=atlas npm run worker     # terminal 2, repeat for a fleet
+npm run dashboard                    # terminal 3, port 3001
 ```
 
-The database must listen on 3011 — port 3000 belongs to the Next.js dashboard,
-and both the dashboard and the workers expect `ws://localhost:3011` by default.
+Local Supabase boots with Clerk third-party auth disabled so database smoke
+tests do not depend on a real Clerk app. To test signed-in dashboard RLS
+locally, enable `[auth.third_party.clerk]` in `supabase/config.toml` and set
+`CLERK_DOMAIN` to your actual Clerk frontend API domain.
 
-The dashboard also needs Clerk auth keys in `client/.env.local` (Next.js reads
-env files from `client/`, not the repo root):
+`npm run db:start` prints the local API URL and keys. Wire them up once:
+
+- Root `.env` (workers, scripts): `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
+- `client/.env.local` (dashboard): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, plus the Clerk keys:
 
 ```
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
 CLERK_SECRET_KEY=sk_test_...
 ```
 
-Add a building from the dashboard's address bar, or from the CLI:
+For the dashboard's live data, connect Clerk to Supabase (one-time): set
+`CLERK_DOMAIN` locally and enable the local Clerk provider, or configure the
+hosted project under Auth → Third-Party Auth → Clerk. That lets row-level
+security read the signed-in Clerk user.
+
+Add a building from the dashboard's address bar, or ingest one from the CLI:
 
 ```bash
-spacetime call -s local fineprint request_building '"345 Park Avenue, Manhattan"'
+npm run ingest -- "350 5th Avenue, Manhattan"
 ```
 
-After any schema or reducer change, `npm run sync` republishes the module and
-regenerates the bindings for both the client and the agents.
+After any schema change, `npm run db:reset` reapplies the migrations.
 
 Workers draft from canned playbooks by default. Set `USE_LLM=true` plus an
 `ANTHROPIC_API_KEY` to let Claude write the drafts instead; without a key
 everything still works.
 
-### Poke it from the CLI
+### Poke it from SQL
 
 ```bash
-spacetime sql  -s local fineprint "SELECT id, status, title FROM task"
-spacetime call -s local fineprint kill_worker 1
-spacetime logs -s local fineprint
+npx supabase db query --local "SELECT id, status, title FROM task"
+npx supabase db query --local "SELECT kill_worker(1)"
+npx supabase db query --local "SELECT kind, payload FROM event ORDER BY id DESC LIMIT 20"
 ```
 
 `scripts/demo-kill.md` has the 90-second demo script, including a CLI fallback that needs no frontend.
@@ -169,16 +177,17 @@ spacetime logs -s local fineprint
 ## Project structure
 
 ```
-spacetimedb/   # the entire backend: tables, reducers, law registry (laws.ts)
+supabase/      # the entire backend: one migration with tables, RLS, functions, reaper
 client/        # Next.js dashboard — portfolio, building pages, review queue
-agents/        # worker and reviewer processes; module_bindings/ are generated
+agents/        # the worker fleet (dispatcher + per-task agents)
 engine/        # pure-TS LL97 fine math — deterministic, golden-tested
-data/          # NYC Open Data ingest: GeoSearch, PLUTO, LL84, measure costs
-scripts/       # law-dashboard audits, demo-kill.md walkthrough
+data/          # NYC Open Data ingest + the canonical law registry (src/laws.ts)
+laws/          # workspace wrapper so the client imports the registry as a package
+scripts/       # ingest CLI, law-dashboard audits, demo-kill.md walkthrough
 ```
 
 ---
 
 ## Honest numbers
 
-Fine estimates come from the formulas in `engine/` and the law registry in `spacetimedb/src/laws.ts`, written from public disclosure data. Real filings need a registered design professional. The AI drafts. A human signs off on everything.
+Fine estimates come from the formulas in `engine/` and the law registry in `data/src/laws.ts`, written from public disclosure data. Real filings need a registered design professional. The AI drafts. A human signs off on everything.

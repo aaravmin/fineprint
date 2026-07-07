@@ -33,8 +33,12 @@ Production needs a real domain you control. One-time checklist, in order:
    - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_live_...`
    - `CLERK_SECRET_KEY=sk_live_...`
    - the four `NEXT_PUBLIC_CLERK_*_URL` values (same paths as dev)
-   - `NEXT_PUBLIC_SPACETIMEDB_HOST=wss://<hosted-spacetimedb>` — production
-     also needs a reachable SpacetimeDB; localhost won't exist there.
+   - `NEXT_PUBLIC_SUPABASE_URL=https://<project-ref>.supabase.co`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key>`
+   - `SUPABASE_URL=https://<project-ref>.supabase.co`
+   - `SUPABASE_SERVICE_ROLE_KEY=<service-role-key>` for workers and ingest only
+   - `CLERK_DOMAIN=<your-clerk-domain>` in the Supabase hosted project's
+     third-party auth settings.
 6. **Deploy and verify.** Sign-up/sign-in on the production URL, banner gone,
    certificate issued for `clerk.<domain>`.
 

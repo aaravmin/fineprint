@@ -1,7 +1,9 @@
 # Fineprint — codebase state
 
-Snapshot taken 2026-06-07, on `main`, latest commit `eeb67d7` ("Merge for functionality changes").
-Personal notes, not a context file.
+Historical snapshot taken 2026-06-07, on `main`, latest commit `eeb67d7`
+("Merge for functionality changes"). This file documents the pre-migration
+SpacetimeDB architecture and is retained as history only. Current work has
+moved the backend to Supabase Postgres in `supabase/migrations/`.
 
 ## What this is
 

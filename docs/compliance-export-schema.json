@@ -21,8 +21,14 @@
       "description": "Stable identifiers for cross-referencing DOB / PLUTO / BEAM records.",
       "required": ["bbl", "bin"],
       "properties": {
-        "bbl": { "type": ["string", "null"], "description": "10-digit Borough-Block-Lot" },
-        "bin": { "type": ["string", "null"], "description": "7-digit Building Identification Number" }
+        "bbl": {
+          "type": ["string", "null"],
+          "description": "10-digit Borough-Block-Lot"
+        },
+        "bin": {
+          "type": ["string", "null"],
+          "description": "7-digit Building Identification Number"
+        }
       }
     },
     "document_type": { "enum": ["compliance_report", "compliance_binder"] }
@@ -34,7 +40,10 @@
       "properties": {
         "dataset": { "type": "string" },
         "identifier": { "type": ["string", "null"] },
-        "as_of": { "type": "string", "description": "ISO date or a named statutory cycle" },
+        "as_of": {
+          "type": "string",
+          "description": "ISO date or a named statutory cycle"
+        },
         "fields": { "type": "array", "items": { "type": "string" } }
       }
     }
@@ -62,8 +71,19 @@
             "type": "object",
             "required": ["law_id", "status"],
             "properties": {
-              "law_id": { "type": "string", "description": "Canonical Fineprint law id (foreign key)" },
-              "status": { "enum": ["applies", "may_apply", "does_not_apply", "unknown", "missing_data"] },
+              "law_id": {
+                "type": "string",
+                "description": "Canonical Fineprint law id (foreign key)"
+              },
+              "status": {
+                "enum": [
+                  "applies",
+                  "may_apply",
+                  "does_not_apply",
+                  "unknown",
+                  "missing_data"
+                ]
+              },
               "next_deadline": { "type": ["string", "null"] },
               "estimated_exposure": { "type": "string" },
               "missing_data": { "type": "array", "items": { "type": "string" } },
@@ -74,9 +94,17 @@
         "recommendations": { "type": "array" },
         "action_plan": { "type": "object" },
         "assumptions_and_limitations": { "type": "array", "items": { "type": "string" } },
-        "source_citations": { "type": "array", "items": { "$ref": "#/$defs/sourceCitation" } }
+        "source_citations": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/sourceCitation" }
+        }
       },
-      "required": ["building_summary", "compliance_snapshot", "findings", "source_citations"]
+      "required": [
+        "building_summary",
+        "compliance_snapshot",
+        "findings",
+        "source_citations"
+      ]
     },
     {
       "title": "Compliance binder",
@@ -94,12 +122,18 @@
               "status": { "type": "string" },
               "assigned_vendor": { "type": ["object", "null"] },
               "evidence_on_file": { "type": "array" },
-              "missing_required_evidence": { "type": "array", "items": { "type": "string" } }
+              "missing_required_evidence": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
             }
           }
         },
         "compliance_history": { "type": "array" },
-        "source_citations": { "type": "array", "items": { "$ref": "#/$defs/sourceCitation" } },
+        "source_citations": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/sourceCitation" }
+        },
         "assumptions_and_limitations": { "type": "array", "items": { "type": "string" } }
       },
       "required": ["building_summary", "law_by_law_obligations", "source_citations"]

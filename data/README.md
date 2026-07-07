@@ -50,7 +50,7 @@ The orchestrator and tool layer take injected sources in tests.
 
 ```bash
 npm test --workspace data
-npx tsx scripts/ingest.ts "350 5th Avenue, Manhattan"   # live end-to-end into SpacetimeDB
+npx tsx scripts/ingest.ts "350 5th Avenue, Manhattan"   # live end-to-end into Supabase
 ```
 
 ## Emissions: recomputed, not just quoted
@@ -75,4 +75,4 @@ amendments this layer doesn't model — still an estimate, but the right kind.
   numbers never substitute.
 - One BBL can hold several buildings (BINs); facts aggregate to the lot.
 - Browser can't import `coveredBuildings.ts` (filesystem read); the
-  dashboard reads building rows from SpacetimeDB instead.
+  dashboard reads building rows from Supabase instead.
