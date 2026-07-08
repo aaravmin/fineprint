@@ -12,8 +12,11 @@ import { useAuth } from "@clerk/nextjs";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { toast } from "sonner";
 
+import type { Database } from "./database.types";
 import { type ReducerToken, TABLE_NAMES, type TableName, type TableToken } from "./index";
 import { mapRow } from "./mappers";
+
+type Db = SupabaseClient<Database>;
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "http://localhost:54321";
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
@@ -21,7 +24,7 @@ const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
 const REFRESH_DEBOUNCE_MS = 150;
 
 interface DbContextValue {
-  client: SupabaseClient;
+  client: Db;
   snapshots: Partial<Record<TableName, unknown[]>>;
   loadedTables: Partial<Record<TableName, boolean>>;
   connected: boolean;
@@ -47,13 +50,13 @@ export function DbProvider({ children }: { children: ReactNode }) {
     if (!isLoaded || !isSignedIn) {
       return null;
     }
-    return createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    return createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, {
       accessToken: async () => (await getToken()) ?? "",
       auth: { persistSession: false, autoRefreshToken: false },
     });
   }, [isLoaded, isSignedIn, getToken]);
 
-  const refreshTable = useCallback(async (db: SupabaseClient, table: TableName) => {
+  const refreshTable = useCallback(async (db: Db, table: TableName) => {
     const { data, error } = await db
       .from(table)
       .select("*")
@@ -181,7 +184,9 @@ export function useReducer<Args>(token: ReducerToken<Args>): (args: Args) => Pro
   return useCallback(
     async (args: Args) => {
       const params = await token.toParams(args, client);
-      const { error } = await client.rpc(token.rpc, params);
+      // The RPC name is schema-checked; the params are assembled dynamically by
+      // each descriptor, so they cross the typed-rpc boundary untyped.
+      const { error } = await client.rpc(token.rpc, params as never);
       if (error) {
         throw new Error(error.message);
       }

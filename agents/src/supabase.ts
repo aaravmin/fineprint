@@ -7,43 +7,18 @@
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-export interface TaskRow {
-  id: number;
-  owner: string;
-  building_id: number | null;
-  law_id: string;
-  kind: string;
-  title: string;
-  status: string;
-  deadline: string;
-  sla_breached: boolean;
-  fine_estimate_usd: number | null;
-  claimed_by: number | null;
-  intake_address: string | null;
-  created_at: string;
-}
+import type { Database } from "./database.types.ts";
 
-export interface BuildingRow {
-  id: number;
-  owner: string;
-  address: string;
-  bbl: string | null;
-  bin: string | null;
-  sqft: number;
-  is_affordable: boolean;
-  annual_emissions_tco2e: number | null;
-  uses_json: string | null;
-  ll97_covered: boolean | null;
-  provenance_json: string | null;
-  num_floors: number | null;
-  units_residential: number | null;
-  community_district: number | null;
-  energy_star_score: number | null;
-  compliance_plan_json: string | null;
-  created_at: string;
-}
+// Rows are derived from the generated schema, so a renamed or dropped column
+// fails to compile instead of surfacing as an undefined at runtime. Regenerate
+// both copies (client + agents) with `npm run db:types` after a schema change.
+export type TaskRow = Database["public"]["Tables"]["task"]["Row"];
+export type BuildingRow = Database["public"]["Tables"]["building"]["Row"];
 
-export function fleetClient(): SupabaseClient {
+type FleetClient = SupabaseClient<Database>;
+type RpcName = keyof Database["public"]["Functions"];
+
+export function fleetClient(): FleetClient {
   const url = process.env.SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -53,19 +28,21 @@ export function fleetClient(): SupabaseClient {
     );
   }
 
-  return createClient(url, serviceKey, {
+  return createClient<Database>(url, serviceKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 }
 
 // Every fleet mutation goes through an RPC; surface the database's error
 // message (the functions throw in human language) instead of a bare object.
+// The RPC name is schema-checked; params are built by each caller, so they
+// cross the typed-rpc boundary untyped.
 export async function callRpc<T = void>(
-  client: SupabaseClient,
-  fn: string,
+  client: FleetClient,
+  fn: RpcName,
   args: Record<string, unknown>,
 ): Promise<T> {
-  const { data, error } = await client.rpc(fn, args);
+  const { data, error } = await client.rpc(fn, args as never);
   if (error) {
     throw new Error(error.message);
   }

@@ -5,6 +5,7 @@
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import type { Database } from "./database.types";
 import type {
   Approval,
   BinderEvent,
@@ -68,12 +69,16 @@ export const tables = {
 
 // A reducer descriptor: the RPC to call and how the component's argument
 // object maps onto the function's parameters.
+// Every RPC name is checked against the generated schema, so a reducer that
+// points at a renamed or dropped function fails to compile.
+export type RpcName = keyof Database["public"]["Functions"];
+
 export interface ReducerToken<Args> {
-  rpc: string;
-  toParams: (args: Args, db: SupabaseClient) => Promise<Record<string, unknown>>;
+  rpc: RpcName;
+  toParams: (args: Args, db: SupabaseClient<Database>) => Promise<Record<string, unknown>>;
 }
 
-function direct<Args>(rpc: string, map: (args: Args) => Record<string, unknown>): ReducerToken<Args> {
+function direct<Args>(rpc: RpcName, map: (args: Args) => Record<string, unknown>): ReducerToken<Args> {
   return { rpc, toParams: async (args) => map(args) };
 }
 
@@ -157,7 +162,7 @@ export const reducers = {
   // building row at call time and hand the RPC a validated list.
   seedObligations: {
     rpc: "seed_obligations",
-    toParams: async (a: { buildingId: number }, db: SupabaseClient) => {
+    toParams: async (a: { buildingId: number }, db: SupabaseClient<Database>) => {
       const { applicableLaws } = await import("fineprint-laws");
       const { data, error } = await db.from("building").select("*").eq("id", a.buildingId).maybeSingle();
       if (error || !data) {

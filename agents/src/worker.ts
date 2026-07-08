@@ -115,7 +115,7 @@ async function runSweep() {
     return;
   }
 
-  const openTasks = (data as TaskRow[]).filter(task => !inFlight.has(task.id));
+  const openTasks = (data ?? []).filter(task => !inFlight.has(task.id));
   for (const task of openTasks.slice(0, MAX_CONCURRENT - inFlight.size)) {
     inFlight.add(task.id);
     runAgentFor(task).finally(() => inFlight.delete(task.id));
@@ -202,7 +202,7 @@ async function draftFor(name: string, task: TaskRow) {
         `[${name}] could not load building #${task.building_id}: ${error.message}`,
       );
     }
-    building = (data as BuildingRow) ?? undefined;
+    building = data ?? undefined;
   }
 
   console.log(`[${name}] drafting for #${task.id}…`);
@@ -217,8 +217,7 @@ async function draftFor(name: string, task: TaskRow) {
 // is only created when a human approves. A geocode the gate refuses
 // auto-rejects the task; any other failure becomes an honest report.
 type IntakeOutcome =
-  | { body: string; payloadJson: string | undefined }
-  | { failed: string };
+  { body: string; payloadJson: string | undefined } | { failed: string };
 
 async function intakeBuilding(name: string, task: TaskRow): Promise<IntakeOutcome> {
   const address = task.intake_address;

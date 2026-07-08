@@ -29,6 +29,7 @@
     "db:stop": "npx supabase stop",
     "db:reset": "npx supabase db reset",
     "db:smoke": "docker exec -i supabase_db_fineprint psql -U postgres -d postgres -v ON_ERROR_STOP=1 < scripts/db-smoke.sql",
+    "db:types": "npx supabase gen types typescript --local | tee client/src/lib/db/database.types.ts agents/src/database.types.ts > /dev/null",
     "ingest": "tsx scripts/ingest.ts"
   },
   "devDependencies": {
