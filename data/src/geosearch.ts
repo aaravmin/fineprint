@@ -6,7 +6,7 @@
 // (350 5th Ave is both Midtown and Park Slope), so callers should include
 // the borough in the query text.
 
-import { cachedFetchJson } from "./http.ts";
+import { cachedFetchJson, type StaleSnapshot } from "./http.ts";
 import type { BblResult } from "./types.ts";
 
 const GEOSEARCH_URL = "https://geosearch.planninglabs.nyc/v2/search";
@@ -138,10 +138,14 @@ export async function lookupBbl(address: string): Promise<BblResult> {
 // All ranked candidates, for callers that can cross-check against another
 // dataset — GeoSearch's top pick is sometimes a different tax lot than the
 // one DOF files under (see "1 Pike Street").
-export async function lookupBblCandidates(address: string): Promise<BblResult[]> {
+export async function lookupBblCandidates(
+  address: string,
+  onStale?: (info: StaleSnapshot) => void,
+): Promise<BblResult[]> {
   const url = `${GEOSEARCH_URL}?text=${encodeURIComponent(address)}`;
   const response = await cachedFetchJson<GeoSearchResponse>(url, {
     service: "GeoSearch",
+    onStale,
   });
 
   return parseBblCandidates(response, address);

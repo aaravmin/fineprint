@@ -3,7 +3,7 @@
 // uses, reported emissions. Returns null when the building has no filing —
 // plenty don't, and the orchestrator must degrade honestly.
 
-import { cachedFetchJson } from "./http.ts";
+import { cachedFetchJson, type StaleSnapshot } from "./http.ts";
 import type { Bbl, Ll84Facts, UseSplit } from "./types.ts";
 
 const LL84_URL = "https://data.cityofnewyork.us/resource/5zyy-y8am.json";
@@ -113,7 +113,10 @@ interface Ll84Row {
   [fuelColumn: string]: string | undefined;
 }
 
-export async function fetchLl84(bbl: Bbl): Promise<Ll84Facts | null> {
+export async function fetchLl84(
+  bbl: Bbl,
+  onStale?: (info: StaleSnapshot) => void,
+): Promise<Ll84Facts | null> {
   const query = new URLSearchParams({
     nyc_borough_block_and_lot: bbl,
     $order: "report_year DESC",
@@ -127,6 +130,7 @@ export async function fetchLl84(bbl: Bbl): Promise<Ll84Facts | null> {
 
   const rows = await cachedFetchJson<Ll84Row[]>(`${LL84_URL}?${query}`, {
     service: "LL84",
+    onStale,
   });
 
   return parseLl84Rows(rows, bbl);

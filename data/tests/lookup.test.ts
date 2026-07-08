@@ -94,6 +94,40 @@ describe("lookupBuilding", () => {
     expect(emissionsNote?.detail).toMatch(/28-320\.3\.1\.1/);
   });
 
+  test("a stale LL84 snapshot leaves a dated provenance note", async () => {
+    const facts = await lookupBuilding(
+      "350 5th Avenue, Manhattan",
+      fakeSources({
+        fetchLl84: async (_bbl, onStale) => {
+          onStale?.({ service: "LL84", recordedAt: "2026-01-15T09:00:00.000Z" });
+          return ll84Facts;
+        },
+      }),
+    );
+
+    const staleNote = facts.provenance.find(
+      note => note.source === "LL84" && /cached snapshot from/.test(note.detail ?? ""),
+    );
+    expect(staleNote?.detail).toMatch(/2026-01-15/);
+  });
+
+  test("a stale GeoSearch snapshot leaves a dated provenance note", async () => {
+    const facts = await lookupBuilding(
+      "350 5th Avenue, Manhattan",
+      fakeSources({
+        lookupBblCandidates: async (_address, onStale) => {
+          onStale?.({ service: "GeoSearch", recordedAt: "2026-02-20T09:00:00.000Z" });
+          return [geoResult];
+        },
+      }),
+    );
+
+    const staleNote = facts.provenance.find(
+      note => note.field === "bbl" && /cached snapshot from/.test(note.detail ?? ""),
+    );
+    expect(staleNote?.detail).toMatch(/2026-02-20/);
+  });
+
   test("falls back to location-based GHG when a fuel cannot be priced", async () => {
     const facts = await lookupBuilding(
       "350 5th Avenue, Manhattan",

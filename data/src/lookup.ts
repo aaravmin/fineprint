@@ -10,6 +10,7 @@ import {
   lookupBblCandidates as realLookupBblCandidates,
 } from "./geosearch.ts";
 import { fetchLl84 as realFetchLl84 } from "./ll84.ts";
+import type { StaleSnapshot } from "./http.ts";
 import fetchBoilerRecordsByBin from "./boilers.ts";
 import fetchBuildJobFilingsByBin from "./permits.ts";
 import fetchOpenEcbViolationsByBin from "./ecb.ts";
@@ -33,8 +34,14 @@ import type {
 } from "./types.ts";
 
 export interface LookupSources {
-  lookupBblCandidates: (address: string) => Promise<BblResult[]>;
-  fetchLl84: (bbl: Bbl) => Promise<Ll84Facts | null>;
+  lookupBblCandidates: (
+    address: string,
+    onStale?: (info: StaleSnapshot) => void,
+  ) => Promise<BblResult[]>;
+  fetchLl84: (
+    bbl: Bbl,
+    onStale?: (info: StaleSnapshot) => void,
+  ) => Promise<Ll84Facts | null>;
   getCblEntry: (bbl: Bbl) => CblEntry | null;
   // Optional dataset enrichers. Optional so tests can run with small
   // fakeSources that only provide the three core functions.
@@ -58,6 +65,22 @@ const realSources: LookupSources = {
   fetchFacadeFilingsByBin: fetchFacadeFilingsByBin,
 };
 
+// A snapshot served because a live dataset was unreachable must not silently
+// feed a dollar figure a human approves. This turns that fallback into a
+// provenance footnote naming the dataset and how old the snapshot is.
+function stalenessNote(
+  provenance: ProvenanceNote[],
+  field: string,
+): (info: StaleSnapshot) => void {
+  return info => {
+    provenance.push({
+      field,
+      source: info.service,
+      detail: `live ${info.service} fetch failed; served cached snapshot from ${info.recordedAt.slice(0, 10)}`,
+    });
+  };
+}
+
 export async function lookupBuilding(
   address: string,
   sources: LookupSources = realSources,
@@ -66,7 +89,10 @@ export async function lookupBuilding(
 
   const geo = await resolveBbl(address, sources, provenance);
 
-  const ll84 = await sources.fetchLl84(geo.bbl);
+  const ll84 = await sources.fetchLl84(
+    geo.bbl,
+    stalenessNote(provenance, "annualEmissionsTco2e"),
+  );
   const cbl = sources.getCblEntry(geo.bbl);
 
   const plutoCharacteristics = sources.fetchPlutoByBbl
@@ -292,7 +318,10 @@ async function resolveBbl(
   sources: LookupSources,
   provenance: ProvenanceNote[],
 ): Promise<BblResult> {
-  const candidates = await sources.lookupBblCandidates(address);
+  const candidates = await sources.lookupBblCandidates(
+    address,
+    stalenessNote(provenance, "bbl"),
+  );
 
   // The geocode gate runs before any preference logic: a candidate on a
   // different street or in the wrong borough is not this address, no matter

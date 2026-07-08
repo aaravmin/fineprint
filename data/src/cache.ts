@@ -16,13 +16,23 @@ interface Snapshot {
   value: unknown;
 }
 
-export function cacheRead<T>(service: string, key: string): T | null {
+export interface CacheEntry<T> {
+  value: T;
+  recordedAt: string; // ISO timestamp of the snapshot, for staleness reporting
+}
+
+export function cacheReadEntry<T>(service: string, key: string): CacheEntry<T> | null {
   try {
     const raw = readFileSync(snapshotPath(service, key), "utf8");
-    return (JSON.parse(raw) as Snapshot).value as T;
+    const snapshot = JSON.parse(raw) as Snapshot;
+    return { value: snapshot.value as T, recordedAt: snapshot.recordedAt };
   } catch {
     return null;
   }
+}
+
+export function cacheRead<T>(service: string, key: string): T | null {
+  return cacheReadEntry<T>(service, key)?.value ?? null;
 }
 
 export function cacheWrite(service: string, key: string, value: unknown): void {

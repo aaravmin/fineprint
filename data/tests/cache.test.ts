@@ -2,8 +2,8 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
-import { cacheRead, cacheWrite } from "../src/cache.ts";
-import { cachedFetchJson } from "../src/http.ts";
+import { cacheRead, cacheReadEntry, cacheWrite } from "../src/cache.ts";
+import { cachedFetchJson, type StaleSnapshot } from "../src/http.ts";
 
 let cacheDir: string;
 
@@ -60,6 +60,33 @@ describe("cachedFetchJson", () => {
     );
 
     expect(result).toEqual({ stale: true });
+  });
+
+  test("a snapshot fallback reports the snapshot's date to onStale", async () => {
+    cacheWrite("Test", "https://example.test/stale", { stale: true });
+    const recordedAt = cacheReadEntry("Test", "https://example.test/stale")?.recordedAt;
+
+    const staleReports: StaleSnapshot[] = [];
+    await cachedFetchJson(
+      "https://example.test/stale",
+      { service: "Test", onStale: info => staleReports.push(info) },
+      async () => {
+        throw new Error("network is down");
+      },
+    );
+
+    expect(staleReports).toEqual([{ service: "Test", recordedAt }]);
+  });
+
+  test("a live fetch never reports staleness", async () => {
+    const staleReports: StaleSnapshot[] = [];
+    await cachedFetchJson(
+      "https://example.test/live2",
+      { service: "Test", onStale: info => staleReports.push(info) },
+      async () => ({ fresh: true }),
+    );
+
+    expect(staleReports).toEqual([]);
   });
 
   test("no snapshot means the live error surfaces", async () => {
