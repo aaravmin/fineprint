@@ -4,18 +4,18 @@
 // here once: which kinds are noise, which read as errors or wins, and the
 // human label each one wears on screen. Raw kinds never reach the UI as text —
 // "worker_reaped" is a database word, not something an owner should read.
+//
+// Fleet-lifecycle kinds (worker_registered, worker_killed, worker_reaped,
+// workers_pruned) are deliberately absent: those rows are logged with
+// owner='fleet' and the event RLS policy scopes reads to the signed-in tenant,
+// so a customer never receives them. The unknown-kind fallback in eventLabel
+// covers the impossible case gracefully.
 
 // Fire constantly or describe module lifecycle; never worth interrupting a
 // human. Filtered out of every customer-facing surface.
 export const NOISE_KINDS = new Set(["heartbeat", "system"]);
 
-export const ERROR_KINDS = new Set([
-  "task_rejected",
-  "worker_killed",
-  "worker_reaped",
-  "sla_breached",
-  "intake_failed",
-]);
+export const ERROR_KINDS = new Set(["task_rejected", "sla_breached", "intake_failed"]);
 
 export const SUCCESS_KINDS = new Set(["task_approved", "building_ingested"]);
 
@@ -26,10 +26,6 @@ const KIND_LABELS: Record<string, string> = {
   task_rejected: "Sent back",
   task_done: "Filed",
   task_released: "Returned to queue",
-  worker_registered: "Agent online",
-  worker_killed: "Agent stopped",
-  worker_reaped: "Agent timed out",
-  workers_pruned: "Fleet swept",
   sla_breached: "Deadline at risk",
   building_requested: "Address queued",
   building_added: "Building added",

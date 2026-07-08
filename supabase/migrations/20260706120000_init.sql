@@ -139,7 +139,13 @@ create table worker (
   name text not null,
   status text not null default 'idle' check (status in ('idle', 'working', 'dead')),
   last_heartbeat timestamptz not null default now(),
-  current_task_id bigint
+  current_task_id bigint,
+  -- The account whose task this worker most recently claimed. current_task_id
+  -- is nulled the moment a worker goes idle or dead, so it can't scope fleet
+  -- visibility; this column persists across that transition and is what
+  -- worker_fleet_read uses to show a tenant only the workers that touched
+  -- their tasks.
+  last_task_owner text
 );
 
 create table submission (
@@ -285,9 +291,11 @@ create index binder_event_owner_idx on binder_event (owner);
 create index binder_event_building_idx on binder_event (building_id);
 
 -- --- row-level security ------------------------------------------------------
--- Each account sees its own rows. The worker table stays open to signed-in
--- users — the agents page shows the fleet to everyone. Fleet processes use
--- the service-role key, which bypasses RLS entirely (the old worker views).
+-- Each account sees its own rows. The worker table is scoped the same way:
+-- a tenant sees a worker once it has claimed one of their tasks (tracked by
+-- last_task_owner), so the agents page shows that account's slice of the fleet
+-- across idle, working, and dead states. Fleet processes use the service-role
+-- key, which bypasses RLS entirely (the old worker views).
 -- Writes never go through the tables: no insert/update/delete policies exist,
 -- so the definer functions below are the only write path.
 
@@ -308,14 +316,7 @@ create policy building_owner_read on building for select to authenticated
 create policy task_owner_read on task for select to authenticated
   using (owner = (select fp_owner()));
 create policy worker_fleet_read on worker for select to authenticated
-  using (
-    current_task_id is not null
-    and exists (
-      select 1 from task
-      where task.id = worker.current_task_id
-        and task.owner = (select fp_owner())
-    )
-  );
+  using (last_task_owner = (select fp_owner()));
 create policy submission_owner_read on submission for select to authenticated
   using (owner = (select fp_owner()));
 create policy approval_owner_read on approval for select to authenticated
@@ -793,7 +794,10 @@ begin
   end if;
 
   update worker
-  set status = 'working', current_task_id = p_task_id, last_heartbeat = now()
+  set status = 'working',
+      current_task_id = p_task_id,
+      last_task_owner = claimed.owner,
+      last_heartbeat = now()
   where id = p_worker_id;
 
   perform fp_log_event(claimed.owner, 'task_claimed',
