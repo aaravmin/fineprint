@@ -24,7 +24,10 @@ const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
 const REFRESH_DEBOUNCE_MS = 150;
 
 interface DbContextValue {
-  client: Db;
+  // Null until Clerk resolves the session and the client is built. The context
+  // is always present so children never crash for want of a provider; a null
+  // client just means "not connected yet".
+  client: Db | null;
   snapshots: Partial<Record<TableName, unknown[]>>;
   loadedTables: Partial<Record<TableName, boolean>>;
   connected: boolean;
@@ -126,17 +129,13 @@ export function DbProvider({ children }: { children: ReactNode }) {
     };
   }, [client, refreshTable]);
 
-  // Signed-out pages (landing, sign-in) render without a connection — every
-  // component that reads live data lives behind the dashboard's auth gate.
-  // While a signed-in session is still building its client, render nothing:
-  // dashboard components would otherwise mount without a provider and crash.
-  if (!client) {
-    if (!isLoaded) {
-      return null;
-    }
-    return <>{children}</>;
-  }
-
+  // Always render the provider, even before Clerk resolves the session or if
+  // the client never signs in. The dashboard layout renders live-data
+  // components (the event toaster, the notifications bell) as our children, and
+  // they call useTable during layout render — with no context above them that
+  // throws past the dashboard error boundary and white-screens every page. A
+  // null client reads as empty tables and refuses writes; it is never a missing
+  // provider.
   return (
     <DbContext.Provider value={{ client, snapshots, loadedTables, connected }}>
       {!connected && <ConnectionLostBanner />}
@@ -183,6 +182,9 @@ export function useReducer<Args>(token: ReducerToken<Args>): (args: Args) => Pro
 
   return useCallback(
     async (args: Args) => {
+      if (!client) {
+        throw new Error("Not connected to the database yet — try again in a moment.");
+      }
       const params = await token.toParams(args, client);
       // The RPC name is schema-checked; the params are assembled dynamically by
       // each descriptor, so they cross the typed-rpc boundary untyped.
