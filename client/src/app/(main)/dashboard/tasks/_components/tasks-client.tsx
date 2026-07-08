@@ -85,9 +85,17 @@ export function TasksClient() {
     const call =
       verdict === "approve"
         ? approve({ taskId: task.id, note: "approved from the dashboard" })
-        : reject({ taskId: task.id, note: "rejected from the dashboard; returned to the queue" });
+        : reject({
+            taskId: task.id,
+            note: "rejected from the dashboard; returned to the queue",
+          });
 
-    withAck(call, "The review verdict")
+    // Approving a building intake runs ingest_building, which creates the
+    // building and every per-law task in one call — longer than a normal
+    // reducer — so give it more headroom before declaring the ack lost.
+    const ackTimeoutMs = verdict === "approve" && task.kind === "building_intake" ? 20_000 : undefined;
+
+    withAck(call, "The review verdict", ackTimeoutMs)
       .then(() => {
         if (verdict === "approve") {
           toast.success("Draft approved");

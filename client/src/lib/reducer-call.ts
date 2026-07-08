@@ -4,9 +4,9 @@
 // into an honest error the caller can toast.
 const ACK_TIMEOUT_MS = 6_000;
 
-export function withAck(call: Promise<void>, label: string): Promise<void> {
+export function withAck(call: Promise<void>, label: string, timeoutMs: number = ACK_TIMEOUT_MS): Promise<void> {
   const timeout = new Promise<never>((_, reject) => {
-    setTimeout(() => reject(new Error(`${label} never reached the database — connection may be down`)), ACK_TIMEOUT_MS);
+    setTimeout(() => reject(new Error(`${label} never reached the database — connection may be down`)), timeoutMs);
   });
 
   return Promise.race([call, timeout]);
