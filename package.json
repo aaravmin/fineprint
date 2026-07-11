@@ -33,9 +33,9 @@
   },
   "devDependencies": {
     "tsx": "^4.19.2",
-    "@supabase/supabase-js": "^2.49.4",
-    "prettier": "^3.4.2",
-    "supabase": "^2.20.5"
+    "@supabase/supabase-js": "^2.110.2",
+    "prettier": "^3.9.5",
+    "supabase": "^2.109.1"
   },
   "overrides": {
     "next": {
