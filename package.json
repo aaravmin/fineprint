@@ -32,10 +32,10 @@
     "ingest": "tsx scripts/ingest.ts"
   },
   "devDependencies": {
-    "tsx": "^4.19.2",
-    "@supabase/supabase-js": "^2.49.4",
-    "prettier": "^3.4.2",
-    "supabase": "^2.20.5"
+    "tsx": "^4.23.1",
+    "@supabase/supabase-js": "^2.110.7",
+    "prettier": "^3.9.5",
+    "supabase": "^2.109.1"
   },
   "overrides": {
     "next": {
